@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/mat-1/skyblock-api/issues"
   },
-  "homepage": "https://github.com/mat-1/skyblock-api#readme"
+  "homepage": "https://github.com/mat-1/skyblock-api#readme",
+  "dependencies": {
+    "node-fetch": "^2.6.1"
+  }
 }
