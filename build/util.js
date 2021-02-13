@@ -1,5 +1,7 @@
 "use strict";
-/* Utility functions (not related to Hypixel) */
+/**
+ * Random utility functions that are not related to Hypixel
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.colorCodeFromName = exports.minecraftColorCodes = exports.shuffle = exports.jsonToQuery = exports.queryToJson = exports.undashUuid = void 0;
 function undashUuid(uuid) {

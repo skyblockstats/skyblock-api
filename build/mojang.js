@@ -1,4 +1,7 @@
 "use strict";
+/**
+ * Fetch the Mojang username API through api.ashcon.app
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };

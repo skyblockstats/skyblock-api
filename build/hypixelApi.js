@@ -4,6 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendApiRequest = exports.chooseApiKey = void 0;
+/**
+ * Fetch the raw Hypixel API
+ */
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const util_1 = require("./util");
 const https_1 = require("https");
@@ -13,7 +16,7 @@ const httpsAgent = new https_1.Agent({
     keepAlive: true
 });
 /* Lower level code related to the Hypixel api */
-const apiKeys = process.env.keys.split(' ');
+const apiKeys = process.env.hypixel_keys.split(' ');
 const apiKeyUsage = {};
 const baseHypixelAPI = 'https://api.hypixel.net';
 /** Choose the best current API key */

@@ -1,4 +1,7 @@
 "use strict";
+/**
+ * Fetch the clean and cached Hypixel API
+ */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
@@ -27,10 +30,6 @@ const node_cache_1 = __importDefault(require("node-cache"));
 const mojang = __importStar(require("./mojang"));
 const hypixel = __importStar(require("./hypixel"));
 const util_1 = require("./util");
-/**
-Hypixel... but with caching
-All the caching in this project is done here!
-*/
 // cache usernames for 4 hours
 const usernameCache = new node_cache_1.default({
     stdTTL: 60 * 60 * 4,
