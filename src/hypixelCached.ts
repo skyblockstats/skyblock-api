@@ -190,7 +190,8 @@ export async function fetchProfileUuid(user: string, profile: string) {
  * @param profile A profile name or profile uuid
  */
 export async function fetchProfile(user: string, profile: string): Promise<CleanFullProfile> {
-	const profileUuid = await fetchProfileUuid(user, profile)
+	const playerUuid = await uuidFromUser(user)
+	const profileUuid = await fetchProfileUuid(playerUuid, profile)
 
 	if (profileCache.has(profileUuid)) {
 		console.log('cache hit! fetchProfile')
@@ -200,12 +201,14 @@ export async function fetchProfile(user: string, profile: string): Promise<Clean
 
 	const profileName = await fetchProfileName(user, profile)
 
-	const cleanProfile: CleanFullProfile = await hypixel.sendCleanApiRequest({
-        path: 'skyblock/profile',
-        args: {
-            profile: profileUuid
-        }
-    })
+	const cleanProfile: CleanFullProfile = await hypixel.sendCleanApiRequest(
+		{
+			path: 'skyblock/profile',
+			args: { profile: profileUuid }
+		},
+		null,
+		{ mainMemberUuid: playerUuid }
+	)
 
 	// we know the name from fetchProfileName, so set it here
 	cleanProfile.name = profileName
