@@ -6,9 +6,10 @@ const hypixel_1 = require("../../hypixel");
  * Clean the minions provided by Hypixel
  * @param minionsRaw The minion data provided by the Hypixel API
  */
-function cleanMinions(minionsRaw) {
+function cleanMinions(data) {
+    var _a;
     const minions = [];
-    for (const minionRaw of minionsRaw !== null && minionsRaw !== void 0 ? minionsRaw : []) {
+    for (const minionRaw of (_a = data === null || data === void 0 ? void 0 : data.crafted_generators) !== null && _a !== void 0 ? _a : []) {
         // do some regex magic to get the minion name and level
         // examples of potential minion names: CLAY_11, PIG_1, MAGMA_CUBE_4
         const minionName = minionRaw.split(/_\d/)[0].toLowerCase();

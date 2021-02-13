@@ -22,7 +22,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchUser = exports.sendCleanApiRequest = exports.maxMinion = exports.saveInterval = void 0;
+exports.fetchMemberProfile = exports.fetchUser = exports.sendCleanApiRequest = exports.maxMinion = exports.saveInterval = void 0;
 const player_1 = require("./cleaners/player");
 const hypixelApi_1 = require("./hypixelApi");
 const cached = __importStar(require("./hypixelCached"));
@@ -108,3 +108,28 @@ async function fetchUser({ user, uuid, username }, included = ['player']) {
     };
 }
 exports.fetchUser = fetchUser;
+/**
+ * Fetch a CleanMemberProfile from a user and string
+ * This is safe to use many times as the results are cached!
+ * @param user A username or uuid
+ * @param profile A profile name or profile uuid
+ */
+async function fetchMemberProfile(user, profile) {
+    const playerUuid = await cached.uuidFromUser(user);
+    const profileUuid = await cached.fetchProfileUuid(user, profile);
+    const player = await cached.fetchPlayer(playerUuid);
+    const cleanProfile = await cached.fetchProfile(playerUuid, profileUuid);
+    const member = cleanProfile.members.find(m => m.uuid === playerUuid);
+    return {
+        member: {
+            // the profile name is in member rather than profile since they sometimes differ for each member
+            profileName: cleanProfile.name,
+            // add all the member data
+            ...member,
+            // add all other data relating to the hypixel player, such as username, rank, etc
+            ...player
+        },
+        profile: cleanProfile
+    };
+}
+exports.fetchMemberProfile = fetchMemberProfile;

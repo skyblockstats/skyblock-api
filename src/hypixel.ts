@@ -116,3 +116,31 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
     }
 }
 
+/**
+ * Fetch a CleanMemberProfile from a user and string
+ * This is safe to use many times as the results are cached!
+ * @param user A username or uuid
+ * @param profile A profile name or profile uuid
+ */
+export async function fetchMemberProfile(user: string, profile: string): Promise<CleanMemberProfile> {
+    const playerUuid = await cached.uuidFromUser(user)
+    const profileUuid = await cached.fetchProfileUuid(user, profile)
+
+    const player = await cached.fetchPlayer(playerUuid)
+
+    const cleanProfile = await cached.fetchProfile(playerUuid, profileUuid)
+
+    const member = cleanProfile.members.find(m => m.uuid === playerUuid)
+
+    return {
+        member: {
+			// the profile name is in member rather than profile since they sometimes differ for each member
+            profileName: cleanProfile.name,
+			// add all the member data
+            ...member,
+            // add all other data relating to the hypixel player, such as username, rank, etc
+            ...player
+        },
+        profile: cleanProfile
+    }
+}

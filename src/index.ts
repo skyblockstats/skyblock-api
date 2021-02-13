@@ -1,5 +1,4 @@
-import { fetchMemberProfile } from './cleaners/skyblock/profile'
-import { fetchUser } from './hypixel'
+import { fetchMemberProfile, fetchUser } from './hypixel'
 import express from 'express'
 
 const app = express()
