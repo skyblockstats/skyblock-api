@@ -1,6 +1,7 @@
 import { Included } from '../../hypixel'
 import * as cached from '../../hypixelCached'
 import { CleanPlayer } from '../player'
+import { Bank, cleanBank } from './bank'
 import { CleanMinion, cleanMinions } from './minions'
 import { CleanProfileStats, cleanProfileStats } from './stats'
 
@@ -14,6 +15,7 @@ export interface CleanBasicMember {
 export interface CleanMember extends CleanBasicMember {
     stats?: CleanProfileStats
     minions?: CleanMinion[]
+	bank?: Bank
 }
 
 
@@ -27,8 +29,8 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
         last_save: member.last_save,
         first_join: member.first_join,
         // last_death: ??? idk how this is formatted,
-        stats: statsIncluded ? cleanProfileStats(member.stats) : undefined,
-        minions: statsIncluded ? cleanMinions(member.crafted_generators) : undefined,
+        stats: statsIncluded ? cleanProfileStats(member?.stats) : undefined,
+        minions: statsIncluded ? cleanMinions(member?.crafted_generators) : undefined,
     }
 }
 
@@ -38,10 +40,7 @@ export interface CleanMemberProfilePlayer extends CleanPlayer {
     profileName: string
     first_join: number
     last_save: number
-    bank?: {
-        balance: number
-        history: any[]
-    }
+    bank?: Bank
 }
 
 export interface CleanMemberProfile {

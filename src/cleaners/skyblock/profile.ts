@@ -1,6 +1,7 @@
-import { CleanBasicMember, CleanMember, cleanSkyBlockProfileMemberResponse } from './member'
+import { CleanBasicMember, CleanMember, CleanMemberProfile, cleanSkyBlockProfileMemberResponse } from './member'
 import { CleanMinion, combineMinionArrays } from './minions'
-
+import * as cached from '../../hypixelCached'
+import { cleanBank } from './bank'
 
 export interface CleanProfile extends CleanBasicProfile {
     members?: CleanBasicMember[]
@@ -59,12 +60,7 @@ export async function cleanSkyblockProfileResponse(data: any): Promise<CleanFull
         uuid: data.profile_id,
         name: data.cute_name,
         members: cleanedMembers,
-        bank: {
-            balance: data?.banking?.balance ?? 0,
-
-            // TODO: make transactions good
-            history: data?.banking?.transactions ?? []
-        },
+        bank: cleanBank(data),
         minions
     }
 }
@@ -77,3 +73,35 @@ export interface CleanBasicProfile {
     name?: string
 }
 
+// TODO: this should be moved and split up
+/**
+ * Fetch a CleanMemberProfile from a user and string
+ * This is safe to use many times as the results are cached!
+ * @param user A username or uuid
+ * @param profile A profile name or profile uuid
+ */
+export async function fetchMemberProfile(user: string, profile: string): Promise<CleanMemberProfile> {
+    const playerUuid = await cached.uuidFromUser(user)
+    const profileUuid = await cached.fetchProfileUuid(user, profile)
+
+    const player = await cached.fetchPlayer(playerUuid)
+
+    const cleanProfile = await cached.fetchProfile(playerUuid, profileUuid)
+
+    const member = cleanProfile.members.find(m => m.uuid === playerUuid)
+
+    return {
+        member: {
+            profileName: cleanProfile.name,
+            first_join: member.first_join,
+            last_save: member.last_save,
+            // add all other data relating to the hypixel player, such as username, rank, etc
+            ...player
+        },
+        profile: {
+			uuid: cleanProfile.uuid,
+			bank: cleanProfile.bank,
+            minions: cleanProfile.minions,
+        }
+    }
+}

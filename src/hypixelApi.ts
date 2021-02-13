@@ -14,8 +14,8 @@ const httpsAgent = new Agent({
 	keepAlive: true
 })
 
-/* Lower level code related to the Hypixel api */
 
+/** This array should only ever contain one item because using multiple hypixel api keys isn't allowed :) */ 
 const apiKeys = process.env.hypixel_keys.split(' ')
 
 interface KeyUsage {
@@ -28,6 +28,7 @@ const apiKeyUsage: { [ key: string ]: KeyUsage } = {}
 
 
 const baseHypixelAPI = 'https://api.hypixel.net'
+
 
 /** Choose the best current API key */
 export function chooseApiKey(): string {
