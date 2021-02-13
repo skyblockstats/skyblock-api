@@ -23,6 +23,7 @@ async function cleanSkyblockProfileResponseLighter(data) {
 exports.cleanSkyblockProfileResponseLighter = cleanSkyblockProfileResponseLighter;
 /** This function is somewhat costly and shouldn't be called often. Use cleanSkyblockProfileResponseLighter if you don't need all the data */
 async function cleanSkyblockProfileResponse(data) {
+    var _a, _b, _c, _d;
     const cleanedMembers = [];
     for (const memberUUID in data.members) {
         const memberRaw = data.members[memberUUID];
@@ -41,9 +42,9 @@ async function cleanSkyblockProfileResponse(data) {
         name: data.cute_name,
         members: cleanedMembers,
         bank: {
-            balance: data?.banking?.balance ?? 0,
+            balance: (_b = (_a = data === null || data === void 0 ? void 0 : data.banking) === null || _a === void 0 ? void 0 : _a.balance) !== null && _b !== void 0 ? _b : 0,
             // TODO: make transactions good
-            history: data?.banking?.transactions ?? []
+            history: (_d = (_c = data === null || data === void 0 ? void 0 : data.banking) === null || _c === void 0 ? void 0 : _c.transactions) !== null && _d !== void 0 ? _d : []
         },
         minions
     };

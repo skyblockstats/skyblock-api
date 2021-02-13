@@ -101,9 +101,9 @@ async function fetchUser({ user, uuid, username }, included = ['player']) {
         }
     }
     return {
-        player: playerData ?? null,
-        profiles: profilesData ?? basicProfilesData,
-        activeProfile: includeProfiles ? activeProfile?.uuid : undefined,
+        player: playerData !== null && playerData !== void 0 ? playerData : null,
+        profiles: profilesData !== null && profilesData !== void 0 ? profilesData : basicProfilesData,
+        activeProfile: includeProfiles ? activeProfile === null || activeProfile === void 0 ? void 0 : activeProfile.uuid : undefined,
         online: includeProfiles ? lastOnline > (Date.now() - exports.saveInterval) : undefined
     };
 }

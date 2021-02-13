@@ -8,7 +8,7 @@ const hypixel_1 = require("../../hypixel");
  */
 function cleanMinions(minionsRaw) {
     const minions = [];
-    for (const minionRaw of minionsRaw ?? []) {
+    for (const minionRaw of minionsRaw !== null && minionsRaw !== void 0 ? minionsRaw : []) {
         // do some regex magic to get the minion name and level
         // examples of potential minion names: CLAY_11, PIG_1, MAGMA_CUBE_4
         const minionName = minionRaw.split(/_\d/)[0].toLowerCase();
