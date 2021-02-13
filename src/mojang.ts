@@ -1,3 +1,7 @@
+/**
+ * Fetch the Mojang username API through api.ashcon.app
+ */
+
 import fetch from 'node-fetch'
 import { Agent } from 'https'
 

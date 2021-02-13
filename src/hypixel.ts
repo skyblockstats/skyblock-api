@@ -1,7 +1,9 @@
-import { CleanMinion, cleanMinions, combineMinionArrays } from './cleaners/skyblock/minions'
-import { CleanProfileStats, cleanProfileStats } from './cleaners/skyblock/stats'
+/**
+ * Fetch the clean Hypixel API
+ */
+
 import { CleanPlayer, cleanPlayerResponse } from './cleaners/player'
-import { chooseApiKey, HypixelPlayerStatsSkyBlockProfiles, HypixelResponse, sendApiRequest } from './hypixelApi'
+import { chooseApiKey, HypixelResponse, sendApiRequest } from './hypixelApi'
 import * as cached from './hypixelCached'
 import { CleanMemberProfile } from './cleaners/skyblock/member'
 import { cleanSkyblockProfileResponse, CleanProfile, CleanBasicProfile } from './cleaners/skyblock/profile'

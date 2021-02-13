@@ -1,14 +1,13 @@
+/**
+ * Fetch the clean and cached Hypixel API
+ */
+
 import NodeCache from 'node-cache'
 import * as mojang from './mojang'
 import * as hypixel from './hypixel'
 import { CleanPlayer } from './cleaners/player'
 import { undashUuid } from './util'
 import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/skyblock/profile'
-
-/**
-Hypixel... but with caching
-All the caching in this project is done here!
-*/
 
 
 // cache usernames for 4 hours

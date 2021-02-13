@@ -61,7 +61,7 @@ export interface CleanProfileStats {
     }
 }
 
-export function cleanProfileStats(statsRaw): CleanProfileStats {
+export function cleanProfileStats(statsRaw: any): CleanProfileStats {
     // TODO: add type for statsRaw (probably in hypixelApi.ts since its coming from there)
     const stats: CleanProfileStats = {}
     for (let statNameRaw in statsRaw) {

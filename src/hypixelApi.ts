@@ -1,3 +1,6 @@
+/**
+ * Fetch the raw Hypixel API
+ */
 import fetch from 'node-fetch'
 import { jsonToQuery, shuffle } from './util'
 import { Agent } from 'https'
@@ -10,7 +13,7 @@ const httpsAgent = new Agent({
 
 /* Lower level code related to the Hypixel api */
 
-const apiKeys = process.env.keys.split(' ')
+const apiKeys = process.env.hypixel_keys.split(' ')
 
 interface KeyUsage {
 	remaining: number
