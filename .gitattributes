@@ -1,1 +1,2 @@
 *.ts linguist-detectable
+*.js -linguist-detectable
