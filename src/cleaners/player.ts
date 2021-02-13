@@ -1,8 +1,9 @@
-import { CleanBasicProfile, cleanPlayerSkyblockProfiles, Included } from '../hypixel'
 import { CleanSocialMedia, parseSocialMedia } from './socialmedia'
 import { CleanRank, parseRank } from './rank'
 import { HypixelPlayer } from '../hypixelApi'
 import { undashUuid } from '../util'
+import { CleanBasicProfile } from './skyblock/profile'
+import { cleanPlayerSkyblockProfiles } from './skyblock/profiles'
 
 export interface CleanBasicPlayer {
     uuid: string

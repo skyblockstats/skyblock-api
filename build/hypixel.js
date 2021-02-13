@@ -19,12 +19,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchMemberProfile = exports.fetchUser = exports.cleanPlayerSkyblockProfiles = exports.sendCleanApiRequest = exports.maxMinion = exports.saveInterval = void 0;
-const minions_1 = require("./cleaners/skyblock/minions");
-const stats_1 = require("./cleaners/skyblock/stats");
+exports.fetchMemberProfile = exports.fetchUser = exports.sendCleanApiRequest = exports.maxMinion = exports.saveInterval = void 0;
 const player_1 = require("./cleaners/player");
 const hypixelApi_1 = require("./hypixelApi");
 const cached = __importStar(require("./hypixelCached"));
+const profile_1 = require("./cleaners/skyblock/profile");
+const profiles_1 = require("./cleaners/skyblock/profiles");
 // the interval at which the "last_save" parameter updates in the hypixel api, this is 3 minutes
 exports.saveInterval = 60 * 3 * 1000;
 // the highest level a minion can be
@@ -52,91 +52,12 @@ async function sendCleanApiRequest({ path, args }, included, cleaned = true) {
     }
 }
 exports.sendCleanApiRequest = sendCleanApiRequest;
-async function cleanSkyBlockProfileMemberResponse(member, included = null) {
-    // Cleans up a member (from skyblock/profile)
-    // profiles.members[]
-    const statsIncluded = included == null || included.includes('stats');
-    return {
-        uuid: member.uuid,
-        username: await cached.usernameFromUser(member.uuid),
-        last_save: member.last_save,
-        first_join: member.first_join,
-        // last_death: ??? idk how this is formatted,
-        stats: statsIncluded ? stats_1.cleanProfileStats(member.stats) : undefined,
-        minions: statsIncluded ? minions_1.cleanMinions(member.crafted_generators) : undefined,
-    };
-}
-/** Return a `CleanProfile` instead of a `CleanFullProfile`, useful when we need to get members but don't want to waste much ram */
-async function cleanSkyblockProfileResponseLighter(data) {
-    // We use Promise.all so it can fetch all the usernames at once instead of waiting for the previous promise to complete
-    const promises = [];
-    for (const memberUUID in data.members) {
-        const memberRaw = data.members[memberUUID];
-        memberRaw.uuid = memberUUID;
-        // we pass an empty array to make it not check stats
-        promises.push(cleanSkyBlockProfileMemberResponse(memberRaw, []));
-    }
-    const cleanedMembers = await Promise.all(promises);
-    return {
-        uuid: data.profile_id,
-        name: data.cute_name,
-        members: cleanedMembers,
-    };
-}
-/** This function is very costly and shouldn't be called often. Use cleanSkyblockProfileResponseLighter if you don't need all the data */
-async function cleanSkyblockProfileResponse(data) {
-    const cleanedMembers = [];
-    for (const memberUUID in data.members) {
-        const memberRaw = data.members[memberUUID];
-        memberRaw.uuid = memberUUID;
-        const member = await cleanSkyBlockProfileMemberResponse(memberRaw, ['stats']);
-        cleanedMembers.push(member);
-    }
-    const memberMinions = [];
-    for (const member of cleanedMembers) {
-        memberMinions.push(member.minions);
-    }
-    const minions = minions_1.combineMinionArrays(memberMinions);
-    // return more detailed info
-    return {
-        uuid: data.profile_id,
-        name: data.cute_name,
-        members: cleanedMembers,
-        bank: {
-            balance: data?.banking?.balance ?? 0,
-            // TODO: make transactions good
-            history: data?.banking?.transactions ?? []
-        },
-        minions
-    };
-}
-function cleanPlayerSkyblockProfiles(rawProfiles) {
-    let profiles = [];
-    for (const profile of Object.values(rawProfiles)) {
-        profiles.push({
-            uuid: profile.profile_id,
-            name: profile.cute_name
-        });
-    }
-    console.log('cleanPlayerSkyblockProfiles', profiles);
-    return profiles;
-}
-exports.cleanPlayerSkyblockProfiles = cleanPlayerSkyblockProfiles;
-/** Convert an array of raw profiles into clean profiles */
-async function cleanSkyblockProfilesResponse(data) {
-    const cleanedProfiles = [];
-    for (const profile of data) {
-        let cleanedProfile = await cleanSkyblockProfileResponseLighter(profile);
-        cleanedProfiles.push(cleanedProfile);
-    }
-    return cleanedProfiles;
-}
 async function cleanResponse({ path, data }, included) {
     // Cleans up an api response
     switch (path) {
         case 'player': return await player_1.cleanPlayerResponse(data.player);
-        case 'skyblock/profile': return await cleanSkyblockProfileResponse(data.profile);
-        case 'skyblock/profiles': return await cleanSkyblockProfilesResponse(data.profiles);
+        case 'skyblock/profile': return await profile_1.cleanSkyblockProfileResponse(data.profile);
+        case 'skyblock/profiles': return await profiles_1.cleanSkyblockProfilesResponse(data.profiles);
     }
 }
 /**

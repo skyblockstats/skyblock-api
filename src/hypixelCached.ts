@@ -2,8 +2,8 @@ import NodeCache from 'node-cache'
 import * as mojang from './mojang'
 import * as hypixel from './hypixel'
 import { CleanPlayer } from './cleaners/player'
-import { CleanBasicProfile, CleanFullProfile, CleanProfile } from './hypixel'
 import { undashUuid } from './util'
+import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/skyblock/profile'
 
 /**
 Hypixel... but with caching

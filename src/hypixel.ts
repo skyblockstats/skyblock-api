@@ -3,6 +3,9 @@ import { CleanProfileStats, cleanProfileStats } from './cleaners/skyblock/stats'
 import { CleanPlayer, cleanPlayerResponse } from './cleaners/player'
 import { chooseApiKey, HypixelPlayerStatsSkyBlockProfiles, HypixelResponse, sendApiRequest } from './hypixelApi'
 import * as cached from './hypixelCached'
+import { CleanMemberProfile } from './cleaners/skyblock/member'
+import { cleanSkyblockProfileResponse, CleanProfile, CleanBasicProfile } from './cleaners/skyblock/profile'
+import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles'
 
 export type Included = 'profiles' | 'player' | 'stats'
 
@@ -34,148 +37,7 @@ export async function sendCleanApiRequest({ path, args }, included?: Included[],
     }
 }
 
-export interface CleanBasicMember {
-    uuid: string
-    username: string
-    last_save: number
-    first_join: number
-}
 
-interface CleanMember extends CleanBasicMember {
-    stats?: CleanProfileStats
-    minions?: CleanMinion[]
-}
-
-async function cleanSkyBlockProfileMemberResponse(member, included: Included[] = null): Promise<CleanMember> {
-    // Cleans up a member (from skyblock/profile)
-    // profiles.members[]
-    const statsIncluded = included == null || included.includes('stats')
-    return {
-        uuid: member.uuid,
-        username: await cached.usernameFromUser(member.uuid),
-        last_save: member.last_save,
-        first_join: member.first_join,
-        // last_death: ??? idk how this is formatted,
-        stats: statsIncluded ? cleanProfileStats(member.stats) : undefined,
-        minions: statsIncluded ? cleanMinions(member.crafted_generators) : undefined,
-    }
-}
-
-
-export interface CleanMemberProfilePlayer extends CleanPlayer {
-    // The profile name may be different for each player, so we put it here
-    profileName: string
-    first_join: number
-    last_save: number
-    bank?: {
-        balance: number
-        history: any[]
-    }
-}
-
-export interface CleanMemberProfile {
-    member: CleanMemberProfilePlayer
-    profile: {
-        
-    }
-}
-
-export interface CleanProfile extends CleanBasicProfile {
-    members?: CleanBasicMember[]
-}
-
-export interface CleanFullProfile extends CleanProfile {
-    members: CleanMember[]
-    bank?: {
-        balance: number
-        history: any[]
-    }
-    minions: CleanMinion[]
-}
-
-/** Return a `CleanProfile` instead of a `CleanFullProfile`, useful when we need to get members but don't want to waste much ram */
-async function cleanSkyblockProfileResponseLighter(data): Promise<CleanProfile> {
-    // We use Promise.all so it can fetch all the usernames at once instead of waiting for the previous promise to complete
-    const promises: Promise<CleanMember>[] = []
-
-    for (const memberUUID in data.members) {
-        const memberRaw = data.members[memberUUID]
-        memberRaw.uuid = memberUUID
-        // we pass an empty array to make it not check stats
-        promises.push(cleanSkyBlockProfileMemberResponse(memberRaw, []))
-    }
-
-    const cleanedMembers: CleanMember[] = await Promise.all(promises)
-
-    return {
-        uuid: data.profile_id,
-        name: data.cute_name,
-        members: cleanedMembers,
-    }
-}
-
-/** This function is very costly and shouldn't be called often. Use cleanSkyblockProfileResponseLighter if you don't need all the data */
-async function cleanSkyblockProfileResponse(data: any): Promise<CleanFullProfile> {
-    const cleanedMembers: CleanMember[] = []
-
-    for (const memberUUID in data.members) {
-        const memberRaw = data.members[memberUUID]
-        memberRaw.uuid = memberUUID
-        const member: CleanMember = await cleanSkyBlockProfileMemberResponse(memberRaw, ['stats'])
-        cleanedMembers.push(member)
-    }
-
-    const memberMinions: CleanMinion[][] = []
-
-    for (const member of cleanedMembers) {
-        memberMinions.push(member.minions)
-    }
-    const minions: CleanMinion[] = combineMinionArrays(memberMinions)
-
-    // return more detailed info
-    return {
-        uuid: data.profile_id,
-        name: data.cute_name,
-        members: cleanedMembers,
-        bank: {
-            balance: data?.banking?.balance ?? 0,
-
-            // TODO: make transactions good
-            history: data?.banking?.transactions ?? []
-        },
-        minions
-    }
-}
-
-/** A basic profile that only includes the profile uuid and name */
-export interface CleanBasicProfile {
-    uuid: string
-
-    // the name depends on the user, so its sometimes not included
-    name?: string
-}
-
-export function cleanPlayerSkyblockProfiles(rawProfiles: HypixelPlayerStatsSkyBlockProfiles): CleanBasicProfile[] {
-    let profiles: CleanBasicProfile[] = []
-    for (const profile of Object.values(rawProfiles)) {
-        profiles.push({
-            uuid: profile.profile_id,
-            name: profile.cute_name
-        })
-    }
-    console.log('cleanPlayerSkyblockProfiles', profiles)
-    return profiles
-}
-
-/** Convert an array of raw profiles into clean profiles */
-async function cleanSkyblockProfilesResponse(data: any[]): Promise<CleanProfile[]> {
-    const cleanedProfiles: CleanProfile[] = []
-    for (const profile of data) {
-        let cleanedProfile = await cleanSkyblockProfileResponseLighter(profile)
-        cleanedProfiles.push(cleanedProfile)
-    }
-    return cleanedProfiles
-}
 
 async function cleanResponse({ path, data }: { path: string, data: HypixelResponse }, included?: Included[]) {
     // Cleans up an api response
