@@ -3,8 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
+const profile_1 = require("./cleaners/skyblock/profile");
 const hypixel_1 = require("./hypixel");
+const express_1 = __importDefault(require("express"));
 const app = express_1.default();
 app.use((req, res, next) => {
     if (process.env.key && req.headers.key !== process.env.key)
@@ -20,6 +21,6 @@ app.get('/player/:user', async (req, res) => {
     res.json(await hypixel_1.fetchUser({ user: req.params.user }, ['profiles', 'player']));
 });
 app.get('/player/:user/:profile', async (req, res) => {
-    res.json(await hypixel_1.fetchMemberProfile(req.params.user, req.params.profile));
+    res.json(await profile_1.fetchMemberProfile(req.params.user, req.params.profile));
 });
 app.listen(8080, () => console.log('App started :)'));

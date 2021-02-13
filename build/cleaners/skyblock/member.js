@@ -33,8 +33,8 @@ async function cleanSkyBlockProfileMemberResponse(member, included = null) {
         last_save: member.last_save,
         first_join: member.first_join,
         // last_death: ??? idk how this is formatted,
-        stats: statsIncluded ? stats_1.cleanProfileStats(member.stats) : undefined,
-        minions: statsIncluded ? minions_1.cleanMinions(member.crafted_generators) : undefined,
+        stats: statsIncluded ? stats_1.cleanProfileStats(member === null || member === void 0 ? void 0 : member.stats) : undefined,
+        minions: statsIncluded ? minions_1.cleanMinions(member === null || member === void 0 ? void 0 : member.crafted_generators) : undefined,
     };
 }
 exports.cleanSkyBlockProfileMemberResponse = cleanSkyBlockProfileMemberResponse;

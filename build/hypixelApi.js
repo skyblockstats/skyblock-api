@@ -10,12 +10,14 @@ exports.sendApiRequest = exports.chooseApiKey = void 0;
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const util_1 = require("./util");
 const https_1 = require("https");
-require('dotenv').config();
+if (!process.env.hypixel_keys)
+    // if there's no hypixel keys in env, run dotenv
+    require('dotenv').config();
 // We need to create an agent to prevent memory leaks and to only do dns lookups once
 const httpsAgent = new https_1.Agent({
     keepAlive: true
 });
-/* Lower level code related to the Hypixel api */
+/** This array should only ever contain one item because using multiple hypixel api keys isn't allowed :) */
 const apiKeys = process.env.hypixel_keys.split(' ');
 const apiKeyUsage = {};
 const baseHypixelAPI = 'https://api.hypixel.net';
