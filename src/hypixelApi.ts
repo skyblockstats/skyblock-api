@@ -4,7 +4,10 @@
 import fetch from 'node-fetch'
 import { jsonToQuery, shuffle } from './util'
 import { Agent } from 'https'
-require('dotenv').config()
+
+if (!process.env.hypixel_keys)
+	// if there's no hypixel keys in env, run dotenv
+	require('dotenv').config()
 
 // We need to create an agent to prevent memory leaks and to only do dns lookups once
 const httpsAgent = new Agent({
