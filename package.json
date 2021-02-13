@@ -26,6 +26,7 @@
   "homepage": "https://github.com/mat-1/skyblock-api#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "node-cache": "^5.1.2",
     "node-fetch": "^2.6.1"
   }
 }
