@@ -3,7 +3,8 @@
 	  "module": "commonjs",
 	  "lib": ["esnext", "dom", "DOM.Iterable"],
 	  "target": "esnext",
-	  "esModuleInterop": true
+	  "esModuleInterop": true,
+	  "outDir": "build"
 	},
 	"include": ["**/*"],
 	"exclude": ["node_modules"],
