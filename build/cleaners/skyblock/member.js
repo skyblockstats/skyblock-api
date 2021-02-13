@@ -22,6 +22,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.cleanSkyBlockProfileMemberResponse = void 0;
 const cached = __importStar(require("../../hypixelCached"));
 const fairysouls_1 = require("./fairysouls");
+const inventory_1 = require("./inventory");
 const minions_1 = require("./minions");
 const stats_1 = require("./stats");
 /** Cleans up a member (from skyblock/profile) */
@@ -36,7 +37,8 @@ async function cleanSkyBlockProfileMemberResponse(member, included = null) {
         // last_death: ??? idk how this is formatted,
         stats: statsIncluded ? stats_1.cleanProfileStats(member === null || member === void 0 ? void 0 : member.stats) : undefined,
         minions: statsIncluded ? minions_1.cleanMinions(member) : undefined,
-        fairy_souls: statsIncluded ? fairysouls_1.cleanFairySouls(member) : undefined
+        fairy_souls: statsIncluded ? fairysouls_1.cleanFairySouls(member) : undefined,
+        inventories: statsIncluded ? await inventory_1.cleanInventories(member) : undefined,
     };
 }
 exports.cleanSkyBlockProfileMemberResponse = cleanSkyBlockProfileMemberResponse;

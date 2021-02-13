@@ -1,9 +1,11 @@
 import { Included } from '../../hypixel'
 import * as cached from '../../hypixelCached'
 import { CleanPlayer } from '../player'
-import { Bank, cleanBank } from './bank'
+import { Bank } from './bank'
 import { cleanFairySouls, FairySouls } from './fairysouls'
+import { cleanInventories, INVENTORIES } from './inventory'
 import { CleanMinion, cleanMinions } from './minions'
+import { CleanFullProfile } from './profile'
 import { CleanProfileStats, cleanProfileStats } from './stats'
 
 export interface CleanBasicMember {
@@ -18,6 +20,7 @@ export interface CleanMember extends CleanBasicMember {
     minions?: CleanMinion[]
 	bank?: Bank
 	fairy_souls?: FairySouls
+    inventories: typeof INVENTORIES
 }
 
 
@@ -33,7 +36,8 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
         // last_death: ??? idk how this is formatted,
         stats: statsIncluded ? cleanProfileStats(member?.stats) : undefined,
         minions: statsIncluded ? cleanMinions(member) : undefined,
-		fairy_souls: statsIncluded ? cleanFairySouls(member) : undefined
+		fairy_souls: statsIncluded ? cleanFairySouls(member) : undefined,
+		inventories: statsIncluded ? await cleanInventories(member) : undefined,
     }
 }
 
@@ -48,7 +52,5 @@ export interface CleanMemberProfilePlayer extends CleanPlayer {
 
 export interface CleanMemberProfile {
     member: CleanMemberProfilePlayer
-    profile: {
-        
-    }
+    profile: CleanFullProfile
 }
