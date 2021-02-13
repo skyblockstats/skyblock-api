@@ -10,9 +10,9 @@ export interface CleanMinion {
  * Clean the minions provided by Hypixel
  * @param minionsRaw The minion data provided by the Hypixel API
  */
-export function cleanMinions(minionsRaw: string[]): CleanMinion[] {
+export function cleanMinions(data: any): CleanMinion[] {
     const minions: CleanMinion[] = []
-    for (const minionRaw of minionsRaw ?? []) {
+    for (const minionRaw of data?.crafted_generators ?? []) {
         // do some regex magic to get the minion name and level
         // examples of potential minion names: CLAY_11, PIG_1, MAGMA_CUBE_4
         const minionName = minionRaw.split(/_\d/)[0].toLowerCase()

@@ -81,6 +81,7 @@ async function fetchMemberProfile(user, profile) {
     const member = cleanProfile.members.find(m => m.uuid === playerUuid);
     return {
         member: {
+            // the profile name is in member rather than profile since they sometimes differ for each member
             profileName: cleanProfile.name,
             first_join: member.first_join,
             last_save: member.last_save,
@@ -91,6 +92,7 @@ async function fetchMemberProfile(user, profile) {
             uuid: cleanProfile.uuid,
             bank: cleanProfile.bank,
             minions: cleanProfile.minions,
+            minion_count: minions_1.countUniqueMinions(cleanProfile.minions)
         }
     };
 }

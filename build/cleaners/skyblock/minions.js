@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.combineMinionArrays = exports.cleanMinions = void 0;
+exports.countUniqueMinions = exports.combineMinionArrays = exports.cleanMinions = void 0;
 const hypixel_1 = require("../../hypixel");
 /**
  * Clean the minions provided by Hypixel
@@ -61,3 +61,12 @@ function combineMinionArrays(minions) {
     return resultMinions;
 }
 exports.combineMinionArrays = combineMinionArrays;
+function countUniqueMinions(minions) {
+    let uniqueMinions = 0;
+    for (const minion of minions) {
+        // find the number of times `true` is in the list and add it to uniqueMinions
+        uniqueMinions += minion.levels.filter(x => x).length;
+    }
+    return uniqueMinions;
+}
+exports.countUniqueMinions = countUniqueMinions;

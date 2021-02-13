@@ -1,7 +1,8 @@
 import { CleanBasicMember, CleanMember, CleanMemberProfile, cleanSkyBlockProfileMemberResponse } from './member'
 import { CleanMinion, combineMinionArrays, countUniqueMinions } from './minions'
 import * as cached from '../../hypixelCached'
-import { cleanBank } from './bank'
+import { Bank, cleanBank } from './bank'
+import { cleanFairySouls, FairySouls } from './fairysouls'
 
 export interface CleanProfile extends CleanBasicProfile {
     members?: CleanBasicMember[]
@@ -9,10 +10,7 @@ export interface CleanProfile extends CleanBasicProfile {
 
 export interface CleanFullProfile extends CleanProfile {
     members: CleanMember[]
-    bank?: {
-        balance: number
-        history: any[]
-    }
+    bank?: Bank
     minions: CleanMinion[]
 }
 
@@ -94,8 +92,8 @@ export async function fetchMemberProfile(user: string, profile: string): Promise
         member: {
 			// the profile name is in member rather than profile since they sometimes differ for each member
             profileName: cleanProfile.name,
-            first_join: member.first_join,
-            last_save: member.last_save,
+			// add all the member data
+            ...member,
             // add all other data relating to the hypixel player, such as username, rank, etc
             ...player
         },

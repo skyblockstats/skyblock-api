@@ -152,7 +152,8 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 	
 	const fetchJsonParsed = await fetchResponse.json()
 	if (fetchJsonParsed.throttle) {
-		apiKeyUsage[key].remaining = 0
+		if (apiKeyUsage[key])
+			apiKeyUsage[key].remaining = 0
 		console.log('throttled :(')
 		return { throttled: true }
 	}

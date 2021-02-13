@@ -1,5 +1,3 @@
-import { cleanSkyblockProfileResponseLighter } from "./profile"
-
 export interface Bank {
 	balance: number
 	history: any[]
