@@ -18,7 +18,6 @@ export interface CleanPlayer extends CleanBasicPlayer {
 
 export async function cleanPlayerResponse(data: HypixelPlayer): Promise<CleanPlayer> {
     // Cleans up a 'player' api response
-    console.log('cleanPlayerResponse', data.stats.SkyBlock.profiles)
     return {
         uuid: undashUuid(data.uuid),
         username: data.displayname,

@@ -28,6 +28,7 @@ export interface CleanMember extends CleanBasicMember {
 export async function cleanSkyBlockProfileMemberResponse(member, included: Included[] = null): Promise<CleanMember> {
     // profiles.members[]
     const statsIncluded = included == null || included.includes('stats')
+    const inventoriesIncluded = included == null || included.includes('inventories')
     return {
         uuid: member.uuid,
         username: await cached.usernameFromUser(member.uuid),
@@ -37,7 +38,7 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
         stats: statsIncluded ? cleanProfileStats(member?.stats) : undefined,
         minions: statsIncluded ? cleanMinions(member) : undefined,
 		fairy_souls: statsIncluded ? cleanFairySouls(member) : undefined,
-		inventories: statsIncluded ? await cleanInventories(member) : undefined,
+		inventories: inventoriesIncluded ? await cleanInventories(member) : undefined,
     }
 }
 

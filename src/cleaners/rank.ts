@@ -52,7 +52,6 @@ export function parseRank({
         const rankColorPrefix = rankColors[name] ? '§' + rankColors[name] : ''
         const nameWithoutPlus = name.split('+')[0]
         const plusesInName = '+'.repeat(name.split('+').length - 1)
-        console.log(plusColor, nameWithoutPlus, plusesInName)
         if (plusColor && plusesInName.length >= 1)
             colored = `${rankColorPrefix}[${nameWithoutPlus}§${plusColor}${plusesInName}${rankColorPrefix}]`
         else

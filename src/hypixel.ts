@@ -9,7 +9,7 @@ import { CleanMemberProfile } from './cleaners/skyblock/member'
 import { cleanSkyblockProfileResponse, CleanProfile, CleanBasicProfile } from './cleaners/skyblock/profile'
 import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles'
 
-export type Included = 'profiles' | 'player' | 'stats'
+export type Included = 'profiles' | 'player' | 'stats' | 'inventories'
 
 // the interval at which the "last_save" parameter updates in the hypixel api, this is 3 minutes
 export const saveInterval = 60 * 3 * 1000
@@ -20,32 +20,32 @@ export const maxMinion = 11
 /**
  *  Send a request to api.hypixel.net using a random key, clean it up to be more useable, and return it 
  */ 
-export async function sendCleanApiRequest({ path, args }, included?: Included[], cleaned=true) {
+
+export interface ApiOptions {
+    mainMemberUuid?: string
+}
+
+export async function sendCleanApiRequest({ path, args }, included?: Included[], options?: ApiOptions) {
     const key = await chooseApiKey()
     const rawResponse = await sendApiRequest({ path, key, args })
     if (rawResponse.throttled) {
 		// if it's throttled, wait a second and try again
         console.log('throttled :/')
 		await new Promise(resolve => setTimeout(resolve, 1000))
-        return await sendCleanApiRequest({ path, args }, included, cleaned)
+        return await sendCleanApiRequest({ path, args }, included, options)
     }
-    if (cleaned) {
-		// if it needs to clean the response, call cleanResponse
-        return await cleanResponse({ path, data: rawResponse }, included=included)
-    } else {
-        // this is provided in case the caller wants to do the cleaning itself
-        // used in skyblock/profile, as cleaning the entire profile would use too much cpu
-        return rawResponse
-    }
+
+    // clean the response
+    return await cleanResponse({ path, data: rawResponse }, options ?? {})
 }
 
 
 
-async function cleanResponse({ path, data }: { path: string, data: HypixelResponse }, included?: Included[]) {
+async function cleanResponse({ path, data }: { path: string, data: HypixelResponse }, options: ApiOptions) {
     // Cleans up an api response
     switch (path) {
         case 'player': return await cleanPlayerResponse(data.player)
-        case 'skyblock/profile': return await cleanSkyblockProfileResponse(data.profile)
+        case 'skyblock/profile': return await cleanSkyblockProfileResponse(data.profile, options)
         case 'skyblock/profiles': return await cleanSkyblockProfilesResponse(data.profiles)
     }
 }

@@ -48,6 +48,7 @@ exports.INVENTORIES = {
 };
 async function cleanInventories(data) {
     var _a;
+    console.log('cleanInventories', data.uuid);
     const cleanInventories = {};
     for (const cleanInventoryName in exports.INVENTORIES) {
         const hypixelInventoryName = exports.INVENTORIES[cleanInventoryName];

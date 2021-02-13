@@ -116,6 +116,11 @@ export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanPr
 		args: {
 			uuid: playerUuid
 		}},
+		null,
+		{
+			// only the inventories for the main player are generated, this is for optimization purposes
+			mainMemberUuid: playerUuid
+		}
 	)
 
 	const basicProfiles: CleanProfile[] = []
@@ -153,8 +158,6 @@ async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[]> {
 	const player = await fetchPlayer(playerUuid)
 	const profiles = player.profiles
 	basicProfilesCache.set(playerUuid, profiles)
-
-	console.log(player)
 
 	// cache the profile names and uuids to profileNameCache because we can
 	for (const profile of profiles)

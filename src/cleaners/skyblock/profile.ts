@@ -1,8 +1,7 @@
-import { CleanBasicMember, CleanMember, CleanMemberProfile, cleanSkyBlockProfileMemberResponse } from './member'
+import { CleanBasicMember, CleanMember, cleanSkyBlockProfileMemberResponse } from './member'
 import { CleanMinion, combineMinionArrays, countUniqueMinions } from './minions'
-import * as cached from '../../hypixelCached'
 import { Bank, cleanBank } from './bank'
-import { cleanFairySouls, FairySouls } from './fairysouls'
+import { ApiOptions } from '../../hypixel'
 
 export interface CleanProfile extends CleanBasicProfile {
     members?: CleanBasicMember[]
@@ -36,14 +35,19 @@ export async function cleanSkyblockProfileResponseLighter(data): Promise<CleanPr
     }
 }
 
-/** This function is somewhat costly and shouldn't be called often. Use cleanSkyblockProfileResponseLighter if you don't need all the data */
-export async function cleanSkyblockProfileResponse(data: any): Promise<CleanFullProfile> {
+/**
+ * This function is somewhat costly and shouldn't be called often. Use cleanSkyblockProfileResponseLighter if you don't need all the data
+ */
+export async function cleanSkyblockProfileResponse(data: any, { mainMemberUuid }: ApiOptions): Promise<CleanFullProfile> {
     const cleanedMembers: CleanMember[] = []
 
     for (const memberUUID in data.members) {
         const memberRaw = data.members[memberUUID]
         memberRaw.uuid = memberUUID
-        const member: CleanMember = await cleanSkyBlockProfileMemberResponse(memberRaw, ['stats'])
+        const member: CleanMember = await cleanSkyBlockProfileMemberResponse(
+            memberRaw,
+            ['stats', mainMemberUuid === memberUUID ? 'inventories' : undefined]
+        )
         cleanedMembers.push(member)
     }
 

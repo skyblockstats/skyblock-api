@@ -28,6 +28,7 @@ export const INVENTORIES = {
 }
 
 export async function cleanInventories(data: any): Promise<typeof INVENTORIES> {
+	console.log('cleanInventories', data.uuid)
 	const cleanInventories: any = {}
 	for (const cleanInventoryName in INVENTORIES) {
 		const hypixelInventoryName = INVENTORIES[cleanInventoryName]
