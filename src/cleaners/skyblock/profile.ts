@@ -1,5 +1,5 @@
 import { CleanBasicMember, CleanMember, CleanMemberProfile, cleanSkyBlockProfileMemberResponse } from './member'
-import { CleanMinion, combineMinionArrays } from './minions'
+import { CleanMinion, combineMinionArrays, countUniqueMinions } from './minions'
 import * as cached from '../../hypixelCached'
 import { cleanBank } from './bank'
 
@@ -92,6 +92,7 @@ export async function fetchMemberProfile(user: string, profile: string): Promise
 
     return {
         member: {
+			// the profile name is in member rather than profile since they sometimes differ for each member
             profileName: cleanProfile.name,
             first_join: member.first_join,
             last_save: member.last_save,
@@ -102,6 +103,7 @@ export async function fetchMemberProfile(user: string, profile: string): Promise
 			uuid: cleanProfile.uuid,
 			bank: cleanProfile.bank,
             minions: cleanProfile.minions,
+			minion_count: countUniqueMinions(cleanProfile.minions)
         }
     }
 }

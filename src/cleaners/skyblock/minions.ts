@@ -68,3 +68,12 @@ export function combineMinionArrays(minions: CleanMinion[][]): CleanMinion[] {
 
     return resultMinions
 }
+
+export function countUniqueMinions(minions: CleanMinion[]): number {
+    let uniqueMinions: number = 0
+    for (const minion of minions) {
+        // find the number of times `true` is in the list and add it to uniqueMinions
+        uniqueMinions += minion.levels.filter(x => x).length
+    }
+    return uniqueMinions
+}
