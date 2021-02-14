@@ -1,5 +1,5 @@
 import { CleanProfileStats, cleanProfileStats } from './stats'
-import { cleanInventories, INVENTORIES } from './inventory'
+import { cleanInventories, Inventories, INVENTORIES } from './inventory'
 import { cleanFairySouls, FairySouls } from './fairysouls'
 import { cleanObjectives, Objective } from './objectives'
 import { CleanMinion, cleanMinions } from './minions'
@@ -22,7 +22,7 @@ export interface CleanMember extends CleanBasicMember {
     stats: CleanProfileStats
     minions: CleanMinion[]
 	fairy_souls: FairySouls
-    inventories: typeof INVENTORIES
+    inventories: Inventories
     objectives: Objective[]
     skills: Skill[]
 }
