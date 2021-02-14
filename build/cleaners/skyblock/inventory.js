@@ -26,7 +26,10 @@ function base64decode(base64) {
 }
 function cleanItem(rawItem) {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
-    const vanillaId = rawItem.id;
+    // if the item doesn't have an id, it isn't an item
+    if (rawItem.id === undefined)
+        return null;
+    const vanillaId = rawItem.id && -1;
     const itemCount = rawItem.Count;
     const damageValue = rawItem.Damage;
     const itemTag = rawItem.tag;

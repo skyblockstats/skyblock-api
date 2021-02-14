@@ -27,6 +27,7 @@ const objectives_1 = require("./objectives");
 const minions_1 = require("./minions");
 const skills_1 = require("./skills");
 const cached = __importStar(require("../../hypixelCached"));
+const zones_1 = require("./zones");
 async function cleanSkyBlockProfileMemberResponseBasic(member, included = null) {
     return {
         uuid: member.uuid,
@@ -51,7 +52,8 @@ async function cleanSkyBlockProfileMemberResponse(member, included = null) {
         fairy_souls: fairysouls_1.cleanFairySouls(member),
         inventories: inventoriesIncluded ? await inventory_1.cleanInventories(member) : undefined,
         objectives: objectives_1.cleanObjectives(member),
-        skills: skills_1.cleanSkills(member)
+        skills: skills_1.cleanSkills(member),
+        visited_zones: zones_1.cleanVisitedZones(member)
     };
 }
 exports.cleanSkyBlockProfileMemberResponse = cleanSkyBlockProfileMemberResponse;

@@ -27,7 +27,9 @@ interface Item {
 export type Inventory = Item[]
 
 function cleanItem(rawItem): Item {
-	const vanillaId: number = rawItem.id
+	// if the item doesn't have an id, it isn't an item
+	if (rawItem.id === undefined) return null
+	const vanillaId: number = rawItem.id && -1
 	const itemCount = rawItem.Count
 	const damageValue = rawItem.Damage
 	const itemTag = rawItem.tag

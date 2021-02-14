@@ -9,6 +9,7 @@ import { CleanFullProfile } from './profile'
 import { Included } from '../../hypixel'
 import { CleanPlayer } from '../player'
 import { Bank } from './bank'
+import { cleanVisitedZones, Zone } from './zones'
 
 export interface CleanBasicMember {
     uuid: string
@@ -25,6 +26,7 @@ export interface CleanMember extends CleanBasicMember {
     inventories: Inventories
     objectives: Objective[]
     skills: Skill[]
+    visited_zones: Zone[]
 }
 
 export async function cleanSkyBlockProfileMemberResponseBasic(member, included: Included[] = null): Promise<CleanBasicMember> {
@@ -53,7 +55,8 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
         fairy_souls: cleanFairySouls(member),
         inventories: inventoriesIncluded ? await cleanInventories(member) : undefined,
         objectives: cleanObjectives(member),
-        skills: cleanSkills(member)
+        skills: cleanSkills(member),
+        visited_zones: cleanVisitedZones(member)
     }
 }
 
