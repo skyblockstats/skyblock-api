@@ -27,7 +27,7 @@ interface Item {
 export type Inventory = Item[]
 
 function cleanItem(rawItem): Item {
-	const vanillaId = rawItem.id
+	const vanillaId: number = rawItem.id
 	const itemCount = rawItem.Count
 	const damageValue = rawItem.Damage
 	const itemTag = rawItem.tag
@@ -35,7 +35,7 @@ function cleanItem(rawItem): Item {
 	return {
 		id: extraAttributes?.id ?? null,
 		count: itemCount ?? 1,
-		vanillaId: damageValue ? `${vanillaId}:${damageValue}` : vanillaId,
+		vanillaId: damageValue ? `${vanillaId}:${damageValue}` : vanillaId.toString(),
 
 		display: {
 			name: itemTag?.display?.Name ?? 'null',

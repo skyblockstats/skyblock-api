@@ -34,7 +34,7 @@ function cleanItem(rawItem) {
     return {
         id: (_b = extraAttributes === null || extraAttributes === void 0 ? void 0 : extraAttributes.id) !== null && _b !== void 0 ? _b : null,
         count: itemCount !== null && itemCount !== void 0 ? itemCount : 1,
-        vanillaId: damageValue ? `${vanillaId}:${damageValue}` : vanillaId,
+        vanillaId: damageValue ? `${vanillaId}:${damageValue}` : vanillaId.toString(),
         display: {
             name: (_d = (_c = itemTag === null || itemTag === void 0 ? void 0 : itemTag.display) === null || _c === void 0 ? void 0 : _c.Name) !== null && _d !== void 0 ? _d : 'null',
             lore: (_f = (_e = itemTag === null || itemTag === void 0 ? void 0 : itemTag.display) === null || _e === void 0 ? void 0 : _e.Lore) !== null && _f !== void 0 ? _f : [],
