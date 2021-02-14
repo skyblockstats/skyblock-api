@@ -9,6 +9,7 @@ export function cleanPlayerSkyblockProfiles(rawProfiles: HypixelPlayerStatsSkyBl
             name: profile.cute_name
         })
     }
+    console.log('cleanPlayerSkyblockProfiles', profiles)
     return profiles
 }
 

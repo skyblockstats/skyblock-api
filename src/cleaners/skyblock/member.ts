@@ -1,13 +1,14 @@
-import { Included } from '../../hypixel'
+import { CleanProfileStats, cleanProfileStats } from './stats'
+import { cleanInventories, INVENTORIES } from './inventory'
+import { cleanFairySouls, FairySouls } from './fairysouls'
+import { cleanObjectives, Objective } from './objectives'
+import { CleanMinion, cleanMinions } from './minions'
+import { cleanSkills, Skill } from './skills'
 import * as cached from '../../hypixelCached'
+import { CleanFullProfile } from './profile'
+import { Included } from '../../hypixel'
 import { CleanPlayer } from '../player'
 import { Bank } from './bank'
-import { cleanFairySouls, FairySouls } from './fairysouls'
-import { cleanInventories, INVENTORIES } from './inventory'
-import { CleanMinion, cleanMinions } from './minions'
-import { cleanObjectives, Objective } from './objectives'
-import { CleanFullProfile } from './profile'
-import { CleanProfileStats, cleanProfileStats } from './stats'
 
 export interface CleanBasicMember {
     uuid: string
@@ -17,11 +18,13 @@ export interface CleanBasicMember {
 }
 
 export interface CleanMember extends CleanBasicMember {
+    purse: number
     stats: CleanProfileStats
     minions: CleanMinion[]
 	fairy_souls: FairySouls
     inventories: typeof INVENTORIES
     objectives: Objective[]
+    skills: Skill[]
 }
 
 export async function cleanSkyBlockProfileMemberResponseBasic(member, included: Included[] = null): Promise<CleanBasicMember> {
@@ -43,12 +46,14 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
         last_save: member.last_save,
         first_join: member.first_join,
 
+        purse: member.coin_purse,
+
         stats: cleanProfileStats(member),
         minions: cleanMinions(member),
         fairy_souls: cleanFairySouls(member),
         inventories: inventoriesIncluded ? await cleanInventories(member) : undefined,
         objectives: cleanObjectives(member),
-        // skills: statsIncluded ? 
+        skills: cleanSkills(member)
     }
 }
 

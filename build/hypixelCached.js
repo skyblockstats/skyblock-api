@@ -107,7 +107,9 @@ async function fetchPlayer(user) {
         path: 'player',
         args: { uuid: playerUuid }
     });
-    playerCache.set(playerUuid, cleanPlayer);
+    // clone in case it gets modified somehow later
+    const cleanPlayerClone = Object.assign({}, cleanPlayer);
+    playerCache.set(playerUuid, cleanPlayerClone);
     return cleanPlayer;
 }
 exports.fetchPlayer = fetchPlayer;

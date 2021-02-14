@@ -20,12 +20,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cleanSkyBlockProfileMemberResponse = exports.cleanSkyBlockProfileMemberResponseBasic = void 0;
-const cached = __importStar(require("../../hypixelCached"));
-const fairysouls_1 = require("./fairysouls");
-const inventory_1 = require("./inventory");
-const minions_1 = require("./minions");
-const objectives_1 = require("./objectives");
 const stats_1 = require("./stats");
+const inventory_1 = require("./inventory");
+const fairysouls_1 = require("./fairysouls");
+const objectives_1 = require("./objectives");
+const minions_1 = require("./minions");
+const skills_1 = require("./skills");
+const cached = __importStar(require("../../hypixelCached"));
 async function cleanSkyBlockProfileMemberResponseBasic(member, included = null) {
     return {
         uuid: member.uuid,
@@ -44,11 +45,13 @@ async function cleanSkyBlockProfileMemberResponse(member, included = null) {
         username: await cached.usernameFromUser(member.uuid),
         last_save: member.last_save,
         first_join: member.first_join,
+        purse: member.coin_purse,
         stats: stats_1.cleanProfileStats(member),
         minions: minions_1.cleanMinions(member),
         fairy_souls: fairysouls_1.cleanFairySouls(member),
         inventories: inventoriesIncluded ? await inventory_1.cleanInventories(member) : undefined,
         objectives: objectives_1.cleanObjectives(member),
+        skills: skills_1.cleanSkills(member)
     };
 }
 exports.cleanSkyBlockProfileMemberResponse = cleanSkyBlockProfileMemberResponse;

@@ -8,6 +8,7 @@ import * as hypixel from './hypixel'
 import { CleanPlayer } from './cleaners/player'
 import { undashUuid } from './util'
 import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/skyblock/profile'
+import { cleanProfileStats } from './cleaners/skyblock/stats'
 
 
 // cache usernames for 4 hours
@@ -100,7 +101,11 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer> {
 		path: 'player',
 		args: { uuid: playerUuid }
 	})
-	playerCache.set(playerUuid, cleanPlayer)
+
+	// clone in case it gets modified somehow later
+	const cleanPlayerClone = Object.assign({}, cleanPlayer)
+	playerCache.set(playerUuid, cleanPlayerClone)
+
 	return cleanPlayer
 }
 
