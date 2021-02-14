@@ -3,7 +3,7 @@ on: [push]
 jobs:
   build-push:
     runs-on: ubuntu-latest
-    name: Builds Typescript
+    name: Compile Typescript
     steps:
       - name: Checkout
         uses: actions/checkout@v2
