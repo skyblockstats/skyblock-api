@@ -71,10 +71,20 @@ const COLLECTIONS = {
         'lily_pad',
         'ink_sac',
         'sponge'
-    ]
+    ],
+    // no item should be here, but in case a new collection is added itll default to this
+    'unknown': []
 };
+// get a category name (farming) from a collection name (wheat)
+function getCategory(collectionName) {
+    for (const categoryName in COLLECTIONS) {
+        const categoryItems = COLLECTIONS[categoryName];
+        if (categoryItems.includes(collectionName))
+            return categoryName;
+    }
+}
 function cleanCollections(data) {
-    var _a, _b;
+    var _a, _b, _c;
     // collection tiers show up like this: [ GRAVEL_3, GOLD_INGOT_2, MELON_-1, LOG_2:1_7, RAW_FISH:3_-1]
     // these tiers are the same for all players in a coop
     const playerCollectionTiersRaw = (_a = data === null || data === void 0 ? void 0 : data.unlocked_coll_tiers) !== null && _a !== void 0 ? _a : [];
@@ -95,11 +105,16 @@ function cleanCollections(data) {
     for (const collectionNameRaw in playerCollectionValuesRaw) {
         const collectionValue = playerCollectionValuesRaw[collectionNameRaw];
         const collectionName = itemId_1.cleanItemId(collectionNameRaw);
-        playerCollectionValues.push({
-            name: collectionName,
-            xp: collectionValue,
-            level: playerCollectionTiers[collectionName]
-        });
+        const collectionLevel = playerCollectionTiers[collectionName];
+        const collectionCategory = (_c = getCategory(collectionName)) !== null && _c !== void 0 ? _c : 'unknown';
+        // in some very weird cases the collection level will be undefined, we should ignore these collections
+        if (collectionLevel !== undefined)
+            playerCollectionValues.push({
+                name: collectionName,
+                xp: collectionValue,
+                level: collectionLevel,
+                category: collectionCategory
+            });
     }
     return playerCollectionValues;
 }
