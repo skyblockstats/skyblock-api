@@ -32,34 +32,24 @@ const profiles_1 = require("./cleaners/skyblock/profiles");
 exports.saveInterval = 60 * 3 * 1000;
 // the highest level a minion can be
 exports.maxMinion = 11;
-/**
- *  Send a request to api.hypixel.net using a random key, clean it up to be more useable, and return it
- */
-async function sendCleanApiRequest({ path, args }, included, cleaned = true) {
+async function sendCleanApiRequest({ path, args }, included, options) {
     const key = await hypixelApi_1.chooseApiKey();
     const rawResponse = await hypixelApi_1.sendApiRequest({ path, key, args });
     if (rawResponse.throttled) {
         // if it's throttled, wait a second and try again
         console.log('throttled :/');
         await new Promise(resolve => setTimeout(resolve, 1000));
-        return await sendCleanApiRequest({ path, args }, included, cleaned);
+        return await sendCleanApiRequest({ path, args }, included, options);
     }
-    if (cleaned) {
-        // if it needs to clean the response, call cleanResponse
-        return await cleanResponse({ path, data: rawResponse }, included = included);
-    }
-    else {
-        // this is provided in case the caller wants to do the cleaning itself
-        // used in skyblock/profile, as cleaning the entire profile would use too much cpu
-        return rawResponse;
-    }
+    // clean the response
+    return await cleanResponse({ path, data: rawResponse }, options !== null && options !== void 0 ? options : {});
 }
 exports.sendCleanApiRequest = sendCleanApiRequest;
-async function cleanResponse({ path, data }, included) {
+async function cleanResponse({ path, data }, options) {
     // Cleans up an api response
     switch (path) {
         case 'player': return await player_1.cleanPlayerResponse(data.player);
-        case 'skyblock/profile': return await profile_1.cleanSkyblockProfileResponse(data.profile);
+        case 'skyblock/profile': return await profile_1.cleanSkyblockProfileResponse(data.profile, options);
         case 'skyblock/profiles': return await profiles_1.cleanSkyblockProfilesResponse(data.profiles);
     }
 }

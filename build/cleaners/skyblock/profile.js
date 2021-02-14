@@ -22,13 +22,15 @@ async function cleanSkyblockProfileResponseLighter(data) {
     };
 }
 exports.cleanSkyblockProfileResponseLighter = cleanSkyblockProfileResponseLighter;
-/** This function is somewhat costly and shouldn't be called often. Use cleanSkyblockProfileResponseLighter if you don't need all the data */
-async function cleanSkyblockProfileResponse(data) {
+/**
+ * This function is somewhat costly and shouldn't be called often. Use cleanSkyblockProfileResponseLighter if you don't need all the data
+ */
+async function cleanSkyblockProfileResponse(data, { mainMemberUuid }) {
     const cleanedMembers = [];
     for (const memberUUID in data.members) {
         const memberRaw = data.members[memberUUID];
         memberRaw.uuid = memberUUID;
-        const member = await member_1.cleanSkyBlockProfileMemberResponse(memberRaw, ['stats']);
+        const member = await member_1.cleanSkyBlockProfileMemberResponse(memberRaw, ['stats', mainMemberUuid === memberUUID ? 'inventories' : undefined]);
         cleanedMembers.push(member);
     }
     const memberMinions = [];

@@ -29,6 +29,7 @@ const stats_1 = require("./stats");
 async function cleanSkyBlockProfileMemberResponse(member, included = null) {
     // profiles.members[]
     const statsIncluded = included == null || included.includes('stats');
+    const inventoriesIncluded = included == null || included.includes('inventories');
     return {
         uuid: member.uuid,
         username: await cached.usernameFromUser(member.uuid),
@@ -38,7 +39,7 @@ async function cleanSkyBlockProfileMemberResponse(member, included = null) {
         stats: statsIncluded ? stats_1.cleanProfileStats(member === null || member === void 0 ? void 0 : member.stats) : undefined,
         minions: statsIncluded ? minions_1.cleanMinions(member) : undefined,
         fairy_souls: statsIncluded ? fairysouls_1.cleanFairySouls(member) : undefined,
-        inventories: statsIncluded ? await inventory_1.cleanInventories(member) : undefined,
+        inventories: inventoriesIncluded ? await inventory_1.cleanInventories(member) : undefined,
     };
 }
 exports.cleanSkyBlockProfileMemberResponse = cleanSkyBlockProfileMemberResponse;

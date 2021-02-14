@@ -121,6 +121,9 @@ async function fetchSkyblockProfiles(playerUuid) {
         args: {
             uuid: playerUuid
         }
+    }, null, {
+        // only the inventories for the main player are generated, this is for optimization purposes
+        mainMemberUuid: playerUuid
     });
     const basicProfiles = [];
     // create the basicProfiles array
@@ -154,7 +157,6 @@ async function fetchBasicProfiles(user) {
     const player = await fetchPlayer(playerUuid);
     const profiles = player.profiles;
     basicProfilesCache.set(playerUuid, profiles);
-    console.log(player);
     // cache the profile names and uuids to profileNameCache because we can
     for (const profile of profiles)
         profileNameCache.set(`${playerUuid}.${profile.uuid}`, profile.name);
@@ -182,7 +184,8 @@ exports.fetchProfileUuid = fetchProfileUuid;
  * @param profile A profile name or profile uuid
  */
 async function fetchProfile(user, profile) {
-    const profileUuid = await fetchProfileUuid(user, profile);
+    const playerUuid = await uuidFromUser(user);
+    const profileUuid = await fetchProfileUuid(playerUuid, profile);
     if (profileCache.has(profileUuid)) {
         console.log('cache hit! fetchProfile');
         // we have the profile cached, return it :)
@@ -191,10 +194,8 @@ async function fetchProfile(user, profile) {
     const profileName = await fetchProfileName(user, profile);
     const cleanProfile = await hypixel.sendCleanApiRequest({
         path: 'skyblock/profile',
-        args: {
-            profile: profileUuid
-        }
-    });
+        args: { profile: profileUuid }
+    }, null, { mainMemberUuid: playerUuid });
     // we know the name from fetchProfileName, so set it here
     cleanProfile.name = profileName;
     profileCache.set(profileUuid, cleanProfile);

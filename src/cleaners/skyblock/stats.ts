@@ -26,8 +26,8 @@ function categorizeStat(statNameRaw: string): statCategory {
         }
         for (const categoryMatch of statCategoryMatchers) {
             // ['deaths_']
-            let trailingEnd = categoryMatch[0] == '_'
-            let trailingStart = categoryMatch.substr(-1) == '_'
+            let trailingEnd = categoryMatch[0] === '_'
+            let trailingStart = categoryMatch.substr(-1) === '_'
             if (trailingStart && statNameRaw.startsWith(categoryMatch)) {
                 return {
                     category: statCategory,
@@ -36,7 +36,7 @@ function categorizeStat(statNameRaw: string): statCategory {
             } else if (trailingEnd && statNameRaw.endsWith(categoryMatch)) {
                 return {
                     category: statCategory,
-                    name: statNameRaw.substr(0, categoryMatch.length)
+                    name: statNameRaw.substr(0, statNameRaw.length - categoryMatch.length)
                 }
             } else if (statNameRaw == categoryMatch) {
                 // if it matches exactly, we don't know the name. will be defaulted to category later on

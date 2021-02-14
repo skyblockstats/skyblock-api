@@ -7,7 +7,6 @@ const util_1 = require("../util");
 const profiles_1 = require("./skyblock/profiles");
 async function cleanPlayerResponse(data) {
     // Cleans up a 'player' api response
-    console.log('cleanPlayerResponse', data.stats.SkyBlock.profiles);
     return {
         uuid: util_1.undashUuid(data.uuid),
         username: data.displayname,
