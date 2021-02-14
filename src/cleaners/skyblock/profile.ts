@@ -1,4 +1,4 @@
-import { CleanBasicMember, CleanMember, cleanSkyBlockProfileMemberResponse } from './member'
+import { CleanBasicMember, CleanMember, cleanSkyBlockProfileMemberResponse, cleanSkyBlockProfileMemberResponseBasic } from './member'
 import { CleanMinion, combineMinionArrays, countUniqueMinions } from './minions'
 import { Bank, cleanBank } from './bank'
 import { ApiOptions } from '../../hypixel'
@@ -8,7 +8,7 @@ export interface CleanProfile extends CleanBasicProfile {
 }
 
 export interface CleanFullProfile extends CleanProfile {
-    members: CleanMember[]
+    members: (CleanMember|CleanBasicMember)[]
     bank: Bank
     minions: CleanMinion[]
 	minion_count: number
@@ -17,16 +17,16 @@ export interface CleanFullProfile extends CleanProfile {
 /** Return a `CleanProfile` instead of a `CleanFullProfile`, useful when we need to get members but don't want to waste much ram */
 export async function cleanSkyblockProfileResponseLighter(data): Promise<CleanProfile> {
     // We use Promise.all so it can fetch all the usernames at once instead of waiting for the previous promise to complete
-    const promises: Promise<CleanMember>[] = []
+    const promises: Promise<CleanBasicMember>[] = []
 
     for (const memberUUID in data.members) {
         const memberRaw = data.members[memberUUID]
         memberRaw.uuid = memberUUID
         // we pass an empty array to make it not check stats
-        promises.push(cleanSkyBlockProfileMemberResponse(memberRaw, []))
+        promises.push(cleanSkyBlockProfileMemberResponseBasic(memberRaw))
     }
 
-    const cleanedMembers: CleanMember[] = await Promise.all(promises)
+    const cleanedMembers: CleanBasicMember[] = await Promise.all(promises)
 
     return {
         uuid: data.profile_id,

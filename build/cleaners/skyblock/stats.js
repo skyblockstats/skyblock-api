@@ -52,14 +52,17 @@ function categorizeStat(statNameRaw) {
         name: statNameRaw
     };
 }
-function cleanProfileStats(statsRaw) {
+function cleanProfileStats(data) {
+    var _a;
     // TODO: add type for statsRaw (probably in hypixelApi.ts since its coming from there)
     const stats = {};
-    for (let statNameRaw in statsRaw) {
+    const rawStats = (_a = data === null || data === void 0 ? void 0 : data.stats) !== null && _a !== void 0 ? _a : {};
+    for (const statNameRaw in rawStats) {
+        const statValue = rawStats[statNameRaw];
         let { category: statCategory, name: statName } = categorizeStat(statNameRaw);
         if (!stats[statCategory])
             stats[statCategory] = {};
-        stats[statCategory][statName || 'total'] = statsRaw[statNameRaw];
+        stats[statCategory][statName || 'total'] = statValue;
     }
     return stats;
 }

@@ -110,6 +110,16 @@ async function fetchMemberProfile(user, profile) {
     const player = await cached.fetchPlayer(playerUuid);
     const cleanProfile = await cached.fetchProfile(playerUuid, profileUuid);
     const member = cleanProfile.members.find(m => m.uuid === playerUuid);
+    // remove unnecessary member data
+    const simpleMembers = cleanProfile.members.map(m => {
+        return {
+            uuid: m.uuid,
+            username: m.username,
+            first_join: m.first_join,
+            last_save: m.last_save,
+        };
+    });
+    cleanProfile.members = simpleMembers;
     return {
         member: {
             // the profile name is in member rather than profile since they sometimes differ for each member

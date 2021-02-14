@@ -12,7 +12,7 @@ async function cleanSkyblockProfileResponseLighter(data) {
         const memberRaw = data.members[memberUUID];
         memberRaw.uuid = memberUUID;
         // we pass an empty array to make it not check stats
-        promises.push(member_1.cleanSkyBlockProfileMemberResponse(memberRaw, []));
+        promises.push(member_1.cleanSkyBlockProfileMemberResponseBasic(memberRaw));
     }
     const cleanedMembers = await Promise.all(promises);
     return {

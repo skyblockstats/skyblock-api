@@ -5,7 +5,7 @@
 import { CleanPlayer, cleanPlayerResponse } from './cleaners/player'
 import { chooseApiKey, HypixelResponse, sendApiRequest } from './hypixelApi'
 import * as cached from './hypixelCached'
-import { CleanMemberProfile } from './cleaners/skyblock/member'
+import { CleanBasicMember, CleanMemberProfile } from './cleaners/skyblock/member'
 import { cleanSkyblockProfileResponse, CleanProfile, CleanBasicProfile } from './cleaners/skyblock/profile'
 import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles'
 
@@ -131,6 +131,18 @@ export async function fetchMemberProfile(user: string, profile: string): Promise
     const cleanProfile = await cached.fetchProfile(playerUuid, profileUuid)
 
     const member = cleanProfile.members.find(m => m.uuid === playerUuid)
+
+    // remove unnecessary member data
+    const simpleMembers: CleanBasicMember[] = cleanProfile.members.map(m => {
+        return {
+            uuid: m.uuid,
+            username: m.username,
+            first_join: m.first_join,
+            last_save: m.last_save,
+        }
+    })
+
+    cleanProfile.members = simpleMembers
 
     return {
         member: {

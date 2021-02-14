@@ -61,13 +61,15 @@ export interface CleanProfileStats {
     }
 }
 
-export function cleanProfileStats(statsRaw: any): CleanProfileStats {
+export function cleanProfileStats(data: any): CleanProfileStats {
     // TODO: add type for statsRaw (probably in hypixelApi.ts since its coming from there)
     const stats: CleanProfileStats = {}
-    for (let statNameRaw in statsRaw) {
+    const rawStats = data?.stats ?? {}
+    for (const statNameRaw in rawStats) {
+        const statValue = rawStats[statNameRaw]
         let { category: statCategory, name: statName } = categorizeStat(statNameRaw)
         if (!stats[statCategory]) stats[statCategory] = {}
-        stats[statCategory][statName || 'total'] = statsRaw[statNameRaw]
+        stats[statCategory][statName || 'total'] = statValue
     }
     return stats
 }
