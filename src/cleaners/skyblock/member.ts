@@ -1,5 +1,5 @@
 import { CleanProfileStats, cleanProfileStats } from './stats'
-import { cleanInventories, Inventories, INVENTORIES } from './inventory'
+import { cleanInventories, Inventories } from './inventory'
 import { cleanFairySouls, FairySouls } from './fairysouls'
 import { cleanObjectives, Objective } from './objectives'
 import { CleanMinion, cleanMinions } from './minions'
@@ -10,6 +10,7 @@ import { Included } from '../../hypixel'
 import { CleanPlayer } from '../player'
 import { Bank } from './bank'
 import { cleanVisitedZones, Zone } from './zones'
+import { cleanCollections, Collection } from './collections'
 
 export interface CleanBasicMember {
     uuid: string
@@ -27,6 +28,7 @@ export interface CleanMember extends CleanBasicMember {
     objectives: Objective[]
     skills: Skill[]
     visited_zones: Zone[]
+    collections: Collection[]
 }
 
 export async function cleanSkyBlockProfileMemberResponseBasic(member, included: Included[] = null): Promise<CleanBasicMember> {
@@ -56,7 +58,8 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
         inventories: inventoriesIncluded ? await cleanInventories(member) : undefined,
         objectives: cleanObjectives(member),
         skills: cleanSkills(member),
-        visited_zones: cleanVisitedZones(member)
+        visited_zones: cleanVisitedZones(member),
+        collections: cleanCollections(member)
     }
 }
 

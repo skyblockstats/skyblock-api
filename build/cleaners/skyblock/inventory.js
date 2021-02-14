@@ -29,7 +29,7 @@ function cleanItem(rawItem) {
     // if the item doesn't have an id, it isn't an item
     if (rawItem.id === undefined)
         return null;
-    const vanillaId = rawItem.id && -1;
+    const vanillaId = rawItem.id;
     const itemCount = rawItem.Count;
     const damageValue = rawItem.Damage;
     const itemTag = rawItem.tag;
