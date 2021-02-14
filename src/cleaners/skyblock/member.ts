@@ -11,7 +11,7 @@ import { CleanPlayer } from '../player'
 import { Bank } from './bank'
 import { cleanVisitedZones, Zone } from './zones'
 import { cleanCollections, Collection } from './collections'
-import { cleanSlayers, Slayer } from './slayers'
+import { cleanSlayers, Slayer, SlayerData } from './slayers'
 
 export interface CleanBasicMember {
     uuid: string
@@ -30,7 +30,7 @@ export interface CleanMember extends CleanBasicMember {
     skills: Skill[]
     visited_zones: Zone[]
     collections: Collection[]
-    slayers: Slayer[]
+    slayers: SlayerData
 }
 
 export async function cleanSkyBlockProfileMemberResponseBasic(member, included: Included[] = null): Promise<CleanBasicMember> {

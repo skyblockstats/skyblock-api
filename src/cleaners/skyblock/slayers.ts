@@ -1,7 +1,14 @@
 
 const slayerLevels = 4 // number of slayer levels, this might be 5 soon
 
-type SlayerName = 'spider' | 'zombie' | 'wolf'
+const SLAYER_NAMES = {
+	spider: 'tarantula',
+	zombie: 'revenant',
+	wolf: 'sven'
+} as const
+
+type ApiSlayerName = keyof typeof SLAYER_NAMES
+type SlayerName = (typeof SLAYER_NAMES)[ApiSlayerName]
 
 interface SlayerTier {
 	tier: number,
@@ -14,12 +21,24 @@ export interface Slayer {
 	tiers: SlayerTier[]
 }
 
-export function cleanSlayers(data: any) {
+export interface SlayerData {
+	xp: number
+	bosses: Slayer[]
+}
+
+export function cleanSlayers(data: any): SlayerData {
 	const slayers: Slayer[] = []
 
 	const slayersDataRaw = data?.slayer_bosses
-	for (const slayerName in slayersDataRaw) {
-		const slayerDataRaw = slayersDataRaw[slayerName]
+
+	let totalXp = 0
+
+	for (const slayerNameRaw in slayersDataRaw) {
+		const slayerDataRaw = slayersDataRaw[slayerNameRaw]
+
+		// convert name provided by api (spider) to the real name (tarantula)
+		const slayerName: SlayerName = SLAYER_NAMES[slayerDataRaw]
+
 		const slayerXp: number = slayerDataRaw.xp
 		const slayerTiers: SlayerTier[] = []
 		for (const slayerDataKey in slayerDataRaw) {
@@ -44,11 +63,16 @@ export function cleanSlayers(data: any) {
 			})
 
 		const slayer: Slayer = {
-			name: slayerName as SlayerName,
+			name: slayerName,
 			tiers: slayerTiers,
 			xp: slayerXp
 		}
 		slayers.push(slayer)
+		// add the xp from this slayer to the total xp
+		totalXp += slayerXp
 	}
-	return slayers
+	return {
+		xp: totalXp,
+		bosses: slayers
+	}
 }
