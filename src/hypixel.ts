@@ -75,7 +75,11 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
     if (!uuid) {
         // If the uuid isn't provided, get it
         uuid = await cached.uuidFromUser(user || username)
-    }   
+    }
+    if (!uuid) {
+        // the user doesn't exist.
+        return null
+    }
 
     const includePlayers = included.includes('player')
     const includeProfiles = included.includes('profiles')

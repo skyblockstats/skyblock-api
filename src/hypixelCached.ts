@@ -65,6 +65,7 @@ export async function uuidFromUser(user: string): Promise<string> {
 
 	// not cached, actually fetch mojang api now
 	let { uuid, username } = await mojang.mojangDataFromUser(user)
+	if (!uuid) return
 
 	// remove dashes from the uuid so its more normal
 	uuid = undashUuid(uuid)
@@ -103,6 +104,7 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer> {
 	// clone in case it gets modified somehow later
 	const cleanPlayerClone = Object.assign({}, cleanPlayer)
 	playerCache.set(playerUuid, cleanPlayerClone)
+	usernameCache.set(playerUuid, cleanPlayerClone.username)
 
 	return cleanPlayer
 }
