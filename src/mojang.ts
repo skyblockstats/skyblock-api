@@ -34,7 +34,6 @@ interface AshconResponse {
  * Get mojang api data from ashcon.app
  */
 export async function mojangDataFromUser(user: string): Promise<AshconResponse> {
-	console.log('cache miss :( mojangDataFromUser', user)
     const fetchResponse = await fetch(
 		'https://api.ashcon.app/mojang/v2/user/' + user,
 		{ agent: () => httpsAgent }

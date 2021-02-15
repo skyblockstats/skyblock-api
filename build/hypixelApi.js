@@ -45,7 +45,6 @@ function chooseApiKey() {
 exports.chooseApiKey = chooseApiKey;
 /** Send an HTTP request to the Hypixel API */
 async function sendApiRequest({ path, key, args }) {
-    console.log('sending api request to', path, args);
     // Send a raw http request to api.hypixel.net, and return the parsed json
     if (key)
         // If there's an api key, add it to the arguments
@@ -64,7 +63,6 @@ async function sendApiRequest({ path, key, args }) {
     if (fetchJsonParsed.throttle) {
         if (apiKeyUsage[key])
             apiKeyUsage[key].remaining = 0;
-        console.log('throttled :(');
         return { throttled: true };
     }
     return fetchJsonParsed;

@@ -17,7 +17,6 @@ const httpsAgent = new https_1.Agent({
  * Get mojang api data from ashcon.app
  */
 async function mojangDataFromUser(user) {
-    console.log('cache miss :( mojangDataFromUser', user);
     const fetchResponse = await node_fetch_1.default('https://api.ashcon.app/mojang/v2/user/' + user, { agent: () => httpsAgent });
     return await fetchResponse.json();
 }

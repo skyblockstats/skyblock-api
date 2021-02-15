@@ -10,7 +10,6 @@ function cleanPlayerSkyblockProfiles(rawProfiles) {
             name: profile.cute_name
         });
     }
-    console.log('cleanPlayerSkyblockProfiles', profiles);
     return profiles;
 }
 exports.cleanPlayerSkyblockProfiles = cleanPlayerSkyblockProfiles;

@@ -30,7 +30,6 @@ export async function sendCleanApiRequest({ path, args }, included?: Included[],
     const rawResponse = await sendApiRequest({ path, key, args })
     if (rawResponse.throttled) {
 		// if it's throttled, wait a second and try again
-        console.log('throttled :/')
 		await new Promise(resolve => setTimeout(resolve, 1000))
         return await sendCleanApiRequest({ path, args }, included, options)
     }

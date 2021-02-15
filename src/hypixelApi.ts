@@ -127,7 +127,6 @@ export interface HypixelPlayer {
 
 /** Send an HTTP request to the Hypixel API */
 export async function sendApiRequest({ path, key, args }): Promise<HypixelResponse> {
-	console.log('sending api request to', path, args)
 	// Send a raw http request to api.hypixel.net, and return the parsed json
 
 	if (key)
@@ -154,7 +153,6 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 	if (fetchJsonParsed.throttle) {
 		if (apiKeyUsage[key])
 			apiKeyUsage[key].remaining = 0
-		console.log('throttled :(')
 		return { throttled: true }
 	}
 	return fetchJsonParsed

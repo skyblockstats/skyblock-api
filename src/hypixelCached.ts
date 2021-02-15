@@ -92,7 +92,6 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer> {
 	const playerUuid = await uuidFromUser(user)
 
 	if (playerCache.has(playerUuid)) {
-		console.log('cache hit! fetchPlayer', playerUuid)
 		return playerCache.get(playerUuid)
 	}
 
@@ -111,7 +110,6 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer> {
 
 export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanProfile[]> {
 	if (profilesCache.has(playerUuid)) {
-		console.log('cache hit! fetchSkyblockProfiles', playerUuid)
 		return profilesCache.get(playerUuid)
 	}
 
@@ -157,7 +155,6 @@ export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanPr
 async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[]> {
 	const playerUuid = await uuidFromUser(user)
 	if (basicProfilesCache.has(playerUuid)) {
-		console.log('cache hit! fetchBasicProfiles')
 		return basicProfilesCache.get(playerUuid)
 	}
 	const player = await fetchPlayer(playerUuid)
@@ -202,7 +199,6 @@ export async function fetchProfile(user: string, profile: string): Promise<Clean
 	const profileUuid = await fetchProfileUuid(playerUuid, profile)
 
 	if (profileCache.has(profileUuid)) {
-		console.log('cache hit! fetchProfile')
 		// we have the profile cached, return it :)
 		return profileCache.get(profileUuid)
 	}
@@ -238,7 +234,6 @@ export async function fetchProfileName(user: string, profile: string): Promise<s
 
 	if (profileNameCache.has(`${playerUuid}.${profileUuid}`)) {
 		// Return the profile name if it's cached
-		console.log('cache hit! fetchProfileName')
 		return profileNameCache.get(`${playerUuid}.${profileUuid}`)
 	}
 
