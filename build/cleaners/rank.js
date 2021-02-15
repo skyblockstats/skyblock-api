@@ -25,10 +25,10 @@ function cleanRank({ packageRank, newPackageRank, monthlyPackageRank, rankPlusCo
         name = colored.replace(/§./g, '').replace(/[\[\]]/g, '');
     }
     else {
-        name = rank
+        name = monthlyPackageRank
+            || rank
             || (newPackageRank === null || newPackageRank === void 0 ? void 0 : newPackageRank.replace('_PLUS', '+'))
-            || (packageRank === null || packageRank === void 0 ? void 0 : packageRank.replace('_PLUS', '+'))
-            || monthlyPackageRank;
+            || (packageRank === null || packageRank === void 0 ? void 0 : packageRank.replace('_PLUS', '+'));
         // MVP++ is called Superstar for some reason
         if (name === 'SUPERSTAR')
             name = 'MVP++';
