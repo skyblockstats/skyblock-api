@@ -37,10 +37,10 @@ export function cleanRank({
         color = minecraftColorCodes[colored.match(/§./)[0][1]]
         name = colored.replace(/§./g, '').replace(/[\[\]]/g, '')
     } else {
-        name = rank
+        name = monthlyPackageRank
+                || rank
                 || newPackageRank?.replace('_PLUS', '+')
                 || packageRank?.replace('_PLUS', '+')
-                || monthlyPackageRank
 
         // MVP++ is called Superstar for some reason
         if (name === 'SUPERSTAR') name = 'MVP++'
