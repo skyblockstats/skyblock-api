@@ -142,6 +142,7 @@ export async function fetchMemberProfile(user: string, profile: string): Promise
             username: m.username,
             first_join: m.first_join,
             last_save: m.last_save,
+            rank: m.rank
         }
     })
 

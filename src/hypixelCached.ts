@@ -139,7 +139,8 @@ export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanPr
 					uuid: m.uuid,
 					username: m.username,
 					first_join: m.first_join,
-					last_save: m.last_save
+					last_save: m.last_save,
+					rank: m.rank
 				}
 			})
 		}

@@ -12,12 +12,14 @@ import { Bank } from './bank'
 import { cleanVisitedZones, Zone } from './zones'
 import { cleanCollections, Collection } from './collections'
 import { cleanSlayers, SlayerData } from './slayers'
+import { cleanRank, CleanRank } from '../rank'
 
 export interface CleanBasicMember {
     uuid: string
     username: string
     last_save: number
     first_join: number
+    rank: CleanRank
 }
 
 export interface CleanMember extends CleanBasicMember {
@@ -33,12 +35,14 @@ export interface CleanMember extends CleanBasicMember {
     slayers: SlayerData
 }
 
-export async function cleanSkyBlockProfileMemberResponseBasic(member, included: Included[] = null): Promise<CleanBasicMember> {
+export async function cleanSkyBlockProfileMemberResponseBasic(member: any, included: Included[] = null): Promise<CleanBasicMember> {
+    const player = await cached.fetchPlayer(member.uuid)
     return {
         uuid: member.uuid,
-        username: await cached.usernameFromUser(member.uuid),
+        username: player.username,
         last_save: member.last_save,
         first_join: member.first_join,
+        rank: player.rank
     }
 }
 
@@ -46,11 +50,13 @@ export async function cleanSkyBlockProfileMemberResponseBasic(member, included: 
 export async function cleanSkyBlockProfileMemberResponse(member, included: Included[] = null): Promise<CleanMember> {
     // profiles.members[]
     const inventoriesIncluded = included == null || included.includes('inventories')
+    const player = await cached.fetchPlayer(member.uuid)
     return {
         uuid: member.uuid,
-        username: await cached.usernameFromUser(member.uuid),
+        username: player.username,
         last_save: member.last_save,
         first_join: member.first_join,
+        rank: player.rank,
 
         purse: member.coin_purse,
 
