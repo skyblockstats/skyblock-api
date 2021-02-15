@@ -77,6 +77,8 @@ async function uuidFromUser(user) {
     }
     // not cached, actually fetch mojang api now
     let { uuid, username } = await mojang.mojangDataFromUser(user);
+    if (!uuid)
+        return;
     // remove dashes from the uuid so its more normal
     uuid = util_1.undashUuid(uuid);
     usernameCache.set(uuid, username);
@@ -109,6 +111,7 @@ async function fetchPlayer(user) {
     // clone in case it gets modified somehow later
     const cleanPlayerClone = Object.assign({}, cleanPlayer);
     playerCache.set(playerUuid, cleanPlayerClone);
+    usernameCache.set(playerUuid, cleanPlayerClone.username);
     return cleanPlayer;
 }
 exports.fetchPlayer = fetchPlayer;

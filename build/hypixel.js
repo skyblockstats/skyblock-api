@@ -63,6 +63,10 @@ async function fetchUser({ user, uuid, username }, included = ['player']) {
         // If the uuid isn't provided, get it
         uuid = await cached.uuidFromUser(user || username);
     }
+    if (!uuid) {
+        // the user doesn't exist.
+        return null;
+    }
     const includePlayers = included.includes('player');
     const includeProfiles = included.includes('profiles');
     let profilesData;
