@@ -59,8 +59,8 @@ export interface UserAny {
 }
 
 export interface CleanUser {
-    player: any
-    profiles?: any
+    player: CleanPlayer
+    profiles?: CleanProfile[]
     activeProfile?: string
     online?: boolean
 }
@@ -125,6 +125,9 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 export async function fetchMemberProfile(user: string, profile: string): Promise<CleanMemberProfile> {
     const playerUuid = await cached.uuidFromUser(user)
     const profileUuid = await cached.fetchProfileUuid(user, profile)
+
+    // if the profile doesn't have an id, just return
+    if (!profileUuid) return null
 
     const player = await cached.fetchPlayer(playerUuid)
 

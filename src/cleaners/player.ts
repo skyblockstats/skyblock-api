@@ -1,9 +1,9 @@
-import { CleanSocialMedia, parseSocialMedia } from './socialmedia'
-import { CleanRank, parseRank } from './rank'
+import { cleanPlayerSkyblockProfiles } from './skyblock/profiles'
+import { cleanSocialMedia, CleanSocialMedia } from './socialmedia'
+import { CleanBasicProfile } from './skyblock/profile'
+import { cleanRank, CleanRank } from './rank'
 import { HypixelPlayer } from '../hypixelApi'
 import { undashUuid } from '../util'
-import { CleanBasicProfile } from './skyblock/profile'
-import { cleanPlayerSkyblockProfiles } from './skyblock/profiles'
 
 export interface CleanBasicPlayer {
     uuid: string
@@ -21,8 +21,8 @@ export async function cleanPlayerResponse(data: HypixelPlayer): Promise<CleanPla
     return {
         uuid: undashUuid(data.uuid),
         username: data.displayname,
-        rank: parseRank(data),
-        socials: parseSocialMedia(data.socialMedia),
-        profiles: cleanPlayerSkyblockProfiles(data.stats.SkyBlock.profiles)
+        rank: cleanRank(data),
+        socials: cleanSocialMedia(data),
+        profiles: cleanPlayerSkyblockProfiles(data.stats?.SkyBlock?.profiles)
     }
 }

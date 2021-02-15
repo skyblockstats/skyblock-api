@@ -1,5 +1,5 @@
-import { HypixelPlayer } from '../hypixelApi'
 import { colorCodeFromName, minecraftColorCodes } from '../util'
+import { HypixelPlayer } from '../hypixelApi'
 
 const rankColors: { [ name: string ]: string } = {
 	'NONE': '7',
@@ -21,7 +21,7 @@ export interface CleanRank {
 }
 
 /** Response cleaning (reformatting to be nicer) */
-export function parseRank({
+export function cleanRank({
     packageRank,
     newPackageRank,
     monthlyPackageRank,
@@ -38,24 +38,28 @@ export function parseRank({
         name = colored.replace(/§./g, '').replace(/[\[\]]/g, '')
     } else {
         name = rank
-                || newPackageRank.replace('_PLUS', '+')
-                || packageRank.replace('_PLUS', '+')
+                || newPackageRank?.replace('_PLUS', '+')
+                || packageRank?.replace('_PLUS', '+')
                 || monthlyPackageRank
 
         // MVP++ is called Superstar for some reason
         if (name === 'SUPERSTAR') name = 'MVP++'
         // YouTube rank is called YouTuber, change this to the proper name
         else if (name === 'YOUTUBER') name = 'YOUTUBE'
+        else if (name === undefined) name = 'NONE'
 
-        const plusColor = colorCodeFromName(rankPlusColor)
+        const plusColor = rankPlusColor ? colorCodeFromName(rankPlusColor) : null
         color = minecraftColorCodes[rankColors[name]]
         const rankColorPrefix = rankColors[name] ? '§' + rankColors[name] : ''
         const nameWithoutPlus = name.split('+')[0]
         const plusesInName = '+'.repeat(name.split('+').length - 1)
         if (plusColor && plusesInName.length >= 1)
             colored = `${rankColorPrefix}[${nameWithoutPlus}§${plusColor}${plusesInName}${rankColorPrefix}]`
-        else
+        else if (name !== 'NONE')
             colored = `${rankColorPrefix}[${name}]`
+        else
+            // nons don't have a prefix
+            colored = `${rankColorPrefix}`
     }
     return {
         name,

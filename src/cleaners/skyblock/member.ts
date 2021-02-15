@@ -11,7 +11,7 @@ import { CleanPlayer } from '../player'
 import { Bank } from './bank'
 import { cleanVisitedZones, Zone } from './zones'
 import { cleanCollections, Collection } from './collections'
-import { cleanSlayers, Slayer, SlayerData } from './slayers'
+import { cleanSlayers, SlayerData } from './slayers'
 
 export interface CleanBasicMember {
     uuid: string
