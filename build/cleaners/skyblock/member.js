@@ -29,12 +29,15 @@ const skills_1 = require("./skills");
 const cached = __importStar(require("../../hypixelCached"));
 const zones_1 = require("./zones");
 const collections_1 = require("./collections");
+const slayers_1 = require("./slayers");
 async function cleanSkyBlockProfileMemberResponseBasic(member, included = null) {
+    const player = await cached.fetchPlayer(member.uuid);
     return {
         uuid: member.uuid,
-        username: await cached.usernameFromUser(member.uuid),
+        username: player.username,
         last_save: member.last_save,
         first_join: member.first_join,
+        rank: player.rank
     };
 }
 exports.cleanSkyBlockProfileMemberResponseBasic = cleanSkyBlockProfileMemberResponseBasic;
@@ -42,11 +45,13 @@ exports.cleanSkyBlockProfileMemberResponseBasic = cleanSkyBlockProfileMemberResp
 async function cleanSkyBlockProfileMemberResponse(member, included = null) {
     // profiles.members[]
     const inventoriesIncluded = included == null || included.includes('inventories');
+    const player = await cached.fetchPlayer(member.uuid);
     return {
         uuid: member.uuid,
-        username: await cached.usernameFromUser(member.uuid),
+        username: player.username,
         last_save: member.last_save,
         first_join: member.first_join,
+        rank: player.rank,
         purse: member.coin_purse,
         stats: stats_1.cleanProfileStats(member),
         minions: minions_1.cleanMinions(member),
@@ -55,7 +60,8 @@ async function cleanSkyBlockProfileMemberResponse(member, included = null) {
         objectives: objectives_1.cleanObjectives(member),
         skills: skills_1.cleanSkills(member),
         visited_zones: zones_1.cleanVisitedZones(member),
-        collections: collections_1.cleanCollections(member)
+        collections: collections_1.cleanCollections(member),
+        slayers: slayers_1.cleanSlayers(member)
     };
 }
 exports.cleanSkyBlockProfileMemberResponse = cleanSkyBlockProfileMemberResponse;

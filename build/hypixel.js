@@ -107,6 +107,9 @@ exports.fetchUser = fetchUser;
 async function fetchMemberProfile(user, profile) {
     const playerUuid = await cached.uuidFromUser(user);
     const profileUuid = await cached.fetchProfileUuid(user, profile);
+    // if the profile doesn't have an id, just return
+    if (!profileUuid)
+        return null;
     const player = await cached.fetchPlayer(playerUuid);
     const cleanProfile = await cached.fetchProfile(playerUuid, profileUuid);
     const member = cleanProfile.members.find(m => m.uuid === playerUuid);
@@ -117,6 +120,7 @@ async function fetchMemberProfile(user, profile) {
             username: m.username,
             first_join: m.first_join,
             last_save: m.last_save,
+            rank: m.rank
         };
     });
     cleanProfile.members = simpleMembers;

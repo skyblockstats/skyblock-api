@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseSocialMedia = void 0;
-function parseSocialMedia(socialMedia) {
-    var _a, _b;
+exports.cleanSocialMedia = void 0;
+function cleanSocialMedia(data) {
+    var _a, _b, _c, _d;
     return {
-        discord: ((_a = socialMedia === null || socialMedia === void 0 ? void 0 : socialMedia.links) === null || _a === void 0 ? void 0 : _a.DISCORD) || null,
-        forums: ((_b = socialMedia === null || socialMedia === void 0 ? void 0 : socialMedia.links) === null || _b === void 0 ? void 0 : _b.HYPIXEL) || null
+        discord: ((_b = (_a = data === null || data === void 0 ? void 0 : data.socialMedia) === null || _a === void 0 ? void 0 : _a.links) === null || _b === void 0 ? void 0 : _b.DISCORD) || null,
+        forums: ((_d = (_c = data === null || data === void 0 ? void 0 : data.socialMedia) === null || _c === void 0 ? void 0 : _c.links) === null || _d === void 0 ? void 0 : _d.HYPIXEL) || null
     };
 }
-exports.parseSocialMedia = parseSocialMedia;
+exports.cleanSocialMedia = cleanSocialMedia;

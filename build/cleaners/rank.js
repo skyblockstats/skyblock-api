@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseRank = void 0;
+exports.cleanRank = void 0;
 const util_1 = require("../util");
 const rankColors = {
     'NONE': '7',
@@ -15,7 +15,7 @@ const rankColors = {
     'ADMIN': 'c'
 };
 /** Response cleaning (reformatting to be nicer) */
-function parseRank({ packageRank, newPackageRank, monthlyPackageRank, rankPlusColor, rank, prefix }) {
+function cleanRank({ packageRank, newPackageRank, monthlyPackageRank, rankPlusColor, rank, prefix }) {
     let name;
     let color;
     let colored;
@@ -26,8 +26,8 @@ function parseRank({ packageRank, newPackageRank, monthlyPackageRank, rankPlusCo
     }
     else {
         name = rank
-            || newPackageRank.replace('_PLUS', '+')
-            || packageRank.replace('_PLUS', '+')
+            || (newPackageRank === null || newPackageRank === void 0 ? void 0 : newPackageRank.replace('_PLUS', '+'))
+            || (packageRank === null || packageRank === void 0 ? void 0 : packageRank.replace('_PLUS', '+'))
             || monthlyPackageRank;
         // MVP++ is called Superstar for some reason
         if (name === 'SUPERSTAR')
@@ -35,15 +35,20 @@ function parseRank({ packageRank, newPackageRank, monthlyPackageRank, rankPlusCo
         // YouTube rank is called YouTuber, change this to the proper name
         else if (name === 'YOUTUBER')
             name = 'YOUTUBE';
-        const plusColor = util_1.colorCodeFromName(rankPlusColor);
+        else if (name === undefined)
+            name = 'NONE';
+        const plusColor = rankPlusColor ? util_1.colorCodeFromName(rankPlusColor) : null;
         color = util_1.minecraftColorCodes[rankColors[name]];
         const rankColorPrefix = rankColors[name] ? '§' + rankColors[name] : '';
         const nameWithoutPlus = name.split('+')[0];
         const plusesInName = '+'.repeat(name.split('+').length - 1);
         if (plusColor && plusesInName.length >= 1)
             colored = `${rankColorPrefix}[${nameWithoutPlus}§${plusColor}${plusesInName}${rankColorPrefix}]`;
-        else
+        else if (name !== 'NONE')
             colored = `${rankColorPrefix}[${name}]`;
+        else
+            // nons don't have a prefix
+            colored = `${rankColorPrefix}`;
     }
     return {
         name,
@@ -51,4 +56,4 @@ function parseRank({ packageRank, newPackageRank, monthlyPackageRank, rankPlusCo
         colored
     };
 }
-exports.parseRank = parseRank;
+exports.cleanRank = cleanRank;

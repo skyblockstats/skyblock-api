@@ -138,7 +138,8 @@ async function fetchSkyblockProfiles(playerUuid) {
                     uuid: m.uuid,
                     username: m.username,
                     first_join: m.first_join,
-                    last_save: m.last_save
+                    last_save: m.last_save,
+                    rank: m.rank
                 };
             })
         };
@@ -170,6 +171,9 @@ async function fetchBasicProfiles(user) {
  * @param profile A profile name or profile uuid
  */
 async function fetchProfileUuid(user, profile) {
+    // if a profile wasn't provided, return
+    if (!profile)
+        return null;
     const profiles = await fetchBasicProfiles(user);
     const profileUuid = util_1.undashUuid(profile);
     for (const p of profiles) {
