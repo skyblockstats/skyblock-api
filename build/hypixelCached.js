@@ -30,6 +30,8 @@ const node_cache_1 = __importDefault(require("node-cache"));
 const mojang = __importStar(require("./mojang"));
 const hypixel = __importStar(require("./hypixel"));
 const util_1 = require("./util");
+// TODO: put this somewhere else
+const debug = false;
 // cache usernames for 4 hours
 const usernameCache = new node_cache_1.default({
     stdTTL: 60 * 60 * 4,
@@ -49,7 +51,7 @@ const playerCache = new node_cache_1.default({
 const profileCache = new node_cache_1.default({
     stdTTL: 30,
     checkperiod: 10,
-    useClones: false,
+    useClones: true,
 });
 const profilesCache = new node_cache_1.default({
     stdTTL: 60 * 3,
@@ -91,6 +93,8 @@ exports.uuidFromUser = uuidFromUser;
  */
 async function usernameFromUser(user) {
     if (usernameCache.has(util_1.undashUuid(user))) {
+        if (debug)
+            console.log('Cache hit! usernameFromUser', user);
         return usernameCache.get(util_1.undashUuid(user));
     }
     let { uuid, username } = await mojang.mojangDataFromUser(user);
@@ -102,6 +106,8 @@ exports.usernameFromUser = usernameFromUser;
 async function fetchPlayer(user) {
     const playerUuid = await uuidFromUser(user);
     if (playerCache.has(playerUuid)) {
+        if (debug)
+            console.log('Cache hit! fetchPlayer', playerUuid);
         return playerCache.get(playerUuid);
     }
     const cleanPlayer = await hypixel.sendCleanApiRequest({
@@ -117,6 +123,8 @@ async function fetchPlayer(user) {
 exports.fetchPlayer = fetchPlayer;
 async function fetchSkyblockProfiles(playerUuid) {
     if (profilesCache.has(playerUuid)) {
+        if (debug)
+            console.log('Cache hit! fetchSkyblockProfiles', playerUuid);
         return profilesCache.get(playerUuid);
     }
     const profiles = await hypixel.sendCleanApiRequest({
@@ -155,6 +163,8 @@ exports.fetchSkyblockProfiles = fetchSkyblockProfiles;
 async function fetchBasicProfiles(user) {
     const playerUuid = await uuidFromUser(user);
     if (basicProfilesCache.has(playerUuid)) {
+        if (debug)
+            console.log('Cache hit! fetchBasicProfiles', playerUuid);
         return basicProfilesCache.get(playerUuid);
     }
     const player = await fetchPlayer(playerUuid);
@@ -194,6 +204,8 @@ async function fetchProfile(user, profile) {
     const profileUuid = await fetchProfileUuid(playerUuid, profile);
     if (profileCache.has(profileUuid)) {
         // we have the profile cached, return it :)
+        if (debug)
+            console.log('Cache hit! fetchProfile', profileUuid);
         return profileCache.get(profileUuid);
     }
     const profileName = await fetchProfileName(user, profile);
@@ -218,6 +230,8 @@ async function fetchProfileName(user, profile) {
     const playerUuid = await uuidFromUser(user);
     if (profileNameCache.has(`${playerUuid}.${profileUuid}`)) {
         // Return the profile name if it's cached
+        if (debug)
+            console.log('Cache hit! fetchProfileName', profileUuid);
         return profileNameCache.get(`${playerUuid}.${profileUuid}`);
     }
     const basicProfiles = await fetchBasicProfiles(playerUuid);
