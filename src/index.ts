@@ -3,6 +3,9 @@ import express from 'express'
 
 const app = express()
 
+export const debug = false
+
+
 app.use((req, res, next) => {
 	if (process.env.key && req.headers.key !== process.env.key)
 		// if a key is set in process.env and the header doesn't match return an error

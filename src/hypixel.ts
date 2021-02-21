@@ -8,6 +8,7 @@ import * as cached from './hypixelCached'
 import { CleanBasicMember, CleanMemberProfile } from './cleaners/skyblock/member'
 import { cleanSkyblockProfileResponse, CleanProfile, CleanBasicProfile } from './cleaners/skyblock/profile'
 import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles'
+import { debug } from '.'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories'
 
@@ -78,6 +79,7 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
     }
     if (!uuid) {
         // the user doesn't exist.
+        if (debug) console.log('error:', user, 'doesnt exist')
         return null
     }
 

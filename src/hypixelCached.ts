@@ -8,10 +8,8 @@ import * as hypixel from './hypixel'
 import { CleanPlayer } from './cleaners/player'
 import { undashUuid } from './util'
 import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/skyblock/profile'
+import { debug } from '.'
 
-
-// TODO: put this somewhere else
-const debug = false
 
 
 // cache usernames for 4 hours
@@ -185,7 +183,10 @@ async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[]> {
  */
 export async function fetchProfileUuid(user: string, profile: string) {
 	// if a profile wasn't provided, return
-	if (!profile) return null
+	if (!profile) {
+		if (debug) console.log('no profile provided?', user, profile)
+		return null
+	}
 
 	const profiles = await fetchBasicProfiles(user)
 
