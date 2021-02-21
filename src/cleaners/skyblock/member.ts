@@ -40,8 +40,8 @@ export async function cleanSkyBlockProfileMemberResponseBasic(member: any, inclu
     return {
         uuid: member.uuid,
         username: player.username,
-        last_save: member.last_save,
-        first_join: member.first_join,
+        last_save: member.last_save / 1000,
+        first_join: member.first_join / 1000,
         rank: player.rank
     }
 }
@@ -54,8 +54,8 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
     return {
         uuid: member.uuid,
         username: player.username,
-        last_save: member.last_save,
-        first_join: member.first_join,
+        last_save: member.last_save / 1000,
+        first_join: member.first_join / 1000,
         rank: player.rank,
 
         purse: member.coin_purse,
