@@ -3,9 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.debug = void 0;
 const hypixel_1 = require("./hypixel");
 const express_1 = __importDefault(require("express"));
 const app = express_1.default();
+exports.debug = false;
 app.use((req, res, next) => {
     if (process.env.key && req.headers.key !== process.env.key)
         // if a key is set in process.env and the header doesn't match return an error

@@ -28,6 +28,7 @@ const hypixelApi_1 = require("./hypixelApi");
 const cached = __importStar(require("./hypixelCached"));
 const profile_1 = require("./cleaners/skyblock/profile");
 const profiles_1 = require("./cleaners/skyblock/profiles");
+const _1 = require(".");
 // the interval at which the "last_save" parameter updates in the hypixel api, this is 3 minutes
 exports.saveInterval = 60 * 3 * 1000;
 // the highest level a minion can be
@@ -65,6 +66,8 @@ async function fetchUser({ user, uuid, username }, included = ['player']) {
     }
     if (!uuid) {
         // the user doesn't exist.
+        if (_1.debug)
+            console.log('error:', user, 'doesnt exist');
         return null;
     }
     const includePlayers = included.includes('player');
