@@ -1,5 +1,3 @@
-import { HypixelPlayerSocialMedia } from "../hypixelApi";
-
 export interface CleanSocialMedia {
 	discord: string | null
 	forums: string | null
