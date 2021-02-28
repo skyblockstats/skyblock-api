@@ -81,9 +81,8 @@ async function uuidFromUser(user) {
     if (usernameCache.has(util_1.undashUuid(user))) {
         // check if the uuid is a key
         const username = usernameCache.get(util_1.undashUuid(user));
-        // if it has .then, then that means its a waitForSet promise
+        // if it has .then, then that means its a waitForSet promise. This is done to prevent requests made while it is already requesting
         if (username.then) {
-            console.log('pog, prevented double request');
             return (await username()).key;
         }
         else
@@ -92,15 +91,13 @@ async function uuidFromUser(user) {
     // check if the username is a value
     const uuidToUsername = usernameCache.mget(usernameCache.keys());
     for (const [uuid, username] of Object.entries(uuidToUsername)) {
-        if (user.toLowerCase() === username.toLowerCase())
+        if (username.toLowerCase && user.toLowerCase() === username.toLowerCase())
             return uuid;
     }
     if (_1.debug)
         console.log('Cache miss: uuidFromUser', user);
     // set it as waitForSet (a promise) in case uuidFromUser gets called while its fetching mojang
-    console.log('setting', util_1.undashUuid(user));
     usernameCache.set(util_1.undashUuid(user), waitForSet(usernameCache, user, user));
-    console.log(util_1.undashUuid(user), usernameCache.has(util_1.undashUuid(user)));
     // not cached, actually fetch mojang api now
     let { uuid, username } = await mojang.mojangDataFromUser(user);
     if (!uuid)
@@ -134,12 +131,8 @@ exports.usernameFromUser = usernameFromUser;
 async function fetchPlayer(user) {
     const playerUuid = await uuidFromUser(user);
     if (playerCache.has(playerUuid)) {
-        if (_1.debug)
-            console.log('Cache hit! fetchPlayer', user);
         return playerCache.get(playerUuid);
     }
-    if (_1.debug)
-        console.log('Cache miss: uuidFromUser', user);
     const cleanPlayer = await hypixel.sendCleanApiRequest({
         path: 'player',
         args: { uuid: playerUuid }
