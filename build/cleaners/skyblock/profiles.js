@@ -15,12 +15,12 @@ function cleanPlayerSkyblockProfiles(rawProfiles) {
 exports.cleanPlayerSkyblockProfiles = cleanPlayerSkyblockProfiles;
 /** Convert an array of raw profiles into clean profiles */
 async function cleanSkyblockProfilesResponse(data) {
-    const cleanedProfiles = [];
+    const promises = [];
     for (const profile of data !== null && data !== void 0 ? data : []) {
         // let cleanedProfile = await cleanSkyblockProfileResponseLighter(profile)
-        let cleanedProfile = await profile_1.cleanSkyblockProfileResponse(profile);
-        cleanedProfiles.push(cleanedProfile);
+        promises.push(profile_1.cleanSkyblockProfileResponse(profile));
     }
+    const cleanedProfiles = await Promise.all(promises);
     return cleanedProfiles;
 }
 exports.cleanSkyblockProfilesResponse = cleanSkyblockProfilesResponse;
