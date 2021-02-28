@@ -39,7 +39,6 @@ const recentlyUpdated = new node_cache_1.default({
     useClones: false,
 });
 const cachedRawLeaderboards = new Map();
-const cachedLeaderboards = new Map();
 const leaderboardMax = 100;
 const reversedStats = [
     'first_join'
@@ -121,8 +120,6 @@ async function fetchMemberLeaderboardRaw(name) {
     return leaderboardRaw;
 }
 async function fetchMemberLeaderboard(name) {
-    if (cachedLeaderboards.has(name))
-        return cachedLeaderboards.get(name);
     const leaderboardRaw = await fetchMemberLeaderboardRaw(name);
     const fetchLeaderboardPlayer = async (item) => {
         return {
@@ -135,7 +132,6 @@ async function fetchMemberLeaderboard(name) {
         promises.push(fetchLeaderboardPlayer(item));
     }
     const leaderboard = await Promise.all(promises);
-    cachedLeaderboards.set(name, leaderboard);
     return leaderboard;
 }
 exports.fetchMemberLeaderboard = fetchMemberLeaderboard;
@@ -177,18 +173,8 @@ async function updateDatabaseMember(member, profile) {
         }
     }, { upsert: true });
     for (const [attributeName, attributeValue] of Object.entries(leaderboardAttributes)) {
-        const existingLeaderboard = await fetchMemberLeaderboard(attributeName);
         const existingRawLeaderboard = await fetchMemberLeaderboardRaw(attributeName);
         const leaderboardReverse = isLeaderboardReversed(attributeName);
-        const newLeaderboard = existingLeaderboard
-            // remove the player from the leaderboard, if they're there
-            .filter(value => value.player.uuid !== member.uuid)
-            .concat([{
-                player: await cached.fetchPlayer(member.uuid),
-                value: attributeValue
-            }])
-            .sort((a, b) => leaderboardReverse ? a.value - b.value : b.value - a.value)
-            .slice(0, 100);
         const newRawLeaderboard = existingRawLeaderboard
             // remove the player from the leaderboard, if they're there
             .filter(value => value.uuid !== member.uuid)
@@ -199,7 +185,6 @@ async function updateDatabaseMember(member, profile) {
             }])
             .sort((a, b) => leaderboardReverse ? a.stats[attributeName] - b.stats[attributeName] : b.stats[attributeName] - a.stats[attributeName])
             .slice(0, 100);
-        cachedLeaderboards.set(attributeName, newLeaderboard);
         cachedRawLeaderboards.set(attributeName, newRawLeaderboard);
     }
 }
@@ -212,7 +197,7 @@ async function removeBadMemberLeaderboardAttributes() {
     // shuffle so if the application is restarting many times itll still be useful
     for (const leaderboard of util_1.shuffle(leaderboards)) {
         // wait 10 seconds so it doesnt use as much ram
-        await new Promise(resolve => setTimeout(resolve, 10000));
+        await util_1.sleep(100000);
         const unsetValue = {};
         unsetValue[leaderboard] = '';
         const filter = {};

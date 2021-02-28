@@ -3,7 +3,7 @@
  * Random utility functions that are not related to Hypixel
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.colorCodeFromName = exports.minecraftColorCodes = exports.shuffle = exports.jsonToQuery = exports.queryToJson = exports.undashUuid = void 0;
+exports.sleep = exports.colorCodeFromName = exports.minecraftColorCodes = exports.shuffle = exports.jsonToQuery = exports.queryToJson = exports.undashUuid = void 0;
 function undashUuid(uuid) {
     return uuid.replace(/-/g, '').toLowerCase();
 }
@@ -78,3 +78,7 @@ function colorCodeFromName(colorName) {
     }
 }
 exports.colorCodeFromName = colorCodeFromName;
+async function sleep(ms) {
+    await new Promise(resolve => setTimeout(resolve, ms));
+}
+exports.sleep = sleep;

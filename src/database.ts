@@ -8,7 +8,7 @@ import { Collection, Db, MongoClient } from 'mongodb'
 import NodeCache from 'node-cache'
 import { CleanMember } from './cleaners/skyblock/member'
 import { CleanPlayer } from './cleaners/player'
-import { shuffle } from './util'
+import { shuffle, sleep } from './util'
 import { CleanFullProfile } from './cleaners/skyblock/profile'
 import { categorizeStat, StatCategory } from './cleaners/skyblock/stats'
 
@@ -31,7 +31,6 @@ interface LeaderboardItem {
 }
 
 const cachedRawLeaderboards: Map<string, DatabaseLeaderboardItem[]> = new Map()
-const cachedLeaderboards: Map<string, LeaderboardItem[]> = new Map()
 
 const leaderboardMax = 100
 const reversedStats = [
@@ -133,9 +132,6 @@ async function fetchMemberLeaderboardRaw(name: string): Promise<DatabaseLeaderbo
 }
 
 export async function fetchMemberLeaderboard(name: string) {
-	if (cachedLeaderboards.has(name))
-		return cachedLeaderboards.get(name)
-
 	const leaderboardRaw = await fetchMemberLeaderboardRaw(name)
 	const fetchLeaderboardPlayer = async(item: DatabaseLeaderboardItem): Promise<LeaderboardItem> => {
 		return {
@@ -148,7 +144,6 @@ export async function fetchMemberLeaderboard(name: string) {
 		promises.push(fetchLeaderboardPlayer(item))
 	}
 	const leaderboard = await Promise.all(promises)
-	cachedLeaderboards.set(name, leaderboard)
 	return leaderboard
 }
 
@@ -198,18 +193,8 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 	)
 
 	for (const [ attributeName, attributeValue ] of Object.entries(leaderboardAttributes)) {
-		const existingLeaderboard = await fetchMemberLeaderboard(attributeName)
 		const existingRawLeaderboard = await fetchMemberLeaderboardRaw(attributeName)
 		const leaderboardReverse = isLeaderboardReversed(attributeName)
-		const newLeaderboard = existingLeaderboard
-			// remove the player from the leaderboard, if they're there
-			.filter(value => value.player.uuid !== member.uuid)
-			.concat([{
-				player: await cached.fetchPlayer(member.uuid),
-				value: attributeValue
-			}])
-			.sort((a, b) => leaderboardReverse ? a.value - b.value : b.value - a.value)
-			.slice(0, 100)
 		const newRawLeaderboard = existingRawLeaderboard
 			// remove the player from the leaderboard, if they're there
 			.filter(value => value.uuid !== member.uuid)
@@ -220,7 +205,6 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 			}])
 			.sort((a, b) => leaderboardReverse ? a.stats[attributeName] - b.stats[attributeName] : b.stats[attributeName] - a.stats[attributeName])
 			.slice(0, 100)
-		cachedLeaderboards.set(attributeName, newLeaderboard)
 		cachedRawLeaderboards.set(attributeName, newRawLeaderboard)
 	}
 }
@@ -234,7 +218,7 @@ async function removeBadMemberLeaderboardAttributes() {
 	// shuffle so if the application is restarting many times itll still be useful
 	for (const leaderboard of shuffle(leaderboards)) {
 		// wait 10 seconds so it doesnt use as much ram
-		await new Promise(resolve => setTimeout(resolve, 10000))
+		await sleep(100000)
 
 		const unsetValue = {}
 		unsetValue[leaderboard] = ''
