@@ -1,6 +1,6 @@
 import { fetchMemberProfile, fetchUser } from './hypixel'
 import express from 'express'
-import { fetchMemberLeaderboard } from './database'
+import { fetchAllMemberLeaderboardAttributes, fetchMemberLeaderboard } from './database'
 
 const app = express()
 
@@ -39,6 +39,13 @@ app.get('/leaderboard/:name', async(req, res) => {
 		await fetchMemberLeaderboard(req.params.name)
 	)
 })
+
+app.get('/leaderboards', async(req, res) => {
+	res.json(
+		await fetchAllMemberLeaderboardAttributes()
+	)
+})
+
 
 
 app.listen(8080, () => console.log('App started :)'))

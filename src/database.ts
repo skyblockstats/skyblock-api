@@ -76,7 +76,7 @@ function getMemberLeaderboardAttributes(member: CleanMember) {
 }
 
 /** Fetch the names of all the leaderboards */
-async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
+export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 	return [
 		// we use the raw stat names rather than the clean stats in case hypixel adds a new stat and it takes a while for us to clean it
 		...await constants.fetchStats(),
