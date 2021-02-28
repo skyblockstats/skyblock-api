@@ -30,6 +30,8 @@ interface LeaderboardItem {
 
 const cachedLeaderboards: Map<string, any> = new Map()
 
+const leaderboardMax = 100
+
 
 let client: MongoClient
 let database: Db
@@ -98,7 +100,7 @@ export async function fetchMemberLeaderboard(name: string) {
 	sortQuery[`stats.${name}`] = -1
 
 
-	const leaderboardRaw = await memberLeaderboardsCollection.find(query).sort(sortQuery).limit(100).toArray()
+	const leaderboardRaw = await memberLeaderboardsCollection.find(query).sort(sortQuery).limit(leaderboardMax).toArray()
 	const fetchLeaderboardPlayer = async(item: DatabaseLeaderboardItem): Promise<LeaderboardItem> => {
 		return {
 			player: await cached.fetchPlayer(item.uuid),
@@ -117,8 +119,8 @@ export async function fetchMemberLeaderboard(name: string) {
 async function getMemberLeaderboardRequirement(name: string): Promise<number> {
 	const leaderboard = await fetchMemberLeaderboard(name)
 	// if there's more than 100 items, return the 100th. if there's less, return null
-	if (leaderboard.length >= 100)
-		return leaderboard[99].value
+	if (leaderboard.length >= leaderboardMax)
+		return leaderboard[leaderboardMax - 1].value
 	else
 		return null
 }
