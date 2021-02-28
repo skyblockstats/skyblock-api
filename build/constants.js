@@ -33,9 +33,9 @@ async function fetchGithubApi(method, route, headers, json) {
         }, headers),
     });
 }
-// cache files for a day
+// cache files for an hour
 const fileCache = new node_cache_1.default({
-    stdTTL: 60 * 60 * 24,
+    stdTTL: 60 * 60,
     checkperiod: 60,
     useClones: false,
 });
