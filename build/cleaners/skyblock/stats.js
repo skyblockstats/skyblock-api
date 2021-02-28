@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cleanProfileStats = void 0;
+exports.cleanProfileStats = exports.categorizeStat = void 0;
 const statCategories = {
     'deaths': ['deaths_', 'deaths'],
     'kills': ['kills_', 'kills'],
     'fishing': ['items_fished_', 'items_fished'],
     'auctions': ['auctions_'],
+    'collection': ['collection_'],
     'races': ['_best_time'],
     'misc': null // everything else goes here
 };
@@ -52,6 +53,7 @@ function categorizeStat(statNameRaw) {
         name: statNameRaw
     };
 }
+exports.categorizeStat = categorizeStat;
 function cleanProfileStats(data) {
     var _a;
     // TODO: add type for statsRaw (probably in hypixelApi.ts since its coming from there)

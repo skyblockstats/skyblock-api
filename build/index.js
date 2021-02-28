@@ -28,4 +28,7 @@ app.get('/player/:user/:profile', async (req, res) => {
 app.get('/leaderboard/:name', async (req, res) => {
     res.json(await database_1.fetchMemberLeaderboard(req.params.name));
 });
+app.get('/leaderboards', async (req, res) => {
+    res.json(await database_1.fetchAllLeaderboardsCategoriezed());
+});
 app.listen(8080, () => console.log('App started :)'));

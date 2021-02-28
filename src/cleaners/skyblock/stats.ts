@@ -3,16 +3,17 @@ const statCategories: { [ key: string ]: string[] | null } = { // sorted in orde
     'kills': ['kills_', 'kills'],
     'fishing': ['items_fished_', 'items_fished'],
     'auctions': ['auctions_'],
+    'collection': ['collection_'],
     'races': ['_best_time'],
     'misc': null // everything else goes here
 }
 
-interface statCategory {
+export interface StatCategory {
 	category: string,
 	name: string
 }
 
-function categorizeStat(statNameRaw: string): statCategory {
+export function categorizeStat(statNameRaw: string): StatCategory {
     // 'deaths_void'
     for (const statCategory in statCategories) {
         // 'deaths'

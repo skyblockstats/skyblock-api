@@ -10,6 +10,7 @@ import { CleanMember } from './cleaners/skyblock/member'
 import { CleanPlayer } from './cleaners/player'
 import { shuffle } from './util'
 import { CleanFullProfile } from './cleaners/skyblock/profile'
+import { categorizeStat, StatCategory } from './cleaners/skyblock/stats'
 
 // don't update the user for 3 minutes
 const recentlyUpdated = new NodeCache({
@@ -74,6 +75,25 @@ function getMemberLeaderboardAttributes(member: CleanMember) {
 		visited_zones: member.visited_zones.length,
 	}
 }
+
+interface CategorizedLeaderboard extends StatCategory {
+	id: string
+}
+
+export async function fetchAllLeaderboardsCategoriezed(): Promise<CategorizedLeaderboard[]> {
+	const memberLeaderboardAttributes = await fetchAllMemberLeaderboardAttributes()
+	const categorizedLeaderboards: CategorizedLeaderboard[] = []
+	for (const leaderboard of memberLeaderboardAttributes) {
+		const { category, name } = categorizeStat(leaderboard)
+		categorizedLeaderboards.push({
+			category,
+			name,
+			id: leaderboard
+		})
+	}
+	return categorizedLeaderboards
+}
+
 
 /** Fetch the names of all the leaderboards */
 export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {

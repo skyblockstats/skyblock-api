@@ -25,12 +25,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateDatabaseMember = exports.fetchMemberLeaderboard = void 0;
+exports.updateDatabaseMember = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchAllLeaderboardsCategoriezed = void 0;
 const constants = __importStar(require("./constants"));
 const cached = __importStar(require("./hypixelCached"));
 const mongodb_1 = require("mongodb");
 const node_cache_1 = __importDefault(require("node-cache"));
 const util_1 = require("./util");
+const stats_1 = require("./cleaners/skyblock/stats");
 // don't update the user for 3 minutes
 const recentlyUpdated = new node_cache_1.default({
     stdTTL: 60 * 3,
@@ -73,6 +74,20 @@ function getMemberLeaderboardAttributes(member) {
         visited_zones: member.visited_zones.length,
     };
 }
+async function fetchAllLeaderboardsCategoriezed() {
+    const memberLeaderboardAttributes = await fetchAllMemberLeaderboardAttributes();
+    const categorizedLeaderboards = [];
+    for (const leaderboard of memberLeaderboardAttributes) {
+        const { category, name } = stats_1.categorizeStat(leaderboard);
+        categorizedLeaderboards.push({
+            category,
+            name,
+            id: leaderboard
+        });
+    }
+    return categorizedLeaderboards;
+}
+exports.fetchAllLeaderboardsCategoriezed = fetchAllLeaderboardsCategoriezed;
 /** Fetch the names of all the leaderboards */
 async function fetchAllMemberLeaderboardAttributes() {
     return [
@@ -86,6 +101,7 @@ async function fetchAllMemberLeaderboardAttributes() {
         'visited_zones',
     ];
 }
+exports.fetchAllMemberLeaderboardAttributes = fetchAllMemberLeaderboardAttributes;
 async function fetchMemberLeaderboardRaw(name) {
     if (cachedRawLeaderboards.has(name))
         return cachedRawLeaderboards.get(name);
