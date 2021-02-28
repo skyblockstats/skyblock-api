@@ -30,6 +30,7 @@ const constants = __importStar(require("./constants"));
 const cached = __importStar(require("./hypixelCached"));
 const mongodb_1 = require("mongodb");
 const node_cache_1 = __importDefault(require("node-cache"));
+const util_1 = require("./util");
 // don't update the user for 3 minutes
 const recentlyUpdated = new node_cache_1.default({
     stdTTL: 60 * 3,
@@ -115,6 +116,16 @@ async function getMemberLeaderboardRequirement(name) {
     else
         return null;
 }
+/** Get the attributes for the member, but only ones that would put them on the top 100 for leaderboards */
+async function getApplicableAttributes(member) {
+    const leaderboardAttributes = getMemberLeaderboardAttributes(member);
+    const applicableAttributes = [];
+    for (const [attributeName, attributeValue] of Object.entries(leaderboardAttributes)) {
+        const requirement = await getMemberLeaderboardRequirement(attributeName);
+        if (!requirement || attributeValue > requirement)
+            applicableAttributes[attributeName] = attributeValue;
+    }
+}
 /** Update the member's leaderboard data on the server if applicable */
 async function updateDatabaseMember(member) {
     if (!client)
@@ -126,7 +137,7 @@ async function updateDatabaseMember(member) {
     recentlyUpdated.set(member.uuid, true);
     await constants.addStats(Object.keys(member.rawHypixelStats));
     await constants.addCollections(member.collections.map(value => value.name));
-    const leaderboardAttributes = getMemberLeaderboardAttributes(member);
+    const leaderboardAttributes = await getApplicableAttributes(member);
     await memberLeaderboardsCollection.updateOne({
         uuid: member.uuid
     }, {
@@ -144,7 +155,8 @@ exports.updateDatabaseMember = updateDatabaseMember;
  */
 async function removeBadMemberLeaderboardAttributes() {
     const leaderboards = await fetchAllMemberLeaderboardAttributes();
-    for (const leaderboard of leaderboards) {
+    // shuffle so if the application is restarting many times itll still be useful
+    for (const leaderboard of util_1.shuffle(leaderboards)) {
         // wait 10 seconds so it doesnt use as much ram
         await new Promise(resolve => setTimeout(resolve, 10000));
         const unsetValue = {};

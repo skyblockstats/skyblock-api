@@ -7,6 +7,8 @@ import * as cached from './hypixelCached'
 import { Collection, Db, MongoClient } from 'mongodb'
 import NodeCache from 'node-cache'
 import { CleanMember } from './cleaners/skyblock/member'
+import { CleanPlayer } from './cleaners/player'
+import { shuffle } from './util'
 
 // don't update the user for 3 minutes
 const recentlyUpdated = new NodeCache({
@@ -15,10 +17,15 @@ const recentlyUpdated = new NodeCache({
 	useClones: false,
 })
 
-interface LeaderboardItem {
+interface DatabaseLeaderboardItem {
 	uuid: string
 	stats: any
 	last_updated: Date
+}
+
+interface LeaderboardItem {
+	player: CleanPlayer
+	value: number
 }
 
 const cachedLeaderboards: Map<string, any> = new Map()
@@ -92,13 +99,13 @@ export async function fetchMemberLeaderboard(name: string) {
 
 
 	const leaderboardRaw = await memberLeaderboardsCollection.find(query).sort(sortQuery).limit(100).toArray()
-	const fetchLeaderboardPlayer = async(item: LeaderboardItem) => {
+	const fetchLeaderboardPlayer = async(item: DatabaseLeaderboardItem): Promise<LeaderboardItem> => {
 		return {
 			player: await cached.fetchPlayer(item.uuid),
 			value: item.stats[name]
 		}
 	}
-	const promises = []
+	const promises: Promise<LeaderboardItem>[] = []
 	for (const item of leaderboardRaw) {
 		promises.push(fetchLeaderboardPlayer(item))
 	}
@@ -107,13 +114,24 @@ export async function fetchMemberLeaderboard(name: string) {
 	return leaderboard
 }
 
-async function getMemberLeaderboardRequirement(name: string): Promise<LeaderboardItem> {
+async function getMemberLeaderboardRequirement(name: string): Promise<number> {
 	const leaderboard = await fetchMemberLeaderboard(name)
 	// if there's more than 100 items, return the 100th. if there's less, return null
 	if (leaderboard.length >= 100)
 		return leaderboard[99].value
 	else
 		return null
+}
+
+/** Get the attributes for the member, but only ones that would put them on the top 100 for leaderboards */
+async function getApplicableAttributes(member) {
+	const leaderboardAttributes = getMemberLeaderboardAttributes(member)
+	const applicableAttributes = []
+	for (const [ attributeName, attributeValue ] of Object.entries(leaderboardAttributes)) {
+		const requirement = await getMemberLeaderboardRequirement(attributeName)
+		if (!requirement || attributeValue > requirement)
+			applicableAttributes[attributeName] = attributeValue
+	}
 }
 
 /** Update the member's leaderboard data on the server if applicable */
@@ -128,7 +146,7 @@ export async function updateDatabaseMember(member: CleanMember) {
 	await constants.addStats(Object.keys(member.rawHypixelStats))
 	await constants.addCollections(member.collections.map(value => value.name))
 
-	const leaderboardAttributes = getMemberLeaderboardAttributes(member)
+	const leaderboardAttributes = await getApplicableAttributes(member)
 
 	await memberLeaderboardsCollection.updateOne(
 		{
@@ -150,7 +168,8 @@ export async function updateDatabaseMember(member: CleanMember) {
  */
 async function removeBadMemberLeaderboardAttributes() {
 	const leaderboards = await fetchAllMemberLeaderboardAttributes()
-	for (const leaderboard of leaderboards) {
+	// shuffle so if the application is restarting many times itll still be useful
+	for (const leaderboard of shuffle(leaderboards)) {
 		// wait 10 seconds so it doesnt use as much ram
 		await new Promise(resolve => setTimeout(resolve, 10000))
 
