@@ -34,7 +34,9 @@ const cachedRawLeaderboards: Map<string, DatabaseLeaderboardItem[]> = new Map()
 const cachedLeaderboards: Map<string, LeaderboardItem[]> = new Map()
 
 const leaderboardMax = 100
-
+const reversedStats = [
+	'first_join'
+]
 
 let client: MongoClient
 let database: Db
@@ -111,15 +113,19 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 	]
 }
 
+function isLeaderboardReversed(name: string): boolean {
+	return reversedStats.includes(name)
+}
+
 async function fetchMemberLeaderboardRaw(name: string): Promise<DatabaseLeaderboardItem[]> {
 	if (cachedRawLeaderboards.has(name))
 		return cachedRawLeaderboards.get(name)
 	// typescript forces us to make a new variable and set it this way because it gives an error otherwise
 	const query = {}
-	query[`stats.${name}`] = { '$exists': true }
+	query[`stats.${name}`] = { '$exists': true, '$ne': NaN }
 
 	const sortQuery: any = {}
-	sortQuery[`stats.${name}`] = -1
+	sortQuery[`stats.${name}`] = isLeaderboardReversed(name) ? 1 : -1
 
 	const leaderboardRaw = await memberLeaderboardsCollection.find(query).sort(sortQuery).limit(leaderboardMax).toArray()
 	cachedRawLeaderboards.set(name, leaderboardRaw)
@@ -194,6 +200,7 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 	for (const [ attributeName, attributeValue ] of Object.entries(leaderboardAttributes)) {
 		const existingLeaderboard = await fetchMemberLeaderboard(attributeName)
 		const existingRawLeaderboard = await fetchMemberLeaderboardRaw(attributeName)
+		const leaderboardReverse = isLeaderboardReversed(attributeName)
 		const newLeaderboard = existingLeaderboard
 			// remove the player from the leaderboard, if they're there
 			.filter(value => value.player.uuid !== member.uuid)
@@ -201,7 +208,7 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 				player: await cached.fetchPlayer(member.uuid),
 				value: attributeValue
 			}])
-			.sort((a, b) => b.value - a.value)
+			.sort((a, b) => leaderboardReverse ? a.value - b.value : b.value - a.value)
 			.slice(0, 100)
 		const newRawLeaderboard = existingRawLeaderboard
 			// remove the player from the leaderboard, if they're there
@@ -211,7 +218,7 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 				stats: leaderboardAttributes,
 				uuid: member.uuid
 			}])
-			.sort((a, b) => b.stats[attributeName] - a.stats[attributeName])
+			.sort((a, b) => leaderboardReverse ? a.stats[attributeName] - b.stats[attributeName] : b.stats[attributeName] - a.stats[attributeName])
 			.slice(0, 100)
 		cachedLeaderboards.set(attributeName, newLeaderboard)
 		cachedRawLeaderboards.set(attributeName, newRawLeaderboard)
