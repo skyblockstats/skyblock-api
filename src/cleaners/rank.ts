@@ -39,9 +39,10 @@ export function cleanRank({
 	} else {
 		if (monthlyPackageRank && monthlyPackageRank !== 'NONE')
 			name = monthlyPackageRank
-		else
+		else if (rank && rank !== 'NORMAL')
 			name = rank
-				?? newPackageRank?.replace('_PLUS', '+')
+		else
+			name = newPackageRank?.replace('_PLUS', '+')
 				?? packageRank?.replace('_PLUS', '+')
 
 		// MVP++ is called Superstar for some reason
