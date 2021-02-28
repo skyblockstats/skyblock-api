@@ -25,8 +25,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateDatabaseMember = void 0;
+exports.updateDatabaseMember = exports.fetchMemberLeaderboard = void 0;
 const constants = __importStar(require("./constants"));
+const cached = __importStar(require("./hypixelCached"));
 const mongodb_1 = require("mongodb");
 const node_cache_1 = __importDefault(require("node-cache"));
 // don't update the user for 3 minutes
@@ -57,7 +58,7 @@ function getMemberCollectionAttributes(member) {
     return collectionAttributes;
 }
 function getMemberLeaderboardAttributes(member) {
-    // if you want to add a new leaderboard for member attributes, add it here
+    // if you want to add a new leaderboard for member attributes, add it here (and getAllLeaderboardAttributes)
     return {
         // we use the raw stat names rather than the clean stats in case hypixel adds a new stat and it takes a while for us to clean it
         ...member.rawHypixelStats,
@@ -69,6 +70,19 @@ function getMemberLeaderboardAttributes(member) {
         visited_zones: member.visited_zones.length,
     };
 }
+/** Fetch the names of all the leaderboards */
+async function fetchAllMemberLeaderboardAttributes() {
+    return [
+        // we use the raw stat names rather than the clean stats in case hypixel adds a new stat and it takes a while for us to clean it
+        ...await constants.fetchStats(),
+        // collection leaderboards
+        ...(await constants.fetchCollections()).map(value => `collection_${value}`),
+        'fairy_souls',
+        'first_join',
+        'purse',
+        'visited_zones',
+    ];
+}
 async function fetchMemberLeaderboard(name) {
     if (cachedLeaderboards.has(name))
         return cachedLeaderboards.get(name);
@@ -76,16 +90,28 @@ async function fetchMemberLeaderboard(name) {
     const query = {};
     query[`stats.${name}`] = { '$exists': true };
     const sortQuery = {};
-    sortQuery[`stats.${name}`] = 1;
-    const leaderboard = await memberLeaderboardsCollection.find(query).sort(sortQuery).toArray();
+    sortQuery[`stats.${name}`] = -1;
+    const leaderboardRaw = await memberLeaderboardsCollection.find(query).sort(sortQuery).limit(100).toArray();
+    const fetchLeaderboardPlayer = async (item) => {
+        return {
+            player: await cached.fetchPlayer(item.uuid),
+            value: item.stats[name]
+        };
+    };
+    const promises = [];
+    for (const item of leaderboardRaw) {
+        promises.push(fetchLeaderboardPlayer(item));
+    }
+    const leaderboard = await Promise.all(promises);
     cachedLeaderboards.set(name, leaderboard);
     return leaderboard;
 }
-async function getLeaderboardRequirement(name) {
+exports.fetchMemberLeaderboard = fetchMemberLeaderboard;
+async function getMemberLeaderboardRequirement(name) {
     const leaderboard = await fetchMemberLeaderboard(name);
     // if there's more than 100 items, return the 100th. if there's less, return null
-    if (leaderboard.length > 100)
-        return leaderboard[100].stats[name];
+    if (leaderboard.length >= 100)
+        return leaderboard[99].value;
     else
         return null;
 }
@@ -99,6 +125,7 @@ async function updateDatabaseMember(member) {
     // store the member in recentlyUpdated so it cant update for 3 more minutes
     recentlyUpdated.set(member.uuid, true);
     await constants.addStats(Object.keys(member.rawHypixelStats));
+    await constants.addCollections(member.collections.map(value => value.name));
     const leaderboardAttributes = getMemberLeaderboardAttributes(member);
     await memberLeaderboardsCollection.updateOne({
         uuid: member.uuid
@@ -112,4 +139,25 @@ async function updateDatabaseMember(member) {
     });
 }
 exports.updateDatabaseMember = updateDatabaseMember;
-connect();
+/**
+ * Remove leaderboard attributes for members that wouldn't actually be on the leaderboard. This saves a lot of storage space
+ */
+async function removeBadMemberLeaderboardAttributes() {
+    const leaderboards = await fetchAllMemberLeaderboardAttributes();
+    for (const leaderboard of leaderboards) {
+        // wait 10 seconds so it doesnt use as much ram
+        await new Promise(resolve => setTimeout(resolve, 10000));
+        const unsetValue = {};
+        unsetValue[leaderboard] = '';
+        const filter = {};
+        const requirement = await getMemberLeaderboardRequirement(leaderboard);
+        if (requirement !== null) {
+            filter[`stats.${leaderboard}`] = {
+                '$lt': requirement
+            };
+            await memberLeaderboardsCollection.updateMany(filter, { '$unset': unsetValue });
+        }
+    }
+}
+connect()
+    .then(removeBadMemberLeaderboardAttributes);

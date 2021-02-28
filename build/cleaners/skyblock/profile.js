@@ -26,13 +26,14 @@ exports.cleanSkyblockProfileResponseLighter = cleanSkyblockProfileResponseLighte
  * This function is somewhat costly and shouldn't be called often. Use cleanSkyblockProfileResponseLighter if you don't need all the data
  */
 async function cleanSkyblockProfileResponse(data, options) {
-    const cleanedMembers = [];
+    // We use Promise.all so it can fetch all the users at once instead of waiting for the previous promise to complete
+    const promises = [];
     for (const memberUUID in data.members) {
         const memberRaw = data.members[memberUUID];
         memberRaw.uuid = memberUUID;
-        const member = await member_1.cleanSkyBlockProfileMemberResponse(memberRaw, ['stats', (options === null || options === void 0 ? void 0 : options.mainMemberUuid) === memberUUID ? 'inventories' : undefined]);
-        cleanedMembers.push(member);
+        promises.push(member_1.cleanSkyBlockProfileMemberResponse(memberRaw, ['stats', (options === null || options === void 0 ? void 0 : options.mainMemberUuid) === memberUUID ? 'inventories' : undefined]));
     }
+    const cleanedMembers = await Promise.all(promises);
     const memberMinions = [];
     for (const member of cleanedMembers) {
         memberMinions.push(member.minions);

@@ -6,7 +6,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addStats = exports.fetchStats = void 0;
+exports.addCollections = exports.addStats = exports.fetchCollections = exports.fetchStats = void 0;
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const https_1 = require("https");
 const node_cache_1 = __importDefault(require("node-cache"));
@@ -81,6 +81,18 @@ async function fetchStats() {
     }
 }
 exports.fetchStats = fetchStats;
+/** Fetch all the known SkyBlock collections as an array of strings */
+async function fetchCollections() {
+    const file = await fetchFile('collections.json');
+    try {
+        return JSON.parse(file.content);
+    }
+    catch {
+        // probably invalid json, return an empty array
+        return [];
+    }
+}
+exports.fetchCollections = fetchCollections;
 /** Add stats to skyblock-constants. This has caching so it's fine to call many times */
 async function addStats(addingStats) {
     if (addingStats.length === 0)
@@ -109,3 +121,31 @@ async function addStats(addingStats) {
     await editFile(file, commitMessage, JSON.stringify(updatedStats, null, 2));
 }
 exports.addStats = addStats;
+/** Add stats to skyblock-constants. This has caching so it's fine to call many times */
+async function addCollections(addingCollections) {
+    if (addingCollections.length === 0)
+        return; // no stats provided, just return
+    const file = await fetchFile('collections.json');
+    if (!file.path)
+        return;
+    let oldCollections;
+    try {
+        oldCollections = JSON.parse(file.content);
+    }
+    catch {
+        // invalid json, set it as an empty array
+        oldCollections = [];
+    }
+    const updatedCollections = oldCollections
+        .concat(addingCollections)
+        // remove duplicates
+        .filter((value, index, array) => array.indexOf(value) === index)
+        .sort((a, b) => a.localeCompare(b));
+    const newCollections = updatedCollections.filter(value => !oldCollections.includes(value));
+    // there's not actually any new stats, just return
+    if (newCollections.length === 0)
+        return;
+    const commitMessage = newCollections.length >= 2 ? `Add ${newCollections.length} new collections` : `Add '${newCollections[0]}'`;
+    await editFile(file, commitMessage, JSON.stringify(updatedCollections, null, 2));
+}
+exports.addCollections = addCollections;
