@@ -4,7 +4,7 @@
 
 import * as constants from './constants'
 import * as cached from './hypixelCached'
-import { Collection, Db, FilterQuery, MongoClient } from 'mongodb'
+import { Collection, Db, MongoClient } from 'mongodb'
 import NodeCache from 'node-cache'
 import { CleanMember } from './cleaners/skyblock/member'
 
@@ -26,7 +26,7 @@ const cachedLeaderboards: Map<string, any> = new Map()
 
 let client: MongoClient
 let database: Db
-let memberLeaderboardsCollection: Collection<LeaderboardItem>
+let memberLeaderboardsCollection: Collection<any>
 
 async function connect() {
 	if (!process.env.db_uri)
@@ -84,7 +84,7 @@ export async function fetchMemberLeaderboard(name: string) {
 	if (cachedLeaderboards.has(name))
 		return cachedLeaderboards.get(name)
 	// typescript forces us to make a new variable and set it this way because it gives an error otherwise
-	const query: FilterQuery<any> = {}
+	const query = {}
 	query[`stats.${name}`] = { '$exists': true }
 
 	const sortQuery: any = {}
@@ -130,16 +130,18 @@ export async function updateDatabaseMember(member: CleanMember) {
 
 	const leaderboardAttributes = getMemberLeaderboardAttributes(member)
 
-	await memberLeaderboardsCollection.updateOne({
-		uuid: member.uuid
-	}, {
-		'$set': {
-			'stats': leaderboardAttributes,
-			'last_updated': new Date()
+	await memberLeaderboardsCollection.updateOne(
+		{
+			uuid: member.uuid
+		}, {
+			'$set': {
+				'stats': leaderboardAttributes,
+				'last_updated': new Date()
+			}
+		}, {
+			upsert: true
 		}
-	}, {
-		upsert: true
-	})
+	)
 }
 
 

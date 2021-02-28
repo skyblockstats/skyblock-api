@@ -2,7 +2,7 @@
  * Fetch the clean and cached Hypixel API
  */
 
-import NodeCache, { EventEmitter, Key } from 'node-cache'
+import NodeCache from 'node-cache'
 import * as mojang from './mojang'
 import * as hypixel from './hypixel'
 import { CleanPlayer } from './cleaners/player'
