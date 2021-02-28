@@ -14,11 +14,11 @@ export function cleanPlayerSkyblockProfiles(rawProfiles: HypixelPlayerStatsSkyBl
 
 /** Convert an array of raw profiles into clean profiles */
 export async function cleanSkyblockProfilesResponse(data: any[]): Promise<CleanProfile[]> {
-    const cleanedProfiles: CleanProfile[] = []
+    const promises = []
     for (const profile of data ?? []) {
         // let cleanedProfile = await cleanSkyblockProfileResponseLighter(profile)
-        let cleanedProfile = await cleanSkyblockProfileResponse(profile)
-        cleanedProfiles.push(cleanedProfile)
+        promises.push(cleanSkyblockProfileResponse(profile))
     }
+    const cleanedProfiles: CleanProfile[] = await Promise.all(promises)
     return cleanedProfiles
 }
