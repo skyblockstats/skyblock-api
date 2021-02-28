@@ -156,7 +156,7 @@ async function fetchMemberProfileUncached(playerUuid, profileUuid) {
         args: { profile: profileUuid }
     }, null, { mainMemberUuid: playerUuid });
     for (const member of profile.members)
-        database_1.updateDatabaseMember(member);
+        database_1.updateDatabaseMember(member, profile);
     return profile;
 }
 exports.fetchMemberProfileUncached = fetchMemberProfileUncached;
@@ -170,9 +170,11 @@ async function fetchMemberProfilesUncached(playerUuid) {
         // only the inventories for the main player are generated, this is for optimization purposes
         mainMemberUuid: playerUuid
     });
-    for (const profile of profiles)
-        for (const member of profile.members)
-            database_1.updateDatabaseMember(member);
+    for (const profile of profiles) {
+        for (const member of profile.members) {
+            database_1.updateDatabaseMember(member, profile);
+        }
+    }
     return profiles;
 }
 exports.fetchMemberProfilesUncached = fetchMemberProfilesUncached;
