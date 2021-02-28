@@ -83,7 +83,7 @@ async function uuidFromUser(user) {
         const username = usernameCache.get(util_1.undashUuid(user));
         // if it has .then, then that means its a waitForSet promise. This is done to prevent requests made while it is already requesting
         if (username.then) {
-            return (await username()).key;
+            return (await username).key;
         }
         else
             return util_1.undashUuid(user);
