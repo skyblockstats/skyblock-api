@@ -183,7 +183,7 @@ export async function fetchMemberProfileUncached(playerUuid: string, profileUuid
 		{ mainMemberUuid: playerUuid }
 	)
 	for (const member of profile.members)
-		updateDatabaseMember(member)
+		updateDatabaseMember(member, profile)
 	return profile
 }
 
@@ -200,8 +200,10 @@ export async function fetchMemberProfilesUncached(playerUuid: string): Promise<C
 			mainMemberUuid: playerUuid
 		}
 	)
-	for (const profile of profiles)
-		for (const member of profile.members)
-			updateDatabaseMember(member)
+	for (const profile of profiles) {
+		for (const member of profile.members) {
+			updateDatabaseMember(member, profile)
+		}
+	}
 	return profiles
 }

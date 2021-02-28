@@ -9,6 +9,7 @@ import NodeCache from 'node-cache'
 import { CleanMember } from './cleaners/skyblock/member'
 import { CleanPlayer } from './cleaners/player'
 import { shuffle } from './util'
+import { CleanFullProfile } from './cleaners/skyblock/profile'
 
 // don't update the user for 3 minutes
 const recentlyUpdated = new NodeCache({
@@ -28,7 +29,8 @@ interface LeaderboardItem {
 	value: number
 }
 
-const cachedLeaderboards: Map<string, any> = new Map()
+const cachedRawLeaderboards: Map<string, DatabaseLeaderboardItem[]> = new Map()
+const cachedLeaderboards: Map<string, LeaderboardItem[]> = new Map()
 
 const leaderboardMax = 100
 
@@ -89,9 +91,9 @@ async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 	]
 }
 
-export async function fetchMemberLeaderboard(name: string) {
-	if (cachedLeaderboards.has(name))
-		return cachedLeaderboards.get(name)
+async function fetchMemberLeaderboardRaw(name: string): Promise<DatabaseLeaderboardItem[]> {
+	if (cachedRawLeaderboards.has(name))
+		return cachedRawLeaderboards.get(name)
 	// typescript forces us to make a new variable and set it this way because it gives an error otherwise
 	const query = {}
 	query[`stats.${name}`] = { '$exists': true }
@@ -99,8 +101,16 @@ export async function fetchMemberLeaderboard(name: string) {
 	const sortQuery: any = {}
 	sortQuery[`stats.${name}`] = -1
 
-
 	const leaderboardRaw = await memberLeaderboardsCollection.find(query).sort(sortQuery).limit(leaderboardMax).toArray()
+	cachedRawLeaderboards.set(name, leaderboardRaw)
+	return leaderboardRaw
+}
+
+export async function fetchMemberLeaderboard(name: string) {
+	if (cachedLeaderboards.has(name))
+		return cachedLeaderboards.get(name)
+
+	const leaderboardRaw = await fetchMemberLeaderboardRaw(name)
 	const fetchLeaderboardPlayer = async(item: DatabaseLeaderboardItem): Promise<LeaderboardItem> => {
 		return {
 			player: await cached.fetchPlayer(item.uuid),
@@ -117,51 +127,75 @@ export async function fetchMemberLeaderboard(name: string) {
 }
 
 async function getMemberLeaderboardRequirement(name: string): Promise<number> {
-	const leaderboard = await fetchMemberLeaderboard(name)
+	const leaderboard = await fetchMemberLeaderboardRaw(name)
 	// if there's more than 100 items, return the 100th. if there's less, return null
 	if (leaderboard.length >= leaderboardMax)
-		return leaderboard[leaderboardMax - 1].value
+		return leaderboard[leaderboardMax - 1].stats[name]
 	else
 		return null
 }
 
 /** Get the attributes for the member, but only ones that would put them on the top 100 for leaderboards */
-async function getApplicableAttributes(member) {
+async function getApplicableAttributes(member): Promise<{ [key: string]: number }> {
 	const leaderboardAttributes = getMemberLeaderboardAttributes(member)
-	const applicableAttributes = []
+	const applicableAttributes = {}
 	for (const [ attributeName, attributeValue ] of Object.entries(leaderboardAttributes)) {
 		const requirement = await getMemberLeaderboardRequirement(attributeName)
 		if (!requirement || attributeValue > requirement)
 			applicableAttributes[attributeName] = attributeValue
 	}
+	return applicableAttributes
 }
 
 /** Update the member's leaderboard data on the server if applicable */
-export async function updateDatabaseMember(member: CleanMember) {
+export async function updateDatabaseMember(member: CleanMember, profile: CleanFullProfile) {
 	if (!client) return // the db client hasn't been initialized
 	// the member's been updated too recently, just return
-	if (recentlyUpdated.get(member.uuid))
+	if (recentlyUpdated.get(profile.uuid + member.uuid))
 		return
 	// store the member in recentlyUpdated so it cant update for 3 more minutes
-	recentlyUpdated.set(member.uuid, true)
+	recentlyUpdated.set(profile.uuid + member.uuid, true)
 
 	await constants.addStats(Object.keys(member.rawHypixelStats))
 	await constants.addCollections(member.collections.map(value => value.name))
-
 	const leaderboardAttributes = await getApplicableAttributes(member)
 
 	await memberLeaderboardsCollection.updateOne(
+		{ uuid: member.uuid },
 		{
-			uuid: member.uuid
-		}, {
 			'$set': {
-				'stats': leaderboardAttributes,
-				'last_updated': new Date()
+				stats: leaderboardAttributes,
+				last_updated: new Date()
 			}
-		}, {
-			upsert: true
-		}
+		},
+		{ upsert: true }
 	)
+
+	for (const [ attributeName, attributeValue ] of Object.entries(leaderboardAttributes)) {
+		const existingLeaderboard = await fetchMemberLeaderboard(attributeName)
+		const existingRawLeaderboard = await fetchMemberLeaderboardRaw(attributeName)
+		const newLeaderboard = existingLeaderboard
+			// remove the player from the leaderboard, if they're there
+			.filter(value => value.player.uuid !== member.uuid)
+			.concat([{
+				player: await cached.fetchPlayer(member.uuid),
+				value: attributeValue
+			}])
+			.sort((a, b) => b.value - a.value)
+			.slice(0, 100)
+		const newRawLeaderboard = existingRawLeaderboard
+			// remove the player from the leaderboard, if they're there
+			.filter(value => value.uuid !== member.uuid)
+			.concat([{
+				last_updated: new Date(),
+				stats: leaderboardAttributes,
+				uuid: member.uuid
+			}])
+			.sort((a, b) => b.stats[attributeName] - a.stats[attributeName])
+			.slice(0, 100)
+		cachedLeaderboards.set(attributeName, newLeaderboard)
+		cachedRawLeaderboards.set(attributeName, newRawLeaderboard)
+	}
 }
 
 
@@ -194,3 +228,4 @@ async function removeBadMemberLeaderboardAttributes() {
 
 connect()
 	.then(removeBadMemberLeaderboardAttributes)
+

@@ -41,9 +41,9 @@ interface GithubFile {
 	sha: string
 }
 
-// cache files for a day
+// cache files for an hour
 const fileCache = new NodeCache({
-	stdTTL: 60 * 60 * 24,
+	stdTTL: 60 * 60,
 	checkperiod: 60,
 	useClones: false,
 })
