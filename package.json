@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "tsc",
-    "start": "npm i; node build/index.js"
+    "start": "npm i --only=prod; node build/index.js"
   },
   "repository": {
     "type": "git",
