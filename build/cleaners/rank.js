@@ -16,6 +16,7 @@ const rankColors = {
 };
 /** Response cleaning (reformatting to be nicer) */
 function cleanRank({ packageRank, newPackageRank, monthlyPackageRank, rankPlusColor, rank, prefix }) {
+    var _a;
     let name;
     let color;
     let colored;
@@ -25,12 +26,10 @@ function cleanRank({ packageRank, newPackageRank, monthlyPackageRank, rankPlusCo
         name = colored.replace(/§./g, '').replace(/[\[\]]/g, '');
     }
     else {
-        if (monthlyPackageRank !== 'NONE')
+        if (monthlyPackageRank && monthlyPackageRank !== 'NONE')
             name = monthlyPackageRank;
         else
-            name = rank
-                || (newPackageRank === null || newPackageRank === void 0 ? void 0 : newPackageRank.replace('_PLUS', '+'))
-                || (packageRank === null || packageRank === void 0 ? void 0 : packageRank.replace('_PLUS', '+'));
+            name = (_a = rank !== null && rank !== void 0 ? rank : newPackageRank === null || newPackageRank === void 0 ? void 0 : newPackageRank.replace('_PLUS', '+')) !== null && _a !== void 0 ? _a : packageRank === null || packageRank === void 0 ? void 0 : packageRank.replace('_PLUS', '+');
         // MVP++ is called Superstar for some reason
         if (name === 'SUPERSTAR')
             name = 'MVP++';
