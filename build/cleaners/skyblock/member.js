@@ -43,6 +43,7 @@ async function cleanSkyBlockProfileMemberResponseBasic(member, included = null) 
 exports.cleanSkyBlockProfileMemberResponseBasic = cleanSkyBlockProfileMemberResponseBasic;
 /** Cleans up a member (from skyblock/profile) */
 async function cleanSkyBlockProfileMemberResponse(member, included = null) {
+    var _a;
     // profiles.members[]
     const inventoriesIncluded = included == null || included.includes('inventories');
     const player = await cached.fetchPlayer(member.uuid);
@@ -54,6 +55,8 @@ async function cleanSkyBlockProfileMemberResponse(member, included = null) {
         rank: player.rank,
         purse: member.coin_purse,
         stats: stats_1.cleanProfileStats(member),
+        // this is used for leaderboards
+        rawHypixelStats: (_a = member.stats) !== null && _a !== void 0 ? _a : {},
         minions: minions_1.cleanMinions(member),
         fairy_souls: fairysouls_1.cleanFairySouls(member),
         inventories: inventoriesIncluded ? await inventory_1.cleanInventories(member) : undefined,

@@ -6,9 +6,10 @@ import { CleanPlayer, cleanPlayerResponse } from './cleaners/player'
 import { chooseApiKey, HypixelResponse, sendApiRequest } from './hypixelApi'
 import * as cached from './hypixelCached'
 import { CleanBasicMember, CleanMemberProfile } from './cleaners/skyblock/member'
-import { cleanSkyblockProfileResponse, CleanProfile, CleanBasicProfile } from './cleaners/skyblock/profile'
+import { cleanSkyblockProfileResponse, CleanProfile, CleanBasicProfile, CleanFullProfile, CleanFullProfileBasicMembers } from './cleaners/skyblock/profile'
 import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles'
 import { debug } from '.'
+import { updateDatabaseMember } from './database'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories'
 
@@ -23,46 +24,47 @@ export const maxMinion = 11
  */ 
 
 export interface ApiOptions {
-    mainMemberUuid?: string
+	mainMemberUuid?: string
 }
 
+/** Sends an API request to Hypixel and cleans it up. */
 export async function sendCleanApiRequest({ path, args }, included?: Included[], options?: ApiOptions) {
-    const key = await chooseApiKey()
-    const rawResponse = await sendApiRequest({ path, key, args })
-    if (rawResponse.throttled) {
+	const key = await chooseApiKey()
+	const rawResponse = await sendApiRequest({ path, key, args })
+	if (rawResponse.throttled) {
 		// if it's throttled, wait a second and try again
 		await new Promise(resolve => setTimeout(resolve, 1000))
-        return await sendCleanApiRequest({ path, args }, included, options)
-    }
+		return await sendCleanApiRequest({ path, args }, included, options)
+	}
 
-    // clean the response
-    return await cleanResponse({ path, data: rawResponse }, options ?? {})
+	// clean the response
+	return await cleanResponse({ path, data: rawResponse }, options ?? {})
 }
 
 
 
 async function cleanResponse({ path, data }: { path: string, data: HypixelResponse }, options: ApiOptions) {
-    // Cleans up an api response
-    switch (path) {
-        case 'player': return await cleanPlayerResponse(data.player)
-        case 'skyblock/profile': return await cleanSkyblockProfileResponse(data.profile, options)
-        case 'skyblock/profiles': return await cleanSkyblockProfilesResponse(data.profiles)
-    }
+	// Cleans up an api response
+	switch (path) {
+		case 'player': return await cleanPlayerResponse(data.player)
+		case 'skyblock/profile': return await cleanSkyblockProfileResponse(data.profile, options)
+		case 'skyblock/profiles': return await cleanSkyblockProfilesResponse(data.profiles)
+	}
 }
 
 /* ----------------------------- */
 
 export interface UserAny {
-    user?: string
-    uuid?: string
-    username?: string
+	user?: string
+	uuid?: string
+	username?: string
 }
 
 export interface CleanUser {
-    player: CleanPlayer
-    profiles?: CleanProfile[]
-    activeProfile?: string
-    online?: boolean
+	player: CleanPlayer
+	profiles?: CleanProfile[]
+	activeProfile?: string
+	online?: boolean
 }
 
 
@@ -73,52 +75,52 @@ export interface CleanUser {
  * used inclusions: player, profiles
  */
 export async function fetchUser({ user, uuid, username }: UserAny, included: Included[]=['player']): Promise<CleanUser> {
-    if (!uuid) {
-        // If the uuid isn't provided, get it
-        uuid = await cached.uuidFromUser(user || username)
-    }
-    if (!uuid) {
-        // the user doesn't exist.
-        if (debug) console.log('error:', user, 'doesnt exist')
-        return null
-    }
+	if (!uuid) {
+		// If the uuid isn't provided, get it
+		uuid = await cached.uuidFromUser(user || username)
+	}
+	if (!uuid) {
+		// the user doesn't exist.
+		if (debug) console.log('error:', user, 'doesnt exist')
+		return null
+	}
 
-    const includePlayers = included.includes('player')
-    const includeProfiles = included.includes('profiles')
+	const includePlayers = included.includes('player')
+	const includeProfiles = included.includes('profiles')
 
-    let profilesData: CleanProfile[]
-    let basicProfilesData: CleanBasicProfile[]
-    let playerData: CleanPlayer
+	let profilesData: CleanProfile[]
+	let basicProfilesData: CleanBasicProfile[]
+	let playerData: CleanPlayer
 
-    if (includePlayers) {
-        playerData = await cached.fetchPlayer(uuid)
-        // if not including profiles, include lightweight profiles just in case
-        if (!includeProfiles)
-            basicProfilesData = playerData.profiles
-        playerData.profiles = undefined
-    }
-    if (includeProfiles) {
-        profilesData = await cached.fetchSkyblockProfiles(uuid)
-    }
+	if (includePlayers) {
+		playerData = await cached.fetchPlayer(uuid)
+		// if not including profiles, include lightweight profiles just in case
+		if (!includeProfiles)
+			basicProfilesData = playerData.profiles
+		playerData.profiles = undefined
+	}
+	if (includeProfiles) {
+		profilesData = await cached.fetchSkyblockProfiles(uuid)
+	}
 
-    let activeProfile: CleanProfile = null
-    let lastOnline: number = 0
+	let activeProfile: CleanProfile = null
+	let lastOnline: number = 0
 
-    if (includeProfiles) {
-        for (const profile of profilesData) {
-            const member = profile.members.find(member => member.uuid === uuid)
-            if (member.last_save > lastOnline) {
-                lastOnline = member.last_save
-                activeProfile = profile
-            }
-        }
-    }
-    return {
-        player: playerData ?? null,
-        profiles: profilesData ?? basicProfilesData,
-        activeProfile: includeProfiles ? activeProfile?.uuid : undefined,
-        online: includeProfiles ? lastOnline > (Date.now() - saveInterval): undefined
-    }
+	if (includeProfiles) {
+		for (const profile of profilesData) {
+			const member = profile.members.find(member => member.uuid === uuid)
+			if (member.last_save > lastOnline) {
+				lastOnline = member.last_save
+				activeProfile = profile
+			}
+		}
+	}
+	return {
+		player: playerData ?? null,
+		profiles: profilesData ?? basicProfilesData,
+		activeProfile: includeProfiles ? activeProfile?.uuid : undefined,
+		online: includeProfiles ? lastOnline > (Date.now() - saveInterval): undefined
+	}
 }
 
 /**
@@ -128,40 +130,78 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
  * @param profile A profile name or profile uuid
  */
 export async function fetchMemberProfile(user: string, profile: string): Promise<CleanMemberProfile> {
-    const playerUuid = await cached.uuidFromUser(user)
-    const profileUuid = await cached.fetchProfileUuid(user, profile)
+	const playerUuid = await cached.uuidFromUser(user)
+	const profileUuid = await cached.fetchProfileUuid(user, profile)
 
-    // if the profile doesn't have an id, just return
-    if (!profileUuid) return null
+	// if the profile doesn't have an id, just return
+	if (!profileUuid) return null
 
-    const player = await cached.fetchPlayer(playerUuid)
+	const player = await cached.fetchPlayer(playerUuid)
 
-    const cleanProfile = await cached.fetchProfile(playerUuid, profileUuid)
+	const cleanProfile = await cached.fetchProfile(playerUuid, profileUuid) as CleanFullProfileBasicMembers
 
-    const member = cleanProfile.members.find(m => m.uuid === playerUuid)
+	const member = cleanProfile.members.find(m => m.uuid === playerUuid)
 
-    // remove unnecessary member data
-    const simpleMembers: CleanBasicMember[] = cleanProfile.members.map(m => {
-        return {
-            uuid: m.uuid,
-            username: m.username,
-            first_join: m.first_join,
-            last_save: m.last_save,
-            rank: m.rank
-        }
-    })
+	// remove unnecessary member data
+	const simpleMembers: CleanBasicMember[] = cleanProfile.members.map(m => {
+		return {
+			uuid: m.uuid,
+			username: m.username,
+			first_join: m.first_join,
+			last_save: m.last_save,
+			rank: m.rank
+		}
+	})
 
-    cleanProfile.members = simpleMembers
+	cleanProfile.members = simpleMembers
 
-    return {
-        member: {
+	return {
+		member: {
 			// the profile name is in member rather than profile since they sometimes differ for each member
-            profileName: cleanProfile.name,
+			profileName: cleanProfile.name,
 			// add all the member data
-            ...member,
-            // add all other data relating to the hypixel player, such as username, rank, etc
-            ...player
-        },
-        profile: cleanProfile
-    }
+			...member,
+			// add all other data relating to the hypixel player, such as username, rank, etc
+			...player
+		},
+		profile: cleanProfile
+	}
+}
+
+/**
+ * Fetches the Hypixel API to get a CleanFullProfile. This doesn't do any caching and you should use hypixelCached.fetchProfile instead
+ * @param playerUuid The UUID of the Minecraft player
+ * @param profileUuid The UUID of the Hypixel SkyBlock profile
+ */
+export async function fetchMemberProfileUncached(playerUuid: string, profileUuid: string): Promise<CleanFullProfile> {
+	const profile: CleanFullProfile = await sendCleanApiRequest(
+		{
+			path: 'skyblock/profile',
+			args: { profile: profileUuid }
+		},
+		null,
+		{ mainMemberUuid: playerUuid }
+	)
+	for (const member of profile.members)
+		updateDatabaseMember(member)
+	return profile
+}
+
+
+export async function fetchMemberProfilesUncached(playerUuid: string): Promise<CleanFullProfile[]> {
+	const profiles: CleanFullProfile[] = await sendCleanApiRequest({
+		path: 'skyblock/profiles',
+		args: {
+			uuid: playerUuid
+		}},
+		null,
+		{
+			// only the inventories for the main player are generated, this is for optimization purposes
+			mainMemberUuid: playerUuid
+		}
+	)
+	for (const profile of profiles)
+		for (const member of profile.members)
+			updateDatabaseMember(member)
+	return profiles
 }

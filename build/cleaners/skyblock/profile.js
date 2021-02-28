@@ -25,12 +25,12 @@ exports.cleanSkyblockProfileResponseLighter = cleanSkyblockProfileResponseLighte
 /**
  * This function is somewhat costly and shouldn't be called often. Use cleanSkyblockProfileResponseLighter if you don't need all the data
  */
-async function cleanSkyblockProfileResponse(data, { mainMemberUuid }) {
+async function cleanSkyblockProfileResponse(data, options) {
     const cleanedMembers = [];
     for (const memberUUID in data.members) {
         const memberRaw = data.members[memberUUID];
         memberRaw.uuid = memberUUID;
-        const member = await member_1.cleanSkyBlockProfileMemberResponse(memberRaw, ['stats', mainMemberUuid === memberUUID ? 'inventories' : undefined]);
+        const member = await member_1.cleanSkyBlockProfileMemberResponse(memberRaw, ['stats', (options === null || options === void 0 ? void 0 : options.mainMemberUuid) === memberUUID ? 'inventories' : undefined]);
         cleanedMembers.push(member);
     }
     const memberMinions = [];

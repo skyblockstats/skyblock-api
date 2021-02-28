@@ -22,17 +22,19 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchMemberProfile = exports.fetchUser = exports.sendCleanApiRequest = exports.maxMinion = exports.saveInterval = void 0;
+exports.fetchMemberProfilesUncached = exports.fetchMemberProfileUncached = exports.fetchMemberProfile = exports.fetchUser = exports.sendCleanApiRequest = exports.maxMinion = exports.saveInterval = void 0;
 const player_1 = require("./cleaners/player");
 const hypixelApi_1 = require("./hypixelApi");
 const cached = __importStar(require("./hypixelCached"));
 const profile_1 = require("./cleaners/skyblock/profile");
 const profiles_1 = require("./cleaners/skyblock/profiles");
 const _1 = require(".");
+const database_1 = require("./database");
 // the interval at which the "last_save" parameter updates in the hypixel api, this is 3 minutes
 exports.saveInterval = 60 * 3 * 1000;
 // the highest level a minion can be
 exports.maxMinion = 11;
+/** Sends an API request to Hypixel and cleans it up. */
 async function sendCleanApiRequest({ path, args }, included, options) {
     const key = await hypixelApi_1.chooseApiKey();
     const rawResponse = await hypixelApi_1.sendApiRequest({ path, key, args });
@@ -143,3 +145,34 @@ async function fetchMemberProfile(user, profile) {
     };
 }
 exports.fetchMemberProfile = fetchMemberProfile;
+/**
+ * Fetches the Hypixel API to get a CleanFullProfile. This doesn't do any caching and you should use hypixelCached.fetchProfile instead
+ * @param playerUuid The UUID of the Minecraft player
+ * @param profileUuid The UUID of the Hypixel SkyBlock profile
+ */
+async function fetchMemberProfileUncached(playerUuid, profileUuid) {
+    const profile = await sendCleanApiRequest({
+        path: 'skyblock/profile',
+        args: { profile: profileUuid }
+    }, null, { mainMemberUuid: playerUuid });
+    for (const member of profile.members)
+        database_1.updateDatabaseMember(member);
+    return profile;
+}
+exports.fetchMemberProfileUncached = fetchMemberProfileUncached;
+async function fetchMemberProfilesUncached(playerUuid) {
+    const profiles = await sendCleanApiRequest({
+        path: 'skyblock/profiles',
+        args: {
+            uuid: playerUuid
+        }
+    }, null, {
+        // only the inventories for the main player are generated, this is for optimization purposes
+        mainMemberUuid: playerUuid
+    });
+    for (const profile of profiles)
+        for (const member of profile.members)
+            database_1.updateDatabaseMember(member);
+    return profiles;
+}
+exports.fetchMemberProfilesUncached = fetchMemberProfilesUncached;

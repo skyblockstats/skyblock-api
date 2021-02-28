@@ -17,7 +17,8 @@ exports.cleanPlayerSkyblockProfiles = cleanPlayerSkyblockProfiles;
 async function cleanSkyblockProfilesResponse(data) {
     const cleanedProfiles = [];
     for (const profile of data !== null && data !== void 0 ? data : []) {
-        let cleanedProfile = await profile_1.cleanSkyblockProfileResponseLighter(profile);
+        // let cleanedProfile = await cleanSkyblockProfileResponseLighter(profile)
+        let cleanedProfile = await profile_1.cleanSkyblockProfileResponse(profile);
         cleanedProfiles.push(cleanedProfile);
     }
     return cleanedProfiles;

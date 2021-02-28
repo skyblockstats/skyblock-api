@@ -62,26 +62,53 @@ const profileNameCache = new node_cache_1.default({
     checkperiod: 60,
     useClones: false,
 });
+function waitForSet(cache, key, value) {
+    return new Promise((resolve, reject) => {
+        const listener = (setKey, setValue) => {
+            if (setKey === key || (value && setValue === value)) {
+                cache.removeListener('set', listener);
+                return resolve({ key, value });
+            }
+        };
+        cache.on('set', listener);
+    });
+}
 /**
  * Fetch the uuid from a user
  * @param user A user can be either a uuid or a username
  */
 async function uuidFromUser(user) {
-    if (usernameCache.has(util_1.undashUuid(user)))
+    if (usernameCache.has(util_1.undashUuid(user))) {
         // check if the uuid is a key
-        return util_1.undashUuid(user);
+        const username = usernameCache.get(util_1.undashUuid(user));
+        // if it has .then, then that means its a waitForSet promise
+        if (username.then) {
+            console.log('pog, prevented double request');
+            return (await username()).key;
+        }
+        else
+            return util_1.undashUuid(user);
+    }
     // check if the username is a value
     const uuidToUsername = usernameCache.mget(usernameCache.keys());
     for (const [uuid, username] of Object.entries(uuidToUsername)) {
         if (user.toLowerCase() === username.toLowerCase())
             return uuid;
     }
+    if (_1.debug)
+        console.log('Cache miss: uuidFromUser', user);
+    // set it as waitForSet (a promise) in case uuidFromUser gets called while its fetching mojang
+    console.log('setting', util_1.undashUuid(user));
+    usernameCache.set(util_1.undashUuid(user), waitForSet(usernameCache, user, user));
+    console.log(util_1.undashUuid(user), usernameCache.has(util_1.undashUuid(user)));
     // not cached, actually fetch mojang api now
     let { uuid, username } = await mojang.mojangDataFromUser(user);
     if (!uuid)
         return;
     // remove dashes from the uuid so its more normal
     uuid = util_1.undashUuid(uuid);
+    if (user !== uuid)
+        usernameCache.del(user);
     usernameCache.set(uuid, username);
     return uuid;
 }
@@ -96,6 +123,8 @@ async function usernameFromUser(user) {
             console.log('Cache hit! usernameFromUser', user);
         return usernameCache.get(util_1.undashUuid(user));
     }
+    if (_1.debug)
+        console.log('Cache miss: usernameFromUser', user);
     let { uuid, username } = await mojang.mojangDataFromUser(user);
     uuid = util_1.undashUuid(uuid);
     usernameCache.set(uuid, username);
@@ -106,9 +135,11 @@ async function fetchPlayer(user) {
     const playerUuid = await uuidFromUser(user);
     if (playerCache.has(playerUuid)) {
         if (_1.debug)
-            console.log('Cache hit! fetchPlayer', playerUuid);
+            console.log('Cache hit! fetchPlayer', user);
         return playerCache.get(playerUuid);
     }
+    if (_1.debug)
+        console.log('Cache miss: uuidFromUser', user);
     const cleanPlayer = await hypixel.sendCleanApiRequest({
         path: 'player',
         args: { uuid: playerUuid }
@@ -126,15 +157,9 @@ async function fetchSkyblockProfiles(playerUuid) {
             console.log('Cache hit! fetchSkyblockProfiles', playerUuid);
         return profilesCache.get(playerUuid);
     }
-    const profiles = await hypixel.sendCleanApiRequest({
-        path: 'skyblock/profiles',
-        args: {
-            uuid: playerUuid
-        }
-    }, null, {
-        // only the inventories for the main player are generated, this is for optimization purposes
-        mainMemberUuid: playerUuid
-    });
+    if (_1.debug)
+        console.log('Cache miss: fetchSkyblockProfiles', playerUuid);
+    const profiles = await hypixel.fetchMemberProfilesUncached(playerUuid);
     const basicProfiles = [];
     // create the basicProfiles array
     for (const profile of profiles) {
@@ -166,6 +191,8 @@ async function fetchBasicProfiles(user) {
             console.log('Cache hit! fetchBasicProfiles', playerUuid);
         return basicProfilesCache.get(playerUuid);
     }
+    if (_1.debug)
+        console.log('Cache miss: fetchBasicProfiles', user);
     const player = await fetchPlayer(playerUuid);
     const profiles = player.profiles;
     basicProfilesCache.set(playerUuid, profiles);
@@ -186,6 +213,8 @@ async function fetchProfileUuid(user, profile) {
             console.log('no profile provided?', user, profile);
         return null;
     }
+    if (_1.debug)
+        console.log('Cache miss: fetchProfileUuid', user);
     const profiles = await fetchBasicProfiles(user);
     const profileUuid = util_1.undashUuid(profile);
     for (const p of profiles) {
@@ -210,11 +239,10 @@ async function fetchProfile(user, profile) {
             console.log('Cache hit! fetchProfile', profileUuid);
         return profileCache.get(profileUuid);
     }
+    if (_1.debug)
+        console.log('Cache miss: fetchProfile', user, profile);
     const profileName = await fetchProfileName(user, profile);
-    const cleanProfile = await hypixel.sendCleanApiRequest({
-        path: 'skyblock/profile',
-        args: { profile: profileUuid }
-    }, null, { mainMemberUuid: playerUuid });
+    const cleanProfile = await hypixel.fetchMemberProfileUncached(playerUuid, profileUuid);
     // we know the name from fetchProfileName, so set it here
     cleanProfile.name = profileName;
     profileCache.set(profileUuid, cleanProfile);
@@ -236,6 +264,8 @@ async function fetchProfileName(user, profile) {
             console.log('Cache hit! fetchProfileName', profileUuid);
         return profileNameCache.get(`${playerUuid}.${profileUuid}`);
     }
+    if (_1.debug)
+        console.log('Cache miss: fetchProfileName', user, profile);
     const basicProfiles = await fetchBasicProfiles(playerUuid);
     let profileName;
     for (const basicProfile of basicProfiles)

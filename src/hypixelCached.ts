@@ -2,15 +2,13 @@
  * Fetch the clean and cached Hypixel API
  */
 
-import NodeCache from 'node-cache'
+import NodeCache, { EventEmitter, Key } from 'node-cache'
 import * as mojang from './mojang'
 import * as hypixel from './hypixel'
 import { CleanPlayer } from './cleaners/player'
 import { undashUuid } from './util'
 import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/skyblock/profile'
 import { debug } from '.'
-
-
 
 // cache usernames for 4 hours
 const usernameCache = new NodeCache({
@@ -49,28 +47,54 @@ const profileNameCache = new NodeCache({
 	useClones: false,
 })
 
+function waitForSet(cache: NodeCache, key?: string, value?: string): Promise<any> {
+	return new Promise((resolve, reject) => {
+		const listener = (setKey, setValue) => {
+			if (setKey === key || (value && setValue === value)) {
+				cache.removeListener('set', listener)
+				return resolve({ key, value })
+			}
+		}
+		cache.on('set', listener)
+	})
+}
+
 /**
  * Fetch the uuid from a user
  * @param user A user can be either a uuid or a username 
  */
 export async function uuidFromUser(user: string): Promise<string> {
-	if (usernameCache.has(undashUuid(user)))
+	if (usernameCache.has(undashUuid(user))) {
 		// check if the uuid is a key
-		return undashUuid(user)
+		const username: any = usernameCache.get(undashUuid(user))
+		// if it has .then, then that means its a waitForSet promise. This is done to prevent requests made while it is already requesting
+		if (username.then) {
+			return (await username()).key
+		} else
+			return undashUuid(user)
+	}
 
 	// check if the username is a value
 	const uuidToUsername: {[ key: string ]: string} = usernameCache.mget(usernameCache.keys())
 	for (const [ uuid, username ] of Object.entries(uuidToUsername)) {
-		if (user.toLowerCase() === username.toLowerCase())
+		if (username.toLowerCase && user.toLowerCase() === username.toLowerCase())
 			return uuid
 	}
 
+	if (debug) console.log('Cache miss: uuidFromUser', user)
+
+	// set it as waitForSet (a promise) in case uuidFromUser gets called while its fetching mojang
+	usernameCache.set(undashUuid(user), waitForSet(usernameCache, user, user))
+	
 	// not cached, actually fetch mojang api now
 	let { uuid, username } = await mojang.mojangDataFromUser(user)
 	if (!uuid) return
 
 	// remove dashes from the uuid so its more normal
 	uuid = undashUuid(uuid)
+
+	if (user !== uuid) usernameCache.del(user)
+
 	usernameCache.set(uuid, username)
 	return uuid
 }
@@ -85,6 +109,8 @@ export async function usernameFromUser(user: string): Promise<string> {
 		return usernameCache.get(undashUuid(user))
 	}
 
+	if (debug) console.log('Cache miss: usernameFromUser', user)
+
 	let { uuid, username } = await mojang.mojangDataFromUser(user)
 	uuid = undashUuid(uuid)
 	usernameCache.set(uuid, username)
@@ -96,7 +122,6 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer> {
 	const playerUuid = await uuidFromUser(user)
 
 	if (playerCache.has(playerUuid)) {
-		if (debug) console.log('Cache hit! fetchPlayer', playerUuid)
 		return playerCache.get(playerUuid)
 	}
 
@@ -120,17 +145,9 @@ export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanPr
 		return profilesCache.get(playerUuid)
 	}
 
-	const profiles: CleanFullProfile[] = await hypixel.sendCleanApiRequest({
-		path: 'skyblock/profiles',
-		args: {
-			uuid: playerUuid
-		}},
-		null,
-		{
-			// only the inventories for the main player are generated, this is for optimization purposes
-			mainMemberUuid: playerUuid
-		}
-	)
+	if (debug) console.log('Cache miss: fetchSkyblockProfiles', playerUuid)
+
+	const profiles: CleanProfile[] = await hypixel.fetchMemberProfilesUncached(playerUuid)
 
 	const basicProfiles: CleanProfile[] = []
 
@@ -165,6 +182,9 @@ async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[]> {
 		if (debug) console.log('Cache hit! fetchBasicProfiles', playerUuid)
 		return basicProfilesCache.get(playerUuid)
 	}
+
+	if (debug) console.log('Cache miss: fetchBasicProfiles', user)
+
 	const player = await fetchPlayer(playerUuid)
 	const profiles = player.profiles
 	basicProfilesCache.set(playerUuid, profiles)
@@ -187,6 +207,8 @@ export async function fetchProfileUuid(user: string, profile: string) {
 		if (debug) console.log('no profile provided?', user, profile)
 		return null
 	}
+
+	if (debug) console.log('Cache miss: fetchProfileUuid', user)
 
 	const profiles = await fetchBasicProfiles(user)
 
@@ -215,16 +237,11 @@ export async function fetchProfile(user: string, profile: string): Promise<Clean
 		return profileCache.get(profileUuid)
 	}
 
+	if (debug) console.log('Cache miss: fetchProfile', user, profile)
+
 	const profileName = await fetchProfileName(user, profile)
 
-	const cleanProfile: CleanFullProfile = await hypixel.sendCleanApiRequest(
-		{
-			path: 'skyblock/profile',
-			args: { profile: profileUuid }
-		},
-		null,
-		{ mainMemberUuid: playerUuid }
-	)
+	const cleanProfile: CleanFullProfile = await hypixel.fetchMemberProfileUncached(playerUuid, profileUuid)
 
 	// we know the name from fetchProfileName, so set it here
 	cleanProfile.name = profileName
@@ -249,6 +266,8 @@ export async function fetchProfileName(user: string, profile: string): Promise<s
 		if (debug) console.log('Cache hit! fetchProfileName', profileUuid)
 		return profileNameCache.get(`${playerUuid}.${profileUuid}`)
 	}
+
+	if (debug) console.log('Cache miss: fetchProfileName', user, profile)
 
 	const basicProfiles = await fetchBasicProfiles(playerUuid)
 	let profileName

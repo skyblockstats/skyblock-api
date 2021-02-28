@@ -5,7 +5,7 @@ import { cleanObjectives, Objective } from './objectives'
 import { CleanMinion, cleanMinions } from './minions'
 import { cleanSkills, Skill } from './skills'
 import * as cached from '../../hypixelCached'
-import { CleanFullProfile } from './profile'
+import { CleanFullProfile, CleanFullProfileBasicMembers } from './profile'
 import { Included } from '../../hypixel'
 import { CleanPlayer } from '../player'
 import { Bank } from './bank'
@@ -25,6 +25,7 @@ export interface CleanBasicMember {
 export interface CleanMember extends CleanBasicMember {
     purse: number
     stats: CleanProfileStats
+    rawHypixelStats?: { [ key: string ]: number }
     minions: CleanMinion[]
 	fairy_souls: FairySouls
     inventories: Inventories
@@ -61,6 +62,10 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
         purse: member.coin_purse,
 
         stats: cleanProfileStats(member),
+
+        // this is used for leaderboards
+        rawHypixelStats: member.stats ?? {},
+
         minions: cleanMinions(member),
         fairy_souls: cleanFairySouls(member),
         inventories: inventoriesIncluded ? await cleanInventories(member) : undefined,
@@ -83,5 +88,5 @@ export interface CleanMemberProfilePlayer extends CleanPlayer {
 
 export interface CleanMemberProfile {
     member: CleanMemberProfilePlayer
-    profile: CleanFullProfile
+    profile: CleanFullProfileBasicMembers
 }

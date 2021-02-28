@@ -5,7 +5,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.colorCodeFromName = exports.minecraftColorCodes = exports.shuffle = exports.jsonToQuery = exports.queryToJson = exports.undashUuid = void 0;
 function undashUuid(uuid) {
-    return uuid.replace(/-/g, '');
+    return uuid.replace(/-/g, '').toLowerCase();
 }
 exports.undashUuid = undashUuid;
 function queryToJson(queryString) {
