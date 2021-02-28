@@ -28,8 +28,10 @@ function cleanRank({ packageRank, newPackageRank, monthlyPackageRank, rankPlusCo
     else {
         if (monthlyPackageRank && monthlyPackageRank !== 'NONE')
             name = monthlyPackageRank;
+        else if (rank && rank !== 'NORMAL')
+            name = rank;
         else
-            name = (_a = rank !== null && rank !== void 0 ? rank : newPackageRank === null || newPackageRank === void 0 ? void 0 : newPackageRank.replace('_PLUS', '+')) !== null && _a !== void 0 ? _a : packageRank === null || packageRank === void 0 ? void 0 : packageRank.replace('_PLUS', '+');
+            name = (_a = newPackageRank === null || newPackageRank === void 0 ? void 0 : newPackageRank.replace('_PLUS', '+')) !== null && _a !== void 0 ? _a : packageRank === null || packageRank === void 0 ? void 0 : packageRank.replace('_PLUS', '+');
         // MVP++ is called Superstar for some reason
         if (name === 'SUPERSTAR')
             name = 'MVP++';
