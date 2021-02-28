@@ -38,6 +38,7 @@ const recentlyUpdated = new node_cache_1.default({
     useClones: false,
 });
 const cachedLeaderboards = new Map();
+const leaderboardMax = 100;
 let client;
 let database;
 let memberLeaderboardsCollection;
@@ -92,7 +93,7 @@ async function fetchMemberLeaderboard(name) {
     query[`stats.${name}`] = { '$exists': true };
     const sortQuery = {};
     sortQuery[`stats.${name}`] = -1;
-    const leaderboardRaw = await memberLeaderboardsCollection.find(query).sort(sortQuery).limit(100).toArray();
+    const leaderboardRaw = await memberLeaderboardsCollection.find(query).sort(sortQuery).limit(leaderboardMax).toArray();
     const fetchLeaderboardPlayer = async (item) => {
         return {
             player: await cached.fetchPlayer(item.uuid),
@@ -111,8 +112,8 @@ exports.fetchMemberLeaderboard = fetchMemberLeaderboard;
 async function getMemberLeaderboardRequirement(name) {
     const leaderboard = await fetchMemberLeaderboard(name);
     // if there's more than 100 items, return the 100th. if there's less, return null
-    if (leaderboard.length >= 100)
-        return leaderboard[99].value;
+    if (leaderboard.length >= leaderboardMax)
+        return leaderboard[leaderboardMax - 1].value;
     else
         return null;
 }
