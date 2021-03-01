@@ -9,7 +9,7 @@ import { CleanBasicMember, CleanMemberProfile } from './cleaners/skyblock/member
 import { cleanSkyblockProfileResponse, CleanProfile, CleanBasicProfile, CleanFullProfile, CleanFullProfileBasicMembers } from './cleaners/skyblock/profile'
 import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles'
 import { debug } from '.'
-import { updateDatabaseMember } from './database'
+import { queueUpdateDatabaseMember } from './database'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories'
 
@@ -183,7 +183,7 @@ export async function fetchMemberProfileUncached(playerUuid: string, profileUuid
 		{ mainMemberUuid: playerUuid }
 	)
 	for (const member of profile.members)
-		updateDatabaseMember(member, profile)
+		queueUpdateDatabaseMember(member, profile)
 	return profile
 }
 
@@ -202,7 +202,7 @@ export async function fetchMemberProfilesUncached(playerUuid: string): Promise<C
 	)
 	for (const profile of profiles) {
 		for (const member of profile.members) {
-			updateDatabaseMember(member, profile)
+			queueUpdateDatabaseMember(member, profile)
 		}
 	}
 	return profiles

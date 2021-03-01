@@ -10,7 +10,8 @@ import { CleanMember } from './cleaners/skyblock/member'
 import { CleanPlayer } from './cleaners/player'
 import { shuffle, sleep } from './util'
 import { CleanFullProfile } from './cleaners/skyblock/profile'
-import { categorizeStat, StatCategory } from './cleaners/skyblock/stats'
+import { categorizeStat } from './cleaners/skyblock/stats'
+import Queue from 'queue-promise'
 
 // don't update the user for 3 minutes
 const recentlyUpdated = new NodeCache({
@@ -62,6 +63,15 @@ function getMemberCollectionAttributes(member: CleanMember) {
 	return collectionAttributes
 }
 
+function getMemberSkillAttributes(member: CleanMember) {
+	const skillAttributes = {}
+	for (const collection of member.skills) {
+		const skillLeaderboardName = `skill_${collection.name}`
+		skillAttributes[skillLeaderboardName] = collection.xp
+	}
+	return skillAttributes
+}
+
 function getMemberLeaderboardAttributes(member: CleanMember) {
 	// if you want to add a new leaderboard for member attributes, add it here (and getAllLeaderboardAttributes)
 	return {
@@ -70,6 +80,9 @@ function getMemberLeaderboardAttributes(member: CleanMember) {
 
 		// collection leaderboards
 		...getMemberCollectionAttributes(member),
+
+		// skill leaderboards
+		...getMemberSkillAttributes(member),
 
 		fairy_souls: member.fairy_souls.total,
 		first_join: member.first_join,
@@ -106,6 +119,9 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 
 		// collection leaderboards
 		...(await constants.fetchCollections()).map(value => `collection_${value}`),
+
+		// skill leaderboards
+		...(await constants.fetchSkills()).map(value => `skill_${value}`),
 
 		'fairy_souls',
 		'first_join',
@@ -176,12 +192,14 @@ async function getApplicableAttributes(member): Promise<{ [key: string]: number 
 		const requirement = await getMemberLeaderboardRequirement(attributeName)
 		if (!requirement || attributeValue > requirement)
 			applicableAttributes[attributeName] = attributeValue
+		console.log(attributeName)
 	}
 	return applicableAttributes
 }
 
 /** Update the member's leaderboard data on the server if applicable */
 export async function updateDatabaseMember(member: CleanMember, profile: CleanFullProfile) {
+	console.log('updating', member.uuid)
 	if (!client) return // the db client hasn't been initialized
 	// the member's been updated too recently, just return
 	if (recentlyUpdated.get(profile.uuid + member.uuid))
@@ -225,6 +243,17 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 			.slice(0, 100)
 		cachedRawLeaderboards.set(attributeName, newRawLeaderboard)
 	}
+	console.log('updated', member.uuid)
+}
+
+const queue = new Queue({
+	concurrent: 3,
+	interval: 500
+})
+
+/** Queue an update for the member's leaderboard data on the server if applicable */
+export async function queueUpdateDatabaseMember(member: CleanMember, profile: CleanFullProfile) {
+	queue.enqueue(async() => await updateDatabaseMember(member, profile))
 }
 
 
