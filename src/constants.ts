@@ -72,6 +72,7 @@ async function fetchFile(path: string): Promise<GithubFile> {
 		sha: data.sha
 	}
 	fileCache.set(path, file)
+	return file
 }
 
 /**
@@ -81,8 +82,7 @@ async function fetchFile(path: string): Promise<GithubFile> {
  * @param newContent The new content in the file
  */
 async function editFile(file: GithubFile, message: string, newContent: string) {
-	fileCache.set(file.path, newContent)
-	await fetchGithubApi(
+	const r = await fetchGithubApi(
 		'PUT',
 		`/repos/${owner}/${repo}/contents/${file.path}`,
 		{ 'Content-Type': 'application/json' },
@@ -93,6 +93,12 @@ async function editFile(file: GithubFile, message: string, newContent: string) {
 			branch: 'main'
 		}
 	)
+	const data = await r.json()
+	fileCache.set(file.path, {
+		path: data.content.path,
+		content: newContent,
+		sha: data.content.sha
+	})
 }
 
 /** Fetch all the known SkyBlock stats as an array of strings */

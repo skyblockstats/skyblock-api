@@ -57,6 +57,7 @@ async function fetchFile(path) {
         sha: data.sha
     };
     fileCache.set(path, file);
+    return file;
 }
 /**
  * Edit a file on skyblock-constants
@@ -65,12 +66,17 @@ async function fetchFile(path) {
  * @param newContent The new content in the file
  */
 async function editFile(file, message, newContent) {
-    fileCache.set(file.path, newContent);
-    await fetchGithubApi('PUT', `/repos/${owner}/${repo}/contents/${file.path}`, { 'Content-Type': 'application/json' }, {
+    const r = await fetchGithubApi('PUT', `/repos/${owner}/${repo}/contents/${file.path}`, { 'Content-Type': 'application/json' }, {
         message: message,
         content: Buffer.from(newContent).toString('base64'),
         sha: file.sha,
         branch: 'main'
+    });
+    const data = await r.json();
+    fileCache.set(file.path, {
+        path: data.content.path,
+        content: newContent,
+        sha: data.content.sha
     });
 }
 /** Fetch all the known SkyBlock stats as an array of strings */
