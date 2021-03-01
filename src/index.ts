@@ -7,11 +7,10 @@ const app = express()
 export const debug = false
 
 
-app.use((req, res, next) => {
+app.use((req: express.Request, res, next) => {
 	if (process.env.key && req.headers.key !== process.env.key)
 		// if a key is set in process.env and the header doesn't match return an error
-		// TODO: make this have a status code
-		return res.json({ error: 'Key in header must match key in env' })
+		return res.status(401).json({ error: 'Key in header must match key in env' })
 	next()
 })
 
