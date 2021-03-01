@@ -29,6 +29,6 @@ app.get('/leaderboard/:name', async (req, res) => {
     res.json(await database_1.fetchMemberLeaderboard(req.params.name));
 });
 app.get('/leaderboards', async (req, res) => {
-    res.json(await database_1.fetchAllLeaderboardsCategoriezed());
+    res.json(await database_1.fetchAllLeaderboardsCategorized());
 });
 app.listen(8080, () => console.log('App started :)'));

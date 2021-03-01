@@ -25,7 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateDatabaseMember = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchAllLeaderboardsCategoriezed = void 0;
+exports.updateDatabaseMember = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchAllLeaderboardsCategorized = void 0;
 const constants = __importStar(require("./constants"));
 const cached = __importStar(require("./hypixelCached"));
 const mongodb_1 = require("mongodb");
@@ -76,7 +76,7 @@ function getMemberLeaderboardAttributes(member) {
         visited_zones: member.visited_zones.length,
     };
 }
-async function fetchAllLeaderboardsCategoriezed() {
+async function fetchAllLeaderboardsCategorized() {
     const memberLeaderboardAttributes = await fetchAllMemberLeaderboardAttributes();
     const categorizedLeaderboards = {};
     for (const leaderboard of memberLeaderboardAttributes) {
@@ -91,7 +91,7 @@ async function fetchAllLeaderboardsCategoriezed() {
     categorizedLeaderboards.misc = misc;
     return categorizedLeaderboards;
 }
-exports.fetchAllLeaderboardsCategoriezed = fetchAllLeaderboardsCategoriezed;
+exports.fetchAllLeaderboardsCategorized = fetchAllLeaderboardsCategorized;
 /** Fetch the names of all the leaderboards */
 async function fetchAllMemberLeaderboardAttributes() {
     return [
