@@ -20,13 +20,13 @@ const usernameCache = new NodeCache({
 const basicProfilesCache = new NodeCache({
 	stdTTL: 60 * 10,
 	checkperiod: 60,
-	useClones: false,
+	useClones: true,
 })
 
 const playerCache = new NodeCache({
 	stdTTL: 60,
 	checkperiod: 10,
-	useClones: false,
+	useClones: true,
 })
 
 const profileCache = new NodeCache({
@@ -64,6 +64,10 @@ function waitForSet(cache: NodeCache, key?: string, value?: string): Promise<any
  * @param user A user can be either a uuid or a username 
  */
 export async function uuidFromUser(user: string): Promise<string> {
+	// if the user is 32 characters long, it has to be a uuid
+	if (undashUuid(user).length === 32)
+		return undashUuid(user)
+
 	if (usernameCache.has(undashUuid(user))) {
 		// check if the uuid is a key
 		const username: any = usernameCache.get(undashUuid(user))
@@ -132,9 +136,8 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer> {
 	if (!cleanPlayer) return
 
 	// clone in case it gets modified somehow later
-	const cleanPlayerClone = Object.assign({}, cleanPlayer)
-	playerCache.set(playerUuid, cleanPlayerClone)
-	usernameCache.set(playerUuid, cleanPlayerClone.username)
+	playerCache.set(playerUuid, cleanPlayer)
+	usernameCache.set(playerUuid, cleanPlayer.username)
 
 	return cleanPlayer
 }

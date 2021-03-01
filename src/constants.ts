@@ -5,6 +5,7 @@
 import fetch from 'node-fetch'
 import { Agent } from 'https'
 import NodeCache from 'node-cache'
+import Queue from 'queue-promise'
 
 const httpsAgent = new Agent({
 	keepAlive: true
@@ -13,6 +14,12 @@ const httpsAgent = new Agent({
 const githubApiBase = 'https://api.github.com'
 const owner = 'skyblockstats'
 const repo = 'skyblock-constants'
+
+// we use a queue for editing so it doesnt hit the github ratelimit as much
+const queue = new Queue({
+	concurrent: 1,
+	interval: 500
+})
 
 /**
  * Send a request to the GitHub API
@@ -62,7 +69,6 @@ async function fetchFile(path: string): Promise<GithubFile> {
 		`/repos/${owner}/${repo}/contents/${path}`,
 		{
 			'Accept': 'application/vnd.github.v3+json',
-			'Authorization': undefined
 		},
 	)
 	const data = await r.json()
@@ -101,9 +107,8 @@ async function editFile(file: GithubFile, message: string, newContent: string) {
 	})
 }
 
-/** Fetch all the known SkyBlock stats as an array of strings */
-export async function fetchStats(): Promise<string[]> {
-	const file = await fetchFile('stats.json')
+async function fetchJSONConstant(filename: string): Promise<string[]> {
+	const file = await fetchFile(filename)
 	try {
 		return JSON.parse(file.content)
 	} catch {
@@ -112,71 +117,73 @@ export async function fetchStats(): Promise<string[]> {
 	}
 }
 
-/** Fetch all the known SkyBlock collections as an array of strings */
-export async function fetchCollections(): Promise<string[]> {
-	const file = await fetchFile('collections.json')
-	try {
-		return JSON.parse(file.content)
-	} catch {
-		// probably invalid json, return an empty array
-		return []
-	}
+/** Add stats to skyblock-constants. This has caching so it's fine to call many times */
+export async function addJSONConstants(filename: string, addingValues: string[], units: string='stats') {
+	if (addingValues.length === 0) return // no stats provided, just return
+
+	queue.enqueue(async() => {
+		const file = await fetchFile(filename)
+		if (!file.path)
+			return
+		let oldStats: string[]
+		try {
+			oldStats = JSON.parse(file.content)
+		} catch {
+			// invalid json, set it as an empty array
+			oldStats = []
+		}
+		const updatedStats = oldStats
+			.concat(addingValues)
+			// remove duplicates
+			.filter((value, index, array) => array.indexOf(value) === index)
+			.sort((a, b) => a.localeCompare(b))
+		const newStats = updatedStats.filter(value => !oldStats.includes(value))
+
+		// there's not actually any new stats, just return
+		if (newStats.length === 0) return
+
+		const commitMessage = newStats.length >= 2 ? `Add ${newStats.length} new ${units}` : `Add '${newStats[0]}'`
+		await editFile(file, commitMessage, JSON.stringify(updatedStats, null, 2))
+	})
+}
+
+
+/** Fetch all the known SkyBlock stats as an array of strings */
+export async function fetchStats(): Promise<string[]> {
+	return await fetchJSONConstant('stats.json')
 }
 
 /** Add stats to skyblock-constants. This has caching so it's fine to call many times */
 export async function addStats(addingStats: string[]) {
-	if (addingStats.length === 0) return // no stats provided, just return
-
-	const file = await fetchFile('stats.json')
-	if (!file.path)
-		return
-	let oldStats: string[]
-	try {
-		oldStats = JSON.parse(file.content)
-	} catch {
-		// invalid json, set it as an empty array
-		oldStats = []
-	}
-	const updatedStats = oldStats
-		.concat(addingStats)
-		// remove duplicates
-		.filter((value, index, array) => array.indexOf(value) === index)
-		.sort((a, b) => a.localeCompare(b))
-	const newStats = updatedStats.filter(value => !oldStats.includes(value))
-
-	// there's not actually any new stats, just return
-	if (newStats.length === 0) return
-
-	const commitMessage = newStats.length >= 2 ? `Add ${newStats.length} new stats` : `Add '${newStats[0]}'`
-
-	await editFile(file, commitMessage, JSON.stringify(updatedStats, null, 2))
+	await addJSONConstants('stats.json', addingStats, 'stats')
 }
 
-/** Add stats to skyblock-constants. This has caching so it's fine to call many times */
+/** Fetch all the known SkyBlock collections as an array of strings */
+export async function fetchCollections(): Promise<string[]> {
+	return await fetchJSONConstant('collections.json')
+}
+
+/** Add collections to skyblock-constants. This has caching so it's fine to call many times */
 export async function addCollections(addingCollections: string[]) {
-	if (addingCollections.length === 0) return // no stats provided, just return
+	await addJSONConstants('collections.json', addingCollections, 'collections')
+}
 
-	const file = await fetchFile('collections.json')
-	if (!file.path)
-		return
-	let oldCollections: string[]
-	try {
-		oldCollections = JSON.parse(file.content)
-	} catch {
-		// invalid json, set it as an empty array
-		oldCollections = []
-	}
-	const updatedCollections = oldCollections
-		.concat(addingCollections)
-		// remove duplicates
-		.filter((value, index, array) => array.indexOf(value) === index)
-		.sort((a, b) => a.localeCompare(b))
-	const newCollections = updatedCollections.filter(value => !oldCollections.includes(value))
+/** Fetch all the known SkyBlock collections as an array of strings */
+export async function fetchSkills(): Promise<string[]> {
+	return await fetchJSONConstant('skills.json')
+}
 
-	// there's not actually any new stats, just return
-	if (newCollections.length === 0) return
+/** Add skills to skyblock-constants. This has caching so it's fine to call many times */
+export async function addSkills(addingSkills: string[]) {
+	await addJSONConstants('skills.json', addingSkills, 'skills')
+}
 
-	const commitMessage = newCollections.length >= 2 ? `Add ${newCollections.length} new collections` : `Add '${newCollections[0]}'`
+/** Fetch all the known SkyBlock collections as an array of strings */
+export async function fetchZones(): Promise<string[]> {
+	return await fetchJSONConstant('zones.json')
+}
 
-	await editFile(file, commitMessage, JSON.stringify(updatedCollections, null, 2))
+/** Add skills to skyblock-constants. This has caching so it's fine to call many times */
+export async function addZones(addingZones: string[]) {
+	await addJSONConstants('zones.json', addingZones, 'zones')
 }
