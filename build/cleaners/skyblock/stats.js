@@ -7,7 +7,7 @@ const statCategories = {
     'fishing': ['items_fished_', 'items_fished'],
     'auctions': ['auctions_'],
     'collection': ['collection_'],
-    'races': ['_best_time'],
+    'races': ['_best_time', '_best_time_2'],
     'misc': null // everything else goes here
 };
 function categorizeStat(statNameRaw) {
