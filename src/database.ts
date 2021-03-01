@@ -34,7 +34,8 @@ const cachedRawLeaderboards: Map<string, DatabaseLeaderboardItem[]> = new Map()
 
 const leaderboardMax = 100
 const reversedStats = [
-	'first_join'
+	'first_join',
+	'_best_time', '_best_time_2'
 ]
 
 let client: MongoClient
@@ -114,7 +115,17 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 }
 
 function isLeaderboardReversed(name: string): boolean {
-	return reversedStats.includes(name)
+	for (const statMatch of reversedStats) {
+		let trailingEnd = statMatch[0] === '_'
+		let trailingStart = statMatch.substr(-1) === '_'
+		if (
+			(trailingStart && name.startsWith(statMatch))
+			|| (trailingEnd && name.endsWith(statMatch))
+			|| (name == statMatch)
+		)
+			return true
+	}
+	return false
 }
 
 async function fetchMemberLeaderboardRaw(name: string): Promise<DatabaseLeaderboardItem[]> {
