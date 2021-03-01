@@ -78,7 +78,7 @@ function getMemberLeaderboardAttributes(member: CleanMember) {
 }
 
 
-export async function fetchAllLeaderboardsCategoriezed(): Promise<{ [ category: string ]: string[] }> {
+export async function fetchAllLeaderboardsCategorized(): Promise<{ [ category: string ]: string[] }> {
 	const memberLeaderboardAttributes = await fetchAllMemberLeaderboardAttributes()
 	const categorizedLeaderboards: { [ category: string ]: string[] } = {}
 	for (const leaderboard of memberLeaderboardAttributes) {

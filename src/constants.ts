@@ -66,11 +66,12 @@ async function fetchFile(path: string): Promise<GithubFile> {
 		},
 	)
 	const data = await r.json()
-	return {
+	const file = {
 		path: data.path,
 		content: Buffer.from(data.content, data.encoding).toString(),
 		sha: data.sha
 	}
+	fileCache.set(path, file)
 }
 
 /**
