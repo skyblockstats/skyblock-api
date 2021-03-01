@@ -1,10 +1,11 @@
 const statCategories: { [ key: string ]: string[] | null } = { // sorted in order of importance
     'deaths': ['deaths_', 'deaths'],
     'kills': ['kills_', 'kills'],
-    'fishing': ['items_fished_', 'items_fished'],
+    'fishing': ['items_fished_', 'items_fished', 'shredder_'],
     'auctions': ['auctions_'],
     'collection': ['collection_'],
     'races': ['_best_time', '_best_time_2'],
+    'mythos': ['mythos_burrows_', 'mythos_kills'],
     'misc': null // everything else goes here
 }
 

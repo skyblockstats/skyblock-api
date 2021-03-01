@@ -52,6 +52,7 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
     // profiles.members[]
     const inventoriesIncluded = included == null || included.includes('inventories')
     const player = await cached.fetchPlayer(member.uuid)
+    if (!player) return
     return {
         uuid: member.uuid,
         username: player.username,

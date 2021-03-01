@@ -129,6 +129,7 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer> {
 		path: 'player',
 		args: { uuid: playerUuid }
 	})
+	if (!cleanPlayer) return
 
 	// clone in case it gets modified somehow later
 	const cleanPlayerClone = Object.assign({}, cleanPlayer)

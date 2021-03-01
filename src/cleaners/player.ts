@@ -19,6 +19,8 @@ export interface CleanPlayer extends CleanBasicPlayer {
 
 export async function cleanPlayerResponse(data: HypixelPlayer): Promise<CleanPlayer> {
     // Cleans up a 'player' api response
+    if (!data)
+        return // bruh
     return {
         uuid: undashUuid(data.uuid),
         username: data.displayname,

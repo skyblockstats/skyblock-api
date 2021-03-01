@@ -58,7 +58,7 @@ export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptio
         ))
     }
 
-    const cleanedMembers: CleanMember[] = await Promise.all(promises)
+    const cleanedMembers: CleanMember[] = (await Promise.all(promises)).filter(m => m !== null && m !== undefined)
 
     const memberMinions: CleanMinion[][] = []
 
