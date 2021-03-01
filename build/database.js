@@ -168,7 +168,10 @@ async function updateDatabaseMember(member, profile) {
     await constants.addStats(Object.keys(member.rawHypixelStats));
     await constants.addCollections(member.collections.map(value => value.name));
     const leaderboardAttributes = await getApplicableAttributes(member);
-    await memberLeaderboardsCollection.updateOne({ uuid: member.uuid }, {
+    await memberLeaderboardsCollection.updateOne({
+        uuid: member.uuid,
+        profile: profile.uuid
+    }, {
         '$set': {
             stats: leaderboardAttributes,
             last_updated: new Date()
