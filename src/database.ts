@@ -183,7 +183,10 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 	const leaderboardAttributes = await getApplicableAttributes(member)
 
 	await memberLeaderboardsCollection.updateOne(
-		{ uuid: member.uuid },
+		{
+			uuid: member.uuid,
+			profile: profile.uuid
+		},
 		{
 			'$set': {
 				stats: leaderboardAttributes,
