@@ -33,7 +33,7 @@ async function cleanSkyblockProfileResponse(data, options) {
         memberRaw.uuid = memberUUID;
         promises.push(member_1.cleanSkyBlockProfileMemberResponse(memberRaw, ['stats', (options === null || options === void 0 ? void 0 : options.mainMemberUuid) === memberUUID ? 'inventories' : undefined]));
     }
-    const cleanedMembers = await Promise.all(promises);
+    const cleanedMembers = (await Promise.all(promises)).filter(m => m !== null && m !== undefined);
     const memberMinions = [];
     for (const member of cleanedMembers) {
         memberMinions.push(member.minions);
