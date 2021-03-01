@@ -77,20 +77,15 @@ function getMemberLeaderboardAttributes(member: CleanMember) {
 	}
 }
 
-interface CategorizedLeaderboard extends StatCategory {
-	id: string
-}
 
-export async function fetchAllLeaderboardsCategoriezed(): Promise<CategorizedLeaderboard[]> {
+export async function fetchAllLeaderboardsCategoriezed(): Promise<{ [ category: string ]: string[] }> {
 	const memberLeaderboardAttributes = await fetchAllMemberLeaderboardAttributes()
-	const categorizedLeaderboards: CategorizedLeaderboard[] = []
+	const categorizedLeaderboards: { [ category: string ]: string[] } = {}
 	for (const leaderboard of memberLeaderboardAttributes) {
-		const { category, name } = categorizeStat(leaderboard)
-		categorizedLeaderboards.push({
-			category,
-			name,
-			id: leaderboard
-		})
+		const { category } = categorizeStat(leaderboard)
+		if (!categorizedLeaderboards[category])
+			categorizedLeaderboards[category] = []
+		categorizedLeaderboards[category].push(leaderboard)
 	}
 	return categorizedLeaderboards
 }
