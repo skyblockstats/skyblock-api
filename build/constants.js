@@ -46,7 +46,10 @@ const fileCache = new node_cache_1.default({
 async function fetchFile(path) {
     if (fileCache.has(path))
         return fileCache.get(path);
-    const r = await fetchGithubApi('GET', `/repos/${owner}/${repo}/contents/${path}`, { 'Accept': 'application/vnd.github.v3+json' });
+    const r = await fetchGithubApi('GET', `/repos/${owner}/${repo}/contents/${path}`, {
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': undefined
+    });
     const data = await r.json();
     return {
         path: data.path,
