@@ -60,7 +60,10 @@ async function fetchFile(path: string): Promise<GithubFile> {
 	const r = await fetchGithubApi(
 		'GET',
 		`/repos/${owner}/${repo}/contents/${path}`,
-		{ 'Accept': 'application/vnd.github.v3+json' },
+		{
+			'Accept': 'application/vnd.github.v3+json',
+			'Authorization': undefined
+		},
 	)
 	const data = await r.json()
 	return {
