@@ -78,14 +78,12 @@ function getMemberLeaderboardAttributes(member) {
 }
 async function fetchAllLeaderboardsCategoriezed() {
     const memberLeaderboardAttributes = await fetchAllMemberLeaderboardAttributes();
-    const categorizedLeaderboards = [];
+    const categorizedLeaderboards = {};
     for (const leaderboard of memberLeaderboardAttributes) {
-        const { category, name } = stats_1.categorizeStat(leaderboard);
-        categorizedLeaderboards.push({
-            category,
-            name,
-            id: leaderboard
-        });
+        const { category } = stats_1.categorizeStat(leaderboard);
+        if (!categorizedLeaderboards[category])
+            categorizedLeaderboards[category] = [];
+        categorizedLeaderboards[category].push(leaderboard);
     }
     return categorizedLeaderboards;
 }
