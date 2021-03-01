@@ -85,6 +85,10 @@ async function fetchAllLeaderboardsCategoriezed() {
             categorizedLeaderboards[category] = [];
         categorizedLeaderboards[category].push(leaderboard);
     }
+    // move misc to end by removing and readding it
+    const misc = categorizedLeaderboards.misc;
+    delete categorizedLeaderboards.misc;
+    categorizedLeaderboards.misc = misc;
     return categorizedLeaderboards;
 }
 exports.fetchAllLeaderboardsCategoriezed = fetchAllLeaderboardsCategoriezed;
