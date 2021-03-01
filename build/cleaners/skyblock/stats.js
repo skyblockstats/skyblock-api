@@ -6,9 +6,10 @@ const statCategories = {
     'kills': ['kills_', 'kills'],
     'fishing': ['items_fished_', 'items_fished', 'shredder_'],
     'auctions': ['auctions_'],
-    'collection': ['collection_'],
     'races': ['_best_time', '_best_time_2'],
     'mythos': ['mythos_burrows_', 'mythos_kills'],
+    'collection': ['collection_'],
+    'skills': ['skill_'],
     'misc': null // everything else goes here
 };
 function categorizeStat(statNameRaw) {

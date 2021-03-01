@@ -156,7 +156,7 @@ async function fetchMemberProfileUncached(playerUuid, profileUuid) {
         args: { profile: profileUuid }
     }, null, { mainMemberUuid: playerUuid });
     for (const member of profile.members)
-        database_1.updateDatabaseMember(member, profile);
+        database_1.queueUpdateDatabaseMember(member, profile);
     return profile;
 }
 exports.fetchMemberProfileUncached = fetchMemberProfileUncached;
@@ -172,7 +172,7 @@ async function fetchMemberProfilesUncached(playerUuid) {
     });
     for (const profile of profiles) {
         for (const member of profile.members) {
-            database_1.updateDatabaseMember(member, profile);
+            database_1.queueUpdateDatabaseMember(member, profile);
         }
     }
     return profiles;

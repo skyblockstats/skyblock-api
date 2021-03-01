@@ -25,13 +25,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateDatabaseMember = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchAllLeaderboardsCategorized = void 0;
+exports.queueUpdateDatabaseMember = exports.updateDatabaseMember = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchAllLeaderboardsCategorized = void 0;
 const constants = __importStar(require("./constants"));
 const cached = __importStar(require("./hypixelCached"));
 const mongodb_1 = require("mongodb");
 const node_cache_1 = __importDefault(require("node-cache"));
 const util_1 = require("./util");
 const stats_1 = require("./cleaners/skyblock/stats");
+const queue_promise_1 = __importDefault(require("queue-promise"));
 // don't update the user for 3 minutes
 const recentlyUpdated = new node_cache_1.default({
     stdTTL: 60 * 3,
@@ -64,6 +65,14 @@ function getMemberCollectionAttributes(member) {
     }
     return collectionAttributes;
 }
+function getMemberSkillAttributes(member) {
+    const skillAttributes = {};
+    for (const collection of member.skills) {
+        const skillLeaderboardName = `skill_${collection.name}`;
+        skillAttributes[skillLeaderboardName] = collection.xp;
+    }
+    return skillAttributes;
+}
 function getMemberLeaderboardAttributes(member) {
     // if you want to add a new leaderboard for member attributes, add it here (and getAllLeaderboardAttributes)
     return {
@@ -71,6 +80,8 @@ function getMemberLeaderboardAttributes(member) {
         ...member.rawHypixelStats,
         // collection leaderboards
         ...getMemberCollectionAttributes(member),
+        // skill leaderboards
+        ...getMemberSkillAttributes(member),
         fairy_souls: member.fairy_souls.total,
         first_join: member.first_join,
         purse: member.purse,
@@ -100,6 +111,8 @@ async function fetchAllMemberLeaderboardAttributes() {
         ...await constants.fetchStats(),
         // collection leaderboards
         ...(await constants.fetchCollections()).map(value => `collection_${value}`),
+        // skill leaderboards
+        ...(await constants.fetchSkills()).map(value => `skill_${value}`),
         'fairy_souls',
         'first_join',
         'purse',
@@ -162,11 +175,13 @@ async function getApplicableAttributes(member) {
         const requirement = await getMemberLeaderboardRequirement(attributeName);
         if (!requirement || attributeValue > requirement)
             applicableAttributes[attributeName] = attributeValue;
+        console.log(attributeName);
     }
     return applicableAttributes;
 }
 /** Update the member's leaderboard data on the server if applicable */
 async function updateDatabaseMember(member, profile) {
+    console.log('updating', member.uuid);
     if (!client)
         return; // the db client hasn't been initialized
     // the member's been updated too recently, just return
@@ -203,8 +218,18 @@ async function updateDatabaseMember(member, profile) {
             .slice(0, 100);
         cachedRawLeaderboards.set(attributeName, newRawLeaderboard);
     }
+    console.log('updated', member.uuid);
 }
 exports.updateDatabaseMember = updateDatabaseMember;
+const queue = new queue_promise_1.default({
+    concurrent: 3,
+    interval: 500
+});
+/** Queue an update for the member's leaderboard data on the server if applicable */
+async function queueUpdateDatabaseMember(member, profile) {
+    queue.enqueue(async () => await updateDatabaseMember(member, profile));
+}
+exports.queueUpdateDatabaseMember = queueUpdateDatabaseMember;
 /**
  * Remove leaderboard attributes for members that wouldn't actually be on the leaderboard. This saves a lot of storage space
  */
