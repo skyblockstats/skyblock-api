@@ -175,7 +175,9 @@ async function updateDatabaseMember(member, profile) {
     // store the member in recentlyUpdated so it cant update for 3 more minutes
     recentlyUpdated.set(profile.uuid + member.uuid, true);
     await constants.addStats(Object.keys(member.rawHypixelStats));
-    await constants.addCollections(member.collections.map(value => value.name));
+    await constants.addCollections(member.collections.map(coll => coll.name));
+    await constants.addSkills(member.skills.map(skill => skill.name));
+    await constants.addZones(member.visited_zones.map(zone => zone.name));
     const leaderboardAttributes = await getApplicableAttributes(member);
     await memberLeaderboardsCollection.updateOne({
         uuid: member.uuid,

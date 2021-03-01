@@ -6,16 +6,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addCollections = exports.addStats = exports.fetchCollections = exports.fetchStats = void 0;
+exports.addZones = exports.fetchZones = exports.addSkills = exports.fetchSkills = exports.addCollections = exports.fetchCollections = exports.addStats = exports.fetchStats = exports.addJSONConstants = void 0;
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const https_1 = require("https");
 const node_cache_1 = __importDefault(require("node-cache"));
+const queue_promise_1 = __importDefault(require("queue-promise"));
 const httpsAgent = new https_1.Agent({
     keepAlive: true
 });
 const githubApiBase = 'https://api.github.com';
 const owner = 'skyblockstats';
 const repo = 'skyblock-constants';
+// we use a queue for editing so it doesnt hit the github ratelimit as much
+const queue = new queue_promise_1.default({
+    concurrent: 1,
+    interval: 500
+});
 /**
  * Send a request to the GitHub API
  * @param method The HTTP method, for example GET, PUT, POST, etc
@@ -48,7 +54,6 @@ async function fetchFile(path) {
         return fileCache.get(path);
     const r = await fetchGithubApi('GET', `/repos/${owner}/${repo}/contents/${path}`, {
         'Accept': 'application/vnd.github.v3+json',
-        'Authorization': undefined
     });
     const data = await r.json();
     const file = {
@@ -79,83 +84,83 @@ async function editFile(file, message, newContent) {
         sha: data.content.sha
     });
 }
+async function fetchJSONConstant(filename) {
+    const file = await fetchFile(filename);
+    try {
+        return JSON.parse(file.content);
+    }
+    catch {
+        // probably invalid json, return an empty array
+        return [];
+    }
+}
+/** Add stats to skyblock-constants. This has caching so it's fine to call many times */
+async function addJSONConstants(filename, addingValues, units = 'stats') {
+    if (addingValues.length === 0)
+        return; // no stats provided, just return
+    queue.enqueue(async () => {
+        const file = await fetchFile(filename);
+        if (!file.path)
+            return;
+        let oldStats;
+        try {
+            oldStats = JSON.parse(file.content);
+        }
+        catch {
+            // invalid json, set it as an empty array
+            oldStats = [];
+        }
+        const updatedStats = oldStats
+            .concat(addingValues)
+            // remove duplicates
+            .filter((value, index, array) => array.indexOf(value) === index)
+            .sort((a, b) => a.localeCompare(b));
+        const newStats = updatedStats.filter(value => !oldStats.includes(value));
+        // there's not actually any new stats, just return
+        if (newStats.length === 0)
+            return;
+        const commitMessage = newStats.length >= 2 ? `Add ${newStats.length} new ${units}` : `Add '${newStats[0]}'`;
+        await editFile(file, commitMessage, JSON.stringify(updatedStats, null, 2));
+    });
+}
+exports.addJSONConstants = addJSONConstants;
 /** Fetch all the known SkyBlock stats as an array of strings */
 async function fetchStats() {
-    const file = await fetchFile('stats.json');
-    try {
-        return JSON.parse(file.content);
-    }
-    catch {
-        // probably invalid json, return an empty array
-        return [];
-    }
+    return await fetchJSONConstant('stats.json');
 }
 exports.fetchStats = fetchStats;
-/** Fetch all the known SkyBlock collections as an array of strings */
-async function fetchCollections() {
-    const file = await fetchFile('collections.json');
-    try {
-        return JSON.parse(file.content);
-    }
-    catch {
-        // probably invalid json, return an empty array
-        return [];
-    }
-}
-exports.fetchCollections = fetchCollections;
 /** Add stats to skyblock-constants. This has caching so it's fine to call many times */
 async function addStats(addingStats) {
-    if (addingStats.length === 0)
-        return; // no stats provided, just return
-    const file = await fetchFile('stats.json');
-    if (!file.path)
-        return;
-    let oldStats;
-    try {
-        oldStats = JSON.parse(file.content);
-    }
-    catch {
-        // invalid json, set it as an empty array
-        oldStats = [];
-    }
-    const updatedStats = oldStats
-        .concat(addingStats)
-        // remove duplicates
-        .filter((value, index, array) => array.indexOf(value) === index)
-        .sort((a, b) => a.localeCompare(b));
-    const newStats = updatedStats.filter(value => !oldStats.includes(value));
-    // there's not actually any new stats, just return
-    if (newStats.length === 0)
-        return;
-    const commitMessage = newStats.length >= 2 ? `Add ${newStats.length} new stats` : `Add '${newStats[0]}'`;
-    await editFile(file, commitMessage, JSON.stringify(updatedStats, null, 2));
+    await addJSONConstants('stats.json', addingStats, 'stats');
 }
 exports.addStats = addStats;
-/** Add stats to skyblock-constants. This has caching so it's fine to call many times */
+/** Fetch all the known SkyBlock collections as an array of strings */
+async function fetchCollections() {
+    return await fetchJSONConstant('collections.json');
+}
+exports.fetchCollections = fetchCollections;
+/** Add collections to skyblock-constants. This has caching so it's fine to call many times */
 async function addCollections(addingCollections) {
-    if (addingCollections.length === 0)
-        return; // no stats provided, just return
-    const file = await fetchFile('collections.json');
-    if (!file.path)
-        return;
-    let oldCollections;
-    try {
-        oldCollections = JSON.parse(file.content);
-    }
-    catch {
-        // invalid json, set it as an empty array
-        oldCollections = [];
-    }
-    const updatedCollections = oldCollections
-        .concat(addingCollections)
-        // remove duplicates
-        .filter((value, index, array) => array.indexOf(value) === index)
-        .sort((a, b) => a.localeCompare(b));
-    const newCollections = updatedCollections.filter(value => !oldCollections.includes(value));
-    // there's not actually any new stats, just return
-    if (newCollections.length === 0)
-        return;
-    const commitMessage = newCollections.length >= 2 ? `Add ${newCollections.length} new collections` : `Add '${newCollections[0]}'`;
-    await editFile(file, commitMessage, JSON.stringify(updatedCollections, null, 2));
+    await addJSONConstants('collections.json', addingCollections, 'collections');
 }
 exports.addCollections = addCollections;
+/** Fetch all the known SkyBlock collections as an array of strings */
+async function fetchSkills() {
+    return await fetchJSONConstant('skills.json');
+}
+exports.fetchSkills = fetchSkills;
+/** Add skills to skyblock-constants. This has caching so it's fine to call many times */
+async function addSkills(addingSkills) {
+    await addJSONConstants('skills.json', addingSkills, 'skills');
+}
+exports.addSkills = addSkills;
+/** Fetch all the known SkyBlock collections as an array of strings */
+async function fetchZones() {
+    return await fetchJSONConstant('zones.json');
+}
+exports.fetchZones = fetchZones;
+/** Add skills to skyblock-constants. This has caching so it's fine to call many times */
+async function addZones(addingZones) {
+    await addJSONConstants('zones.json', addingZones, 'zones');
+}
+exports.addZones = addZones;
