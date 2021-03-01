@@ -17,6 +17,5 @@ jobs:
           user-name: "mat-1"
           user-email: "github@matdoes.dev"
           message: "Compiled TS into JS"
-          directories: ./src
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
