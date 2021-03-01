@@ -67,7 +67,7 @@ function waitForSet(cache, key, value) {
         const listener = (setKey, setValue) => {
             if (setKey === key || (value && setValue === value)) {
                 cache.removeListener('set', listener);
-                return resolve({ key, value });
+                return resolve({ key: setKey, value: setValue });
             }
         };
         cache.on('set', listener);
@@ -86,7 +86,9 @@ async function uuidFromUser(user) {
         const username = usernameCache.get(util_1.undashUuid(user));
         // if it has .then, then that means its a waitForSet promise. This is done to prevent requests made while it is already requesting
         if (username.then) {
-            return (await username).key;
+            const { key: uuid, value: _username } = await username;
+            usernameCache.set(uuid, _username);
+            return uuid;
         }
         else
             return util_1.undashUuid(user);
@@ -103,8 +105,10 @@ async function uuidFromUser(user) {
     usernameCache.set(util_1.undashUuid(user), waitForSet(usernameCache, user, user));
     // not cached, actually fetch mojang api now
     let { uuid, username } = await mojang.mojangDataFromUser(user);
-    if (!uuid)
+    if (!uuid) {
+        usernameCache.set(uuid, null);
         return;
+    }
     // remove dashes from the uuid so its more normal
     uuid = util_1.undashUuid(uuid);
     if (user !== uuid)
