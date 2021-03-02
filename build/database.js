@@ -194,10 +194,11 @@ async function getMemberLeaderboardRequirement(name) {
 async function getApplicableAttributes(member) {
     const leaderboardAttributes = getMemberLeaderboardAttributes(member);
     const applicableAttributes = {};
-    for (const [attributeName, attributeValue] of Object.entries(leaderboardAttributes)) {
-        const requirement = await getMemberLeaderboardRequirement(attributeName);
-        if (!requirement || attributeValue > requirement)
-            applicableAttributes[attributeName] = attributeValue;
+    for (const [leaderboard, attributeValue] of Object.entries(leaderboardAttributes)) {
+        const requirement = await getMemberLeaderboardRequirement(leaderboard);
+        const leaderboardReversed = isLeaderboardReversed(leaderboard);
+        if (!requirement || leaderboardReversed ? attributeValue < requirement : attributeValue > requirement)
+            applicableAttributes[leaderboard] = attributeValue;
     }
     return applicableAttributes;
 }
