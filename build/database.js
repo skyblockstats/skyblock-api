@@ -48,7 +48,8 @@ const reversedLeaderboards = [
 ];
 const leaderboardUnits = {
     time: ['_best_time', '_best_time_2'],
-    date: ['first_join']
+    date: ['first_join'],
+    coins: ['purse']
 };
 let client;
 let database;
