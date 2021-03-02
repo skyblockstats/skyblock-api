@@ -96,8 +96,9 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 		playerData = await cached.fetchPlayer(uuid)
 		// if not including profiles, include lightweight profiles just in case
 		if (!includeProfiles)
-			basicProfilesData = playerData.profiles
-		playerData.profiles = undefined
+			basicProfilesData = playerData?.profiles
+		if (playerData)
+			playerData.profiles = undefined
 	}
 	if (includeProfiles) {
 		profilesData = await cached.fetchSkyblockProfiles(uuid)
