@@ -90,6 +90,9 @@ async function uuidFromUser(user) {
     if (usernameCache.has(util_1.undashUuid(user))) {
         // check if the uuid is a key
         const username = usernameCache.get(util_1.undashUuid(user));
+        // sometimes the username will be null, return that
+        if (username === null)
+            return username;
         // if it has .then, then that means its a waitForCacheSet promise. This is done to prevent requests made while it is already requesting
         if (username.then) {
             const { key: uuid, value: _username } = await username;
@@ -205,6 +208,8 @@ exports.fetchSkyblockProfiles = fetchSkyblockProfiles;
 /** Fetch an array of `BasicProfile`s */
 async function fetchBasicProfiles(user) {
     const playerUuid = await uuidFromUser(user);
+    if (!playerUuid)
+        return; // invalid player, just return
     if (basicProfilesCache.has(playerUuid)) {
         if (_1.debug)
             console.log('Cache hit! fetchBasicProfiles', playerUuid);
@@ -235,6 +240,8 @@ async function fetchProfileUuid(user, profile) {
     if (_1.debug)
         console.log('Cache miss: fetchProfileUuid', user);
     const profiles = await fetchBasicProfiles(user);
+    if (!profiles)
+        return; // user probably doesnt exist
     const profileUuid = util_1.undashUuid(profile);
     for (const p of profiles) {
         if (p.name.toLowerCase() === profileUuid.toLowerCase())
