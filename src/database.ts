@@ -326,6 +326,8 @@ async function fetchAllLeaderboards() {
 connect().then(() => {
 	// when it connects, cache the leaderboards and remove bad members
 	removeBadMemberLeaderboardAttributes()
-	// cache leaderboard players every hour
+	// cache leaderboards on startup so its faster later on
+	fetchAllLeaderboards()
+	// cache leaderboard players again every hour
 	setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000)
 })
