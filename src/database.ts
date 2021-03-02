@@ -231,6 +231,8 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 	// store the member in recentlyUpdated so it cant update for 3 more minutes
 	recentlyUpdated.set(profile.uuid + member.uuid, true)
 
+	if (debug) console.log('adding member to leaderboards', member.username)
+
 	await constants.addStats(Object.keys(member.rawHypixelStats))
 	await constants.addCollections(member.collections.map(coll => coll.name))
 	await constants.addSkills(member.skills.map(skill => skill.name))
@@ -267,6 +269,8 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 			.slice(0, 100)
 		cachedRawLeaderboards.set(attributeName, newRawLeaderboard)
 	}
+
+	if (debug) console.log('added member to leaderboards', member.username, leaderboardAttributes)
 }
 
 const queue = new Queue({

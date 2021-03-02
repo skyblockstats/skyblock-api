@@ -211,6 +211,8 @@ async function updateDatabaseMember(member, profile) {
         return;
     // store the member in recentlyUpdated so it cant update for 3 more minutes
     recentlyUpdated.set(profile.uuid + member.uuid, true);
+    if (_1.debug)
+        console.log('adding member to leaderboards', member.username);
     await constants.addStats(Object.keys(member.rawHypixelStats));
     await constants.addCollections(member.collections.map(coll => coll.name));
     await constants.addSkills(member.skills.map(skill => skill.name));
@@ -240,10 +242,12 @@ async function updateDatabaseMember(member, profile) {
             .slice(0, 100);
         cachedRawLeaderboards.set(attributeName, newRawLeaderboard);
     }
+    if (_1.debug)
+        console.log('added member to leaderboards', member.username, leaderboardAttributes);
 }
 exports.updateDatabaseMember = updateDatabaseMember;
 const queue = new queue_promise_1.default({
-    concurrent: 3,
+    concurrent: 10,
     interval: 500
 });
 /** Queue an update for the member's leaderboard data on the server if applicable */
