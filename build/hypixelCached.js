@@ -102,7 +102,7 @@ async function uuidFromUser(user) {
     // check if the username is a value
     const uuidToUsername = usernameCache.mget(usernameCache.keys());
     for (const [uuid, username] of Object.entries(uuidToUsername)) {
-        if (username.toLowerCase && user.toLowerCase() === username.toLowerCase())
+        if (username && username.toLowerCase && user.toLowerCase() === username.toLowerCase())
             return uuid;
     }
     if (_1.debug)

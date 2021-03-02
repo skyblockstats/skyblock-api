@@ -90,7 +90,7 @@ export async function uuidFromUser(user: string): Promise<string> {
 	// check if the username is a value
 	const uuidToUsername: {[ key: string ]: string} = usernameCache.mget(usernameCache.keys())
 	for (const [ uuid, username ] of Object.entries(uuidToUsername)) {
-		if (username.toLowerCase && user.toLowerCase() === username.toLowerCase())
+		if (username && username.toLowerCase && user.toLowerCase() === username.toLowerCase())
 			return uuid
 	}
 
