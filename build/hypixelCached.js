@@ -25,7 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchProfileName = exports.fetchProfile = exports.fetchProfileUuid = exports.fetchSkyblockProfiles = exports.fetchPlayer = exports.usernameFromUser = exports.uuidFromUser = void 0;
+exports.fetchProfileName = exports.fetchProfile = exports.fetchProfileUuid = exports.fetchSkyblockProfiles = exports.fetchBasicPlayer = exports.fetchPlayer = exports.usernameFromUser = exports.uuidFromUser = void 0;
 const node_cache_1 = __importDefault(require("node-cache"));
 const mojang = __importStar(require("./mojang"));
 const hypixel = __importStar(require("./hypixel"));
@@ -46,6 +46,12 @@ const playerCache = new node_cache_1.default({
     stdTTL: 60,
     checkperiod: 10,
     useClones: true,
+});
+// cache "basic players" (players without profiles) for 4 hours
+const basicPlayerCache = new node_cache_1.default({
+    stdTTL: 60 * 60 * 4,
+    checkperiod: 60 * 10,
+    useClones: true
 });
 const profileCache = new node_cache_1.default({
     stdTTL: 30,
@@ -137,9 +143,8 @@ async function usernameFromUser(user) {
 exports.usernameFromUser = usernameFromUser;
 async function fetchPlayer(user) {
     const playerUuid = await uuidFromUser(user);
-    if (playerCache.has(playerUuid)) {
+    if (playerCache.has(playerUuid))
         return playerCache.get(playerUuid);
-    }
     const cleanPlayer = await hypixel.sendCleanApiRequest({
         path: 'player',
         args: { uuid: playerUuid }
@@ -149,9 +154,22 @@ async function fetchPlayer(user) {
     // clone in case it gets modified somehow later
     playerCache.set(playerUuid, cleanPlayer);
     usernameCache.set(playerUuid, cleanPlayer.username);
+    const cleanBasicPlayer = Object.assign({}, cleanPlayer);
+    delete cleanBasicPlayer.profiles;
+    basicPlayerCache.set(playerUuid, cleanBasicPlayer);
     return cleanPlayer;
 }
 exports.fetchPlayer = fetchPlayer;
+/** Fetch a player without their profiles. This is heavily cached. */
+async function fetchBasicPlayer(user) {
+    const playerUuid = await uuidFromUser(user);
+    if (basicPlayerCache.has(playerUuid))
+        return basicPlayerCache.get(playerUuid);
+    const player = await fetchPlayer(playerUuid);
+    delete player.profiles;
+    return player;
+}
+exports.fetchBasicPlayer = fetchBasicPlayer;
 async function fetchSkyblockProfiles(playerUuid) {
     if (profilesCache.has(playerUuid)) {
         if (_1.debug)

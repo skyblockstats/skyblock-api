@@ -29,6 +29,13 @@ const playerCache = new NodeCache({
 	useClones: true,
 })
 
+// cache "basic players" (players without profiles) for 4 hours
+const basicPlayerCache = new NodeCache({
+	stdTTL: 60 * 60 * 4,
+	checkperiod: 60 * 10,
+	useClones: true
+})
+
 const profileCache = new NodeCache({
 	stdTTL: 30,
 	checkperiod: 10,
@@ -130,9 +137,8 @@ export async function usernameFromUser(user: string): Promise<string> {
 export async function fetchPlayer(user: string): Promise<CleanPlayer> {
 	const playerUuid = await uuidFromUser(user)
 
-	if (playerCache.has(playerUuid)) {
+	if (playerCache.has(playerUuid))
 		return playerCache.get(playerUuid)
-	}
 
 	const cleanPlayer: CleanPlayer = await hypixel.sendCleanApiRequest({
 		path: 'player',
@@ -144,10 +150,25 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer> {
 	// clone in case it gets modified somehow later
 	playerCache.set(playerUuid, cleanPlayer)
 	usernameCache.set(playerUuid, cleanPlayer.username)
+	
+	const cleanBasicPlayer = Object.assign({}, cleanPlayer)
+	delete cleanBasicPlayer.profiles
+	basicPlayerCache.set(playerUuid, cleanBasicPlayer)
 
 	return cleanPlayer
 }
 
+/** Fetch a player without their profiles. This is heavily cached. */
+export async function fetchBasicPlayer(user: string): Promise<CleanPlayer> {
+	const playerUuid = await uuidFromUser(user)
+
+	if (basicPlayerCache.has(playerUuid))
+		return basicPlayerCache.get(playerUuid)
+	
+	const player = await fetchPlayer(playerUuid)
+	delete player.profiles
+	return player
+}
 
 export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanProfile[]> {
 	if (profilesCache.has(playerUuid)) {

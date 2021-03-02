@@ -12,6 +12,7 @@ import { shuffle, sleep } from './util'
 import { CleanFullProfile } from './cleaners/skyblock/profile'
 import { categorizeStat } from './cleaners/skyblock/stats'
 import Queue from 'queue-promise'
+import { debug } from '.'
 
 // don't update the user for 3 minutes
 const recentlyUpdated = new NodeCache({
@@ -34,10 +35,14 @@ interface LeaderboardItem {
 const cachedRawLeaderboards: Map<string, DatabaseLeaderboardItem[]> = new Map()
 
 const leaderboardMax = 100
-const reversedStats = [
+const reversedLeaderboards = [
 	'first_join',
 	'_best_time', '_best_time_2'
 ]
+const leaderboardUnits = {
+	time: ['_best_time', '_best_time_2'],
+	date: ['first_join']
+}
 
 let client: MongoClient
 let database: Db
@@ -131,17 +136,32 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 }
 
 function isLeaderboardReversed(name: string): boolean {
-	for (const statMatch of reversedStats) {
-		let trailingEnd = statMatch[0] === '_'
-		let trailingStart = statMatch.substr(-1) === '_'
+	for (const leaderboardMatch of reversedLeaderboards) {
+		let trailingEnd = leaderboardMatch[0] === '_'
+		let trailingStart = leaderboardMatch.substr(-1) === '_'
 		if (
-			(trailingStart && name.startsWith(statMatch))
-			|| (trailingEnd && name.endsWith(statMatch))
-			|| (name == statMatch)
+			(trailingStart && name.startsWith(leaderboardMatch))
+			|| (trailingEnd && name.endsWith(leaderboardMatch))
+			|| (name == leaderboardMatch)
 		)
 			return true
 	}
 	return false
+}
+
+function getLeaderboardUnit(name: string): string {
+	for (const [ unitName, leaderboardMatchers ] of Object.entries(leaderboardUnits)) {
+		for (const leaderboardMatch of leaderboardMatchers) {
+			let trailingEnd = leaderboardMatch[0] === '_'
+			let trailingStart = leaderboardMatch.substr(-1) === '_'
+			if (
+				(trailingStart && name.startsWith(leaderboardMatch))
+				|| (trailingEnd && name.endsWith(leaderboardMatch))
+				|| (name == leaderboardMatch)
+			)
+				return unitName
+		}
+	}
 }
 
 async function fetchMemberLeaderboardRaw(name: string): Promise<DatabaseLeaderboardItem[]> {
@@ -163,7 +183,7 @@ export async function fetchMemberLeaderboard(name: string) {
 	const leaderboardRaw = await fetchMemberLeaderboardRaw(name)
 	const fetchLeaderboardPlayer = async(item: DatabaseLeaderboardItem): Promise<LeaderboardItem> => {
 		return {
-			player: await cached.fetchPlayer(item.uuid),
+			player: await cached.fetchBasicPlayer(item.uuid),
 			value: item.stats[name]
 		}
 	}
@@ -172,7 +192,11 @@ export async function fetchMemberLeaderboard(name: string) {
 		promises.push(fetchLeaderboardPlayer(item))
 	}
 	const leaderboard = await Promise.all(promises)
-	return leaderboard
+	return {
+		name: name,
+		unit: getLeaderboardUnit(name) ?? null,
+		list: leaderboard
+	}
 }
 
 async function getMemberLeaderboardRequirement(name: string): Promise<number> {
@@ -192,14 +216,12 @@ async function getApplicableAttributes(member): Promise<{ [key: string]: number 
 		const requirement = await getMemberLeaderboardRequirement(attributeName)
 		if (!requirement || attributeValue > requirement)
 			applicableAttributes[attributeName] = attributeValue
-		console.log(attributeName)
 	}
 	return applicableAttributes
 }
 
 /** Update the member's leaderboard data on the server if applicable */
 export async function updateDatabaseMember(member: CleanMember, profile: CleanFullProfile) {
-	console.log('updating', member.uuid)
 	if (!client) return // the db client hasn't been initialized
 	// the member's been updated too recently, just return
 	if (recentlyUpdated.get(profile.uuid + member.uuid))
@@ -243,7 +265,6 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 			.slice(0, 100)
 		cachedRawLeaderboards.set(attributeName, newRawLeaderboard)
 	}
-	console.log('updated', member.uuid)
 }
 
 const queue = new Queue({
@@ -265,7 +286,7 @@ async function removeBadMemberLeaderboardAttributes() {
 	// shuffle so if the application is restarting many times itll still be useful
 	for (const leaderboard of shuffle(leaderboards)) {
 		// wait 10 seconds so it doesnt use as much ram
-		await sleep(100000)
+		await sleep(10 * 1000)
 
 		const unsetValue = {}
 		unsetValue[leaderboard] = ''
@@ -283,7 +304,26 @@ async function removeBadMemberLeaderboardAttributes() {
 	}
 }
 
+/** Fetch all the leaderboards, used for caching. Don't call this often! */
+async function fetchAllLeaderboards() {
+	const leaderboards = await fetchAllMemberLeaderboardAttributes()
+	// shuffle so if the application is restarting many times itll still be useful
+	if (debug) console.log('Caching leaderboards!')
+	for (const leaderboard of shuffle(leaderboards)) {
+		// wait 2 seconds so it doesnt use as much ram
+		await sleep(2 * 1000)
 
-connect()
-	.then(removeBadMemberLeaderboardAttributes)
+		await fetchMemberLeaderboard(leaderboard)
+	}
+	if (debug) console.log('Finished caching leaderboards!')
+}
 
+
+connect().then(() => {
+	// when it connects, cache the leaderboards and remove bad members
+	removeBadMemberLeaderboardAttributes()
+	// cache leaderboards on startup so its faster later on
+	fetchAllLeaderboards()
+	// cache leaderboard players again every hour
+	setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000)
+})

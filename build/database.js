@@ -33,6 +33,7 @@ const node_cache_1 = __importDefault(require("node-cache"));
 const util_1 = require("./util");
 const stats_1 = require("./cleaners/skyblock/stats");
 const queue_promise_1 = __importDefault(require("queue-promise"));
+const _1 = require(".");
 // don't update the user for 3 minutes
 const recentlyUpdated = new node_cache_1.default({
     stdTTL: 60 * 3,
@@ -41,10 +42,14 @@ const recentlyUpdated = new node_cache_1.default({
 });
 const cachedRawLeaderboards = new Map();
 const leaderboardMax = 100;
-const reversedStats = [
+const reversedLeaderboards = [
     'first_join',
     '_best_time', '_best_time_2'
 ];
+const leaderboardUnits = {
+    time: ['_best_time', '_best_time_2'],
+    date: ['first_join']
+};
 let client;
 let database;
 let memberLeaderboardsCollection;
@@ -121,15 +126,27 @@ async function fetchAllMemberLeaderboardAttributes() {
 }
 exports.fetchAllMemberLeaderboardAttributes = fetchAllMemberLeaderboardAttributes;
 function isLeaderboardReversed(name) {
-    for (const statMatch of reversedStats) {
-        let trailingEnd = statMatch[0] === '_';
-        let trailingStart = statMatch.substr(-1) === '_';
-        if ((trailingStart && name.startsWith(statMatch))
-            || (trailingEnd && name.endsWith(statMatch))
-            || (name == statMatch))
+    for (const leaderboardMatch of reversedLeaderboards) {
+        let trailingEnd = leaderboardMatch[0] === '_';
+        let trailingStart = leaderboardMatch.substr(-1) === '_';
+        if ((trailingStart && name.startsWith(leaderboardMatch))
+            || (trailingEnd && name.endsWith(leaderboardMatch))
+            || (name == leaderboardMatch))
             return true;
     }
     return false;
+}
+function getLeaderboardUnit(name) {
+    for (const [unitName, leaderboardMatchers] of Object.entries(leaderboardUnits)) {
+        for (const leaderboardMatch of leaderboardMatchers) {
+            let trailingEnd = leaderboardMatch[0] === '_';
+            let trailingStart = leaderboardMatch.substr(-1) === '_';
+            if ((trailingStart && name.startsWith(leaderboardMatch))
+                || (trailingEnd && name.endsWith(leaderboardMatch))
+                || (name == leaderboardMatch))
+                return unitName;
+        }
+    }
 }
 async function fetchMemberLeaderboardRaw(name) {
     if (cachedRawLeaderboards.has(name))
@@ -144,10 +161,11 @@ async function fetchMemberLeaderboardRaw(name) {
     return leaderboardRaw;
 }
 async function fetchMemberLeaderboard(name) {
+    var _a;
     const leaderboardRaw = await fetchMemberLeaderboardRaw(name);
     const fetchLeaderboardPlayer = async (item) => {
         return {
-            player: await cached.fetchPlayer(item.uuid),
+            player: await cached.fetchBasicPlayer(item.uuid),
             value: item.stats[name]
         };
     };
@@ -156,7 +174,11 @@ async function fetchMemberLeaderboard(name) {
         promises.push(fetchLeaderboardPlayer(item));
     }
     const leaderboard = await Promise.all(promises);
-    return leaderboard;
+    return {
+        name: name,
+        unit: (_a = getLeaderboardUnit(name)) !== null && _a !== void 0 ? _a : null,
+        list: leaderboard
+    };
 }
 exports.fetchMemberLeaderboard = fetchMemberLeaderboard;
 async function getMemberLeaderboardRequirement(name) {
@@ -175,13 +197,11 @@ async function getApplicableAttributes(member) {
         const requirement = await getMemberLeaderboardRequirement(attributeName);
         if (!requirement || attributeValue > requirement)
             applicableAttributes[attributeName] = attributeValue;
-        console.log(attributeName);
     }
     return applicableAttributes;
 }
 /** Update the member's leaderboard data on the server if applicable */
 async function updateDatabaseMember(member, profile) {
-    console.log('updating', member.uuid);
     if (!client)
         return; // the db client hasn't been initialized
     // the member's been updated too recently, just return
@@ -218,7 +238,6 @@ async function updateDatabaseMember(member, profile) {
             .slice(0, 100);
         cachedRawLeaderboards.set(attributeName, newRawLeaderboard);
     }
-    console.log('updated', member.uuid);
 }
 exports.updateDatabaseMember = updateDatabaseMember;
 const queue = new queue_promise_1.default({
@@ -238,7 +257,7 @@ async function removeBadMemberLeaderboardAttributes() {
     // shuffle so if the application is restarting many times itll still be useful
     for (const leaderboard of util_1.shuffle(leaderboards)) {
         // wait 10 seconds so it doesnt use as much ram
-        await util_1.sleep(100000);
+        await util_1.sleep(10 * 1000);
         const unsetValue = {};
         unsetValue[leaderboard] = '';
         const filter = {};
@@ -251,5 +270,25 @@ async function removeBadMemberLeaderboardAttributes() {
         }
     }
 }
-connect()
-    .then(removeBadMemberLeaderboardAttributes);
+/** Fetch all the leaderboards, used for caching. Don't call this often! */
+async function fetchAllLeaderboards() {
+    const leaderboards = await fetchAllMemberLeaderboardAttributes();
+    // shuffle so if the application is restarting many times itll still be useful
+    if (_1.debug)
+        console.log('Caching leaderboards!');
+    for (const leaderboard of util_1.shuffle(leaderboards)) {
+        // wait 2 seconds so it doesnt use as much ram
+        await util_1.sleep(2 * 1000);
+        await fetchMemberLeaderboard(leaderboard);
+    }
+    if (_1.debug)
+        console.log('Finished caching leaderboards!');
+}
+connect().then(() => {
+    // when it connects, cache the leaderboards and remove bad members
+    removeBadMemberLeaderboardAttributes();
+    // cache leaderboards on startup so its faster later on
+    fetchAllLeaderboards();
+    // cache leaderboard players again every hour
+    setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000);
+});
