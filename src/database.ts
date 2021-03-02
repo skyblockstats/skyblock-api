@@ -293,9 +293,11 @@ async function removeBadMemberLeaderboardAttributes() {
 		unsetValue[leaderboard] = ''
 		const filter = {}
 		const requirement = await getMemberLeaderboardRequirement(leaderboard)
+		const leaderboardReversed = isLeaderboardReversed(leaderboard)
 		if (requirement !== null) {
 			filter[`stats.${leaderboard}`] = {
-				'$lt': requirement
+				'$lt': leaderboardReversed ? undefined : requirement,
+				'$gt': leaderboardReversed ? requirement : undefined
 			}
 			await memberLeaderboardsCollection.updateMany(
 				filter,
