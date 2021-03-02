@@ -102,7 +102,7 @@ export async function uuidFromUser(user: string): Promise<string> {
 	// not cached, actually fetch mojang api now
 	let { uuid, username } = await mojang.mojangDataFromUser(user)
 	if (!uuid) {
-		usernameCache.set(uuid, null)
+		usernameCache.set(user, null)
 		return
 	}
 
