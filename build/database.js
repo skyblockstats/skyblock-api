@@ -247,7 +247,7 @@ async function updateDatabaseMember(member, profile) {
 }
 exports.updateDatabaseMember = updateDatabaseMember;
 const queue = new queue_promise_1.default({
-    concurrent: 10,
+    concurrent: 1,
     interval: 500
 });
 /** Queue an update for the member's leaderboard data on the server if applicable */

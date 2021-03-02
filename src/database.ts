@@ -274,7 +274,7 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 }
 
 const queue = new Queue({
-	concurrent: 10,
+	concurrent: 1,
 	interval: 500
 })
 

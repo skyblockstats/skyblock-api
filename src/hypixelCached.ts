@@ -54,7 +54,7 @@ const profileNameCache = new NodeCache({
 	useClones: false,
 })
 
-function waitForSet(cache: NodeCache, key?: string, value?: string): Promise<any> {
+function waitForCacheSet(cache: NodeCache, key?: string, value?: string): Promise<any> {
 	return new Promise((resolve, reject) => {
 		const listener = (setKey, setValue) => {
 			if (setKey === key || (value && setValue === value)) {
@@ -78,7 +78,7 @@ export async function uuidFromUser(user: string): Promise<string> {
 	if (usernameCache.has(undashUuid(user))) {
 		// check if the uuid is a key
 		const username: any = usernameCache.get(undashUuid(user))
-		// if it has .then, then that means its a waitForSet promise. This is done to prevent requests made while it is already requesting
+		// if it has .then, then that means its a waitForCacheSet promise. This is done to prevent requests made while it is already requesting
 		if (username.then) {
 			const { key: uuid, value: _username } = await username
 			usernameCache.set(uuid, _username)
@@ -96,8 +96,8 @@ export async function uuidFromUser(user: string): Promise<string> {
 
 	if (debug) console.log('Cache miss: uuidFromUser', user)
 
-	// set it as waitForSet (a promise) in case uuidFromUser gets called while its fetching mojang
-	usernameCache.set(undashUuid(user), waitForSet(usernameCache, user, user))
+	// set it as waitForCacheSet (a promise) in case uuidFromUser gets called while its fetching mojang
+	usernameCache.set(undashUuid(user), waitForCacheSet(usernameCache, user, user))
 	
 	// not cached, actually fetch mojang api now
 	let { uuid, username } = await mojang.mojangDataFromUser(user)
