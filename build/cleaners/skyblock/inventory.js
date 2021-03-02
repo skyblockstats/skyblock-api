@@ -83,12 +83,13 @@ async function cleanInventories(data) {
         const hypixelInventoryName = exports.INVENTORIES[cleanInventoryName];
         const encodedInventoryContents = (_a = data[hypixelInventoryName]) === null || _a === void 0 ? void 0 : _a.data;
         let inventoryContents;
-        if (encodedInventoryContents)
+        if (encodedInventoryContents) {
             inventoryContents = await cleanInventory(encodedInventoryContents);
-        if (cleanInventoryName === 'armor')
-            // the armor is sent from boots to head, the opposite makes more sense
-            inventoryContents.reverse();
-        cleanInventories[cleanInventoryName] = inventoryContents;
+            if (cleanInventoryName === 'armor')
+                // the armor is sent from boots to head, the opposite makes more sense
+                inventoryContents.reverse();
+            cleanInventories[cleanInventoryName] = inventoryContents;
+        }
     }
     return cleanInventories;
 }

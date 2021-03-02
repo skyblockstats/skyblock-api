@@ -91,14 +91,15 @@ export async function cleanInventories(data: any): Promise<Inventories> {
 		const hypixelInventoryName = INVENTORIES[cleanInventoryName]
 		const encodedInventoryContents = data[hypixelInventoryName]?.data
 		let inventoryContents: Inventory
-		if (encodedInventoryContents)
+		if (encodedInventoryContents) {
 			inventoryContents = await cleanInventory(encodedInventoryContents)
 
-		if (cleanInventoryName === 'armor')
-			// the armor is sent from boots to head, the opposite makes more sense
-			inventoryContents.reverse()
+			if (cleanInventoryName === 'armor')
+				// the armor is sent from boots to head, the opposite makes more sense
+				inventoryContents.reverse()
 
-		cleanInventories[cleanInventoryName] = inventoryContents
+			cleanInventories[cleanInventoryName] = inventoryContents
+		}
 	}
 	return cleanInventories
 }
