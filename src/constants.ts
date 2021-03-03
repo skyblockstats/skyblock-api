@@ -3,6 +3,7 @@
  */
 
 import fetch from 'node-fetch'
+import * as nodeFetch from 'node-fetch'
 import { Agent } from 'https'
 import NodeCache from 'node-cache'
 import Queue from 'queue-promise'
@@ -28,7 +29,7 @@ const queue = new Queue({
  * @param headers The extra headers
  * @param json The JSON body, only applicable for some types of methods
  */
-async function fetchGithubApi(method: string, route: string, headers?: any, json?: any) {
+async function fetchGithubApi(method: string, route: string, headers?: any, json?: any): Promise<nodeFetch.Response> {
 	return await fetch(
 		githubApiBase + route,
 		{
@@ -87,7 +88,7 @@ async function fetchFile(path: string): Promise<GithubFile> {
  * @param message The commit message
  * @param newContent The new content in the file
  */
-async function editFile(file: GithubFile, message: string, newContent: string) {
+async function editFile(file: GithubFile, message: string, newContent: string): Promise<void> {
 	const r = await fetchGithubApi(
 		'PUT',
 		`/repos/${owner}/${repo}/contents/${file.path}`,
@@ -118,7 +119,7 @@ async function fetchJSONConstant(filename: string): Promise<string[]> {
 }
 
 /** Add stats to skyblock-constants. This has caching so it's fine to call many times */
-export async function addJSONConstants(filename: string, addingValues: string[], units: string='stats') {
+export async function addJSONConstants(filename: string, addingValues: string[], units: string='stats'): Promise<void> {
 	if (addingValues.length === 0) return // no stats provided, just return
 
 	queue.enqueue(async() => {
@@ -154,7 +155,7 @@ export async function fetchStats(): Promise<string[]> {
 }
 
 /** Add stats to skyblock-constants. This has caching so it's fine to call many times */
-export async function addStats(addingStats: string[]) {
+export async function addStats(addingStats: string[]): Promise<void> {
 	await addJSONConstants('stats.json', addingStats, 'stats')
 }
 
@@ -164,7 +165,7 @@ export async function fetchCollections(): Promise<string[]> {
 }
 
 /** Add collections to skyblock-constants. This has caching so it's fine to call many times */
-export async function addCollections(addingCollections: string[]) {
+export async function addCollections(addingCollections: string[]): Promise<void> {
 	await addJSONConstants('collections.json', addingCollections, 'collections')
 }
 
@@ -174,7 +175,7 @@ export async function fetchSkills(): Promise<string[]> {
 }
 
 /** Add skills to skyblock-constants. This has caching so it's fine to call many times */
-export async function addSkills(addingSkills: string[]) {
+export async function addSkills(addingSkills: string[]): Promise<void> {
 	await addJSONConstants('skills.json', addingSkills, 'skills')
 }
 
@@ -184,6 +185,6 @@ export async function fetchZones(): Promise<string[]> {
 }
 
 /** Add skills to skyblock-constants. This has caching so it's fine to call many times */
-export async function addZones(addingZones: string[]) {
+export async function addZones(addingZones: string[]): Promise<void> {
 	await addJSONConstants('zones.json', addingZones, 'zones')
 }

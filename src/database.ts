@@ -49,7 +49,7 @@ let client: MongoClient
 let database: Db
 let memberLeaderboardsCollection: Collection<any>
 
-async function connect() {
+async function connect(): Promise<void> {
 	if (!process.env.db_uri)
 		return console.warn('Warning: db_uri was not found in .env. Features that utilize the database such as leaderboards won\'t work.')
 	if (!process.env.db_name)
@@ -59,8 +59,11 @@ async function connect() {
 	memberLeaderboardsCollection = database.collection('member-leaderboards')
 }
 
+interface StringNumber {
+	[ name: string]: number
+}
 
-function getMemberCollectionAttributes(member: CleanMember) {
+function getMemberCollectionAttributes(member: CleanMember): StringNumber {
 	const collectionAttributes = {}
 	for (const collection of member.collections) {
 		const collectionLeaderboardName = `collection_${collection.name}`
@@ -69,7 +72,7 @@ function getMemberCollectionAttributes(member: CleanMember) {
 	return collectionAttributes
 }
 
-function getMemberSkillAttributes(member: CleanMember) {
+function getMemberSkillAttributes(member: CleanMember): StringNumber {
 	const skillAttributes = {}
 	for (const collection of member.skills) {
 		const skillLeaderboardName = `skill_${collection.name}`
@@ -78,7 +81,7 @@ function getMemberSkillAttributes(member: CleanMember) {
 	return skillAttributes
 }
 
-function getMemberLeaderboardAttributes(member: CleanMember) {
+function getMemberLeaderboardAttributes(member: CleanMember): StringNumber {
 	// if you want to add a new leaderboard for member attributes, add it here (and getAllLeaderboardAttributes)
 	return {
 		// we use the raw stat names rather than the clean stats in case hypixel adds a new stat and it takes a while for us to clean it
@@ -180,7 +183,13 @@ async function fetchMemberLeaderboardRaw(name: string): Promise<DatabaseLeaderbo
 	return leaderboardRaw
 }
 
-export async function fetchMemberLeaderboard(name: string) {
+interface Leaderboard {
+	name: string
+	unit?: string
+	list: LeaderboardItem[]
+}
+
+export async function fetchMemberLeaderboard(name: string): Promise<Leaderboard> {
 	const leaderboardRaw = await fetchMemberLeaderboardRaw(name)
 	const fetchLeaderboardPlayer = async(item: DatabaseLeaderboardItem): Promise<LeaderboardItem> => {
 		return {
@@ -210,7 +219,7 @@ async function getMemberLeaderboardRequirement(name: string): Promise<number> {
 }
 
 /** Get the attributes for the member, but only ones that would put them on the top 100 for leaderboards */
-async function getApplicableAttributes(member): Promise<{ [key: string]: number }> {
+async function getApplicableAttributes(member): Promise<StringNumber> {
 	const leaderboardAttributes = getMemberLeaderboardAttributes(member)
 	const applicableAttributes = {}
 	for (const [ leaderboard, attributeValue ] of Object.entries(leaderboardAttributes)) {
@@ -223,7 +232,7 @@ async function getApplicableAttributes(member): Promise<{ [key: string]: number 
 }
 
 /** Update the member's leaderboard data on the server if applicable */
-export async function updateDatabaseMember(member: CleanMember, profile: CleanFullProfile) {
+export async function updateDatabaseMember(member: CleanMember, profile: CleanFullProfile): Promise<void> {
 	if (!client) return // the db client hasn't been initialized
 	// the member's been updated too recently, just return
 	if (recentlyUpdated.get(profile.uuid + member.uuid))
@@ -279,7 +288,7 @@ const queue = new Queue({
 })
 
 /** Queue an update for the member's leaderboard data on the server if applicable */
-export async function queueUpdateDatabaseMember(member: CleanMember, profile: CleanFullProfile) {
+export async function queueUpdateDatabaseMember(member: CleanMember, profile: CleanFullProfile): Promise<void> {
 	queue.enqueue(async() => await updateDatabaseMember(member, profile))
 }
 
@@ -287,7 +296,7 @@ export async function queueUpdateDatabaseMember(member: CleanMember, profile: Cl
 /**
  * Remove leaderboard attributes for members that wouldn't actually be on the leaderboard. This saves a lot of storage space
  */
-async function removeBadMemberLeaderboardAttributes() {
+async function removeBadMemberLeaderboardAttributes(): Promise<void> {
 	const leaderboards = await fetchAllMemberLeaderboardAttributes()
 	// shuffle so if the application is restarting many times itll still be useful
 	for (const leaderboard of shuffle(leaderboards)) {
@@ -313,7 +322,7 @@ async function removeBadMemberLeaderboardAttributes() {
 }
 
 /** Fetch all the leaderboards, used for caching. Don't call this often! */
-async function fetchAllLeaderboards() {
+async function fetchAllLeaderboards(): Promise<void> {
 	const leaderboards = await fetchAllMemberLeaderboardAttributes()
 	// shuffle so if the application is restarting many times itll still be useful
 	if (debug) console.log('Caching leaderboards!')

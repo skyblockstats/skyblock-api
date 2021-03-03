@@ -6,28 +6,27 @@ export function undashUuid(uuid: string): string {
 	return uuid.replace(/-/g, '').toLowerCase()
 }
 
-
-
-export function queryToJson(queryString) {
-    var query = {};
-    var pairs = (queryString[0] === '?' ? queryString.substr(1) : queryString).split('&');
-    for (var i = 0; i < pairs.length; i++) {
-        var pair = pairs[i].split('=');
-        query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
+export function queryToJson(queryString): { [ key: string ]: string } {
+    const query = {}
+    const pairs = (queryString[0] === '?' ? queryString.substr(1) : queryString).split('&')
+    for (let i = 0; i < pairs.length; i++) {
+        const pair = pairs[i].split('=')
+        query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '')
     }
-    return query;
+    return query
 }
 
-export function jsonToQuery(data) {
+
+export function jsonToQuery(data): string {
     return Object.entries(data || {}).map(e => e.join('=')).join('&')
 }
 
-export function shuffle(a) {
+export function shuffle(a): string {
     for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[a[i], a[j]] = [a[j], a[i]]
     }
-    return a;
+    return a
 }
 
 
@@ -81,6 +80,6 @@ export function colorCodeFromName(colorName: string): string {
     }
 }
 
-export async function sleep(ms: number) {
+export async function sleep(ms: number): Promise<void> {
 	await new Promise(resolve => setTimeout(resolve, ms))
 }

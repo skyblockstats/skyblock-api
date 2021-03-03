@@ -28,7 +28,7 @@ export interface ApiOptions {
 }
 
 /** Sends an API request to Hypixel and cleans it up. */
-export async function sendCleanApiRequest({ path, args }, included?: Included[], options?: ApiOptions) {
+export async function sendCleanApiRequest({ path, args }, included?: Included[], options?: ApiOptions): Promise<any> {
 	const key = await chooseApiKey()
 	const rawResponse = await sendApiRequest({ path, key, args })
 	if (rawResponse.throttled) {
@@ -43,7 +43,7 @@ export async function sendCleanApiRequest({ path, args }, included?: Included[],
 
 
 
-async function cleanResponse({ path, data }: { path: string, data: HypixelResponse }, options: ApiOptions) {
+async function cleanResponse({ path, data }: { path: string, data: HypixelResponse }, options: ApiOptions): Promise<any> {
 	// Cleans up an api response
 	switch (path) {
 		case 'player': return await cleanPlayerResponse(data.player)

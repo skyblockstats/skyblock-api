@@ -54,7 +54,12 @@ const profileNameCache = new NodeCache({
 	useClones: false,
 })
 
-function waitForCacheSet(cache: NodeCache, key?: string, value?: string): Promise<any> {
+interface KeyValue {
+	key: any
+	value: any
+}
+
+function waitForCacheSet(cache: NodeCache, key?: string, value?: string): Promise<KeyValue> {
 	return new Promise((resolve, reject) => {
 		const listener = (setKey, setValue) => {
 			if (setKey === key || (value && setValue === value)) {
@@ -239,7 +244,7 @@ async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[]> {
  * @param user A username or uuid
  * @param profile A profile name or profile uuid
  */
-export async function fetchProfileUuid(user: string, profile: string) {
+export async function fetchProfileUuid(user: string, profile: string): Promise<string> {
 	// if a profile wasn't provided, return
 	if (!profile) {
 		if (debug) console.log('no profile provided?', user, profile)
