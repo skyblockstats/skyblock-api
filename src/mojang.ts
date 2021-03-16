@@ -22,7 +22,7 @@ interface AshconTextures {
 	raw: { value: string, signature: string }
 }
 
-interface AshconResponse {
+interface AshconV2Response {
 	uuid: string
 	username: string
 	username_history: AshconHistoryItem[]
@@ -30,12 +30,21 @@ interface AshconResponse {
 	created_at?: string
 }
 
+interface AshconV1Response {
+	uuid: string
+	username: string
+	username_history: AshconHistoryItem[]
+	textures: AshconTextures
+	cached_at?: string
+}
+
 /**
  * Get mojang api data from ashcon.app
  */
-export async function mojangDataFromUser(user: string): Promise<AshconResponse> {
+export async function mojangDataFromUser(user: string): Promise<AshconV1Response> {
     const fetchResponse = await fetch(
-		'https://api.ashcon.app/mojang/v2/user/' + user,
+		// we use v1 rather than v2 since its more stable
+		`https://api.ashcon.app/mojang/v1/user/${user}`,
 		{ agent: () => httpsAgent }
 	)
     return await fetchResponse.json()
