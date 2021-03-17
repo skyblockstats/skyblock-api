@@ -19,7 +19,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cleanInventories = exports.INVENTORIES = exports.cleanInventory = void 0;
+exports.cleanInventories = exports.INVENTORIES = exports.cleanInventory = exports.cleanItemEncoded = void 0;
 const nbt = __importStar(require("prismarine-nbt"));
 function base64decode(base64) {
     return Buffer.from(base64, 'base64');
@@ -54,12 +54,22 @@ function cleanItem(rawItem) {
 function cleanItems(rawItems) {
     return rawItems.map(cleanItem);
 }
+function cleanItemEncoded(encodedNbt) {
+    return new Promise(resolve => {
+        const base64Data = base64decode(encodedNbt);
+        nbt.parse(base64Data, false, (err, value) => {
+            const simplifiedNbt = nbt.simplify(value);
+            resolve(cleanItem(simplifiedNbt.i[0]));
+        });
+    });
+}
+exports.cleanItemEncoded = cleanItemEncoded;
 function cleanInventory(encodedNbt) {
     return new Promise(resolve => {
         const base64Data = base64decode(encodedNbt);
         nbt.parse(base64Data, false, (err, value) => {
             const simplifiedNbt = nbt.simplify(value);
-            // do some basic cleaning on the items and return
+            // do some cleaning on the items and return
             resolve(cleanItems(simplifiedNbt.i));
         });
     });

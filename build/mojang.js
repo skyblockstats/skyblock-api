@@ -17,7 +17,9 @@ const httpsAgent = new https_1.Agent({
  * Get mojang api data from ashcon.app
  */
 async function mojangDataFromUser(user) {
-    const fetchResponse = await node_fetch_1.default('https://api.ashcon.app/mojang/v2/user/' + user, { agent: () => httpsAgent });
+    const fetchResponse = await node_fetch_1.default(
+    // we use v1 rather than v2 since its more stable
+    `https://api.ashcon.app/mojang/v1/user/${user}`, { agent: () => httpsAgent });
     return await fetchResponse.json();
 }
 exports.mojangDataFromUser = mojangDataFromUser;
