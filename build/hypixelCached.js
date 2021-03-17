@@ -25,11 +25,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchProfileName = exports.fetchProfile = exports.fetchProfileUuid = exports.fetchSkyblockProfiles = exports.fetchBasicPlayer = exports.fetchPlayer = exports.usernameFromUser = exports.uuidFromUser = void 0;
-const node_cache_1 = __importDefault(require("node-cache"));
-const mojang = __importStar(require("./mojang"));
+exports.fetchAllAuctions = exports.fetchProfileName = exports.fetchProfile = exports.fetchProfileUuid = exports.fetchSkyblockProfiles = exports.fetchBasicPlayer = exports.fetchPlayer = exports.usernameFromUser = exports.uuidFromUser = void 0;
+const hypixel_1 = require("./hypixel");
 const hypixel = __importStar(require("./hypixel"));
 const util_1 = require("./util");
+const mojang = __importStar(require("./mojang"));
+const node_cache_1 = __importDefault(require("node-cache"));
+const queue_promise_1 = __importDefault(require("queue-promise"));
 const _1 = require(".");
 // cache usernames for 4 hours
 const usernameCache = new node_cache_1.default({
@@ -301,3 +303,28 @@ async function fetchProfileName(user, profile) {
     return profileName;
 }
 exports.fetchProfileName = fetchProfileName;
+let allAuctionsCache = [];
+let nextAuctionsUpdate = 0;
+let nextAuctionsUpdateTimeout = null;
+const fetchAllAuctionsQueue = new queue_promise_1.default({
+    concurrent: 1
+});
+/**
+ * Fetch an array of all active Auctions
+ */
+async function fetchAllAuctions() {
+    if (Date.now() / 1000 > nextAuctionsUpdate) {
+        fetchAllAuctionsQueue.enqueue(hypixel_1.fetchAllAuctionsUncached);
+        const auctionsResponse = await fetchAllAuctionsQueue.dequeue();
+        allAuctionsCache = auctionsResponse.auctions;
+        // the auctions endpoint updates every 60 seconds
+        nextAuctionsUpdate = auctionsResponse.lastUpdated + 60;
+        // if there's already a timeout, clear it and make a new one
+        if (nextAuctionsUpdateTimeout)
+            clearTimeout(nextAuctionsUpdateTimeout);
+        // make a timeout for the next auctions update
+        nextAuctionsUpdateTimeout = setTimeout(fetchAllAuctions, Date.now() - nextAuctionsUpdate * 1000);
+    }
+    return allAuctionsCache;
+}
+exports.fetchAllAuctions = fetchAllAuctions;

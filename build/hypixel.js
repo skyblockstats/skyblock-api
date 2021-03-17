@@ -22,14 +22,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchMemberProfilesUncached = exports.fetchMemberProfileUncached = exports.fetchMemberProfile = exports.fetchUser = exports.sendCleanApiRequest = exports.maxMinion = exports.saveInterval = void 0;
-const player_1 = require("./cleaners/player");
-const hypixelApi_1 = require("./hypixelApi");
-const cached = __importStar(require("./hypixelCached"));
+exports.fetchAllAuctionsUncached = exports.fetchMemberProfilesUncached = exports.fetchMemberProfileUncached = exports.fetchMemberProfile = exports.fetchUser = exports.sendCleanApiRequest = exports.maxMinion = exports.saveInterval = void 0;
 const profile_1 = require("./cleaners/skyblock/profile");
+const auctions_1 = require("./cleaners/skyblock/auctions");
+const hypixelApi_1 = require("./hypixelApi");
 const profiles_1 = require("./cleaners/skyblock/profiles");
-const _1 = require(".");
+const player_1 = require("./cleaners/player");
 const database_1 = require("./database");
+const cached = __importStar(require("./hypixelCached"));
+const _1 = require(".");
 // the interval at which the "last_save" parameter updates in the hypixel api, this is 3 minutes
 exports.saveInterval = 60 * 3 * 1000;
 // the highest level a minion can be
@@ -53,6 +54,7 @@ async function cleanResponse({ path, data }, options) {
         case 'player': return await player_1.cleanPlayerResponse(data.player);
         case 'skyblock/profile': return await profile_1.cleanSkyblockProfileResponse(data.profile, options);
         case 'skyblock/profiles': return await profiles_1.cleanSkyblockProfilesResponse(data.profiles);
+        case 'skyblock/auctions': return await auctions_1.cleanSkyBlockAuctionsResponse(data);
     }
 }
 /**
@@ -179,3 +181,31 @@ async function fetchMemberProfilesUncached(playerUuid) {
     return profiles;
 }
 exports.fetchMemberProfilesUncached = fetchMemberProfilesUncached;
+async function fetchAuctionsPage(page) {
+    return await sendCleanApiRequest({
+        path: 'skyblock/auctions',
+        args: {
+            page: page
+        }
+    });
+}
+/**
+ * this is expensive and takes about a few seconds, use cached.fetchAllAuctions instead
+ */
+async function fetchAllAuctionsUncached() {
+    const firstPage = await fetchAuctionsPage(1);
+    const allAuctions = [...firstPage.auctions];
+    const promises = [];
+    for (let pageNumber = 2; pageNumber <= firstPage.pageCount; pageNumber++)
+        promises.push(fetchAuctionsPage(pageNumber));
+    const otherResponses = await Promise.all(promises);
+    for (const auctionsResponse of otherResponses) {
+        allAuctions.push(...auctionsResponse.auctions);
+    }
+    return {
+        pageCount: firstPage.pageCount,
+        lastUpdated: firstPage.lastUpdated,
+        auctions: allAuctions
+    };
+}
+exports.fetchAllAuctionsUncached = fetchAllAuctionsUncached;

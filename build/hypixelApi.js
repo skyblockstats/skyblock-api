@@ -46,7 +46,9 @@ exports.chooseApiKey = chooseApiKey;
 /** Send an HTTP request to the Hypixel API */
 async function sendApiRequest({ path, key, args }) {
     // Send a raw http request to api.hypixel.net, and return the parsed json
-    if (key)
+    if (key
+        // keys arent required for skyblock/auctions
+        && path !== 'skyblock/auctions')
         // If there's an api key, add it to the arguments
         args.key = key;
     // Construct a url from the base api url, path, and arguments
