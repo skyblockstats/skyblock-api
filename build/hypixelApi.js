@@ -7,8 +7,8 @@ exports.sendApiRequest = exports.chooseApiKey = void 0;
 /**
  * Fetch the raw Hypixel API
  */
-const node_fetch_1 = __importDefault(require("node-fetch"));
 const util_1 = require("./util");
+const node_fetch_1 = __importDefault(require("node-fetch"));
 const https_1 = require("https");
 if (!process.env.hypixel_keys)
     // if there's no hypixel keys in env, run dotenv
@@ -53,7 +53,21 @@ async function sendApiRequest({ path, key, args }) {
         args.key = key;
     // Construct a url from the base api url, path, and arguments
     const fetchUrl = baseHypixelAPI + '/' + path + '?' + util_1.jsonToQuery(args);
-    const fetchResponse = await node_fetch_1.default(fetchUrl, { agent: () => httpsAgent });
+    let fetchResponse = null;
+    // the number of times it's retried the attempt
+    let retries = 0;
+    const maxRetries = 2;
+    while (retries <= maxRetries) {
+        try {
+            fetchResponse = await node_fetch_1.default(fetchUrl, { agent: () => httpsAgent });
+        }
+        catch (err) {
+            retries++;
+            // too many retries, just throw the error
+            if (retries > maxRetries)
+                throw err;
+        }
+    }
     if (fetchResponse.headers['ratelimit-limit'])
         // remember how many uses it has
         apiKeyUsage[key] = {
