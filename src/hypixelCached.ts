@@ -330,6 +330,7 @@ let allAuctionsCache: Auction[] = []
 let nextAuctionsUpdate = 0
 let nextAuctionsUpdateTimeout = null
 
+// we use a queue so it doesnt fetch twice at the same time, and instead it waits so it can just use the cached version
 const fetchAllAuctionsQueue = new Queue({
 	concurrent: 1
 })

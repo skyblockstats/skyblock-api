@@ -1,8 +1,9 @@
 /**
  * Fetch the raw Hypixel API
  */
-import fetch from 'node-fetch'
 import { jsonToQuery, shuffle } from './util'
+import type { Response } from 'node-fetch'
+import fetch from 'node-fetch'
 import { Agent } from 'https'
 
 if (!process.env.hypixel_keys)
@@ -140,10 +141,27 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 	// Construct a url from the base api url, path, and arguments
 	const fetchUrl = baseHypixelAPI + '/' + path + '?' + jsonToQuery(args)
 
-	const fetchResponse = await fetch(
-		fetchUrl,
-		{ agent: () => httpsAgent }
-	)
+	let fetchResponse: Response = null
+
+	// the number of times it's retried the attempt
+	let retries = 0
+
+	const maxRetries = 2
+
+	while (retries <= maxRetries) {
+		try {
+			fetchResponse = await fetch(
+				fetchUrl,
+				{ agent: () => httpsAgent }
+			)
+		} catch (err) {
+			retries ++
+
+			// too many retries, just throw the error
+			if (retries > maxRetries)
+				throw err
+		}
+	}
 
 	if (fetchResponse.headers['ratelimit-limit'])
 		// remember how many uses it has
