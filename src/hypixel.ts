@@ -2,14 +2,15 @@
  * Fetch the clean Hypixel API
  */
 
-import { CleanPlayer, cleanPlayerResponse } from './cleaners/player'
-import { chooseApiKey, HypixelResponse, sendApiRequest } from './hypixelApi'
-import * as cached from './hypixelCached'
-import { CleanBasicMember, CleanMemberProfile } from './cleaners/skyblock/member'
 import { cleanSkyblockProfileResponse, CleanProfile, CleanBasicProfile, CleanFullProfile, CleanFullProfileBasicMembers } from './cleaners/skyblock/profile'
+import { Auction, AuctionsResponse, cleanSkyBlockAuctionsResponse } from './cleaners/skyblock/auctions'
+import { CleanBasicMember, CleanMemberProfile } from './cleaners/skyblock/member'
+import { chooseApiKey, HypixelResponse, sendApiRequest } from './hypixelApi'
 import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles'
-import { debug } from '.'
+import { CleanPlayer, cleanPlayerResponse } from './cleaners/player'
 import { queueUpdateDatabaseMember } from './database'
+import * as cached from './hypixelCached'
+import { debug } from '.'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories'
 
@@ -49,6 +50,7 @@ async function cleanResponse({ path, data }: { path: string, data: HypixelRespon
 		case 'player': return await cleanPlayerResponse(data.player)
 		case 'skyblock/profile': return await cleanSkyblockProfileResponse(data.profile, options)
 		case 'skyblock/profiles': return await cleanSkyblockProfilesResponse(data.profiles)
+		case 'skyblock/auctions': return await cleanSkyBlockAuctionsResponse(data)
 	}
 }
 
@@ -207,4 +209,36 @@ export async function fetchMemberProfilesUncached(playerUuid: string): Promise<C
 		}
 	}
 	return profiles
+}
+
+async function fetchAuctionsPage(page: number): Promise<AuctionsResponse> {
+	return await sendCleanApiRequest({
+		path: 'skyblock/auctions',
+		args: {
+			page: page
+		}}
+	)
+}
+
+/**
+ * this is expensive and takes about a few seconds, use cached.fetchAllAuctions instead
+ */
+export async function fetchAllAuctionsUncached(): Promise<AuctionsResponse> {
+	const firstPage = await fetchAuctionsPage(1)
+	const allAuctions: Auction[] = [ ...firstPage.auctions ]
+
+	const promises: Promise<AuctionsResponse>[] = []
+
+	for (let pageNumber = 2; pageNumber <= firstPage.pageCount; pageNumber ++)
+		promises.push(fetchAuctionsPage(pageNumber))
+	const otherResponses = await Promise.all(promises)
+	for (const auctionsResponse of otherResponses) {
+		allAuctions.push(...auctionsResponse.auctions)
+	}
+
+	return {
+		pageCount: firstPage.pageCount,
+		lastUpdated: firstPage.lastUpdated,
+		auctions: allAuctions
+	}
 }

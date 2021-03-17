@@ -4,7 +4,9 @@ function base64decode(base64: string): Buffer {
 	return Buffer.from(base64, 'base64')
 }
 
-interface Item {
+type Tier = 'COMMON' | 'UNCOMMON' | 'RARE' | 'EPIC' | 'LEGENDARY' | 'MYTHIC' | 'SUPREME' | 'SPECIAL' | 'VERY SPECIAL'
+
+export interface Item {
 	id: string
 	count: number
 	vanillaId: string
@@ -21,6 +23,9 @@ interface Item {
 	enchantments?: { [ name: string ]: number }
 
 	skull_owner?: string
+
+	// this isn't extracted automatically atm
+	tier?: Tier
 }
 
 export type Inventory = Item[]
@@ -34,6 +39,7 @@ function cleanItem(rawItem): Item {
 	const damageValue = rawItem.Damage
 	const itemTag = rawItem.tag
 	const extraAttributes = itemTag?.ExtraAttributes ?? {}
+
 	return {
 		id: extraAttributes?.id ?? null,
 		count: itemCount ?? 1,
@@ -52,7 +58,6 @@ function cleanItem(rawItem): Item {
 		timestamp: extraAttributes?.timestamp,
 
 		skull_owner: itemTag?.SkullOwner?.Properties?.textures?.[0]?.value ?? undefined,
-
 	}
 }
 
@@ -60,12 +65,22 @@ function cleanItems(rawItems): Inventory {
 	return rawItems.map(cleanItem)
 }
 
+export function cleanItemEncoded(encodedNbt: string): Promise<Item> {
+	return new Promise(resolve => {
+		const base64Data = base64decode(encodedNbt)
+		nbt.parse(base64Data, false, (err, value) => {
+			const simplifiedNbt = nbt.simplify(value)
+			resolve(cleanItem(simplifiedNbt.i[0]))
+		})
+	})
+}
+
 export function cleanInventory(encodedNbt: string): Promise<Inventory> {
 	return new Promise(resolve => {
 		const base64Data = base64decode(encodedNbt)
 		nbt.parse(base64Data, false, (err, value) => {
 			const simplifiedNbt = nbt.simplify(value)
-			// do some basic cleaning on the items and return
+			// do some cleaning on the items and return
 			resolve(cleanItems(simplifiedNbt.i))
 		})
 	})

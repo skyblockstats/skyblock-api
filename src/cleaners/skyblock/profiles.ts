@@ -1,5 +1,5 @@
+import { CleanBasicProfile, CleanProfile, cleanSkyblockProfileResponse } from "./profile"
 import { HypixelPlayerStatsSkyBlockProfiles } from "../../hypixelApi"
-import { CleanBasicProfile, CleanProfile, cleanSkyblockProfileResponse, cleanSkyblockProfileResponseLighter } from "./profile"
 
 export function cleanPlayerSkyblockProfiles(rawProfiles: HypixelPlayerStatsSkyBlockProfiles): CleanBasicProfile[] {
     let profiles: CleanBasicProfile[] = []
@@ -16,7 +16,6 @@ export function cleanPlayerSkyblockProfiles(rawProfiles: HypixelPlayerStatsSkyBl
 export async function cleanSkyblockProfilesResponse(data: any[]): Promise<CleanProfile[]> {
     const promises = []
     for (const profile of data ?? []) {
-        // let cleanedProfile = await cleanSkyblockProfileResponseLighter(profile)
         promises.push(cleanSkyblockProfileResponse(profile))
     }
     const cleanedProfiles: CleanProfile[] = await Promise.all(promises)

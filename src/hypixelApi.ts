@@ -129,7 +129,11 @@ export interface HypixelPlayer {
 export async function sendApiRequest({ path, key, args }): Promise<HypixelResponse> {
 	// Send a raw http request to api.hypixel.net, and return the parsed json
 
-	if (key)
+	if (
+		key
+		// keys arent required for skyblock/auctions
+		&& path !== 'skyblock/auctions'
+	)
 		// If there's an api key, add it to the arguments
 		args.key = key
 

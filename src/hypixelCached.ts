@@ -2,12 +2,15 @@
  * Fetch the clean and cached Hypixel API
  */
 
-import NodeCache from 'node-cache'
-import * as mojang from './mojang'
-import * as hypixel from './hypixel'
-import { CleanPlayer } from './cleaners/player'
-import { undashUuid } from './util'
 import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/skyblock/profile'
+import { Auction } from './cleaners/skyblock/auctions'
+import { fetchAllAuctionsUncached } from './hypixel'
+import { CleanPlayer } from './cleaners/player'
+import * as hypixel from './hypixel'
+import { undashUuid } from './util'
+import * as mojang from './mojang'
+import NodeCache from 'node-cache'
+import Queue from 'queue-promise'
 import { debug } from '.'
 
 // cache usernames for 4 hours
@@ -321,4 +324,34 @@ export async function fetchProfileName(user: string, profile: string): Promise<s
 
 	profileNameCache.set(`${playerUuid}.${profileUuid}`, profileName)
 	return profileName
+}
+
+let allAuctionsCache: Auction[] = []
+let nextAuctionsUpdate = 0
+let nextAuctionsUpdateTimeout = null
+
+const fetchAllAuctionsQueue = new Queue({
+	concurrent: 1
+})
+
+/**
+ * Fetch an array of all active Auctions 
+ */
+export async function fetchAllAuctions(): Promise<Auction[]> {
+	if (Date.now() / 1000 > nextAuctionsUpdate) {
+		fetchAllAuctionsQueue.enqueue(fetchAllAuctionsUncached)
+		const auctionsResponse = await fetchAllAuctionsQueue.dequeue()
+
+		allAuctionsCache = auctionsResponse.auctions
+
+		// the auctions endpoint updates every 60 seconds
+		nextAuctionsUpdate = auctionsResponse.lastUpdated + 60
+
+		// if there's already a timeout, clear it and make a new one
+		if (nextAuctionsUpdateTimeout)
+			clearTimeout(nextAuctionsUpdateTimeout)
+		// make a timeout for the next auctions update
+		nextAuctionsUpdateTimeout = setTimeout(fetchAllAuctions, Date.now() - nextAuctionsUpdate * 1000)
+	}
+	return allAuctionsCache
 }
