@@ -7,12 +7,15 @@ const app = express()
 
 export const debug = false
 
-// 250 requests over 5 minutes
+// 500 requests over 5 minutes
 const limiter = rateLimit({
 	windowMs: 60 * 1000 * 5,
-	max: 250,
-	skip: (req: express.Request, res) => {
+	max: 500,
+	skip: (req: express.Request) => {
 		return req.headers.key === process.env.key
+	},
+	keyGenerator: (req: express.Request) => {
+		return (req.headers['Cf-Connecting-Ip'] ?? req.ip).toString()
 	}
 })
 
