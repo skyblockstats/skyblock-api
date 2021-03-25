@@ -18,7 +18,6 @@ const httpsAgent = new https_1.Agent({
  * Get mojang api data from the session server
  */
 async function mojangDataFromUuid(uuid) {
-    console.log('mojangDataFromUuid', uuid);
     const fetchResponse = await node_fetch_1.default(
     // using mojang directly is faster than ashcon lol, also mojang removed the ratelimits from here
     `https://sessionserver.mojang.com/session/minecraft/profile/${util_1.undashUuid(uuid)}`, { agent: () => httpsAgent });
@@ -30,7 +29,6 @@ async function mojangDataFromUuid(uuid) {
 }
 exports.mojangDataFromUuid = mojangDataFromUuid;
 async function uuidFromUsername(username) {
-    console.log('uuidFromUsername', username);
     // since we don't care about anything other than the uuid, we can use /uuid/ instead of /user/
     const fetchResponse = await node_fetch_1.default(`https://api.ashcon.app/mojang/v2/uuid/${username}`, { agent: () => httpsAgent });
     const userUuid = await fetchResponse.text();

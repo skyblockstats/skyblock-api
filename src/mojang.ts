@@ -22,7 +22,6 @@ interface MojangApiResponse {
  * Get mojang api data from the session server
  */
 export async function mojangDataFromUuid(uuid: string): Promise<MojangApiResponse> {
-	console.log('mojangDataFromUuid', uuid)
 	const fetchResponse = await fetch(
 		// using mojang directly is faster than ashcon lol, also mojang removed the ratelimits from here
 		`https://sessionserver.mojang.com/session/minecraft/profile/${undashUuid(uuid)}`,
@@ -37,7 +36,6 @@ export async function mojangDataFromUuid(uuid: string): Promise<MojangApiRespons
 
 
 export async function uuidFromUsername(username: string): Promise<string> {
-	console.log('uuidFromUsername', username)
 	// since we don't care about anything other than the uuid, we can use /uuid/ instead of /user/
 	const fetchResponse = await fetch(
 		`https://api.ashcon.app/mojang/v2/uuid/${username}`,
