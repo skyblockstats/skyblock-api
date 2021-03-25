@@ -110,7 +110,7 @@ export async function uuidFromUser(user: string): Promise<string> {
 	usernameCache.set(undashUuid(user), waitForCacheSet(usernameCache, user, user))
 	
 	// not cached, actually fetch mojang api now
-	let { uuid, username } = await mojang.mojangDataFromUser(user)
+	let { uuid, username } = await mojang.profileFromUser(user)
 	if (!uuid) {
 		usernameCache.set(user, null)
 		return
@@ -137,7 +137,7 @@ export async function usernameFromUser(user: string): Promise<string> {
 
 	if (debug) console.log('Cache miss: usernameFromUser', user)
 
-	let { uuid, username } = await mojang.mojangDataFromUser(user)
+	let { uuid, username } = await mojang.profileFromUser(user)
 	uuid = undashUuid(uuid)
 	usernameCache.set(uuid, username)
 	return username
