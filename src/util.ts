@@ -83,3 +83,8 @@ export function colorCodeFromName(colorName: string): string {
 export async function sleep(ms: number): Promise<void> {
 	await new Promise(resolve => setTimeout(resolve, ms))
 }
+
+/** Returns whether a string is a UUID4 (Minecraft uuid) */
+export function isUuid(string: string) {
+	return undashUuid(string).length === 32
+}

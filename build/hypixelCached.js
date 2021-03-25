@@ -32,6 +32,7 @@ const hypixel = __importStar(require("./hypixel"));
 const util_1 = require("./util");
 const _1 = require(".");
 // cache usernames for 4 hours
+/** uuid: username */
 const usernameCache = new node_cache_1.default({
     stdTTL: 60 * 60 * 4,
     checkperiod: 60,
@@ -85,7 +86,7 @@ function waitForCacheSet(cache, key, value) {
  */
 async function uuidFromUser(user) {
     // if the user is 32 characters long, it has to be a uuid
-    if (util_1.undashUuid(user).length === 32)
+    if (util_1.isUuid(user))
         return util_1.undashUuid(user);
     if (usernameCache.has(util_1.undashUuid(user))) {
         // check if the uuid is a key

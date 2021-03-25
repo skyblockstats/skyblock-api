@@ -6,11 +6,12 @@ import NodeCache from 'node-cache'
 import * as mojang from './mojang'
 import * as hypixel from './hypixel'
 import { CleanPlayer } from './cleaners/player'
-import { undashUuid } from './util'
+import { isUuid, undashUuid } from './util'
 import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/skyblock/profile'
 import { debug } from '.'
 
 // cache usernames for 4 hours
+/** uuid: username */
 const usernameCache = new NodeCache({
 	stdTTL: 60 * 60 * 4,
 	checkperiod: 60,
@@ -77,7 +78,7 @@ function waitForCacheSet(cache: NodeCache, key?: string, value?: string): Promis
  */
 export async function uuidFromUser(user: string): Promise<string> {
 	// if the user is 32 characters long, it has to be a uuid
-	if (undashUuid(user).length === 32)
+	if (isUuid(user))
 		return undashUuid(user)
 
 	if (usernameCache.has(undashUuid(user))) {

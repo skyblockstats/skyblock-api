@@ -3,7 +3,7 @@
  * Random utility functions that are not related to Hypixel
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sleep = exports.colorCodeFromName = exports.minecraftColorCodes = exports.shuffle = exports.jsonToQuery = exports.queryToJson = exports.undashUuid = void 0;
+exports.isUuid = exports.sleep = exports.colorCodeFromName = exports.minecraftColorCodes = exports.shuffle = exports.jsonToQuery = exports.queryToJson = exports.undashUuid = void 0;
 function undashUuid(uuid) {
     return uuid.replace(/-/g, '').toLowerCase();
 }
@@ -82,3 +82,8 @@ async function sleep(ms) {
     await new Promise(resolve => setTimeout(resolve, ms));
 }
 exports.sleep = sleep;
+/** Returns whether a string is a UUID4 (Minecraft uuid) */
+function isUuid(string) {
+    return undashUuid(string).length === 32;
+}
+exports.isUuid = isUuid;

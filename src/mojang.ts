@@ -4,59 +4,75 @@
 
 import fetch from 'node-fetch'
 import { Agent } from 'https'
+import { isUuid, undashUuid } from './util'
 
 // We need to create an agent to prevent memory leaks
 const httpsAgent = new Agent({
 	keepAlive: true
 })
 
-interface AshconHistoryItem {
-	username: string
-	changed_at?: string
-}
-
-interface AshconTextures {
-	custom: boolean
-	slim: boolean
-	skin: { url: string, data: string }
-	raw: { value: string, signature: string }
-}
-
-interface AshconV2Response {
+interface MojangApiResponse {
+	/** These uuids are already undashed */
 	uuid: string
-	username: string
-	username_history: AshconHistoryItem[]
-	textures: AshconTextures
-	created_at?: string
-}
 
-interface AshconV1Response {
-	uuid: string
 	username: string
-	username_history: AshconHistoryItem[]
-	textures: AshconTextures
-	cached_at?: string
 }
 
 /**
- * Get mojang api data from ashcon.app
+ * Get mojang api data from the session server
  */
-export async function mojangDataFromUser(user: string): Promise<AshconV1Response> {
-    const fetchResponse = await fetch(
-		// we use v1 rather than v2 since its more stable
-		`https://api.ashcon.app/mojang/v1/user/${user}`,
+export async function mojangDataFromUuid(uuid: string): Promise<MojangApiResponse> {
+	console.log('mojangDataFromUuid', uuid)
+	const fetchResponse = await fetch(
+		// using mojang directly is faster than ashcon lol, also mojang removed the ratelimits from here
+		`https://sessionserver.mojang.com/session/minecraft/profile/${undashUuid(uuid)}`,
 		{ agent: () => httpsAgent }
 	)
-    return await fetchResponse.json()
+	const data = await fetchResponse.json()
+	return {
+		uuid: data.id,
+		username: data.name
+	}
 }
+
+
+export async function uuidFromUsername(username: string): Promise<string> {
+	console.log('uuidFromUsername', username)
+	// since we don't care about anything other than the uuid, we can use /uuid/ instead of /user/
+	const fetchResponse = await fetch(
+		`https://api.ashcon.app/mojang/v2/uuid/${username}`,
+		{ agent: () => httpsAgent }
+	)
+	const userUuid = await fetchResponse.text()
+	return userUuid.replace(/-/g, '')
+}
+
+export async function usernameFromUuid(uuid: string): Promise<string> {
+	const userJson = await mojangDataFromUuid(uuid)
+	return userJson.username
+}
+
+
+
 
 /**
  * Fetch the uuid from a user
  * @param user A user can be either a uuid or a username 
  */
 export async function uuidFromUser(user: string): Promise<string> {
-    const fetchJSON = await mojangDataFromUser(user)
-    return fetchJSON.uuid.replace(/-/g, '')
+	if (isUuid(user))
+		// already a uuid, just return it undashed
+		return undashUuid(user)
+	else
+		return await uuidFromUsername(user)
+}
+
+
+export async function mojangDataFromUser(user: string): Promise<MojangApiResponse> {
+	if (!isUuid(user))
+		return await mojangDataFromUuid(await uuidFromUsername(user))
+	else
+		return await mojangDataFromUuid(user)
 }
 
 /**
@@ -64,8 +80,8 @@ export async function uuidFromUser(user: string): Promise<string> {
  * @param user A user can be either a uuid or a username 
  */
 export async function usernameFromUser(user: string): Promise<string> {
-    // get a minecraft uuid from a username, using ashcon.app's mojang api
-    const fetchJSON = await mojangDataFromUser(user)
-    return fetchJSON.username
+	// we do this to fix the capitalization
+	const data = await mojangDataFromUser(user)
+	return data.username
 }
 
