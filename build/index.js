@@ -7,14 +7,18 @@ exports.debug = void 0;
 const hypixel_1 = require("./hypixel");
 const express_1 = __importDefault(require("express"));
 const database_1 = require("./database");
+const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const app = express_1.default();
 exports.debug = false;
-app.use((req, res, next) => {
-    if (process.env.key && req.headers.key !== process.env.key)
-        // if a key is set in process.env and the header doesn't match return an error
-        return res.status(401).json({ error: 'Key in header must match key in env' });
-    next();
+// 250 requests over 5 minutes
+const limiter = express_rate_limit_1.default({
+    windowMs: 60 * 1000 * 5,
+    max: 250,
+    skip: (req, res) => {
+        return req.headers.key === process.env.key;
+    }
 });
+app.use(limiter);
 app.get('/', async (req, res) => {
     res.json({ ok: true });
 });
