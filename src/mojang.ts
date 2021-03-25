@@ -27,7 +27,16 @@ export async function mojangDataFromUuid(uuid: string): Promise<MojangApiRespons
 		`https://sessionserver.mojang.com/session/minecraft/profile/${undashUuid(uuid)}`,
 		{ agent: () => httpsAgent }
 	)
-	const data = await fetchResponse.json()
+	let data
+	try {
+		data = await fetchResponse.json()
+	} catch {
+		// if it errors, just return null
+		return {
+			uuid: null,
+			username: null
+		}
+	}
 	return {
 		uuid: data.id,
 		username: data.name
