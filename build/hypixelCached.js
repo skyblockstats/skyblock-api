@@ -114,7 +114,7 @@ async function uuidFromUser(user) {
     // set it as waitForCacheSet (a promise) in case uuidFromUser gets called while its fetching mojang
     usernameCache.set(util_1.undashUuid(user), waitForCacheSet(usernameCache, user, user));
     // not cached, actually fetch mojang api now
-    let { uuid, username } = await mojang.mojangDataFromUser(user);
+    let { uuid, username } = await mojang.profileFromUser(user);
     if (!uuid) {
         usernameCache.set(user, null);
         return;
@@ -139,7 +139,7 @@ async function usernameFromUser(user) {
     }
     if (_1.debug)
         console.log('Cache miss: usernameFromUser', user);
-    let { uuid, username } = await mojang.mojangDataFromUser(user);
+    let { uuid, username } = await mojang.profileFromUser(user);
     uuid = util_1.undashUuid(uuid);
     usernameCache.set(uuid, username);
     return username;
