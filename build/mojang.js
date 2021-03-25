@@ -21,7 +21,17 @@ async function mojangDataFromUuid(uuid) {
     const fetchResponse = await node_fetch_1.default(
     // using mojang directly is faster than ashcon lol, also mojang removed the ratelimits from here
     `https://sessionserver.mojang.com/session/minecraft/profile/${util_1.undashUuid(uuid)}`, { agent: () => httpsAgent });
-    const data = await fetchResponse.json();
+    let data;
+    try {
+        data = await fetchResponse.json();
+    }
+    catch {
+        // if it errors, just return null
+        return {
+            uuid: null,
+            username: null
+        };
+    }
     return {
         uuid: data.id,
         username: data.name
