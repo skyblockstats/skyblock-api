@@ -1,18 +1,22 @@
 import { fetchMemberProfile, fetchUser } from './hypixel'
 import express from 'express'
 import { fetchAllLeaderboardsCategorized, fetchMemberLeaderboard } from './database'
+import rateLimit from 'express-rate-limit'
 
 const app = express()
 
 export const debug = false
 
-
-app.use((req: express.Request, res, next) => {
-	if (process.env.key && req.headers.key !== process.env.key)
-		// if a key is set in process.env and the header doesn't match return an error
-		return res.status(401).json({ error: 'Key in header must match key in env' })
-	next()
+// 250 requests over 5 minutes
+const limiter = rateLimit({
+	windowMs: 60 * 1000 * 5,
+	max: 250,
+	skip: (req: express.Request, res) => {
+		return req.headers.key === process.env.key
+	}
 })
+
+app.use(limiter)
 
 app.get('/', async(req, res) => {
 	res.json({ ok: true })
