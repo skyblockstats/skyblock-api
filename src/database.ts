@@ -23,6 +23,7 @@ const recentlyUpdated = new NodeCache({
 
 interface DatabaseLeaderboardItem {
 	uuid: string
+	profile: string
 	stats: any
 	last_updated: Date
 }
@@ -178,7 +179,12 @@ async function fetchMemberLeaderboardRaw(name: string): Promise<DatabaseLeaderbo
 	const sortQuery: any = {}
 	sortQuery[`stats.${name}`] = isLeaderboardReversed(name) ? 1 : -1
 
-	const leaderboardRaw = await memberLeaderboardsCollection.find(query).sort(sortQuery).limit(leaderboardMax).toArray()
+	const leaderboardRaw: DatabaseLeaderboardItem[] = await memberLeaderboardsCollection
+		.find(query)
+		.sort(sortQuery)
+		.limit(leaderboardMax)
+		.toArray()
+
 	cachedRawLeaderboards.set(name, leaderboardRaw)
 	return leaderboardRaw
 }
@@ -209,6 +215,32 @@ export async function fetchMemberLeaderboard(name: string): Promise<Leaderboard>
 	}
 }
 
+/** Get the leaderboard positions a member is on. This may take a while depending on whether stuff is cached */
+export async function fetchMemberLeaderboardSpots(player: string, profile: string) {
+	const fullProfile = await cached.fetchProfile(player, profile)
+	const fullMember = fullProfile.members.find(m => m.username.toLowerCase() === player.toLowerCase() || m.uuid === player)
+
+	// update the leaderboard positions for the member
+	await updateDatabaseMember(fullMember, fullProfile)
+
+	const applicableAttributes = await getApplicableAttributes(fullMember)
+
+	const memberLeaderboardSpots = []
+
+	for (const leaderboardName in applicableAttributes) {
+		const leaderboard = await fetchMemberLeaderboardRaw(leaderboardName)
+		const leaderboardPositionIndex = leaderboard.findIndex(i => i.uuid === fullMember.uuid && i.profile === fullProfile.uuid)
+		memberLeaderboardSpots.push({
+			name: leaderboardName,
+			positionIndex: leaderboardPositionIndex,
+			value: applicableAttributes[leaderboardName],
+			
+		})
+	}
+
+	return memberLeaderboardSpots
+}
+
 async function getMemberLeaderboardRequirement(name: string): Promise<number> {
 	const leaderboard = await fetchMemberLeaderboardRaw(name)
 	// if there's more than 100 items, return the 100th. if there's less, return null
@@ -219,7 +251,7 @@ async function getMemberLeaderboardRequirement(name: string): Promise<number> {
 }
 
 /** Get the attributes for the member, but only ones that would put them on the top 100 for leaderboards */
-async function getApplicableAttributes(member): Promise<StringNumber> {
+async function getApplicableAttributes(member: CleanMember): Promise<StringNumber> {
 	const leaderboardAttributes = getMemberLeaderboardAttributes(member)
 	const applicableAttributes = {}
 	for (const [ leaderboard, attributeValue ] of Object.entries(leaderboardAttributes)) {
@@ -277,7 +309,8 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 			.concat([{
 				last_updated: new Date(),
 				stats: leaderboardAttributes,
-				uuid: member.uuid
+				uuid: member.uuid,
+				profile: profile.uuid
 			}])
 			.sort((a, b) => leaderboardReverse ? a.stats[attributeName] - b.stats[attributeName] : b.stats[attributeName] - a.stats[attributeName])
 			.slice(0, 100)
@@ -329,6 +362,7 @@ async function removeBadMemberLeaderboardAttributes(): Promise<void> {
 /** Fetch all the leaderboards, used for caching. Don't call this often! */
 async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
 	const leaderboards = await fetchAllMemberLeaderboardAttributes()
+
 	// shuffle so if the application is restarting many times itll still be useful
 	if (debug) console.log('Caching leaderboards!')
 	for (const leaderboard of shuffle(leaderboards)) {

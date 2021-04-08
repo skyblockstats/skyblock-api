@@ -1,7 +1,7 @@
+import { fetchAllLeaderboardsCategorized, fetchMemberLeaderboard, fetchMemberLeaderboardSpots } from './database'
 import { fetchMemberProfile, fetchUser } from './hypixel'
-import express from 'express'
-import { fetchAllLeaderboardsCategorized, fetchMemberLeaderboard } from './database'
 import rateLimit from 'express-rate-limit'
+import express from 'express'
 
 const app = express()
 
@@ -37,6 +37,12 @@ app.get('/player/:user', async(req, res) => {
 app.get('/player/:user/:profile', async(req, res) => {
 	res.json(
 		await fetchMemberProfile(req.params.user, req.params.profile)
+	)
+})
+
+app.get('/player/:user/:profile/leaderboards', async(req, res) => {
+	res.json(
+		await fetchMemberLeaderboardSpots(req.params.user, req.params.profile)
 	)
 })
 
