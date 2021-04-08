@@ -233,6 +233,7 @@ async function getApplicableAttributes(member): Promise<StringNumber> {
 
 /** Update the member's leaderboard data on the server if applicable */
 export async function updateDatabaseMember(member: CleanMember, profile: CleanFullProfile): Promise<void> {
+	if (debug) console.log('updateDatabaseMember', member.username)
 	if (!client) return // the db client hasn't been initialized
 	// the member's been updated too recently, just return
 	if (recentlyUpdated.get(profile.uuid + member.uuid))
@@ -247,7 +248,11 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 	await constants.addSkills(member.skills.map(skill => skill.name))
 	await constants.addZones(member.visited_zones.map(zone => zone.name))
 
+	if (debug) console.log('done constants..')
+
 	const leaderboardAttributes = await getApplicableAttributes(member)
+
+	if (debug) console.log('done getApplicableAttributes..', leaderboardAttributes)
 
 	await memberLeaderboardsCollection.updateOne(
 		{
@@ -322,13 +327,14 @@ async function removeBadMemberLeaderboardAttributes(): Promise<void> {
 }
 
 /** Fetch all the leaderboards, used for caching. Don't call this often! */
-async function fetchAllLeaderboards(): Promise<void> {
+async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
 	const leaderboards = await fetchAllMemberLeaderboardAttributes()
 	// shuffle so if the application is restarting many times itll still be useful
 	if (debug) console.log('Caching leaderboards!')
 	for (const leaderboard of shuffle(leaderboards)) {
-		// wait 2 seconds so it doesnt use as much ram
-		await sleep(2 * 1000)
+		if (!fast)
+			// wait 2 seconds so it doesnt use as much ram
+			await sleep(2 * 1000)
 
 		await fetchMemberLeaderboard(leaderboard)
 	}
@@ -340,7 +346,7 @@ connect().then(() => {
 	// when it connects, cache the leaderboards and remove bad members
 	removeBadMemberLeaderboardAttributes()
 	// cache leaderboards on startup so its faster later on
-	fetchAllLeaderboards()
-	// cache leaderboard players again every hour
+	fetchAllLeaderboards(true)
+	// cache leaderboard players again every 4 hours
 	setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000)
 })
