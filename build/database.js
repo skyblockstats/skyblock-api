@@ -204,6 +204,8 @@ async function getApplicableAttributes(member) {
 }
 /** Update the member's leaderboard data on the server if applicable */
 async function updateDatabaseMember(member, profile) {
+    if (_1.debug)
+        console.log('updateDatabaseMember', member.username);
     if (!client)
         return; // the db client hasn't been initialized
     // the member's been updated too recently, just return
@@ -217,7 +219,11 @@ async function updateDatabaseMember(member, profile) {
     await constants.addCollections(member.collections.map(coll => coll.name));
     await constants.addSkills(member.skills.map(skill => skill.name));
     await constants.addZones(member.visited_zones.map(zone => zone.name));
+    if (_1.debug)
+        console.log('done constants..');
     const leaderboardAttributes = await getApplicableAttributes(member);
+    if (_1.debug)
+        console.log('done getApplicableAttributes..', leaderboardAttributes);
     await memberLeaderboardsCollection.updateOne({
         uuid: member.uuid,
         profile: profile.uuid
@@ -279,14 +285,15 @@ async function removeBadMemberLeaderboardAttributes() {
     }
 }
 /** Fetch all the leaderboards, used for caching. Don't call this often! */
-async function fetchAllLeaderboards() {
+async function fetchAllLeaderboards(fast) {
     const leaderboards = await fetchAllMemberLeaderboardAttributes();
     // shuffle so if the application is restarting many times itll still be useful
     if (_1.debug)
         console.log('Caching leaderboards!');
     for (const leaderboard of util_1.shuffle(leaderboards)) {
-        // wait 2 seconds so it doesnt use as much ram
-        await util_1.sleep(2 * 1000);
+        if (!fast)
+            // wait 2 seconds so it doesnt use as much ram
+            await util_1.sleep(2 * 1000);
         await fetchMemberLeaderboard(leaderboard);
     }
     if (_1.debug)
@@ -296,7 +303,7 @@ connect().then(() => {
     // when it connects, cache the leaderboards and remove bad members
     removeBadMemberLeaderboardAttributes();
     // cache leaderboards on startup so its faster later on
-    fetchAllLeaderboards();
-    // cache leaderboard players again every hour
+    fetchAllLeaderboards(true);
+    // cache leaderboard players again every 4 hours
     setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000);
 });

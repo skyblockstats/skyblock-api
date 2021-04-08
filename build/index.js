@@ -9,7 +9,7 @@ const express_1 = __importDefault(require("express"));
 const database_1 = require("./database");
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const app = express_1.default();
-exports.debug = false;
+exports.debug = true;
 // 500 requests over 5 minutes
 const limiter = express_rate_limit_1.default({
     windowMs: 60 * 1000 * 5,
