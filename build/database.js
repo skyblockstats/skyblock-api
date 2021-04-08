@@ -25,7 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.queueUpdateDatabaseMember = exports.updateDatabaseMember = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchAllLeaderboardsCategorized = void 0;
+exports.queueUpdateDatabaseMember = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchAllLeaderboardsCategorized = void 0;
 const constants = __importStar(require("./constants"));
 const cached = __importStar(require("./hypixelCached"));
 const mongodb_1 = require("mongodb");
@@ -157,7 +157,11 @@ async function fetchMemberLeaderboardRaw(name) {
     query[`stats.${name}`] = { '$exists': true, '$ne': NaN };
     const sortQuery = {};
     sortQuery[`stats.${name}`] = isLeaderboardReversed(name) ? 1 : -1;
-    const leaderboardRaw = await memberLeaderboardsCollection.find(query).sort(sortQuery).limit(leaderboardMax).toArray();
+    const leaderboardRaw = await memberLeaderboardsCollection
+        .find(query)
+        .sort(sortQuery)
+        .limit(leaderboardMax)
+        .toArray();
     cachedRawLeaderboards.set(name, leaderboardRaw);
     return leaderboardRaw;
 }
@@ -182,6 +186,26 @@ async function fetchMemberLeaderboard(name) {
     };
 }
 exports.fetchMemberLeaderboard = fetchMemberLeaderboard;
+/** Get the leaderboard positions a member is on. This may take a while depending on whether stuff is cached */
+async function fetchMemberLeaderboardSpots(player, profile) {
+    const fullProfile = await cached.fetchProfile(player, profile);
+    const fullMember = fullProfile.members.find(m => m.username.toLowerCase() === player.toLowerCase() || m.uuid === player);
+    // update the leaderboard positions for the member
+    await updateDatabaseMember(fullMember, fullProfile);
+    const applicableAttributes = await getApplicableAttributes(fullMember);
+    const memberLeaderboardSpots = [];
+    for (const leaderboardName in applicableAttributes) {
+        const leaderboard = await fetchMemberLeaderboardRaw(leaderboardName);
+        const leaderboardPositionIndex = leaderboard.findIndex(i => i.uuid === fullMember.uuid && i.profile === fullProfile.uuid);
+        memberLeaderboardSpots.push({
+            name: leaderboardName,
+            positionIndex: leaderboardPositionIndex,
+            value: applicableAttributes[leaderboardName],
+        });
+    }
+    return memberLeaderboardSpots;
+}
+exports.fetchMemberLeaderboardSpots = fetchMemberLeaderboardSpots;
 async function getMemberLeaderboardRequirement(name) {
     const leaderboard = await fetchMemberLeaderboardRaw(name);
     // if there's more than 100 items, return the 100th. if there's less, return null
@@ -242,7 +266,8 @@ async function updateDatabaseMember(member, profile) {
             .concat([{
                 last_updated: new Date(),
                 stats: leaderboardAttributes,
-                uuid: member.uuid
+                uuid: member.uuid,
+                profile: profile.uuid
             }])
             .sort((a, b) => leaderboardReverse ? a.stats[attributeName] - b.stats[attributeName] : b.stats[attributeName] - a.stats[attributeName])
             .slice(0, 100);
