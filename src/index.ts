@@ -5,7 +5,7 @@ import express from 'express'
 
 const app = express()
 
-export const debug = true
+export const debug = false
 
 // 500 requests over 5 minutes
 const limiter = rateLimit({
