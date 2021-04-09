@@ -26,12 +26,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.queueUpdateDatabaseMember = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchAllLeaderboardsCategorized = void 0;
-const constants = __importStar(require("./constants"));
-const cached = __importStar(require("./hypixelCached"));
-const mongodb_1 = require("mongodb");
-const node_cache_1 = __importDefault(require("node-cache"));
-const util_1 = require("./util");
 const stats_1 = require("./cleaners/skyblock/stats");
+const mongodb_1 = require("mongodb");
+const cached = __importStar(require("./hypixelCached"));
+const constants = __importStar(require("./constants"));
+const util_1 = require("./util");
+const node_cache_1 = __importDefault(require("node-cache"));
 const queue_promise_1 = __importDefault(require("queue-promise"));
 const _1 = require(".");
 // don't update the user for 3 minutes
@@ -46,11 +46,6 @@ const reversedLeaderboards = [
     'first_join',
     '_best_time', '_best_time_2'
 ];
-const leaderboardUnits = {
-    time: ['_best_time', '_best_time_2'],
-    date: ['first_join'],
-    coins: ['purse']
-};
 let client;
 let database;
 let memberLeaderboardsCollection;
@@ -137,18 +132,6 @@ function isLeaderboardReversed(name) {
     }
     return false;
 }
-function getLeaderboardUnit(name) {
-    for (const [unitName, leaderboardMatchers] of Object.entries(leaderboardUnits)) {
-        for (const leaderboardMatch of leaderboardMatchers) {
-            let trailingEnd = leaderboardMatch[0] === '_';
-            let trailingStart = leaderboardMatch.substr(-1) === '_';
-            if ((trailingStart && name.startsWith(leaderboardMatch))
-                || (trailingEnd && name.endsWith(leaderboardMatch))
-                || (name == leaderboardMatch))
-                return unitName;
-        }
-    }
-}
 async function fetchMemberLeaderboardRaw(name) {
     if (cachedRawLeaderboards.has(name))
         return cachedRawLeaderboards.get(name);
@@ -165,6 +148,7 @@ async function fetchMemberLeaderboardRaw(name) {
     cachedRawLeaderboards.set(name, leaderboardRaw);
     return leaderboardRaw;
 }
+/** Fetch a leaderboard that ranks members, as opposed to profiles */
 async function fetchMemberLeaderboard(name) {
     var _a;
     const leaderboardRaw = await fetchMemberLeaderboardRaw(name);
@@ -181,13 +165,14 @@ async function fetchMemberLeaderboard(name) {
     const leaderboard = await Promise.all(promises);
     return {
         name: name,
-        unit: (_a = getLeaderboardUnit(name)) !== null && _a !== void 0 ? _a : null,
+        unit: (_a = stats_1.getStatUnit(name)) !== null && _a !== void 0 ? _a : null,
         list: leaderboard
     };
 }
 exports.fetchMemberLeaderboard = fetchMemberLeaderboard;
 /** Get the leaderboard positions a member is on. This may take a while depending on whether stuff is cached */
 async function fetchMemberLeaderboardSpots(player, profile) {
+    var _a;
     const fullProfile = await cached.fetchProfile(player, profile);
     const fullMember = fullProfile.members.find(m => m.username.toLowerCase() === player.toLowerCase() || m.uuid === player);
     // update the leaderboard positions for the member
@@ -201,6 +186,7 @@ async function fetchMemberLeaderboardSpots(player, profile) {
             name: leaderboardName,
             positionIndex: leaderboardPositionIndex,
             value: applicableAttributes[leaderboardName],
+            unit: (_a = stats_1.getStatUnit(leaderboardName)) !== null && _a !== void 0 ? _a : null
         });
     }
     return memberLeaderboardSpots;

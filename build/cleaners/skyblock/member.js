@@ -20,16 +20,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cleanSkyBlockProfileMemberResponse = exports.cleanSkyBlockProfileMemberResponseBasic = void 0;
-const stats_1 = require("./stats");
+const collections_1 = require("./collections");
 const inventory_1 = require("./inventory");
 const fairysouls_1 = require("./fairysouls");
 const objectives_1 = require("./objectives");
+const stats_1 = require("./stats");
 const minions_1 = require("./minions");
+const slayers_1 = require("./slayers");
+const zones_1 = require("./zones");
 const skills_1 = require("./skills");
 const cached = __importStar(require("../../hypixelCached"));
-const zones_1 = require("./zones");
-const collections_1 = require("./collections");
-const slayers_1 = require("./slayers");
 async function cleanSkyBlockProfileMemberResponseBasic(member, included = null) {
     const player = await cached.fetchPlayer(member.uuid);
     return {

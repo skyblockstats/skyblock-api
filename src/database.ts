@@ -2,15 +2,15 @@
  * Store data about members for leaderboards
 */
 
-import * as constants from './constants'
-import * as cached from './hypixelCached'
-import { Collection, Db, MongoClient } from 'mongodb'
-import NodeCache from 'node-cache'
-import { CleanMember } from './cleaners/skyblock/member'
-import { CleanPlayer } from './cleaners/player'
-import { shuffle, sleep } from './util'
+import { categorizeStat, getStatUnit } from './cleaners/skyblock/stats'
 import { CleanFullProfile } from './cleaners/skyblock/profile'
-import { categorizeStat } from './cleaners/skyblock/stats'
+import { CleanMember } from './cleaners/skyblock/member'
+import { Collection, Db, MongoClient } from 'mongodb'
+import { CleanPlayer } from './cleaners/player'
+import * as cached from './hypixelCached'
+import * as constants from './constants'
+import { shuffle, sleep } from './util'
+import NodeCache from 'node-cache'
 import Queue from 'queue-promise'
 import { debug } from '.'
 
@@ -40,11 +40,6 @@ const reversedLeaderboards = [
 	'first_join',
 	'_best_time', '_best_time_2'
 ]
-const leaderboardUnits = {
-	time: ['_best_time', '_best_time_2'],
-	date: ['first_join'],
-	coins: ['purse']
-}
 
 let client: MongoClient
 let database: Db
@@ -154,21 +149,6 @@ function isLeaderboardReversed(name: string): boolean {
 	return false
 }
 
-function getLeaderboardUnit(name: string): string {
-	for (const [ unitName, leaderboardMatchers ] of Object.entries(leaderboardUnits)) {
-		for (const leaderboardMatch of leaderboardMatchers) {
-			let trailingEnd = leaderboardMatch[0] === '_'
-			let trailingStart = leaderboardMatch.substr(-1) === '_'
-			if (
-				(trailingStart && name.startsWith(leaderboardMatch))
-				|| (trailingEnd && name.endsWith(leaderboardMatch))
-				|| (name == leaderboardMatch)
-			)
-				return unitName
-		}
-	}
-}
-
 async function fetchMemberLeaderboardRaw(name: string): Promise<DatabaseLeaderboardItem[]> {
 	if (cachedRawLeaderboards.has(name))
 		return cachedRawLeaderboards.get(name)
@@ -195,6 +175,7 @@ interface Leaderboard {
 	list: LeaderboardItem[]
 }
 
+/** Fetch a leaderboard that ranks members, as opposed to profiles */
 export async function fetchMemberLeaderboard(name: string): Promise<Leaderboard> {
 	const leaderboardRaw = await fetchMemberLeaderboardRaw(name)
 	const fetchLeaderboardPlayer = async(item: DatabaseLeaderboardItem): Promise<LeaderboardItem> => {
@@ -210,7 +191,7 @@ export async function fetchMemberLeaderboard(name: string): Promise<Leaderboard>
 	const leaderboard = await Promise.all(promises)
 	return {
 		name: name,
-		unit: getLeaderboardUnit(name) ?? null,
+		unit: getStatUnit(name) ?? null,
 		list: leaderboard
 	}
 }
@@ -234,7 +215,7 @@ export async function fetchMemberLeaderboardSpots(player: string, profile: strin
 			name: leaderboardName,
 			positionIndex: leaderboardPositionIndex,
 			value: applicableAttributes[leaderboardName],
-			
+			unit: getStatUnit(leaderboardName) ?? null
 		})
 	}
 

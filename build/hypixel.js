@@ -156,6 +156,7 @@ async function fetchMemberProfileUncached(playerUuid, profileUuid) {
         path: 'skyblock/profile',
         args: { profile: profileUuid }
     }, null, { mainMemberUuid: playerUuid });
+    // queue updating the leaderboard positions for the member, eventually
     for (const member of profile.members)
         database_1.queueUpdateDatabaseMember(member, profile);
     return profile;
