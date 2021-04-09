@@ -207,8 +207,10 @@ async function getApplicableAttributes(member) {
     for (const [leaderboard, attributeValue] of Object.entries(leaderboardAttributes)) {
         const requirement = await getMemberLeaderboardRequirement(leaderboard);
         const leaderboardReversed = isLeaderboardReversed(leaderboard);
-        if (!requirement || leaderboardReversed ? attributeValue < requirement : attributeValue > requirement)
+        if ((requirement === null)
+            || (leaderboardReversed ? attributeValue < requirement : attributeValue > requirement)) {
             applicableAttributes[leaderboard] = attributeValue;
+        }
     }
     return applicableAttributes;
 }

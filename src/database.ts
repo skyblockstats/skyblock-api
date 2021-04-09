@@ -224,6 +224,7 @@ export async function fetchMemberLeaderboardSpots(player: string, profile: strin
 
 async function getMemberLeaderboardRequirement(name: string): Promise<number> {
 	const leaderboard = await fetchMemberLeaderboardRaw(name)
+
 	// if there's more than 100 items, return the 100th. if there's less, return null
 	if (leaderboard.length >= leaderboardMax)
 		return leaderboard[leaderboardMax - 1].stats[name]
@@ -238,8 +239,12 @@ async function getApplicableAttributes(member: CleanMember): Promise<StringNumbe
 	for (const [ leaderboard, attributeValue ] of Object.entries(leaderboardAttributes)) {
 		const requirement = await getMemberLeaderboardRequirement(leaderboard)
 		const leaderboardReversed = isLeaderboardReversed(leaderboard)
-		if (!requirement || leaderboardReversed ? attributeValue < requirement : attributeValue > requirement)
+		if (
+			(requirement === null)
+			|| (leaderboardReversed ? attributeValue < requirement : attributeValue > requirement)
+		) {
 			applicableAttributes[leaderboard] = attributeValue
+		}
 	}
 	return applicableAttributes
 }
