@@ -7,10 +7,10 @@ const app = express()
 
 export const debug = false
 
-// 500 requests over 5 minutes
+// 200 requests over 5 minutes
 const limiter = rateLimit({
 	windowMs: 60 * 1000 * 5,
-	max: 500,
+	max: 200,
 	skip: (req: express.Request) => {
 		return req.headers.key === process.env.key
 	},
@@ -20,6 +20,10 @@ const limiter = rateLimit({
 })
 
 app.use(limiter)
+app.use((req, res, next) => {
+	res.setHeader('Access-Control-Allow-Origin', '*')
+	next()
+})
 
 app.get('/', async(req, res) => {
 	res.json({ ok: true })
