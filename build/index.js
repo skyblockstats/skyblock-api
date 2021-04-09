@@ -10,10 +10,10 @@ const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const express_1 = __importDefault(require("express"));
 const app = express_1.default();
 exports.debug = false;
-// 500 requests over 5 minutes
+// 200 requests over 5 minutes
 const limiter = express_rate_limit_1.default({
     windowMs: 60 * 1000 * 5,
-    max: 500,
+    max: 200,
     skip: (req) => {
         return req.headers.key === process.env.key;
     },
@@ -23,6 +23,10 @@ const limiter = express_rate_limit_1.default({
     }
 });
 app.use(limiter);
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    next();
+});
 app.get('/', async (req, res) => {
     res.json({ ok: true });
 });
