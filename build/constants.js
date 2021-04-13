@@ -95,7 +95,7 @@ async function fetchJSONConstant(filename) {
     }
 }
 /** Add stats to skyblock-constants. This has caching so it's fine to call many times */
-async function addJSONConstants(filename, addingValues, units = 'stats') {
+async function addJSONConstants(filename, addingValues, unit = 'stat') {
     if (addingValues.length === 0)
         return; // no stats provided, just return
     queue.enqueue(async () => {
@@ -119,7 +119,7 @@ async function addJSONConstants(filename, addingValues, units = 'stats') {
         // there's not actually any new stats, just return
         if (newStats.length === 0)
             return;
-        const commitMessage = newStats.length >= 2 ? `Add ${newStats.length} new ${units}` : `Add '${newStats[0]}'`;
+        const commitMessage = newStats.length >= 2 ? `Add ${newStats.length} new ${unit}s` : `Add '${newStats[0]}' ${unit}`;
         await editFile(file, commitMessage, JSON.stringify(updatedStats, null, 2));
     });
 }
@@ -131,7 +131,7 @@ async function fetchStats() {
 exports.fetchStats = fetchStats;
 /** Add stats to skyblock-constants. This has caching so it's fine to call many times */
 async function addStats(addingStats) {
-    await addJSONConstants('stats.json', addingStats, 'stats');
+    await addJSONConstants('stats.json', addingStats, 'stat');
 }
 exports.addStats = addStats;
 /** Fetch all the known SkyBlock collections as an array of strings */
@@ -141,7 +141,7 @@ async function fetchCollections() {
 exports.fetchCollections = fetchCollections;
 /** Add collections to skyblock-constants. This has caching so it's fine to call many times */
 async function addCollections(addingCollections) {
-    await addJSONConstants('collections.json', addingCollections, 'collections');
+    await addJSONConstants('collections.json', addingCollections, 'collection');
 }
 exports.addCollections = addCollections;
 /** Fetch all the known SkyBlock collections as an array of strings */
@@ -151,7 +151,7 @@ async function fetchSkills() {
 exports.fetchSkills = fetchSkills;
 /** Add skills to skyblock-constants. This has caching so it's fine to call many times */
 async function addSkills(addingSkills) {
-    await addJSONConstants('skills.json', addingSkills, 'skills');
+    await addJSONConstants('skills.json', addingSkills, 'skill');
 }
 exports.addSkills = addSkills;
 /** Fetch all the known SkyBlock collections as an array of strings */
@@ -161,7 +161,7 @@ async function fetchZones() {
 exports.fetchZones = fetchZones;
 /** Add skills to skyblock-constants. This has caching so it's fine to call many times */
 async function addZones(addingZones) {
-    await addJSONConstants('zones.json', addingZones, 'zones');
+    await addJSONConstants('zones.json', addingZones, 'zone');
 }
 exports.addZones = addZones;
 /** Fetch all the known SkyBlock slayer names as an array of strings */
@@ -171,6 +171,6 @@ async function fetchSlayers() {
 exports.fetchSlayers = fetchSlayers;
 /** Add skills to skyblock-constants. This has caching so it's fine to call many times */
 async function addSlayers(addingSlayers) {
-    await addJSONConstants('slayers.json', addingSlayers, 'slayers');
+    await addJSONConstants('slayers.json', addingSlayers, 'slayer');
 }
 exports.addSlayers = addSlayers;
