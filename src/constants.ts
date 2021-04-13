@@ -188,3 +188,14 @@ export async function fetchZones(): Promise<string[]> {
 export async function addZones(addingZones: string[]): Promise<void> {
 	await addJSONConstants('zones.json', addingZones, 'zones')
 }
+
+
+/** Fetch all the known SkyBlock slayer names as an array of strings */
+export async function fetchSlayers(): Promise<string[]> {
+	return await fetchJSONConstant('slayers.json')
+}
+
+/** Add skills to skyblock-constants. This has caching so it's fine to call many times */
+export async function addSlayers(addingSlayers: string[]): Promise<void> {
+	await addJSONConstants('slayers.json', addingSlayers, 'slayers')
+}

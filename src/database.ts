@@ -265,6 +265,7 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 	await constants.addCollections(member.collections.map(coll => coll.name))
 	await constants.addSkills(member.skills.map(skill => skill.name))
 	await constants.addZones(member.visited_zones.map(zone => zone.name))
+	await constants.addSlayers(member.slayers.bosses.map(s => s.raw_name))
 
 	if (debug) console.log('done constants..')
 
@@ -306,14 +307,14 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 	if (debug) console.log('added member to leaderboards', member.username, leaderboardAttributes)
 }
 
-const queue = new Queue({
+const leaderboardUpdateQueue = new Queue({
 	concurrent: 1,
 	interval: 500
 })
 
 /** Queue an update for the member's leaderboard data on the server if applicable */
 export async function queueUpdateDatabaseMember(member: CleanMember, profile: CleanFullProfile): Promise<void> {
-	queue.enqueue(async() => await updateDatabaseMember(member, profile))
+	leaderboardUpdateQueue.enqueue(async() => await updateDatabaseMember(member, profile))
 }
 
 

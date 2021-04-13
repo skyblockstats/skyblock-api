@@ -17,6 +17,7 @@ interface SlayerTier {
 
 export interface Slayer {
 	name: SlayerName
+	raw_name: string
 	xp: number
 	tiers: SlayerTier[]
 }
@@ -37,7 +38,7 @@ export function cleanSlayers(data: any): SlayerData {
 		const slayerDataRaw = slayersDataRaw[slayerNameRaw]
 
 		// convert name provided by api (spider) to the real name (tarantula)
-		const slayerName: SlayerName = SLAYER_NAMES[slayerDataRaw]
+		const slayerName: SlayerName = SLAYER_NAMES[slayerNameRaw]
 
 		const slayerXp: number = slayerDataRaw.xp
 		const slayerTiers: SlayerTier[] = []
@@ -64,6 +65,7 @@ export function cleanSlayers(data: any): SlayerData {
 
 		const slayer: Slayer = {
 			name: slayerName,
+			raw_name: slayerNameRaw,
 			tiers: slayerTiers,
 			xp: slayerXp
 		}
@@ -76,3 +78,8 @@ export function cleanSlayers(data: any): SlayerData {
 		bosses: slayers
 	}
 }
+
+
+// function getSlayerLeaderboards() {
+
+// }
