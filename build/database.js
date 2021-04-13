@@ -231,6 +231,7 @@ async function updateDatabaseMember(member, profile) {
     await constants.addCollections(member.collections.map(coll => coll.name));
     await constants.addSkills(member.skills.map(skill => skill.name));
     await constants.addZones(member.visited_zones.map(zone => zone.name));
+    await constants.addSlayers(member.slayers.bosses.map(s => s.raw_name));
     if (_1.debug)
         console.log('done constants..');
     const leaderboardAttributes = await getApplicableAttributes(member);
@@ -265,13 +266,13 @@ async function updateDatabaseMember(member, profile) {
         console.log('added member to leaderboards', member.username, leaderboardAttributes);
 }
 exports.updateDatabaseMember = updateDatabaseMember;
-const queue = new queue_promise_1.default({
+const leaderboardUpdateQueue = new queue_promise_1.default({
     concurrent: 1,
     interval: 500
 });
 /** Queue an update for the member's leaderboard data on the server if applicable */
 async function queueUpdateDatabaseMember(member, profile) {
-    queue.enqueue(async () => await updateDatabaseMember(member, profile));
+    leaderboardUpdateQueue.enqueue(async () => await updateDatabaseMember(member, profile));
 }
 exports.queueUpdateDatabaseMember = queueUpdateDatabaseMember;
 /**

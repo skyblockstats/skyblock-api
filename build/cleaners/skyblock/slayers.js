@@ -14,7 +14,7 @@ function cleanSlayers(data) {
     for (const slayerNameRaw in slayersDataRaw) {
         const slayerDataRaw = slayersDataRaw[slayerNameRaw];
         // convert name provided by api (spider) to the real name (tarantula)
-        const slayerName = SLAYER_NAMES[slayerDataRaw];
+        const slayerName = SLAYER_NAMES[slayerNameRaw];
         const slayerXp = slayerDataRaw.xp;
         const slayerTiers = [];
         for (const slayerDataKey in slayerDataRaw) {
@@ -38,6 +38,7 @@ function cleanSlayers(data) {
             });
         const slayer = {
             name: slayerName,
+            raw_name: slayerNameRaw,
             tiers: slayerTiers,
             xp: slayerXp
         };
@@ -51,3 +52,5 @@ function cleanSlayers(data) {
     };
 }
 exports.cleanSlayers = cleanSlayers;
+// function getSlayerLeaderboards() {
+// }
