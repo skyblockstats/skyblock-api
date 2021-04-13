@@ -85,10 +85,10 @@ function getMemberSlayerAttributes(member: CleanMember): StringNumber {
 	}
 
 	for (const slayer of member.slayers.bosses) {
-		slayerAttributes[`slayer_${slayer.name}_total_xp`] = slayer.xp
-		slayerAttributes[`slayer_${slayer.name}_total_kills`] = slayer.kills
+		slayerAttributes[`slayer_${slayer.raw_name}_total_xp`] = slayer.xp
+		slayerAttributes[`slayer_${slayer.raw_name}_total_kills`] = slayer.kills
 		for (const tier of slayer.tiers) {
-			slayerAttributes[`slayer_${slayer.name}_${tier.tier}_kills`] = tier.kills
+			slayerAttributes[`slayer_${slayer.raw_name}_${tier.tier}_kills`] = tier.kills
 		}
 	}
 

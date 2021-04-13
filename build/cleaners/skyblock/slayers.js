@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cleanSlayers = exports.slayerLevels = void 0;
-exports.slayerLevels = 4; // number of slayer levels, this might be 5 soon
+exports.slayerLevels = 5;
 const SLAYER_NAMES = {
     spider: 'tarantula',
     zombie: 'revenant',

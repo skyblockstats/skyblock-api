@@ -1,4 +1,4 @@
-export const slayerLevels = 4 // number of slayer levels, this might be 5 soon
+export const slayerLevels = 5
 
 const SLAYER_NAMES = {
 	spider: 'tarantula',
