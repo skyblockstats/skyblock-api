@@ -18,9 +18,17 @@ const httpsAgent = new https_1.Agent({
  * Get mojang api data from the session server
  */
 async function profileFromUuid(uuid) {
-    const fetchResponse = await node_fetch_1.default(
-    // using mojang directly is faster than ashcon lol, also mojang removed the ratelimits from here
-    `https://sessionserver.mojang.com/session/minecraft/profile/${util_1.undashUuid(uuid)}`, { agent: () => httpsAgent });
+    let fetchResponse;
+    try {
+        fetchResponse = await node_fetch_1.default(
+        // using mojang directly is faster than ashcon lol, also mojang removed the ratelimits from here
+        `https://sessionserver.mojang.com/session/minecraft/profile/${util_1.undashUuid(uuid)}`, { agent: () => httpsAgent });
+    }
+    catch {
+        // if there's an error, wait a second and try again
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        return await profileFromUuid(uuid);
+    }
     let data;
     try {
         data = await fetchResponse.json();
@@ -37,7 +45,15 @@ async function profileFromUuid(uuid) {
 exports.profileFromUuid = profileFromUuid;
 async function profileFromUsername(username) {
     // since we don't care about anything other than the uuid, we can use /uuid/ instead of /user/
-    const fetchResponse = await node_fetch_1.default(`https://api.mojang.com/users/profiles/minecraft/${username}`, { agent: () => httpsAgent });
+    let fetchResponse;
+    try {
+        fetchResponse = await node_fetch_1.default(`https://api.mojang.com/users/profiles/minecraft/${username}`, { agent: () => httpsAgent });
+    }
+    catch {
+        // if there's an error, wait a second and try again
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        return await profileFromUsername(username);
+    }
     let data;
     try {
         data = await fetchResponse.json();
