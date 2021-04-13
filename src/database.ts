@@ -92,8 +92,6 @@ function getMemberSlayerAttributes(member: CleanMember): StringNumber {
 		}
 	}
 
-	console.log('getMemberSlayerAttributes', slayerAttributes, member.username, member.slayers)
-
 	return slayerAttributes
 }
 

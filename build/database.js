@@ -87,7 +87,6 @@ function getMemberSlayerAttributes(member) {
             slayerAttributes[`slayer_${slayer.name}_${tier.tier}_kills`] = tier.kills;
         }
     }
-    console.log('getMemberSlayerAttributes', slayerAttributes, member.username, member.slayers);
     return slayerAttributes;
 }
 function getMemberLeaderboardAttributes(member) {
