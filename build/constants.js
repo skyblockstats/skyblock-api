@@ -6,7 +6,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addZones = exports.fetchZones = exports.addSkills = exports.fetchSkills = exports.addCollections = exports.fetchCollections = exports.addStats = exports.fetchStats = exports.addJSONConstants = void 0;
+exports.addSlayers = exports.fetchSlayers = exports.addZones = exports.fetchZones = exports.addSkills = exports.fetchSkills = exports.addCollections = exports.fetchCollections = exports.addStats = exports.fetchStats = exports.addJSONConstants = void 0;
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const https_1 = require("https");
 const node_cache_1 = __importDefault(require("node-cache"));
@@ -164,3 +164,13 @@ async function addZones(addingZones) {
     await addJSONConstants('zones.json', addingZones, 'zones');
 }
 exports.addZones = addZones;
+/** Fetch all the known SkyBlock slayer names as an array of strings */
+async function fetchSlayers() {
+    return await fetchJSONConstant('slayers.json');
+}
+exports.fetchSlayers = fetchSlayers;
+/** Add skills to skyblock-constants. This has caching so it's fine to call many times */
+async function addSlayers(addingSlayers) {
+    await addJSONConstants('slayers.json', addingSlayers, 'slayers');
+}
+exports.addSlayers = addSlayers;
