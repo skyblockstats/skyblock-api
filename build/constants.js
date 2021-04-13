@@ -30,14 +30,21 @@ const queue = new queue_promise_1.default({
  * @param json The JSON body, only applicable for some types of methods
  */
 async function fetchGithubApi(method, route, headers, json) {
-    return await node_fetch_1.default(githubApiBase + route, {
-        agent: () => httpsAgent,
-        body: json ? JSON.stringify(json) : null,
-        method,
-        headers: Object.assign({
-            'Authorization': `token ${process.env.github_token}`
-        }, headers),
-    });
+    try {
+        return await node_fetch_1.default(githubApiBase + route, {
+            agent: () => httpsAgent,
+            body: json ? JSON.stringify(json) : null,
+            method,
+            headers: Object.assign({
+                'Authorization': `token ${process.env.github_token}`
+            }, headers),
+        });
+    }
+    catch {
+        // if there's an error, wait a second and try again
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        return await fetchGithubApi(method, route, headers, json);
+    }
 }
 // cache files for an hour
 const fileCache = new node_cache_1.default({

@@ -13,6 +13,7 @@ import { shuffle, sleep } from './util'
 import NodeCache from 'node-cache'
 import Queue from 'queue-promise'
 import { debug } from '.'
+import { slayerLevels } from './cleaners/skyblock/slayers'
 
 // don't update the user for 3 minutes
 const recentlyUpdated = new NodeCache({
@@ -77,6 +78,25 @@ function getMemberSkillAttributes(member: CleanMember): StringNumber {
 	return skillAttributes
 }
 
+function getMemberSlayerAttributes(member: CleanMember): StringNumber {
+	const slayerAttributes: StringNumber = {
+		slayer_total_xp: member.slayers.xp,
+		slayer_total_kills: member.slayers.kills,
+	}
+
+	for (const slayer of member.slayers.bosses) {
+		slayerAttributes[`slayer_${slayer.name}_total_xp`] = slayer.xp
+		slayerAttributes[`slayer_${slayer.name}_total_kills`] = slayer.kills
+		for (const tier of slayer.tiers) {
+			slayerAttributes[`slayer_${slayer.name}_${tier.tier}_kills`] = tier.kills
+		}
+	}
+
+	console.log('getMemberSlayerAttributes', slayerAttributes, member.username, member.slayers)
+
+	return slayerAttributes
+}
+
 function getMemberLeaderboardAttributes(member: CleanMember): StringNumber {
 	// if you want to add a new leaderboard for member attributes, add it here (and getAllLeaderboardAttributes)
 	return {
@@ -88,6 +108,9 @@ function getMemberLeaderboardAttributes(member: CleanMember): StringNumber {
 
 		// skill leaderboards
 		...getMemberSkillAttributes(member),
+
+		// slayer leaderboards
+		...getMemberSlayerAttributes(member),
 
 		fairy_souls: member.fairy_souls.total,
 		first_join: member.first_join,
@@ -115,6 +138,25 @@ export async function fetchAllLeaderboardsCategorized(): Promise<{ [ category: s
 	return categorizedLeaderboards
 }
 
+/** Fetch the raw names for the slayer leaderboards */
+export async function fetchSlayerLeaderboards(): Promise<string[]> {
+	const rawSlayerNames = await constants.fetchSlayers()
+	let leaderboardNames: string[] = [
+		'slayer_total_xp',
+		'slayer_total_kills'
+	]
+
+	// we use the raw names (zombie, spider, wolf) instead of the clean names (revenant, tarantula, sven) because the raw names are guaranteed to never change
+	for (const slayerNameRaw of rawSlayerNames) {
+		leaderboardNames.push(`slayer_${slayerNameRaw}_total_xp`)
+		leaderboardNames.push(`slayer_${slayerNameRaw}_total_kills`)
+		for (let slayerTier = 1; slayerTier <= slayerLevels; slayerTier ++) {
+			leaderboardNames.push(`slayer_${slayerNameRaw}_${slayerTier}_kills`)
+		}
+	}
+
+	return leaderboardNames
+}
 
 /** Fetch the names of all the leaderboards */
 export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
@@ -127,6 +169,9 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 
 		// skill leaderboards
 		...(await constants.fetchSkills()).map(value => `skill_${value}`),
+
+		// slayer leaderboards
+		...await fetchSlayerLeaderboards(),
 
 		'fairy_souls',
 		'first_join',

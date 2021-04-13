@@ -30,17 +30,23 @@ const queue = new Queue({
  * @param json The JSON body, only applicable for some types of methods
  */
 async function fetchGithubApi(method: string, route: string, headers?: any, json?: any): Promise<nodeFetch.Response> {
-	return await fetch(
-		githubApiBase + route,
-		{
-			agent: () => httpsAgent,
-			body: json ? JSON.stringify(json) : null,
-			method,
-			headers: Object.assign({
-				'Authorization': `token ${process.env.github_token}`
-			}, headers),
-		}
-	)
+	try {
+		return await fetch(
+			githubApiBase + route,
+			{
+				agent: () => httpsAgent,
+				body: json ? JSON.stringify(json) : null,
+				method,
+				headers: Object.assign({
+					'Authorization': `token ${process.env.github_token}`
+				}, headers),
+			}
+		)
+	} catch {
+		// if there's an error, wait a second and try again
+		await new Promise((resolve) => setTimeout(resolve, 1000))
+		return await fetchGithubApi(method, route, headers, json)
+	}
 }
 
 interface GithubFile {
@@ -73,6 +79,7 @@ async function fetchFile(path: string): Promise<GithubFile> {
 		},
 	)
 	const data = await r.json()
+
 	const file = {
 		path: data.path,
 		content: Buffer.from(data.content, data.encoding).toString(),

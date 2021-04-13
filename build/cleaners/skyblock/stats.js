@@ -10,6 +10,7 @@ const statCategories = {
     'mythos': ['mythos_burrows_', 'mythos_kills'],
     'collection': ['collection_'],
     'skills': ['skill_'],
+    'slayer': ['slayer_'],
     'misc': null // everything else goes here
 };
 function categorizeStat(statNameRaw) {

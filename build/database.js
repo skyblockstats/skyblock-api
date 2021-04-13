@@ -25,7 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.queueUpdateDatabaseMember = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchAllLeaderboardsCategorized = void 0;
+exports.queueUpdateDatabaseMember = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchSlayerLeaderboards = exports.fetchAllLeaderboardsCategorized = void 0;
 const stats_1 = require("./cleaners/skyblock/stats");
 const mongodb_1 = require("mongodb");
 const cached = __importStar(require("./hypixelCached"));
@@ -34,6 +34,7 @@ const util_1 = require("./util");
 const node_cache_1 = __importDefault(require("node-cache"));
 const queue_promise_1 = __importDefault(require("queue-promise"));
 const _1 = require(".");
+const slayers_1 = require("./cleaners/skyblock/slayers");
 // don't update the user for 3 minutes
 const recentlyUpdated = new node_cache_1.default({
     stdTTL: 60 * 3,
@@ -74,6 +75,21 @@ function getMemberSkillAttributes(member) {
     }
     return skillAttributes;
 }
+function getMemberSlayerAttributes(member) {
+    const slayerAttributes = {
+        slayer_total_xp: member.slayers.xp,
+        slayer_total_kills: member.slayers.kills,
+    };
+    for (const slayer of member.slayers.bosses) {
+        slayerAttributes[`slayer_${slayer.name}_total_xp`] = slayer.xp;
+        slayerAttributes[`slayer_${slayer.name}_total_kills`] = slayer.kills;
+        for (const tier of slayer.tiers) {
+            slayerAttributes[`slayer_${slayer.name}_${tier.tier}_kills`] = tier.kills;
+        }
+    }
+    console.log('getMemberSlayerAttributes', slayerAttributes, member.username, member.slayers);
+    return slayerAttributes;
+}
 function getMemberLeaderboardAttributes(member) {
     // if you want to add a new leaderboard for member attributes, add it here (and getAllLeaderboardAttributes)
     return {
@@ -83,6 +99,8 @@ function getMemberLeaderboardAttributes(member) {
         ...getMemberCollectionAttributes(member),
         // skill leaderboards
         ...getMemberSkillAttributes(member),
+        // slayer leaderboards
+        ...getMemberSlayerAttributes(member),
         fairy_souls: member.fairy_souls.total,
         first_join: member.first_join,
         purse: member.purse,
@@ -105,6 +123,24 @@ async function fetchAllLeaderboardsCategorized() {
     return categorizedLeaderboards;
 }
 exports.fetchAllLeaderboardsCategorized = fetchAllLeaderboardsCategorized;
+/** Fetch the raw names for the slayer leaderboards */
+async function fetchSlayerLeaderboards() {
+    const rawSlayerNames = await constants.fetchSlayers();
+    let leaderboardNames = [
+        'slayer_total_xp',
+        'slayer_total_kills'
+    ];
+    // we use the raw names (zombie, spider, wolf) instead of the clean names (revenant, tarantula, sven) because the raw names are guaranteed to never change
+    for (const slayerNameRaw of rawSlayerNames) {
+        leaderboardNames.push(`slayer_${slayerNameRaw}_total_xp`);
+        leaderboardNames.push(`slayer_${slayerNameRaw}_total_kills`);
+        for (let slayerTier = 1; slayerTier <= slayers_1.slayerLevels; slayerTier++) {
+            leaderboardNames.push(`slayer_${slayerNameRaw}_${slayerTier}_kills`);
+        }
+    }
+    return leaderboardNames;
+}
+exports.fetchSlayerLeaderboards = fetchSlayerLeaderboards;
 /** Fetch the names of all the leaderboards */
 async function fetchAllMemberLeaderboardAttributes() {
     return [
@@ -114,6 +150,8 @@ async function fetchAllMemberLeaderboardAttributes() {
         ...(await constants.fetchCollections()).map(value => `collection_${value}`),
         // skill leaderboards
         ...(await constants.fetchSkills()).map(value => `skill_${value}`),
+        // slayer leaderboards
+        ...await fetchSlayerLeaderboards(),
         'fairy_souls',
         'first_join',
         'purse',

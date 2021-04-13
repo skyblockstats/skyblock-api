@@ -8,6 +8,7 @@ const statCategories: { [ key: string ]: string[] | null } = { // sorted in orde
 
     'collection': ['collection_'],
     'skills': ['skill_'],
+    'slayer': ['slayer_'],
 
     'misc': null // everything else goes here
 }
