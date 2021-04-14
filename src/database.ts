@@ -3,7 +3,7 @@
 */
 
 import { categorizeStat, getStatUnit } from './cleaners/skyblock/stats'
-import { CleanFullProfile } from './cleaners/skyblock/profile'
+import { CleanFullProfile, CleanProfile } from './cleaners/skyblock/profile'
 import { CleanMember } from './cleaners/skyblock/member'
 import { Collection, Db, MongoClient } from 'mongodb'
 import { CleanPlayer } from './cleaners/player'
@@ -175,6 +175,7 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 		'first_join',
 		'purse',
 		'visited_zones',
+		'leaderboards_count'
 	]
 }
 
@@ -247,7 +248,7 @@ export async function fetchMemberLeaderboardSpots(player: string, profile: strin
 	// update the leaderboard positions for the member
 	await updateDatabaseMember(fullMember, fullProfile)
 
-	const applicableAttributes = await getApplicableAttributes(fullMember)
+	const applicableAttributes = await getApplicableAttributes(fullMember, fullProfile)
 
 	const memberLeaderboardSpots = []
 
@@ -276,7 +277,7 @@ async function getMemberLeaderboardRequirement(name: string): Promise<number> {
 }
 
 /** Get the attributes for the member, but only ones that would put them on the top 100 for leaderboards */
-async function getApplicableAttributes(member: CleanMember): Promise<StringNumber> {
+async function getApplicableAttributes(member: CleanMember, profile: CleanProfile): Promise<StringNumber> {
 	const leaderboardAttributes = getMemberLeaderboardAttributes(member)
 	const applicableAttributes = {}
 	for (const [ leaderboard, attributeValue ] of Object.entries(leaderboardAttributes)) {
@@ -289,6 +290,18 @@ async function getApplicableAttributes(member: CleanMember): Promise<StringNumbe
 			applicableAttributes[leaderboard] = attributeValue
 		}
 	}
+
+	let leaderboardsCount: number = Object.keys(applicableAttributes).length
+	const leaderboardsCountRequirement: number = await getMemberLeaderboardRequirement('leaderboards_count')
+	console.log(member.username, profile.name, leaderboardsCount)
+	if (
+		(leaderboardsCountRequirement === null)
+		|| (leaderboardsCount > leaderboardsCountRequirement)
+	) {
+		// add 1 extra because this attribute also counts :)
+		applicableAttributes['leaderboards_count'] = leaderboardsCount + 1
+	}
+
 	return applicableAttributes
 }
 
@@ -312,7 +325,7 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 
 	if (debug) console.log('done constants..')
 
-	const leaderboardAttributes = await getApplicableAttributes(member)
+	const leaderboardAttributes = await getApplicableAttributes(member, profile)
 
 	if (debug) console.log('done getApplicableAttributes..', leaderboardAttributes)
 
