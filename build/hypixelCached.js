@@ -27,8 +27,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fetchAllAuctions = exports.fetchProfileName = exports.fetchProfile = exports.fetchProfileUuid = exports.fetchSkyblockProfiles = exports.fetchBasicPlayer = exports.fetchPlayer = exports.usernameFromUser = exports.uuidFromUser = void 0;
 const hypixel_1 = require("./hypixel");
-const hypixel = __importStar(require("./hypixel"));
 const util_1 = require("./util");
+const hypixel = __importStar(require("./hypixel"));
 const mojang = __importStar(require("./mojang"));
 const node_cache_1 = __importDefault(require("node-cache"));
 const queue_promise_1 = __importDefault(require("queue-promise"));
