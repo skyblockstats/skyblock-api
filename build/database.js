@@ -155,6 +155,7 @@ async function fetchAllMemberLeaderboardAttributes() {
         'first_join',
         'purse',
         'visited_zones',
+        'leaderboards_count'
     ];
 }
 exports.fetchAllMemberLeaderboardAttributes = fetchAllMemberLeaderboardAttributes;
@@ -214,7 +215,7 @@ async function fetchMemberLeaderboardSpots(player, profile) {
     const fullMember = fullProfile.members.find(m => m.username.toLowerCase() === player.toLowerCase() || m.uuid === player);
     // update the leaderboard positions for the member
     await updateDatabaseMember(fullMember, fullProfile);
-    const applicableAttributes = await getApplicableAttributes(fullMember);
+    const applicableAttributes = await getApplicableAttributes(fullMember, fullProfile);
     const memberLeaderboardSpots = [];
     for (const leaderboardName in applicableAttributes) {
         const leaderboard = await fetchMemberLeaderboardRaw(leaderboardName);
@@ -238,7 +239,7 @@ async function getMemberLeaderboardRequirement(name) {
         return null;
 }
 /** Get the attributes for the member, but only ones that would put them on the top 100 for leaderboards */
-async function getApplicableAttributes(member) {
+async function getApplicableAttributes(member, profile) {
     const leaderboardAttributes = getMemberLeaderboardAttributes(member);
     const applicableAttributes = {};
     for (const [leaderboard, attributeValue] of Object.entries(leaderboardAttributes)) {
@@ -248,6 +249,14 @@ async function getApplicableAttributes(member) {
             || (leaderboardReversed ? attributeValue < requirement : attributeValue > requirement)) {
             applicableAttributes[leaderboard] = attributeValue;
         }
+    }
+    let leaderboardsCount = Object.keys(applicableAttributes).length;
+    const leaderboardsCountRequirement = await getMemberLeaderboardRequirement('leaderboards_count');
+    console.log(member.username, profile.name, leaderboardsCount);
+    if ((leaderboardsCountRequirement === null)
+        || (leaderboardsCount > leaderboardsCountRequirement)) {
+        // add 1 extra because this attribute also counts :)
+        applicableAttributes['leaderboards_count'] = leaderboardsCount + 1;
     }
     return applicableAttributes;
 }
@@ -271,7 +280,7 @@ async function updateDatabaseMember(member, profile) {
     await constants.addSlayers(member.slayers.bosses.map(s => s.raw_name));
     if (_1.debug)
         console.log('done constants..');
-    const leaderboardAttributes = await getApplicableAttributes(member);
+    const leaderboardAttributes = await getApplicableAttributes(member, profile);
     if (_1.debug)
         console.log('done getApplicableAttributes..', leaderboardAttributes);
     await memberLeaderboardsCollection.updateOne({
