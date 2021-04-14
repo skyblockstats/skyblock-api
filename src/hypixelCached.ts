@@ -143,9 +143,20 @@ export async function usernameFromUser(user: string): Promise<string> {
 	return username
 }
 
+let fetchingPlayers = new Set()
 
 export async function fetchPlayer(user: string): Promise<CleanPlayer> {
 	const playerUuid = await uuidFromUser(user)
+
+	// if it's already in the process of fetching, check every 100ms until it's not fetching the player anymore and fetch it again, since it'll be cached now
+	if (fetchingPlayers.has(playerUuid)) {
+		while (fetchingPlayers.has(playerUuid)) {
+			await new Promise(resolve => setTimeout(resolve, 100))
+		}
+		return await fetchPlayer(user)
+	}
+
+	fetchingPlayers.add(playerUuid)
 
 	if (playerCache.has(playerUuid))
 		return playerCache.get(playerUuid)
