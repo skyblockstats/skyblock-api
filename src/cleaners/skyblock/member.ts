@@ -1,18 +1,18 @@
-import { CleanProfileStats, cleanProfileStats } from './stats'
+import { cleanCollections, Collection } from './collections'
 import { cleanInventories, Inventories } from './inventory'
 import { cleanFairySouls, FairySouls } from './fairysouls'
 import { cleanObjectives, Objective } from './objectives'
+import { CleanFullProfileBasicMembers } from './profile'
+import { cleanProfileStats, StatItem } from './stats'
 import { CleanMinion, cleanMinions } from './minions'
+import { cleanSlayers, SlayerData } from './slayers'
+import { cleanVisitedZones, Zone } from './zones'
 import { cleanSkills, Skill } from './skills'
 import * as cached from '../../hypixelCached'
-import { CleanFullProfile, CleanFullProfileBasicMembers } from './profile'
 import { Included } from '../../hypixel'
 import { CleanPlayer } from '../player'
+import { CleanRank } from '../rank'
 import { Bank } from './bank'
-import { cleanVisitedZones, Zone } from './zones'
-import { cleanCollections, Collection } from './collections'
-import { cleanSlayers, SlayerData } from './slayers'
-import { cleanRank, CleanRank } from '../rank'
 
 export interface CleanBasicMember {
     uuid: string
@@ -24,7 +24,7 @@ export interface CleanBasicMember {
 
 export interface CleanMember extends CleanBasicMember {
     purse: number
-    stats: CleanProfileStats
+    stats: StatItem[]
     rawHypixelStats?: { [ key: string ]: number }
     minions: CleanMinion[]
 	fairy_souls: FairySouls

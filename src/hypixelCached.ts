@@ -6,14 +6,15 @@ import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/sk
 import { Auction } from './cleaners/skyblock/auctions'
 import { fetchAllAuctionsUncached } from './hypixel'
 import { CleanPlayer } from './cleaners/player'
+import { isUuid, undashUuid } from './util'
 import * as hypixel from './hypixel'
-import { undashUuid } from './util'
 import * as mojang from './mojang'
 import NodeCache from 'node-cache'
 import Queue from 'queue-promise'
 import { debug } from '.'
 
 // cache usernames for 4 hours
+/** uuid: username */
 const usernameCache = new NodeCache({
 	stdTTL: 60 * 60 * 4,
 	checkperiod: 60,
@@ -80,7 +81,7 @@ function waitForCacheSet(cache: NodeCache, key?: string, value?: string): Promis
  */
 export async function uuidFromUser(user: string): Promise<string> {
 	// if the user is 32 characters long, it has to be a uuid
-	if (undashUuid(user).length === 32)
+	if (isUuid(user))
 		return undashUuid(user)
 
 	if (usernameCache.has(undashUuid(user))) {
@@ -112,7 +113,7 @@ export async function uuidFromUser(user: string): Promise<string> {
 	usernameCache.set(undashUuid(user), waitForCacheSet(usernameCache, user, user))
 	
 	// not cached, actually fetch mojang api now
-	let { uuid, username } = await mojang.mojangDataFromUser(user)
+	let { uuid, username } = await mojang.profileFromUser(user)
 	if (!uuid) {
 		usernameCache.set(user, null)
 		return
@@ -139,7 +140,7 @@ export async function usernameFromUser(user: string): Promise<string> {
 
 	if (debug) console.log('Cache miss: usernameFromUser', user)
 
-	let { uuid, username } = await mojang.mojangDataFromUser(user)
+	let { uuid, username } = await mojang.profileFromUser(user)
 	uuid = undashUuid(uuid)
 	usernameCache.set(uuid, username)
 	return username

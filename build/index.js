@@ -4,15 +4,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.debug = void 0;
-const hypixel_1 = require("./hypixel");
-const express_1 = __importDefault(require("express"));
 const database_1 = require("./database");
+const hypixel_1 = require("./hypixel");
+const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
+const express_1 = __importDefault(require("express"));
 const app = express_1.default();
 exports.debug = false;
+// 200 requests over 5 minutes
+const limiter = express_rate_limit_1.default({
+    windowMs: 60 * 1000 * 5,
+    max: 200,
+    skip: (req) => {
+        return req.headers.key === process.env.key;
+    },
+    keyGenerator: (req) => {
+        var _a;
+        return ((_a = req.headers['Cf-Connecting-Ip']) !== null && _a !== void 0 ? _a : req.ip).toString();
+    }
+});
+app.use(limiter);
 app.use((req, res, next) => {
-    if (process.env.key && req.headers.key !== process.env.key)
-        // if a key is set in process.env and the header doesn't match return an error
-        return res.status(401).json({ error: 'Key in header must match key in env' });
+    res.setHeader('Access-Control-Allow-Origin', '*');
     next();
 });
 app.get('/', async (req, res) => {
@@ -23,6 +35,9 @@ app.get('/player/:user', async (req, res) => {
 });
 app.get('/player/:user/:profile', async (req, res) => {
     res.json(await hypixel_1.fetchMemberProfile(req.params.user, req.params.profile));
+});
+app.get('/player/:user/:profile/leaderboards', async (req, res) => {
+    res.json(await database_1.fetchMemberLeaderboardSpots(req.params.user, req.params.profile));
 });
 app.get('/leaderboard/:name', async (req, res) => {
     res.json(await database_1.fetchMemberLeaderboard(req.params.name));

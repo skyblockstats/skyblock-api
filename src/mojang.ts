@@ -3,69 +3,86 @@
  */
 
 import fetch from 'node-fetch'
+import * as nodeFetch from 'node-fetch'
 import { Agent } from 'https'
+import { isUuid, undashUuid } from './util'
 
 // We need to create an agent to prevent memory leaks
 const httpsAgent = new Agent({
 	keepAlive: true
 })
 
-interface AshconHistoryItem {
-	username: string
-	changed_at?: string
-}
-
-interface AshconTextures {
-	custom: boolean
-	slim: boolean
-	skin: { url: string, data: string }
-	raw: { value: string, signature: string }
-}
-
-interface AshconV2Response {
+interface MojangApiResponse {
+	/** These uuids are already undashed */
 	uuid: string
+
 	username: string
-	username_history: AshconHistoryItem[]
-	textures: AshconTextures
-	created_at?: string
-}
-
-interface AshconV1Response {
-	uuid: string
-	username: string
-	username_history: AshconHistoryItem[]
-	textures: AshconTextures
-	cached_at?: string
 }
 
 /**
- * Get mojang api data from ashcon.app
+ * Get mojang api data from the session server
  */
-export async function mojangDataFromUser(user: string): Promise<AshconV1Response> {
-    const fetchResponse = await fetch(
-		// we use v1 rather than v2 since its more stable
-		`https://api.ashcon.app/mojang/v1/user/${user}`,
-		{ agent: () => httpsAgent }
-	)
-    return await fetchResponse.json()
+export async function profileFromUuid(uuid: string): Promise<MojangApiResponse> {
+	let fetchResponse: nodeFetch.Response
+
+	try {
+		fetchResponse = await fetch(
+			// using mojang directly is faster than ashcon lol, also mojang removed the ratelimits from here
+			`https://sessionserver.mojang.com/session/minecraft/profile/${undashUuid(uuid)}`,
+			{ agent: () => httpsAgent }
+		)
+	} catch {
+		// if there's an error, wait a second and try again
+		await new Promise((resolve) => setTimeout(resolve, 1000))
+		return await profileFromUuid(uuid)
+	}
+
+	let data
+	try {
+		data = await fetchResponse.json()
+	} catch {
+		// if it errors, just return null
+		return { uuid: null, username: null }
+	}
+	return {
+		uuid: data.id,
+		username: data.name
+	}
 }
 
-/**
- * Fetch the uuid from a user
- * @param user A user can be either a uuid or a username 
- */
-export async function uuidFromUser(user: string): Promise<string> {
-    const fetchJSON = await mojangDataFromUser(user)
-    return fetchJSON.uuid.replace(/-/g, '')
+
+export async function profileFromUsername(username: string): Promise<MojangApiResponse> {
+	// since we don't care about anything other than the uuid, we can use /uuid/ instead of /user/
+
+	let fetchResponse: nodeFetch.Response
+
+	try {
+		fetchResponse = await fetch(
+			`https://api.mojang.com/users/profiles/minecraft/${username}`,
+			{ agent: () => httpsAgent }
+		)
+	} catch {
+		// if there's an error, wait a second and try again
+		await new Promise((resolve) => setTimeout(resolve, 1000))
+		return await profileFromUsername(username)
+	}
+
+	let data
+	try {
+		data = await fetchResponse.json()
+	} catch {
+		return { uuid: null, username: null }
+	}
+	return {
+		uuid: data.id,
+		username: data.name
+	}
 }
 
-/**
- * Fetch the username from a user
- * @param user A user can be either a uuid or a username 
- */
-export async function usernameFromUser(user: string): Promise<string> {
-    // get a minecraft uuid from a username, using ashcon.app's mojang api
-    const fetchJSON = await mojangDataFromUser(user)
-    return fetchJSON.username
-}
 
+export async function profileFromUser(user: string): Promise<MojangApiResponse> {
+	if (isUuid(user)) {
+		return await profileFromUuid(user)
+	} else
+		return await profileFromUsername(user)
+}

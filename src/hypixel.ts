@@ -185,8 +185,11 @@ export async function fetchMemberProfileUncached(playerUuid: string, profileUuid
 		null,
 		{ mainMemberUuid: playerUuid }
 	)
+
+	// queue updating the leaderboard positions for the member, eventually
 	for (const member of profile.members)
 		queueUpdateDatabaseMember(member, profile)
+
 	return profile
 }
 

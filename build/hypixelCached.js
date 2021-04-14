@@ -34,6 +34,7 @@ const node_cache_1 = __importDefault(require("node-cache"));
 const queue_promise_1 = __importDefault(require("queue-promise"));
 const _1 = require(".");
 // cache usernames for 4 hours
+/** uuid: username */
 const usernameCache = new node_cache_1.default({
     stdTTL: 60 * 60 * 4,
     checkperiod: 60,
@@ -87,7 +88,7 @@ function waitForCacheSet(cache, key, value) {
  */
 async function uuidFromUser(user) {
     // if the user is 32 characters long, it has to be a uuid
-    if (util_1.undashUuid(user).length === 32)
+    if (util_1.isUuid(user))
         return util_1.undashUuid(user);
     if (usernameCache.has(util_1.undashUuid(user))) {
         // check if the uuid is a key
@@ -115,7 +116,7 @@ async function uuidFromUser(user) {
     // set it as waitForCacheSet (a promise) in case uuidFromUser gets called while its fetching mojang
     usernameCache.set(util_1.undashUuid(user), waitForCacheSet(usernameCache, user, user));
     // not cached, actually fetch mojang api now
-    let { uuid, username } = await mojang.mojangDataFromUser(user);
+    let { uuid, username } = await mojang.profileFromUser(user);
     if (!uuid) {
         usernameCache.set(user, null);
         return;
@@ -140,7 +141,7 @@ async function usernameFromUser(user) {
     }
     if (_1.debug)
         console.log('Cache miss: usernameFromUser', user);
-    let { uuid, username } = await mojang.mojangDataFromUser(user);
+    let { uuid, username } = await mojang.profileFromUser(user);
     uuid = util_1.undashUuid(uuid);
     usernameCache.set(uuid, username);
     return username;

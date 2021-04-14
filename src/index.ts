@@ -1,16 +1,27 @@
+import { fetchAllLeaderboardsCategorized, fetchMemberLeaderboard, fetchMemberLeaderboardSpots } from './database'
 import { fetchMemberProfile, fetchUser } from './hypixel'
+import rateLimit from 'express-rate-limit'
 import express from 'express'
-import { fetchAllLeaderboardsCategorized, fetchMemberLeaderboard } from './database'
 
 const app = express()
 
 export const debug = false
 
+// 200 requests over 5 minutes
+const limiter = rateLimit({
+	windowMs: 60 * 1000 * 5,
+	max: 200,
+	skip: (req: express.Request) => {
+		return req.headers.key === process.env.key
+	},
+	keyGenerator: (req: express.Request) => {
+		return (req.headers['Cf-Connecting-Ip'] ?? req.ip).toString()
+	}
+})
 
-app.use((req: express.Request, res, next) => {
-	if (process.env.key && req.headers.key !== process.env.key)
-		// if a key is set in process.env and the header doesn't match return an error
-		return res.status(401).json({ error: 'Key in header must match key in env' })
+app.use(limiter)
+app.use((req, res, next) => {
+	res.setHeader('Access-Control-Allow-Origin', '*')
 	next()
 })
 
@@ -30,6 +41,12 @@ app.get('/player/:user', async(req, res) => {
 app.get('/player/:user/:profile', async(req, res) => {
 	res.json(
 		await fetchMemberProfile(req.params.user, req.params.profile)
+	)
+})
+
+app.get('/player/:user/:profile/leaderboards', async(req, res) => {
+	res.json(
+		await fetchMemberLeaderboardSpots(req.params.user, req.params.profile)
 	)
 })
 

@@ -8,6 +8,7 @@ const statCategories: { [ key: string ]: string[] | null } = { // sorted in orde
 
     'collection': ['collection_'],
     'skills': ['skill_'],
+    'slayer': ['slayer_'],
 
     'misc': null // everything else goes here
 }
@@ -59,22 +60,53 @@ export function categorizeStat(statNameRaw: string): StatCategory {
     }
 }
 
-export interface CleanProfileStats {
-    [ category: string ]: {
-        [ stat: string ]: any
-        total?: any
-    }
+export const statUnits = {
+	time: ['_best_time', '_best_time_2'],
+	date: ['first_join'],
+	coins: ['purse']
 }
 
-export function cleanProfileStats(data: any): CleanProfileStats {
+export interface StatItem {
+    rawName: string
+    value: number
+    categorizedName: string
+    category: string
+    unit: string
+}
+
+export function getStatUnit(name: string): string {
+	for (const [ unitName, statMatchers ] of Object.entries(statUnits)) {
+		for (const statMatch of statMatchers) {
+			let trailingEnd = statMatch[0] === '_'
+			let trailingStart = statMatch.substr(-1) === '_'
+			if (
+				(trailingStart && name.startsWith(statMatch))
+				|| (trailingEnd && name.endsWith(statMatch))
+				|| (name == statMatch)
+			)
+				return unitName
+		}
+	}
+}
+
+
+export function cleanProfileStats(data: any): StatItem[] {
     // TODO: add type for statsRaw (probably in hypixelApi.ts since its coming from there)
-    const stats: CleanProfileStats = {}
+    const stats: StatItem[] = []
+
     const rawStats = data?.stats ?? {}
+
     for (const statNameRaw in rawStats) {
         const statValue = rawStats[statNameRaw]
         let { category: statCategory, name: statName } = categorizeStat(statNameRaw)
-        if (!stats[statCategory]) stats[statCategory] = {}
-        stats[statCategory][statName || 'total'] = statValue
+        stats.push({
+            categorizedName: statName ?? 'total',
+            value: statValue,
+            rawName: statNameRaw,
+            category: statCategory,
+            unit: getStatUnit(statNameRaw) ?? null
+        })
     }
+
     return stats
 }
