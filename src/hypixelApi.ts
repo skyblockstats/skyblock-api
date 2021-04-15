@@ -125,7 +125,6 @@ export interface HypixelPlayer {
 	socialMedia?: HypixelPlayerSocialMedia
 }
 
-
 /** Send an HTTP request to the Hypixel API */
 export async function sendApiRequest({ path, key, args }): Promise<HypixelResponse> {
 	// Send a raw http request to api.hypixel.net, and return the parsed json

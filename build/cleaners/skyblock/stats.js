@@ -60,7 +60,8 @@ exports.categorizeStat = categorizeStat;
 exports.statUnits = {
     time: ['_best_time', '_best_time_2'],
     date: ['first_join'],
-    coins: ['purse']
+    coins: ['purse'],
+    leaderboards: ['leaderboards_count']
 };
 function getStatUnit(name) {
     for (const [unitName, statMatchers] of Object.entries(exports.statUnits)) {

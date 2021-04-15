@@ -155,6 +155,7 @@ async function fetchAllMemberLeaderboardAttributes() {
         'first_join',
         'purse',
         'visited_zones',
+        'leaderboards_count'
     ];
 }
 exports.fetchAllMemberLeaderboardAttributes = fetchAllMemberLeaderboardAttributes;
@@ -249,6 +250,13 @@ async function getApplicableAttributes(member) {
             applicableAttributes[leaderboard] = attributeValue;
         }
     }
+    let leaderboardsCount = Object.keys(applicableAttributes).length;
+    const leaderboardsCountRequirement = await getMemberLeaderboardRequirement('leaderboards_count');
+    if ((leaderboardsCountRequirement === null)
+        || (leaderboardsCount > leaderboardsCountRequirement)) {
+        // add 1 extra because this attribute also counts :)
+        applicableAttributes['leaderboards_count'] = leaderboardsCount;
+    }
     return applicableAttributes;
 }
 /** Update the member's leaderboard data on the server if applicable */
@@ -273,7 +281,7 @@ async function updateDatabaseMember(member, profile) {
         console.log('done constants..');
     const leaderboardAttributes = await getApplicableAttributes(member);
     if (_1.debug)
-        console.log('done getApplicableAttributes..', leaderboardAttributes);
+        console.log('done getApplicableAttributes..', leaderboardAttributes, member.username, profile.name);
     await memberLeaderboardsCollection.updateOne({
         uuid: member.uuid,
         profile: profile.uuid
@@ -288,7 +296,7 @@ async function updateDatabaseMember(member, profile) {
         const leaderboardReverse = isLeaderboardReversed(attributeName);
         const newRawLeaderboard = existingRawLeaderboard
             // remove the player from the leaderboard, if they're there
-            .filter(value => value.uuid !== member.uuid)
+            .filter(value => value.uuid !== member.uuid || value.profile !== profile.uuid)
             .concat([{
                 last_updated: new Date(),
                 stats: leaderboardAttributes,
@@ -354,7 +362,8 @@ connect().then(() => {
     // when it connects, cache the leaderboards and remove bad members
     removeBadMemberLeaderboardAttributes();
     // cache leaderboards on startup so its faster later on
-    fetchAllLeaderboards(true);
+    // fetchAllLeaderboards(true)
+    fetchAllLeaderboards(false);
     // cache leaderboard players again every 4 hours
     setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000);
 });

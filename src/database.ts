@@ -3,7 +3,7 @@
 */
 
 import { categorizeStat, getStatUnit } from './cleaners/skyblock/stats'
-import { CleanFullProfile } from './cleaners/skyblock/profile'
+import { CleanFullProfile, CleanProfile } from './cleaners/skyblock/profile'
 import { CleanMember } from './cleaners/skyblock/member'
 import { Collection, Db, MongoClient } from 'mongodb'
 import { CleanPlayer } from './cleaners/player'
@@ -119,7 +119,7 @@ function getMemberLeaderboardAttributes(member: CleanMember): StringNumber {
 
 
 export async function fetchAllLeaderboardsCategorized(): Promise<{ [ category: string ]: string[] }> {
-	const memberLeaderboardAttributes = await fetchAllMemberLeaderboardAttributes()
+	const memberLeaderboardAttributes: string[] = await fetchAllMemberLeaderboardAttributes()
 	const categorizedLeaderboards: { [ category: string ]: string[] } = {}
 	for (const leaderboard of memberLeaderboardAttributes) {
 		const { category } = categorizeStat(leaderboard)
@@ -175,6 +175,7 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 		'first_join',
 		'purse',
 		'visited_zones',
+		'leaderboards_count'
 	]
 }
 
@@ -221,6 +222,7 @@ interface Leaderboard {
 /** Fetch a leaderboard that ranks members, as opposed to profiles */
 export async function fetchMemberLeaderboard(name: string): Promise<Leaderboard> {
 	const leaderboardRaw = await fetchMemberLeaderboardRaw(name)
+
 	const fetchLeaderboardPlayer = async(item: DatabaseLeaderboardItem): Promise<LeaderboardItem> => {
 		return {
 			player: await cached.fetchBasicPlayer(item.uuid),
@@ -254,6 +256,7 @@ export async function fetchMemberLeaderboardSpots(player: string, profile: strin
 	for (const leaderboardName in applicableAttributes) {
 		const leaderboard = await fetchMemberLeaderboardRaw(leaderboardName)
 		const leaderboardPositionIndex = leaderboard.findIndex(i => i.uuid === fullMember.uuid && i.profile === fullProfile.uuid)
+
 		memberLeaderboardSpots.push({
 			name: leaderboardName,
 			positionIndex: leaderboardPositionIndex,
@@ -279,6 +282,7 @@ async function getMemberLeaderboardRequirement(name: string): Promise<number> {
 async function getApplicableAttributes(member: CleanMember): Promise<StringNumber> {
 	const leaderboardAttributes = getMemberLeaderboardAttributes(member)
 	const applicableAttributes = {}
+
 	for (const [ leaderboard, attributeValue ] of Object.entries(leaderboardAttributes)) {
 		const requirement = await getMemberLeaderboardRequirement(leaderboard)
 		const leaderboardReversed = isLeaderboardReversed(leaderboard)
@@ -289,6 +293,20 @@ async function getApplicableAttributes(member: CleanMember): Promise<StringNumbe
 			applicableAttributes[leaderboard] = attributeValue
 		}
 	}
+
+
+	let leaderboardsCount: number = Object.keys(applicableAttributes).length
+	const leaderboardsCountRequirement: number = await getMemberLeaderboardRequirement('leaderboards_count')
+
+	if (
+		(leaderboardsCountRequirement === null)
+		|| (leaderboardsCount > leaderboardsCountRequirement)
+	) {
+		// add 1 extra because this attribute also counts :)
+		applicableAttributes['leaderboards_count'] = leaderboardsCount
+	}
+
+
 	return applicableAttributes
 }
 
@@ -314,7 +332,7 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 
 	const leaderboardAttributes = await getApplicableAttributes(member)
 
-	if (debug) console.log('done getApplicableAttributes..', leaderboardAttributes)
+	if (debug) console.log('done getApplicableAttributes..', leaderboardAttributes, member.username, profile.name)
 
 	await memberLeaderboardsCollection.updateOne(
 		{
@@ -335,7 +353,7 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 		const leaderboardReverse = isLeaderboardReversed(attributeName)
 		const newRawLeaderboard = existingRawLeaderboard
 			// remove the player from the leaderboard, if they're there
-			.filter(value => value.uuid !== member.uuid)
+			.filter(value => value.uuid !== member.uuid || value.profile !== profile.uuid)
 			.concat([{
 				last_updated: new Date(),
 				stats: leaderboardAttributes,
@@ -365,8 +383,9 @@ export async function queueUpdateDatabaseMember(member: CleanMember, profile: Cl
  * Remove leaderboard attributes for members that wouldn't actually be on the leaderboard. This saves a lot of storage space
  */
 async function removeBadMemberLeaderboardAttributes(): Promise<void> {
-	const leaderboards = await fetchAllMemberLeaderboardAttributes()
+	const leaderboards: string[] = await fetchAllMemberLeaderboardAttributes()
 	// shuffle so if the application is restarting many times itll still be useful
+
 	for (const leaderboard of shuffle(leaderboards)) {
 		// wait 10 seconds so it doesnt use as much ram
 		await sleep(10 * 1000)
@@ -391,7 +410,7 @@ async function removeBadMemberLeaderboardAttributes(): Promise<void> {
 
 /** Fetch all the leaderboards, used for caching. Don't call this often! */
 async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
-	const leaderboards = await fetchAllMemberLeaderboardAttributes()
+	const leaderboards: string[] = await fetchAllMemberLeaderboardAttributes()
 
 	// shuffle so if the application is restarting many times itll still be useful
 	if (debug) console.log('Caching leaderboards!')
@@ -410,7 +429,8 @@ connect().then(() => {
 	// when it connects, cache the leaderboards and remove bad members
 	removeBadMemberLeaderboardAttributes()
 	// cache leaderboards on startup so its faster later on
-	fetchAllLeaderboards(true)
+	// fetchAllLeaderboards(true)
+	fetchAllLeaderboards(false)
 	// cache leaderboard players again every 4 hours
 	setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000)
 })
