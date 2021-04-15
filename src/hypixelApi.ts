@@ -125,6 +125,7 @@ export interface HypixelPlayer {
 	socialMedia?: HypixelPlayerSocialMedia
 }
 
+
 /** Send an HTTP request to the Hypixel API */
 export async function sendApiRequest({ path, key, args }): Promise<HypixelResponse> {
 	// Send a raw http request to api.hypixel.net, and return the parsed json
@@ -144,7 +145,6 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 			{ agent: () => httpsAgent }
 		)
 	} catch {
-		console.log('error in fetch :/')
 		// if there's an error, wait a second and try again
 		await new Promise((resolve) => setTimeout(resolve, 1000))
 		return await sendApiRequest({ path, key, args })

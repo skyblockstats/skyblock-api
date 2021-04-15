@@ -145,24 +145,14 @@ async function usernameFromUser(user) {
     return username;
 }
 exports.usernameFromUser = usernameFromUser;
-let fetchingPlayers = new Set();
 async function fetchPlayer(user) {
     const playerUuid = await uuidFromUser(user);
     if (playerCache.has(playerUuid))
         return playerCache.get(playerUuid);
-    // if it's already in the process of fetching, check every 100ms until it's not fetching the player anymore and fetch it again, since it'll be cached now
-    if (fetchingPlayers.has(playerUuid)) {
-        while (fetchingPlayers.has(playerUuid)) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-        }
-        return await fetchPlayer(user);
-    }
-    fetchingPlayers.add(playerUuid);
     const cleanPlayer = await hypixel.sendCleanApiRequest({
         path: 'player',
         args: { uuid: playerUuid }
     });
-    fetchingPlayers.delete(playerUuid);
     if (!cleanPlayer)
         return;
     // clone in case it gets modified somehow later
