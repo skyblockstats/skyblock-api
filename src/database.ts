@@ -293,7 +293,6 @@ async function getApplicableAttributes(member: CleanMember, profile: CleanProfil
 
 	let leaderboardsCount: number = Object.keys(applicableAttributes).length
 	const leaderboardsCountRequirement: number = await getMemberLeaderboardRequirement('leaderboards_count')
-	console.log(member.username, profile.name, leaderboardsCount)
 	if (
 		(leaderboardsCountRequirement === null)
 		|| (leaderboardsCount > leaderboardsCountRequirement)

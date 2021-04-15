@@ -252,7 +252,6 @@ async function getApplicableAttributes(member, profile) {
     }
     let leaderboardsCount = Object.keys(applicableAttributes).length;
     const leaderboardsCountRequirement = await getMemberLeaderboardRequirement('leaderboards_count');
-    console.log(member.username, profile.name, leaderboardsCount);
     if ((leaderboardsCountRequirement === null)
         || (leaderboardsCount > leaderboardsCountRequirement)) {
         // add 1 extra because this attribute also counts :)

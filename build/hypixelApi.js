@@ -53,7 +53,6 @@ async function sendApiRequest({ path, key, args }) {
     const fetchUrl = baseHypixelAPI + '/' + path + '?' + util_1.jsonToQuery(args);
     let fetchResponse;
     try {
-        console.log('fetch', path, args);
         fetchResponse = await node_fetch_1.default(fetchUrl, { agent: () => httpsAgent });
     }
     catch {

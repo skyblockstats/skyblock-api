@@ -143,10 +143,14 @@ export async function usernameFromUser(user: string): Promise<string> {
 	return username
 }
 
-let fetchingPlayers = new Set()
+let fetchingPlayers: Set<string> = new Set()
 
 export async function fetchPlayer(user: string): Promise<CleanPlayer> {
 	const playerUuid = await uuidFromUser(user)
+
+
+	if (playerCache.has(playerUuid))
+		return playerCache.get(playerUuid)
 
 	// if it's already in the process of fetching, check every 100ms until it's not fetching the player anymore and fetch it again, since it'll be cached now
 	if (fetchingPlayers.has(playerUuid)) {
@@ -158,13 +162,12 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer> {
 
 	fetchingPlayers.add(playerUuid)
 
-	if (playerCache.has(playerUuid))
-		return playerCache.get(playerUuid)
-
 	const cleanPlayer: CleanPlayer = await hypixel.sendCleanApiRequest({
 		path: 'player',
 		args: { uuid: playerUuid }
 	})
+
+	fetchingPlayers.delete(playerUuid)
 
 	if (!cleanPlayer) return
 
