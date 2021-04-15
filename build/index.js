@@ -19,7 +19,7 @@ const limiter = express_rate_limit_1.default({
     },
     keyGenerator: (req) => {
         var _a;
-        return ((_a = req.headers['Cf-Connecting-Ip']) !== null && _a !== void 0 ? _a : req.ip).toString();
+        return ((_a = req.headers['cf-connecting-ip']) !== null && _a !== void 0 ? _a : req.ip).toString();
     }
 });
 app.use(limiter);
