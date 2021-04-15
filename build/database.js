@@ -215,7 +215,7 @@ async function fetchMemberLeaderboardSpots(player, profile) {
     const fullMember = fullProfile.members.find(m => m.username.toLowerCase() === player.toLowerCase() || m.uuid === player);
     // update the leaderboard positions for the member
     await updateDatabaseMember(fullMember, fullProfile);
-    const applicableAttributes = await getApplicableAttributes(fullMember, fullProfile);
+    const applicableAttributes = await getApplicableAttributes(fullMember);
     const memberLeaderboardSpots = [];
     for (const leaderboardName in applicableAttributes) {
         const leaderboard = await fetchMemberLeaderboardRaw(leaderboardName);
@@ -239,7 +239,7 @@ async function getMemberLeaderboardRequirement(name) {
         return null;
 }
 /** Get the attributes for the member, but only ones that would put them on the top 100 for leaderboards */
-async function getApplicableAttributes(member, profile) {
+async function getApplicableAttributes(member) {
     const leaderboardAttributes = getMemberLeaderboardAttributes(member);
     const applicableAttributes = {};
     for (const [leaderboard, attributeValue] of Object.entries(leaderboardAttributes)) {
@@ -255,7 +255,7 @@ async function getApplicableAttributes(member, profile) {
     if ((leaderboardsCountRequirement === null)
         || (leaderboardsCount > leaderboardsCountRequirement)) {
         // add 1 extra because this attribute also counts :)
-        applicableAttributes['leaderboards_count'] = leaderboardsCount + 1;
+        applicableAttributes['leaderboards_count'] = leaderboardsCount;
     }
     return applicableAttributes;
 }
@@ -279,9 +279,9 @@ async function updateDatabaseMember(member, profile) {
     await constants.addSlayers(member.slayers.bosses.map(s => s.raw_name));
     if (_1.debug)
         console.log('done constants..');
-    const leaderboardAttributes = await getApplicableAttributes(member, profile);
+    const leaderboardAttributes = await getApplicableAttributes(member);
     if (_1.debug)
-        console.log('done getApplicableAttributes..', leaderboardAttributes);
+        console.log('done getApplicableAttributes..', leaderboardAttributes, member.username, profile.name);
     await memberLeaderboardsCollection.updateOne({
         uuid: member.uuid,
         profile: profile.uuid
@@ -296,7 +296,7 @@ async function updateDatabaseMember(member, profile) {
         const leaderboardReverse = isLeaderboardReversed(attributeName);
         const newRawLeaderboard = existingRawLeaderboard
             // remove the player from the leaderboard, if they're there
-            .filter(value => value.uuid !== member.uuid)
+            .filter(value => value.uuid !== member.uuid || value.profile !== profile.uuid)
             .concat([{
                 last_updated: new Date(),
                 stats: leaderboardAttributes,
@@ -362,7 +362,8 @@ connect().then(() => {
     // when it connects, cache the leaderboards and remove bad members
     removeBadMemberLeaderboardAttributes();
     // cache leaderboards on startup so its faster later on
-    fetchAllLeaderboards(true);
+    // fetchAllLeaderboards(true)
+    fetchAllLeaderboards(false);
     // cache leaderboard players again every 4 hours
     setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000);
 });
