@@ -52,8 +52,10 @@ async function sendApiRequest({ path, key, args }) {
     // Construct a url from the base api url, path, and arguments
     const fetchUrl = baseHypixelAPI + '/' + path + '?' + util_1.jsonToQuery(args);
     let fetchResponse;
+    let fetchJsonParsed;
     try {
         fetchResponse = await node_fetch_1.default(fetchUrl, { agent: () => httpsAgent });
+        fetchJsonParsed = await fetchResponse.json();
     }
     catch {
         // if there's an error, wait a second and try again
@@ -67,11 +69,12 @@ async function sendApiRequest({ path, key, args }) {
             limit: fetchResponse.headers['ratelimit-limit'],
             reset: Date.now() + parseInt(fetchResponse.headers['ratelimit-reset']) * 1000
         };
-    const fetchJsonParsed = await fetchResponse.json();
     if (fetchJsonParsed.throttle) {
         if (apiKeyUsage[key])
             apiKeyUsage[key].remaining = 0;
-        return { throttled: true };
+        // if it's throttled, wait 10 seconds and try again
+        await new Promise((resolve) => setTimeout(resolve, 10000));
+        return await sendApiRequest({ path, key, args });
     }
     return fetchJsonParsed;
 }
