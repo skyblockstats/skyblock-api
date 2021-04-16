@@ -161,7 +161,9 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 	if (fetchJsonParsed.throttle) {
 		if (apiKeyUsage[key])
 			apiKeyUsage[key].remaining = 0
-		return { throttled: true }
+		// if it's throttled, wait 10 seconds and try again
+		await new Promise((resolve) => setTimeout(resolve, 10000))
+		return await sendApiRequest({ path, key, args })
 	}
 	return fetchJsonParsed
 }
