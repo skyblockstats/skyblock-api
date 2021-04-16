@@ -151,6 +151,12 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 		return await sendApiRequest({ path, key, args })
 	}
 
+	// bruh
+	if (fetchJsonParsed.cause === 'This endpoint is currently disabled') {
+		await new Promise((resolve) => setTimeout(resolve, 30000))
+		return await sendApiRequest({ path, key, args })
+	}
+
 	if (fetchResponse.headers['ratelimit-limit'])
 		// remember how many uses it has
 		apiKeyUsage[key] = {
