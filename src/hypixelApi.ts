@@ -137,12 +137,14 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 	const fetchUrl = baseHypixelAPI + '/' + path + '?' + jsonToQuery(args)
 
 	let fetchResponse: nodeFetch.Response
+	let fetchJsonParsed: any
 
 	try {
 		fetchResponse = await fetch(
 			fetchUrl,
 			{ agent: () => httpsAgent }
 		)
+		fetchJsonParsed = await fetchResponse.json()
 	} catch {
 		// if there's an error, wait a second and try again
 		await new Promise((resolve) => setTimeout(resolve, 1000))
@@ -157,7 +159,6 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 			reset: Date.now() + parseInt(fetchResponse.headers['ratelimit-reset']) * 1000
 		}
 	
-	const fetchJsonParsed = await fetchResponse.json()
 	if (fetchJsonParsed.throttle) {
 		if (apiKeyUsage[key])
 			apiKeyUsage[key].remaining = 0
