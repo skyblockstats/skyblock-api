@@ -27,7 +27,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "express-rate-limit": "^5.2.6",
-    "mongodb": "^3.6.4",
+    "mongodb": "^3.6.6",
     "node-cache": "^5.1.2",
     "node-fetch": "^2.6.1",
     "prismarine-nbt": "^1.4.0",
