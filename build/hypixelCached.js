@@ -148,8 +148,8 @@ exports.usernameFromUser = usernameFromUser;
 let fetchingPlayers = new Set();
 async function fetchPlayer(user) {
     const playerUuid = await uuidFromUser(user);
-    if (playerCache.has(playerUuid))
-        return playerCache.get(playerUuid);
+    if (exports.playerCache.has(playerUuid))
+        return exports.playerCache.get(playerUuid);
     // if it's already in the process of fetching, check every 100ms until it's not fetching the player anymore and fetch it again, since it'll be cached now
     if (fetchingPlayers.has(playerUuid)) {
         while (fetchingPlayers.has(playerUuid)) {
