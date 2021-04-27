@@ -17,7 +17,7 @@ const httpsAgent = new Agent({
 
 
 /** This array should only ever contain one item because using multiple hypixel api keys isn't allowed :) */ 
-const apiKeys = process.env.hypixel_keys.split(' ')
+const apiKeys = process.env?.hypixel_keys?.split(' ') ?? []
 
 interface KeyUsage {
 	remaining: number
@@ -137,15 +137,23 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 	const fetchUrl = baseHypixelAPI + '/' + path + '?' + jsonToQuery(args)
 
 	let fetchResponse: nodeFetch.Response
+	let fetchJsonParsed: any
 
 	try {
 		fetchResponse = await fetch(
 			fetchUrl,
 			{ agent: () => httpsAgent }
 		)
+		fetchJsonParsed = await fetchResponse.json()
 	} catch {
 		// if there's an error, wait a second and try again
 		await new Promise((resolve) => setTimeout(resolve, 1000))
+		return await sendApiRequest({ path, key, args })
+	}
+
+	// bruh
+	if (fetchJsonParsed.cause === 'This endpoint is currently disabled') {
+		await new Promise((resolve) => setTimeout(resolve, 30000))
 		return await sendApiRequest({ path, key, args })
 	}
 
@@ -157,11 +165,12 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 			reset: Date.now() + parseInt(fetchResponse.headers['ratelimit-reset']) * 1000
 		}
 	
-	const fetchJsonParsed = await fetchResponse.json()
 	if (fetchJsonParsed.throttle) {
 		if (apiKeyUsage[key])
 			apiKeyUsage[key].remaining = 0
-		return { throttled: true }
+		// if it's throttled, wait 10 seconds and try again
+		await new Promise((resolve) => setTimeout(resolve, 10000))
+		return await sendApiRequest({ path, key, args })
 	}
 	return fetchJsonParsed
 }

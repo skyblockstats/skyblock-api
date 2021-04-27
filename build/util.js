@@ -3,21 +3,11 @@
  * Random utility functions that are not related to Hypixel
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isUuid = exports.sleep = exports.colorCodeFromName = exports.minecraftColorCodes = exports.shuffle = exports.jsonToQuery = exports.queryToJson = exports.undashUuid = void 0;
+exports.isUuid = exports.sleep = exports.colorCodeFromName = exports.minecraftColorCodes = exports.shuffle = exports.jsonToQuery = exports.undashUuid = void 0;
 function undashUuid(uuid) {
     return uuid.replace(/-/g, '').toLowerCase();
 }
 exports.undashUuid = undashUuid;
-function queryToJson(queryString) {
-    const query = {};
-    const pairs = (queryString[0] === '?' ? queryString.substr(1) : queryString).split('&');
-    for (let i = 0; i < pairs.length; i++) {
-        const pair = pairs[i].split('=');
-        query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
-    }
-    return query;
-}
-exports.queryToJson = queryToJson;
 function jsonToQuery(data) {
     return Object.entries(data || {}).map(e => e.join('=')).join('&');
 }

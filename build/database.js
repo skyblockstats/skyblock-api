@@ -358,12 +358,14 @@ async function fetchAllLeaderboards(fast) {
     if (_1.debug)
         console.log('Finished caching leaderboards!');
 }
-connect().then(() => {
-    // when it connects, cache the leaderboards and remove bad members
-    removeBadMemberLeaderboardAttributes();
-    // cache leaderboards on startup so its faster later on
-    // fetchAllLeaderboards(true)
-    fetchAllLeaderboards(false);
-    // cache leaderboard players again every 4 hours
-    setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000);
-});
+// make sure it's not in a test
+if (typeof global.it !== 'function') {
+    connect().then(() => {
+        // when it connects, cache the leaderboards and remove bad members
+        removeBadMemberLeaderboardAttributes();
+        // cache leaderboards on startup so its faster later on
+        fetchAllLeaderboards(true);
+        // cache leaderboard players again every 4 hours
+        setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000);
+    });
+}

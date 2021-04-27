@@ -19,7 +19,7 @@ const limiter = express_rate_limit_1.default({
     },
     keyGenerator: (req) => {
         var _a;
-        return ((_a = req.headers['Cf-Connecting-Ip']) !== null && _a !== void 0 ? _a : req.ip).toString();
+        return ((_a = req.headers['cf-connecting-ip']) !== null && _a !== void 0 ? _a : req.ip).toString();
     }
 });
 app.use(limiter);
@@ -45,4 +45,6 @@ app.get('/leaderboard/:name', async (req, res) => {
 app.get('/leaderboards', async (req, res) => {
     res.json(await database_1.fetchAllLeaderboardsCategorized());
 });
-app.listen(8080, () => console.log('App started :)'));
+// only run the server if it's not doing tests
+if (typeof global.it !== 'function')
+    app.listen(8080, () => console.log('App started :)'));
