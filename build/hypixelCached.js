@@ -25,7 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchProfileName = exports.fetchProfile = exports.fetchProfileUuid = exports.fetchSkyblockProfiles = exports.fetchBasicPlayer = exports.fetchPlayer = exports.usernameFromUser = exports.uuidFromUser = void 0;
+exports.fetchProfileName = exports.fetchProfile = exports.fetchProfileUuid = exports.fetchSkyblockProfiles = exports.fetchBasicPlayer = exports.fetchPlayer = exports.usernameFromUser = exports.uuidFromUser = exports.clearCaches = void 0;
 const node_cache_1 = __importDefault(require("node-cache"));
 const mojang = __importStar(require("./mojang"));
 const hypixel = __importStar(require("./hypixel"));
@@ -69,6 +69,16 @@ const profileNameCache = new node_cache_1.default({
     checkperiod: 60,
     useClones: false,
 });
+/** Clear all the current caches */
+function clearCaches() {
+    usernameCache.flushAll();
+    basicProfilesCache.flushAll();
+    playerCache.flushAll();
+    basicPlayerCache.flushAll();
+    profileCache.flushAll();
+    profileNameCache.flushAll();
+}
+exports.clearCaches = clearCaches;
 function waitForCacheSet(cache, key, value) {
     return new Promise((resolve, reject) => {
         const listener = (setKey, setValue) => {

@@ -55,6 +55,16 @@ const profileNameCache = new NodeCache({
 	useClones: false,
 })
 
+/** Clear all the current caches */
+export function clearCaches() {
+	usernameCache.flushAll()
+	basicProfilesCache.flushAll()
+	playerCache.flushAll()
+	basicPlayerCache.flushAll()
+	profileCache.flushAll()
+	profileNameCache.flushAll()
+}
+
 interface KeyValue {
 	key: any
 	value: any

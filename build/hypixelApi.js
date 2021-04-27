@@ -2,6 +2,7 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendApiRequest = exports.chooseApiKey = void 0;
 /**
@@ -18,7 +19,7 @@ const httpsAgent = new https_1.Agent({
     keepAlive: true
 });
 /** This array should only ever contain one item because using multiple hypixel api keys isn't allowed :) */
-const apiKeys = process.env.hypixel_keys.split(' ');
+const apiKeys = (_c = (_b = (_a = process.env) === null || _a === void 0 ? void 0 : _a.hypixel_keys) === null || _b === void 0 ? void 0 : _b.split(' ')) !== null && _c !== void 0 ? _c : [];
 const apiKeyUsage = {};
 const baseHypixelAPI = 'https://api.hypixel.net';
 /** Choose the best current API key */
