@@ -11,6 +11,8 @@ const path = require('path')
 
 const cachedJsonData = {}
 
+let requestsSent = 0
+
 async function readJsonData(dir) {
 	if (cachedJsonData[dir])
 		return cachedJsonData[dir]
@@ -22,6 +24,7 @@ async function readJsonData(dir) {
 }
 
 hypixelApi.sendApiRequest = async ({ path, key, args }) => {
+	requestsSent ++
 	switch (path) {
 		case 'player': {
 			return await readJsonData(`player/${args.uuid}`)
@@ -32,13 +35,16 @@ hypixelApi.sendApiRequest = async ({ path, key, args }) => {
 	}
 	console.log(path, args)
 }
+
 mojang.profileFromUuid = async (uuid) => {
+	requestsSent ++
 	const uuidToUsername = await readJsonData('mojang')
 	const undashedUuid = undashUuid(uuid)
 	const username = uuidToUsername[undashUuid(undashedUuid)]
 	return { username, uuid: undashedUuid }
 }
 mojang.profileFromUsername = async (username) => {
+	requestsSent ++
 	const uuidToUsername = await readJsonData('mojang')
 	const uuid = Object.keys(uuidToUsername).find(uuid => uuidToUsername[uuid] === username)
 	return { username, uuid }
@@ -59,6 +65,7 @@ function resetState() {
 	hypixelCached.basicPlayerCache.flushAll()
 	hypixelCached.profileCache.flushAll()
 	hypixelCached.profileNameCache.flushAll()
+	requestsSent = 0
 }
 
 describe('util', () => {
@@ -98,8 +105,33 @@ describe('util', () => {
 })
 
 describe('hypixel', () => {
+	describe('#fetchBasicPlayer()', () => {
+		it('Checks user uuid and username', async() => {
+			resetState()
+			const user = await hypixelCached.fetchBasicPlayer('py5')
+			assert.strictEqual(user.uuid, '6536bfed869548fd83a1ecd24cf2a0fd')
+			assert.strictEqual(user.username, 'py5')
+		})
+		it('Checks the player\'s rank', async() => {
+			resetState()
+			const user = await hypixelCached.fetchBasicPlayer('py5')
+			assert.strictEqual(user.rank.name, 'MVP+')
+			assert.strictEqual(user.rank.color, '#3ffefe')
+			assert.strictEqual(user.rank.colored, '§b[MVP§2+§b]')
+		})
+		it('Makes sure caching works properly', async() => {
+			resetState()
+			await hypixelCached.fetchBasicPlayer('py5')
+			// 1 request to mojang, 1 request to hypixel
+			assert.strictEqual(requestsSent, 2)
+			await hypixelCached.fetchBasicPlayer('py5')
+			// since it's caching, it should still be 2 requests
+			assert.strictEqual(requestsSent, 2)
+		})
+	})
+
 	describe('#fetchUser()', () => {
-		it('Make sure user exists', async() => {
+		it('Makes sure user.player exists', async() => {
 			resetState()
 			const user = await hypixel.fetchUser(
 				{ user: 'py5' },
