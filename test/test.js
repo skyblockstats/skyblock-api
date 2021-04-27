@@ -8,8 +8,6 @@ const mojang = require('../build/mojang')
 const fs = require('fs')
 const path = require('path')
 
-process.env.db_uri = null
-process.env.db_name = null
 
 const cachedJsonData = {}
 
@@ -23,7 +21,7 @@ async function readJsonData(dir) {
 	return parsedData
 }
 
-hypixelApi.sendApiRequest = async({ path, key, args }) => {
+hypixelApi.sendApiRequest = async ({ path, key, args }) => {
 	switch (path) {
 		case 'player': {
 			return await readJsonData(`player/${args.uuid}`)
@@ -34,13 +32,33 @@ hypixelApi.sendApiRequest = async({ path, key, args }) => {
 	}
 	console.log(path, args)
 }
-mojang.profileFromUuid = async(uuid) => {
+mojang.profileFromUuid = async (uuid) => {
 	const uuidToUsername = await readJsonData('mojang')
-	return uuidToUsername[undashUuid(uuid)]
+	const undashedUuid = undashUuid(uuid)
+	const username = uuidToUsername[undashUuid(undashedUuid)]
+	return { username, uuid: undashedUuid }
 }
-mojang.profileFromUsername = async(username) => {
+mojang.profileFromUsername = async (username) => {
 	const uuidToUsername = await readJsonData('mojang')
-	return uuidToUsername.find(uuid => uuidToUsername[uuid] === username)
+	const uuid = Object.keys(uuidToUsername).find(uuid => uuidToUsername[uuid] === username)
+	return { username, uuid }
+}
+mojang.profileFromUser = async (user) => {
+	if (util.isUuid(user))
+		return await mojang.profileFromUuid(user)
+	else
+		return await mojang.profileFromUsername(user)
+}
+
+
+/** Clear all the current caches and stuff */
+function resetState() {
+	hypixelCached.usernameCache.flushAll()
+	hypixelCached.basicProfilesCache.flushAll()
+	hypixelCached.playerCache.flushAll()
+	hypixelCached.basicPlayerCache.flushAll()
+	hypixelCached.profileCache.flushAll()
+	hypixelCached.profileNameCache.flushAll()
 }
 
 describe('util', () => {
@@ -82,7 +100,7 @@ describe('util', () => {
 describe('hypixel', () => {
 	describe('#fetchUser()', () => {
 		it('Make sure user exists', async() => {
-			hypixelCached.clearCaches()
+			resetState()
 			const user = await hypixel.fetchUser(
 				{ user: 'py5' },
 				['profiles', 'player']
