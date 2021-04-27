@@ -63,5 +63,6 @@ app.get('/leaderboards', async(req, res) => {
 })
 
 
-
-app.listen(8080, () => console.log('App started :)'))
+// only run the server if it's not doing tests
+if (typeof global.it !== 'function')
+	app.listen(8080, () => console.log('App started :)'))
