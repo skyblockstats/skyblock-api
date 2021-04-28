@@ -25,7 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchProfileName = exports.fetchProfile = exports.fetchProfileUuid = exports.fetchSkyblockProfiles = exports.fetchBasicPlayer = exports.fetchPlayer = exports.usernameFromUser = exports.uuidFromUser = exports.profileNameCache = exports.profilesCache = exports.profileCache = exports.basicPlayerCache = exports.playerCache = exports.basicProfilesCache = exports.usernameCache = void 0;
+exports.fetchProfileName = exports.fetchBasicProfileFromUuid = exports.fetchProfile = exports.fetchProfileUuid = exports.fetchSkyblockProfiles = exports.fetchBasicPlayer = exports.fetchPlayer = exports.usernameFromUser = exports.uuidFromUser = exports.profileNameCache = exports.profilesCache = exports.profileCache = exports.basicPlayerCache = exports.playerCache = exports.basicProfilesCache = exports.usernameCache = void 0;
 const node_cache_1 = __importDefault(require("node-cache"));
 const mojang = __importStar(require("./mojang"));
 const hypixel = __importStar(require("./hypixel"));
@@ -180,6 +180,8 @@ async function fetchBasicPlayer(user) {
     if (exports.basicPlayerCache.has(playerUuid))
         return exports.basicPlayerCache.get(playerUuid);
     const player = await fetchPlayer(playerUuid);
+    if (!player)
+        console.log(user);
     delete player.profiles;
     return player;
 }
@@ -286,6 +288,32 @@ async function fetchProfile(user, profile) {
     return cleanProfile;
 }
 exports.fetchProfile = fetchProfile;
+/**
+ * Fetch a CleanProfile from the uuid
+ * @param profileUuid A profile name or profile uuid
+*/
+async function fetchBasicProfileFromUuid(profileUuid) {
+    if (exports.profileCache.has(profileUuid)) {
+        // we have the profile cached, return it :)
+        if (_1.debug)
+            console.log('Cache hit! fetchBasicProfileFromUuid', profileUuid);
+        const profile = exports.profileCache.get(profileUuid);
+        return {
+            uuid: profile.uuid,
+            members: profile.members.map(m => ({
+                uuid: m.uuid,
+                username: m.username,
+                last_save: m.last_save,
+                first_join: m.first_join,
+                rank: m.rank,
+            })),
+            name: profile.name
+        };
+    }
+    // TODO: cache this
+    return await hypixel.fetchBasicProfileFromUuidUncached(profileUuid);
+}
+exports.fetchBasicProfileFromUuid = fetchBasicProfileFromUuid;
 /**
  * Fetch the name of a profile from the user and profile uuid
  * @param user A player uuid or username

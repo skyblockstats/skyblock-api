@@ -22,7 +22,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchMemberProfilesUncached = exports.fetchMemberProfileUncached = exports.fetchMemberProfile = exports.fetchUser = exports.sendCleanApiRequest = exports.maxMinion = exports.saveInterval = void 0;
+exports.fetchMemberProfilesUncached = exports.fetchBasicProfileFromUuidUncached = exports.fetchMemberProfileUncached = exports.fetchMemberProfile = exports.fetchUser = exports.sendCleanApiRequest = exports.maxMinion = exports.saveInterval = void 0;
 const player_1 = require("./cleaners/player");
 const hypixelApi_1 = require("./hypixelApi");
 const cached = __importStar(require("./hypixelCached"));
@@ -159,9 +159,23 @@ async function fetchMemberProfileUncached(playerUuid, profileUuid) {
     // queue updating the leaderboard positions for the member, eventually
     for (const member of profile.members)
         database_1.queueUpdateDatabaseMember(member, profile);
+    database_1.queueUpdateDatabaseProfile(profile);
     return profile;
 }
 exports.fetchMemberProfileUncached = fetchMemberProfileUncached;
+/**
+ * Fetches the Hypixel API to get a CleanProfile from its id. This doesn't do any caching and you should use hypixelCached.fetchBasicProfileFromUuid instead
+ * @param playerUuid The UUID of the Minecraft player
+ * @param profileUuid The UUID of the Hypixel SkyBlock profile
+ */
+async function fetchBasicProfileFromUuidUncached(profileUuid) {
+    const profile = await sendCleanApiRequest({
+        path: 'skyblock/profile',
+        args: { profile: profileUuid }
+    }, null, { basic: true });
+    return profile;
+}
+exports.fetchBasicProfileFromUuidUncached = fetchBasicProfileFromUuidUncached;
 async function fetchMemberProfilesUncached(playerUuid) {
     const profiles = await sendCleanApiRequest({
         path: 'skyblock/profiles',
@@ -176,6 +190,7 @@ async function fetchMemberProfilesUncached(playerUuid) {
         for (const member of profile.members) {
             database_1.queueUpdateDatabaseMember(member, profile);
         }
+        database_1.queueUpdateDatabaseProfile(profile);
     }
     return profiles;
 }

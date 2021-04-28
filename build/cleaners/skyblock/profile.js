@@ -31,9 +31,19 @@ async function cleanSkyblockProfileResponse(data, options) {
     for (const memberUUID in data.members) {
         const memberRaw = data.members[memberUUID];
         memberRaw.uuid = memberUUID;
-        promises.push(member_1.cleanSkyBlockProfileMemberResponse(memberRaw, ['stats', (options === null || options === void 0 ? void 0 : options.mainMemberUuid) === memberUUID ? 'inventories' : undefined]));
+        promises.push(member_1.cleanSkyBlockProfileMemberResponse(memberRaw, [
+            !(options === null || options === void 0 ? void 0 : options.basic) ? 'stats' : undefined,
+            (options === null || options === void 0 ? void 0 : options.mainMemberUuid) === memberUUID ? 'inventories' : undefined
+        ]));
     }
     const cleanedMembers = (await Promise.all(promises)).filter(m => m !== null && m !== undefined);
+    if (options === null || options === void 0 ? void 0 : options.basic) {
+        return {
+            uuid: data.profile_id,
+            name: data.cute_name,
+            members: cleanedMembers,
+        };
+    }
     const memberMinions = [];
     for (const member of cleanedMembers) {
         memberMinions.push(member.minions);

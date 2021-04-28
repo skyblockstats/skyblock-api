@@ -1,3 +1,4 @@
+// maybe todo?: create a fast replacement for prismarine-nbt
 import * as nbt from 'prismarine-nbt'
 
 function base64decode(base64: string): Buffer {

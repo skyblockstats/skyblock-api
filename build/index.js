@@ -40,7 +40,13 @@ app.get('/player/:user/:profile/leaderboards', async (req, res) => {
     res.json(await database_1.fetchMemberLeaderboardSpots(req.params.user, req.params.profile));
 });
 app.get('/leaderboard/:name', async (req, res) => {
-    res.json(await database_1.fetchMemberLeaderboard(req.params.name));
+    try {
+        res.json(await database_1.fetchLeaderboard(req.params.name));
+    }
+    catch (err) {
+        console.error(err);
+        res.json({ 'error': err.toString() });
+    }
 });
 app.get('/leaderboards', async (req, res) => {
     res.json(await database_1.fetchAllLeaderboardsCategorized());
