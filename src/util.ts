@@ -6,16 +6,6 @@ export function undashUuid(uuid: string): string {
 	return uuid.replace(/-/g, '').toLowerCase()
 }
 
-export function queryToJson(queryString): { [ key: string ]: string } {
-    const query = {}
-    const pairs = (queryString[0] === '?' ? queryString.substr(1) : queryString).split('&')
-    for (let i = 0; i < pairs.length; i++) {
-        const pair = pairs[i].split('=')
-        query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '')
-    }
-    return query
-}
-
 
 export function jsonToQuery(data): string {
     return Object.entries(data || {}).map(e => e.join('=')).join('&')

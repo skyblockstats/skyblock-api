@@ -12,48 +12,49 @@ import { debug } from '.'
 
 // cache usernames for 4 hours
 /** uuid: username */
-const usernameCache = new NodeCache({
+export const usernameCache = new NodeCache({
 	stdTTL: 60 * 60 * 4,
 	checkperiod: 60,
 	useClones: false,
 })
 
-const basicProfilesCache = new NodeCache({
+export const basicProfilesCache = new NodeCache({
 	stdTTL: 60 * 10,
 	checkperiod: 60,
 	useClones: true,
 })
 
-const playerCache = new NodeCache({
+export const playerCache = new NodeCache({
 	stdTTL: 60,
 	checkperiod: 10,
 	useClones: true,
 })
 
 // cache "basic players" (players without profiles) for 4 hours
-const basicPlayerCache = new NodeCache({
+export const basicPlayerCache = new NodeCache({
 	stdTTL: 60 * 60 * 4,
 	checkperiod: 60 * 10,
 	useClones: true
 })
 
-const profileCache = new NodeCache({
+export const profileCache = new NodeCache({
 	stdTTL: 30,
 	checkperiod: 10,
 	useClones: true,
 })
 
-const profilesCache = new NodeCache({
+export const profilesCache = new NodeCache({
 	stdTTL: 60 * 3,
 	checkperiod: 10,
 	useClones: false,
 })
 
-const profileNameCache = new NodeCache({
+export const profileNameCache = new NodeCache({
 	stdTTL: 60 * 60,
 	checkperiod: 60,
 	useClones: false,
 })
+
 
 interface KeyValue {
 	key: any
@@ -190,6 +191,8 @@ export async function fetchBasicPlayer(user: string): Promise<CleanPlayer> {
 		return basicPlayerCache.get(playerUuid)
 	
 	const player = await fetchPlayer(playerUuid)
+	if (!player) console.log(user)
+
 	delete player.profiles
 	return player
 }
@@ -309,6 +312,32 @@ export async function fetchProfile(user: string, profile: string): Promise<Clean
 
 	return cleanProfile
 }
+
+/**
+ * Fetch a CleanProfile from the uuid
+ * @param profileUuid A profile name or profile uuid
+*/
+export async function fetchBasicProfileFromUuid(profileUuid: string): Promise<CleanProfile> {
+	if (profileCache.has(profileUuid)) {
+		// we have the profile cached, return it :)
+		if (debug) console.log('Cache hit! fetchBasicProfileFromUuid', profileUuid)
+		const profile: CleanFullProfile = profileCache.get(profileUuid)
+		return {
+			uuid: profile.uuid,
+			members: profile.members.map(m => ({
+				uuid: m.uuid,
+				username: m.username,
+				last_save: m.last_save,
+				first_join: m.first_join,
+				rank: m.rank,
+			})),
+			name: profile.name
+		}
+	}
+	// TODO: cache this
+	return await hypixel.fetchBasicProfileFromUuidUncached(profileUuid)
+}
+
 
 /**
  * Fetch the name of a profile from the user and profile uuid

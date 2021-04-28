@@ -20,6 +20,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cleanInventories = exports.INVENTORIES = exports.cleanInventory = void 0;
+// maybe todo?: create a fast replacement for prismarine-nbt
 const nbt = __importStar(require("prismarine-nbt"));
 function base64decode(base64) {
     return Buffer.from(base64, 'base64');

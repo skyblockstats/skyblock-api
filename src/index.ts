@@ -1,4 +1,4 @@
-import { fetchAllLeaderboardsCategorized, fetchMemberLeaderboard, fetchMemberLeaderboardSpots } from './database'
+import { fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots } from './database'
 import { fetchMemberProfile, fetchUser } from './hypixel'
 import rateLimit from 'express-rate-limit'
 import express from 'express'
@@ -51,9 +51,14 @@ app.get('/player/:user/:profile/leaderboards', async(req, res) => {
 })
 
 app.get('/leaderboard/:name', async(req, res) => {
-	res.json(
-		await fetchMemberLeaderboard(req.params.name)
-	)
+	try {
+		res.json(
+			await fetchLeaderboard(req.params.name)
+		)
+	} catch (err) {
+		console.error(err)
+		res.json({ 'error': err.toString() })
+	}
 })
 
 app.get('/leaderboards', async(req, res) => {
@@ -63,5 +68,6 @@ app.get('/leaderboards', async(req, res) => {
 })
 
 
-
-app.listen(8080, () => console.log('App started :)'))
+// only run the server if it's not doing tests
+if (typeof global.it !== 'function')
+	app.listen(8080, () => console.log('App started :)'))

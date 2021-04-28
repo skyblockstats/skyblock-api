@@ -50,7 +50,7 @@ export async function cleanSkyBlockProfileMemberResponseBasic(member: any, inclu
 /** Cleans up a member (from skyblock/profile) */
 export async function cleanSkyBlockProfileMemberResponse(member, included: Included[] = null): Promise<CleanMember> {
 	// profiles.members[]
-	const inventoriesIncluded = included == null || included.includes('inventories')
+	const inventoriesIncluded = included === null || included.includes('inventories')
 	const player = await cached.fetchPlayer(member.uuid)
 	if (!player) return
 	return {

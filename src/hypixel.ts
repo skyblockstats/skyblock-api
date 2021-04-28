@@ -9,7 +9,7 @@ import { CleanBasicMember, CleanMemberProfile } from './cleaners/skyblock/member
 import { cleanSkyblockProfileResponse, CleanProfile, CleanBasicProfile, CleanFullProfile, CleanFullProfileBasicMembers } from './cleaners/skyblock/profile'
 import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles'
 import { debug } from '.'
-import { queueUpdateDatabaseMember } from './database'
+import { queueUpdateDatabaseMember, queueUpdateDatabaseProfile } from './database'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories'
 
@@ -25,6 +25,8 @@ export const maxMinion = 11
 
 export interface ApiOptions {
 	mainMemberUuid?: string
+	/** Only get the most basic information, like uuids and names */
+	basic?: boolean
 }
 
 /** Sends an API request to Hypixel and cleans it up. */
@@ -174,7 +176,7 @@ export async function fetchMemberProfile(user: string, profile: string): Promise
  * @param playerUuid The UUID of the Minecraft player
  * @param profileUuid The UUID of the Hypixel SkyBlock profile
  */
-export async function fetchMemberProfileUncached(playerUuid: string, profileUuid: string): Promise<CleanFullProfile> {
+ export async function fetchMemberProfileUncached(playerUuid: string, profileUuid: string): Promise<CleanFullProfile> {
 	const profile: CleanFullProfile = await sendCleanApiRequest(
 		{
 			path: 'skyblock/profile',
@@ -187,6 +189,25 @@ export async function fetchMemberProfileUncached(playerUuid: string, profileUuid
 	// queue updating the leaderboard positions for the member, eventually
 	for (const member of profile.members)
 		queueUpdateDatabaseMember(member, profile)
+	queueUpdateDatabaseProfile(profile)
+
+	return profile
+}
+
+/**
+ * Fetches the Hypixel API to get a CleanProfile from its id. This doesn't do any caching and you should use hypixelCached.fetchBasicProfileFromUuid instead
+ * @param playerUuid The UUID of the Minecraft player
+ * @param profileUuid The UUID of the Hypixel SkyBlock profile
+ */
+ export async function fetchBasicProfileFromUuidUncached(profileUuid: string): Promise<CleanProfile> {
+	const profile: CleanFullProfile = await sendCleanApiRequest(
+		{
+			path: 'skyblock/profile',
+			args: { profile: profileUuid }
+		},
+		null,
+		{ basic: true }
+	)
 
 	return profile
 }
@@ -208,6 +229,7 @@ export async function fetchMemberProfilesUncached(playerUuid: string): Promise<C
 		for (const member of profile.members) {
 			queueUpdateDatabaseMember(member, profile)
 		}
+		queueUpdateDatabaseProfile(profile)
 	}
 	return profiles
 }
