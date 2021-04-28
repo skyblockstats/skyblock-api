@@ -191,6 +191,8 @@ export async function fetchBasicPlayer(user: string): Promise<CleanPlayer> {
 		return basicPlayerCache.get(playerUuid)
 	
 	const player = await fetchPlayer(playerUuid)
+	if (!player) console.log(user)
+
 	delete player.profiles
 	return player
 }
@@ -310,6 +312,32 @@ export async function fetchProfile(user: string, profile: string): Promise<Clean
 
 	return cleanProfile
 }
+
+/**
+ * Fetch a CleanProfile from the uuid
+ * @param profileUuid A profile name or profile uuid
+*/
+export async function fetchBasicProfileFromUuid(profileUuid: string): Promise<CleanProfile> {
+	if (profileCache.has(profileUuid)) {
+		// we have the profile cached, return it :)
+		if (debug) console.log('Cache hit! fetchBasicProfileFromUuid', profileUuid)
+		const profile: CleanFullProfile = profileCache.get(profileUuid)
+		return {
+			uuid: profile.uuid,
+			members: profile.members.map(m => ({
+				uuid: m.uuid,
+				username: m.username,
+				last_save: m.last_save,
+				first_join: m.first_join,
+				rank: m.rank,
+			})),
+			name: profile.name
+		}
+	}
+	// TODO: cache this
+	return await hypixel.fetchBasicProfileFromUuidUncached(profileUuid)
+}
+
 
 /**
  * Fetch the name of a profile from the user and profile uuid

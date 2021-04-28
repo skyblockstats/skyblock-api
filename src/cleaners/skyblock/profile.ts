@@ -45,7 +45,7 @@ export async function cleanSkyblockProfileResponseLighter(data): Promise<CleanPr
 /**
  * This function is somewhat costly and shouldn't be called often. Use cleanSkyblockProfileResponseLighter if you don't need all the data
  */
-export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptions): Promise<CleanFullProfile> {
+export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptions): Promise<CleanFullProfile|CleanProfile> {
     // We use Promise.all so it can fetch all the users at once instead of waiting for the previous promise to complete
     const promises: Promise<CleanMember>[] = []
     
@@ -54,11 +54,22 @@ export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptio
         memberRaw.uuid = memberUUID
         promises.push(cleanSkyBlockProfileMemberResponse(
             memberRaw,
-            ['stats', options?.mainMemberUuid === memberUUID ? 'inventories' : undefined]
+            [
+                !options?.basic ? 'stats' : undefined,
+                options?.mainMemberUuid === memberUUID ? 'inventories' : undefined
+            ]
         ))
     }
 
     const cleanedMembers: CleanMember[] = (await Promise.all(promises)).filter(m => m !== null && m !== undefined)
+
+    if (options.basic) {
+        return {
+            uuid: data.profile_id,
+            name: data.cute_name,
+            members: cleanedMembers,
+        }
+    }
 
     const memberMinions: CleanMinion[][] = []
 
