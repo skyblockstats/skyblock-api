@@ -37,7 +37,7 @@ async function cleanSkyblockProfileResponse(data, options) {
         ]));
     }
     const cleanedMembers = (await Promise.all(promises)).filter(m => m !== null && m !== undefined);
-    if (options.basic) {
+    if (options === null || options === void 0 ? void 0 : options.basic) {
         return {
             uuid: data.profile_id,
             name: data.cute_name,

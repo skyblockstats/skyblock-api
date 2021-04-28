@@ -63,7 +63,7 @@ export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptio
 
     const cleanedMembers: CleanMember[] = (await Promise.all(promises)).filter(m => m !== null && m !== undefined)
 
-    if (options.basic) {
+    if (options?.basic) {
         return {
             uuid: data.profile_id,
             name: data.cute_name,
