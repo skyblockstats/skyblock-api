@@ -261,7 +261,6 @@ async function fetchProfileLeaderboardRaw(name: string): Promise<DatabaseProfile
 		.sort(sortQuery)
 		.limit(leaderboardMax)
 		.toArray()
-	console.log('leaderboardRaw', leaderboardRaw)
 
 	cachedRawLeaderboards.set(name, leaderboardRaw)
 	return leaderboardRaw
@@ -333,7 +332,6 @@ export async function fetchProfileLeaderboard(name: string): Promise<ProfileLead
 /** Fetch a leaderboard */
 export async function fetchLeaderboard(name: string): Promise<MemberLeaderboard|ProfileLeaderboard> {
 	const profileLeaderboards = await fetchAllProfileLeaderboardAttributes()
-	console.log(name, profileLeaderboards, profileLeaderboards.includes(name))
 	if (profileLeaderboards.includes(name)) {
 		return await fetchProfileLeaderboard(name)
 	} else {

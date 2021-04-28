@@ -216,7 +216,6 @@ async function fetchProfileLeaderboardRaw(name) {
         .sort(sortQuery)
         .limit(leaderboardMax)
         .toArray();
-    console.log('leaderboardRaw', leaderboardRaw);
     cachedRawLeaderboards.set(name, leaderboardRaw);
     return leaderboardRaw;
 }
@@ -272,7 +271,6 @@ exports.fetchProfileLeaderboard = fetchProfileLeaderboard;
 /** Fetch a leaderboard */
 async function fetchLeaderboard(name) {
     const profileLeaderboards = await fetchAllProfileLeaderboardAttributes();
-    console.log(name, profileLeaderboards, profileLeaderboards.includes(name));
     if (profileLeaderboards.includes(name)) {
         return await fetchProfileLeaderboard(name);
     }

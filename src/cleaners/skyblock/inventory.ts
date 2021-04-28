@@ -39,7 +39,6 @@ function cleanItem(rawItem): Item {
 
 	if (vanillaId === 397) {
 		const headDataBase64 = itemTag?.SkullOwner?.Properties?.textures?.[0]?.Value
-		if (extraAttributes?.id === 'LARGE_MINING_SACK') console.log(headDataBase64)
 		if (headDataBase64) {
 			const headData = JSON.parse(base64decode(headDataBase64).toString())
 			const headDataUrl = headData?.textures?.SKIN?.url

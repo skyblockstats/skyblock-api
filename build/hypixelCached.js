@@ -181,7 +181,7 @@ async function fetchBasicPlayer(user) {
         return exports.basicPlayerCache.get(playerUuid);
     const player = await fetchPlayer(playerUuid);
     if (!player)
-        console.log(user);
+        console.log('no player? this should never happen', user);
     delete player.profiles;
     return player;
 }

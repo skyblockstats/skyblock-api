@@ -38,8 +38,6 @@ function cleanItem(rawItem) {
     let headId;
     if (vanillaId === 397) {
         const headDataBase64 = (_e = (_d = (_c = (_b = itemTag === null || itemTag === void 0 ? void 0 : itemTag.SkullOwner) === null || _b === void 0 ? void 0 : _b.Properties) === null || _c === void 0 ? void 0 : _c.textures) === null || _d === void 0 ? void 0 : _d[0]) === null || _e === void 0 ? void 0 : _e.Value;
-        if ((extraAttributes === null || extraAttributes === void 0 ? void 0 : extraAttributes.id) === 'LARGE_MINING_SACK')
-            console.log(headDataBase64);
         if (headDataBase64) {
             const headData = JSON.parse(base64decode(headDataBase64).toString());
             const headDataUrl = (_g = (_f = headData === null || headData === void 0 ? void 0 : headData.textures) === null || _f === void 0 ? void 0 : _f.SKIN) === null || _g === void 0 ? void 0 : _g.url;

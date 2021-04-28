@@ -191,7 +191,7 @@ export async function fetchBasicPlayer(user: string): Promise<CleanPlayer> {
 		return basicPlayerCache.get(playerUuid)
 	
 	const player = await fetchPlayer(playerUuid)
-	if (!player) console.log(user)
+	if (!player) console.log('no player? this should never happen', user)
 
 	delete player.profiles
 	return player
