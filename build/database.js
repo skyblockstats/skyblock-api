@@ -111,7 +111,7 @@ function getMemberLeaderboardAttributes(member) {
 function getProfileLeaderboardAttributes(profile) {
     // if you want to add a new leaderboard for member attributes, add it here (and getAllLeaderboardAttributes)
     return {
-        minion_count: profile.minion_count
+        unique_minions: profile.minion_count
     };
 }
 async function fetchAllLeaderboardsCategorized() {
@@ -171,7 +171,7 @@ exports.fetchAllMemberLeaderboardAttributes = fetchAllMemberLeaderboardAttribute
 /** Fetch the names of all the leaderboards that rank profiles */
 async function fetchAllProfileLeaderboardAttributes() {
     return [
-        'minion_count'
+        'unique_minions'
     ];
 }
 function isLeaderboardReversed(name) {

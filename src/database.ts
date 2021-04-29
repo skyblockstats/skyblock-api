@@ -135,7 +135,7 @@ function getMemberLeaderboardAttributes(member: CleanMember): StringNumber {
 function getProfileLeaderboardAttributes(profile: CleanFullProfile): StringNumber {
 	// if you want to add a new leaderboard for member attributes, add it here (and getAllLeaderboardAttributes)
 	return {
-		minion_count: profile.minion_count
+		unique_minions: profile.minion_count
 	}
 }
 
@@ -206,7 +206,7 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 /** Fetch the names of all the leaderboards that rank profiles */
 async function fetchAllProfileLeaderboardAttributes(): Promise<string[]> {
 	return [
-		'minion_count'
+		'unique_minions'
 	]
 }
 
