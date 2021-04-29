@@ -1,0 +1,14 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: "@types/mongodb"
+    versions:
+    - 3.6.12
+  - dependency-name: prismarine-nbt
+    versions:
+    - 1.5.0
