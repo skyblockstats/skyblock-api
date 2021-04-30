@@ -33,7 +33,7 @@ app.get('/player/:user', async(req, res) => {
 	res.json(
 		await fetchUser(
 			{ user: req.params.user },
-			['profiles', 'player']
+			[req.query.basic as string === 'true' ? undefined : 'profiles', 'player']
 		)
 	)
 })
