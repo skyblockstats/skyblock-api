@@ -67,7 +67,7 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
 		// this is used for leaderboards
 		rawHypixelStats: member.stats ?? {},
 
-		minions: cleanMinions(member),
+		minions: await cleanMinions(member),
 		fairy_souls: cleanFairySouls(member),
 		inventories: inventoriesIncluded ? await cleanInventories(member) : undefined,
 		objectives: cleanObjectives(member),

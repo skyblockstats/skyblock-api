@@ -59,7 +59,7 @@ async function cleanSkyBlockProfileMemberResponse(member, included = null) {
         stats: stats_1.cleanProfileStats(member),
         // this is used for leaderboards
         rawHypixelStats: (_a = member.stats) !== null && _a !== void 0 ? _a : {},
-        minions: minions_1.cleanMinions(member),
+        minions: await minions_1.cleanMinions(member),
         fairy_souls: fairysouls_1.cleanFairySouls(member),
         inventories: inventoriesIncluded ? await inventory_1.cleanInventories(member) : undefined,
         objectives: objectives_1.cleanObjectives(member),
