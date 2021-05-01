@@ -105,7 +105,7 @@ export async function uuidFromUser(user: string): Promise<string> {
 			return uuid
 	}
 
-	if (debug) console.log('Cache miss: uuidFromUser', user)
+	if (debug) console.debug('Cache miss: uuidFromUser', user)
 
 	// set it as waitForCacheSet (a promise) in case uuidFromUser gets called while its fetching mojang
 	usernameCache.set(undashUuid(user), waitForCacheSet(usernameCache, user, user))
@@ -132,11 +132,11 @@ export async function uuidFromUser(user: string): Promise<string> {
  */
 export async function usernameFromUser(user: string): Promise<string> {
 	if (usernameCache.has(undashUuid(user))) {
-		if (debug) console.log('Cache hit! usernameFromUser', user)
+		if (debug) console.debug('Cache hit! usernameFromUser', user)
 		return usernameCache.get(undashUuid(user))
 	}
 
-	if (debug) console.log('Cache miss: usernameFromUser', user)
+	if (debug) console.debug('Cache miss: usernameFromUser', user)
 
 	let { uuid, username } = await mojang.profileFromUser(user)
 	uuid = undashUuid(uuid)
@@ -191,7 +191,7 @@ export async function fetchBasicPlayer(user: string): Promise<CleanPlayer> {
 		return basicPlayerCache.get(playerUuid)
 	
 	const player = await fetchPlayer(playerUuid)
-	if (!player) console.log('no player? this should never happen', user)
+	if (!player) console.debug('no player? this should never happen', user)
 
 	delete player.profiles
 	return player
@@ -199,11 +199,11 @@ export async function fetchBasicPlayer(user: string): Promise<CleanPlayer> {
 
 export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanProfile[]> {
 	if (profilesCache.has(playerUuid)) {
-		if (debug) console.log('Cache hit! fetchSkyblockProfiles', playerUuid)
+		if (debug) console.debug('Cache hit! fetchSkyblockProfiles', playerUuid)
 		return profilesCache.get(playerUuid)
 	}
 
-	if (debug) console.log('Cache miss: fetchSkyblockProfiles', playerUuid)
+	if (debug) console.debug('Cache miss: fetchSkyblockProfiles', playerUuid)
 
 	const profiles: CleanProfile[] = await hypixel.fetchMemberProfilesUncached(playerUuid)
 
@@ -240,11 +240,11 @@ async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[]> {
 	if (!playerUuid) return // invalid player, just return
 
 	if (basicProfilesCache.has(playerUuid)) {
-		if (debug) console.log('Cache hit! fetchBasicProfiles', playerUuid)
+		if (debug) console.debug('Cache hit! fetchBasicProfiles', playerUuid)
 		return basicProfilesCache.get(playerUuid)
 	}
 
-	if (debug) console.log('Cache miss: fetchBasicProfiles', user)
+	if (debug) console.debug('Cache miss: fetchBasicProfiles', user)
 
 	const player = await fetchPlayer(playerUuid)
 	const profiles = player.profiles
@@ -265,11 +265,11 @@ async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[]> {
 export async function fetchProfileUuid(user: string, profile: string): Promise<string> {
 	// if a profile wasn't provided, return
 	if (!profile) {
-		if (debug) console.log('no profile provided?', user, profile)
+		if (debug) console.debug('no profile provided?', user, profile)
 		return null
 	}
 
-	if (debug) console.log('Cache miss: fetchProfileUuid', user)
+	if (debug) console.debug('Cache miss: fetchProfileUuid', user)
 
 	const profiles = await fetchBasicProfiles(user)
 	if (!profiles) return // user probably doesnt exist
@@ -295,11 +295,11 @@ export async function fetchProfile(user: string, profile: string): Promise<Clean
 
 	if (profileCache.has(profileUuid)) {
 		// we have the profile cached, return it :)
-		if (debug) console.log('Cache hit! fetchProfile', profileUuid)
+		if (debug) console.debug('Cache hit! fetchProfile', profileUuid)
 		return profileCache.get(profileUuid)
 	}
 
-	if (debug) console.log('Cache miss: fetchProfile', user, profile)
+	if (debug) console.debug('Cache miss: fetchProfile', user, profile)
 
 	const profileName = await fetchProfileName(user, profile)
 
@@ -320,7 +320,7 @@ export async function fetchProfile(user: string, profile: string): Promise<Clean
 export async function fetchBasicProfileFromUuid(profileUuid: string): Promise<CleanProfile> {
 	if (profileCache.has(profileUuid)) {
 		// we have the profile cached, return it :)
-		if (debug) console.log('Cache hit! fetchBasicProfileFromUuid', profileUuid)
+		if (debug) console.debug('Cache hit! fetchBasicProfileFromUuid', profileUuid)
 		const profile: CleanFullProfile = profileCache.get(profileUuid)
 		return {
 			uuid: profile.uuid,
@@ -351,11 +351,11 @@ export async function fetchProfileName(user: string, profile: string): Promise<s
 
 	if (profileNameCache.has(`${playerUuid}.${profileUuid}`)) {
 		// Return the profile name if it's cached
-		if (debug) console.log('Cache hit! fetchProfileName', profileUuid)
+		if (debug) console.debug('Cache hit! fetchProfileName', profileUuid)
 		return profileNameCache.get(`${playerUuid}.${profileUuid}`)
 	}
 
-	if (debug) console.log('Cache miss: fetchProfileName', user, profile)
+	if (debug) console.debug('Cache miss: fetchProfileName', user, profile)
 
 	const basicProfiles = await fetchBasicProfiles(playerUuid)
 	let profileName

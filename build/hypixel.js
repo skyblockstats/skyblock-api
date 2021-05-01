@@ -69,7 +69,7 @@ async function fetchUser({ user, uuid, username }, included = ['player']) {
     if (!uuid) {
         // the user doesn't exist.
         if (_1.debug)
-            console.log('error:', user, 'doesnt exist');
+            console.debug('error:', user, 'doesnt exist');
         return null;
     }
     const includePlayers = included.includes('player');
