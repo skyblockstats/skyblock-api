@@ -2,15 +2,37 @@
 /**
  * Fetch and edit constants from the skyblock-constants repo
  */
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addMinions = exports.fetchMinions = exports.addSlayers = exports.fetchSlayers = exports.addZones = exports.fetchZones = exports.addSkills = exports.fetchSkills = exports.addCollections = exports.fetchCollections = exports.addStats = exports.fetchStats = exports.addJSONConstants = void 0;
+exports.addMinions = exports.fetchMinions = exports.addSlayers = exports.fetchSlayers = exports.addZones = exports.fetchZones = exports.addSkills = exports.fetchSkills = exports.addCollections = exports.fetchCollections = exports.addStats = exports.fetchStats = exports.addJSONConstants = exports.fetchJSONConstant = void 0;
+// we have to do this so we can mock the function from the tests properly
+const constants = __importStar(require("./constants"));
 const node_cache_1 = __importDefault(require("node-cache"));
 const queue_promise_1 = __importDefault(require("queue-promise"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const https_1 = require("https");
+const _1 = require(".");
 const httpsAgent = new https_1.Agent({
     keepAlive: true
 });
@@ -31,6 +53,8 @@ const queue = new queue_promise_1.default({
  */
 async function fetchGithubApi(method, route, headers, json) {
     try {
+        if (_1.debug)
+            console.debug('fetching github api', method, route);
         return await node_fetch_1.default(githubApiBase + route, {
             agent: () => httpsAgent,
             body: json ? JSON.stringify(json) : null,
@@ -96,6 +120,7 @@ async function editFile(file, message, newContent) {
     });
 }
 async function fetchJSONConstant(filename) {
+    console.log('actually fetchJSONConstant');
     const file = await fetchFile(filename);
     try {
         return JSON.parse(file.content);
@@ -105,6 +130,7 @@ async function fetchJSONConstant(filename) {
         return [];
     }
 }
+exports.fetchJSONConstant = fetchJSONConstant;
 /** Add stats to skyblock-constants. This has caching so it's fine to call many times */
 async function addJSONConstants(filename, addingValues, unit = 'stat') {
     if (addingValues.length === 0)
@@ -142,61 +168,61 @@ async function addJSONConstants(filename, addingValues, unit = 'stat') {
 exports.addJSONConstants = addJSONConstants;
 /** Fetch all the known SkyBlock stats as an array of strings */
 async function fetchStats() {
-    return await fetchJSONConstant('stats.json');
+    return await constants.fetchJSONConstant('stats.json');
 }
 exports.fetchStats = fetchStats;
 /** Add stats to skyblock-constants. This has caching so it's fine to call many times */
 async function addStats(addingStats) {
-    await addJSONConstants('stats.json', addingStats, 'stat');
+    await constants.addJSONConstants('stats.json', addingStats, 'stat');
 }
 exports.addStats = addStats;
 /** Fetch all the known SkyBlock collections as an array of strings */
 async function fetchCollections() {
-    return await fetchJSONConstant('collections.json');
+    return await constants.fetchJSONConstant('collections.json');
 }
 exports.fetchCollections = fetchCollections;
 /** Add collections to skyblock-constants. This has caching so it's fine to call many times */
 async function addCollections(addingCollections) {
-    await addJSONConstants('collections.json', addingCollections, 'collection');
+    await constants.addJSONConstants('collections.json', addingCollections, 'collection');
 }
 exports.addCollections = addCollections;
 /** Fetch all the known SkyBlock collections as an array of strings */
 async function fetchSkills() {
-    return await fetchJSONConstant('skills.json');
+    return await constants.fetchJSONConstant('skills.json');
 }
 exports.fetchSkills = fetchSkills;
 /** Add skills to skyblock-constants. This has caching so it's fine to call many times */
 async function addSkills(addingSkills) {
-    await addJSONConstants('skills.json', addingSkills, 'skill');
+    await constants.addJSONConstants('skills.json', addingSkills, 'skill');
 }
 exports.addSkills = addSkills;
 /** Fetch all the known SkyBlock collections as an array of strings */
 async function fetchZones() {
-    return await fetchJSONConstant('zones.json');
+    return await constants.fetchJSONConstant('zones.json');
 }
 exports.fetchZones = fetchZones;
 /** Add skills to skyblock-constants. This has caching so it's fine to call many times */
 async function addZones(addingZones) {
-    await addJSONConstants('zones.json', addingZones, 'zone');
+    await constants.addJSONConstants('zones.json', addingZones, 'zone');
 }
 exports.addZones = addZones;
 /** Fetch all the known SkyBlock slayer names as an array of strings */
 async function fetchSlayers() {
-    return await fetchJSONConstant('slayers.json');
+    return await constants.fetchJSONConstant('slayers.json');
 }
 exports.fetchSlayers = fetchSlayers;
 /** Add skills to skyblock-constants. This has caching so it's fine to call many times */
 async function addSlayers(addingSlayers) {
-    await addJSONConstants('slayers.json', addingSlayers, 'slayer');
+    await constants.addJSONConstants('slayers.json', addingSlayers, 'slayer');
 }
 exports.addSlayers = addSlayers;
 /** Fetch all the known SkyBlock slayer names as an array of strings */
 async function fetchMinions() {
-    return await fetchJSONConstant('minions.json');
+    return await constants.fetchJSONConstant('minions.json');
 }
 exports.fetchMinions = fetchMinions;
 /** Add skills to skyblock-constants. This has caching so it's fine to call many times */
 async function addMinions(addingMinions) {
-    await addJSONConstants('minions.json', addingMinions, 'minion');
+    await constants.addJSONConstants('minions.json', addingMinions, 'minion');
 }
 exports.addMinions = addMinions;

@@ -52,5 +52,5 @@ app.get('/leaderboards', async (req, res) => {
     res.json(await database_1.fetchAllLeaderboardsCategorized());
 });
 // only run the server if it's not doing tests
-if (typeof global.it !== 'function')
+if (!globalThis.isTest)
     app.listen(8080, () => console.log('App started :)'));

@@ -355,10 +355,10 @@ async function getApplicableProfileLeaderboardAttributes(profile) {
 }
 /** Update the member's leaderboard data on the server if applicable */
 async function updateDatabaseMember(member, profile) {
-    if (_1.debug)
-        console.debug('updateDatabaseMember', member.username);
     if (!client)
         return; // the db client hasn't been initialized
+    if (_1.debug)
+        console.debug('updateDatabaseMember', member.username);
     // the member's been updated too recently, just return
     if (recentlyUpdated.get(profile.uuid + member.uuid))
         return;
@@ -410,10 +410,10 @@ exports.updateDatabaseMember = updateDatabaseMember;
  * This will not also update the members, you have to call updateDatabaseMember separately for that
  */
 async function updateDatabaseProfile(profile) {
-    if (_1.debug)
-        console.debug('updateDatabaseProfile', profile.name);
     if (!client)
         return; // the db client hasn't been initialized
+    if (_1.debug)
+        console.debug('updateDatabaseProfile', profile.name);
     // the profile's been updated too recently, just return
     if (recentlyUpdated.get(profile.uuid + 'profile'))
         return;
@@ -511,7 +511,7 @@ async function fetchAllLeaderboards(fast) {
         console.debug('Finished caching leaderboards!');
 }
 // make sure it's not in a test
-if (typeof global.it !== 'function') {
+if (!globalThis.isTest) {
     connect().then(() => {
         // when it connects, cache the leaderboards and remove bad members
         removeBadMemberLeaderboardAttributes();

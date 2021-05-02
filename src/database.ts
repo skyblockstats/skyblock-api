@@ -442,8 +442,8 @@ async function getApplicableProfileLeaderboardAttributes(profile: CleanFullProfi
 
 /** Update the member's leaderboard data on the server if applicable */
 export async function updateDatabaseMember(member: CleanMember, profile: CleanFullProfile): Promise<void> {
-	if (debug) console.debug('updateDatabaseMember', member.username)
 	if (!client) return // the db client hasn't been initialized
+	if (debug) console.debug('updateDatabaseMember', member.username)
 	// the member's been updated too recently, just return
 	if (recentlyUpdated.get(profile.uuid + member.uuid))
 		return
@@ -503,8 +503,8 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
  * This will not also update the members, you have to call updateDatabaseMember separately for that
  */
 export async function updateDatabaseProfile(profile: CleanFullProfile): Promise<void> {
-	if (debug) console.debug('updateDatabaseProfile', profile.name)
 	if (!client) return // the db client hasn't been initialized
+	if (debug) console.debug('updateDatabaseProfile', profile.name)
 
 	// the profile's been updated too recently, just return
 	if (recentlyUpdated.get(profile.uuid + 'profile'))
@@ -619,7 +619,7 @@ async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
 }
 
 // make sure it's not in a test
-if (typeof global.it !== 'function') {
+if (!globalThis.isTest) {
 	connect().then(() => {
 		// when it connects, cache the leaderboards and remove bad members
 		removeBadMemberLeaderboardAttributes()

@@ -1,12 +1,14 @@
-const assert = require('assert')
-const database = require('../build/database')
-const hypixelApi = require('../build/hypixelApi')
+globalThis.isTest = true
+
 const hypixelCached = require('../build/hypixelCached')
+const hypixelApi = require('../build/hypixelApi')
+const constants = require('../build/constants')
 const hypixel = require('../build/hypixel')
-const util = require('../build/util')
 const mojang = require('../build/mojang')
-const fs = require('fs')
+const util = require('../build/util')
+const assert = require('assert')
 const path = require('path')
+const fs = require('fs')
 
 
 const cachedJsonData = {}
@@ -54,6 +56,11 @@ mojang.profileFromUser = async (user) => {
 		return await mojang.profileFromUuid(user)
 	else
 		return await mojang.profileFromUsername(user)
+}
+
+constants.addJSONConstants = async(filename, addingValues, unit) => {}
+constants.fetchJSONConstant = async(filename) => {
+	return await readJsonData('constants/' + filename.slice(0, filename.length - '.json'.length))
 }
 
 
