@@ -120,7 +120,6 @@ async function editFile(file, message, newContent) {
     });
 }
 async function fetchJSONConstant(filename) {
-    console.log('actually fetchJSONConstant');
     const file = await fetchFile(filename);
     try {
         return JSON.parse(file.content);

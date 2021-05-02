@@ -125,7 +125,6 @@ async function editFile(file: GithubFile, message: string, newContent: string): 
 }
 
 export async function fetchJSONConstant(filename: string): Promise<string[]> {
-	console.log('actually fetchJSONConstant')
 	const file = await fetchFile(filename)
 	try {
 		return JSON.parse(file.content)
