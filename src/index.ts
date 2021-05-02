@@ -7,6 +7,7 @@ const app = express()
 
 export const debug = false
 
+
 // 200 requests over 5 minutes
 const limiter = rateLimit({
 	windowMs: 60 * 1000 * 5,
@@ -69,5 +70,5 @@ app.get('/leaderboards', async(req, res) => {
 
 
 // only run the server if it's not doing tests
-if (typeof global.it !== 'function')
+if (!globalThis.isTest)
 	app.listen(8080, () => console.log('App started :)'))

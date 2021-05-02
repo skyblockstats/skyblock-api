@@ -2,10 +2,14 @@
  * Automatically generate Hypixel API responses for the unit tests
  */
 
+globalThis.isTest = true
+
 import * as hypixelApi from '../src/hypixelApi'
+import * as constants from '../src/constants'
 import * as mojang from '../src/mojang'
 import fs from 'fs/promises'
 import path from 'path'
+
 
 const playerUuids = [
 	'6536bfed869548fd83a1ecd24cf2a0fd',
@@ -29,6 +33,15 @@ async function addResponse(requestPath: string, args: { [ key: string ]: string 
 	await writeTestData(requestPath, name, response)
 }
 
+
+async function addConstants() {
+	const constantNames = ['collections', 'minions', 'skills', 'slayers', 'stats', 'zones']
+	for (const constantName of constantNames) {
+		const constantData = await constants.fetchJSONConstant(constantName + '.json')
+		await writeTestData('constants', constantName, constantData)
+	}
+}
+
 async function main() {
 	const uuidsToUsername = {}
 	for (const playerUuid of playerUuids) {
@@ -39,6 +52,7 @@ async function main() {
 	}
 
 	await writeTestData('', 'mojang', uuidsToUsername)
+	await addConstants()
 }
 
 main()

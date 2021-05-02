@@ -355,27 +355,27 @@ async function getApplicableProfileLeaderboardAttributes(profile) {
 }
 /** Update the member's leaderboard data on the server if applicable */
 async function updateDatabaseMember(member, profile) {
-    if (_1.debug)
-        console.log('updateDatabaseMember', member.username);
     if (!client)
         return; // the db client hasn't been initialized
+    if (_1.debug)
+        console.debug('updateDatabaseMember', member.username);
     // the member's been updated too recently, just return
     if (recentlyUpdated.get(profile.uuid + member.uuid))
         return;
     // store the member in recentlyUpdated so it cant update for 3 more minutes
     recentlyUpdated.set(profile.uuid + member.uuid, true);
     if (_1.debug)
-        console.log('adding member to leaderboards', member.username);
+        console.debug('adding member to leaderboards', member.username);
     await constants.addStats(Object.keys(member.rawHypixelStats));
     await constants.addCollections(member.collections.map(coll => coll.name));
     await constants.addSkills(member.skills.map(skill => skill.name));
     await constants.addZones(member.visited_zones.map(zone => zone.name));
     await constants.addSlayers(member.slayers.bosses.map(s => s.raw_name));
     if (_1.debug)
-        console.log('done constants..');
+        console.debug('done constants..');
     const leaderboardAttributes = await getApplicableMemberLeaderboardAttributes(member);
     if (_1.debug)
-        console.log('done getApplicableMemberLeaderboardAttributes..', leaderboardAttributes, member.username, profile.name);
+        console.debug('done getApplicableMemberLeaderboardAttributes..', leaderboardAttributes, member.username, profile.name);
     await memberLeaderboardsCollection.updateOne({
         uuid: member.uuid,
         profile: profile.uuid
@@ -402,7 +402,7 @@ async function updateDatabaseMember(member, profile) {
         cachedRawLeaderboards.set(attributeName, newRawLeaderboard);
     }
     if (_1.debug)
-        console.log('added member to leaderboards', member.username, leaderboardAttributes);
+        console.debug('added member to leaderboards', member.username, leaderboardAttributes);
 }
 exports.updateDatabaseMember = updateDatabaseMember;
 /**
@@ -410,20 +410,20 @@ exports.updateDatabaseMember = updateDatabaseMember;
  * This will not also update the members, you have to call updateDatabaseMember separately for that
  */
 async function updateDatabaseProfile(profile) {
-    if (_1.debug)
-        console.log('updateDatabaseProfile', profile.name);
     if (!client)
         return; // the db client hasn't been initialized
+    if (_1.debug)
+        console.debug('updateDatabaseProfile', profile.name);
     // the profile's been updated too recently, just return
     if (recentlyUpdated.get(profile.uuid + 'profile'))
         return;
     // store the profile in recentlyUpdated so it cant update for 3 more minutes
     recentlyUpdated.set(profile.uuid + 'profile', true);
     if (_1.debug)
-        console.log('adding profile to leaderboards', profile.name);
+        console.debug('adding profile to leaderboards', profile.name);
     const leaderboardAttributes = await getApplicableProfileLeaderboardAttributes(profile);
     if (_1.debug)
-        console.log('done getApplicableProfileLeaderboardAttributes..', leaderboardAttributes, profile.name);
+        console.debug('done getApplicableProfileLeaderboardAttributes..', leaderboardAttributes, profile.name);
     await profileLeaderboardsCollection.updateOne({
         uuid: profile.uuid
     }, {
@@ -451,7 +451,7 @@ async function updateDatabaseProfile(profile) {
         cachedRawLeaderboards.set(attributeName, newRawLeaderboard);
     }
     if (_1.debug)
-        console.log('added profile to leaderboards', profile.name, leaderboardAttributes);
+        console.debug('added profile to leaderboards', profile.name, leaderboardAttributes);
 }
 exports.updateDatabaseProfile = updateDatabaseProfile;
 const leaderboardUpdateMemberQueue = new queue_promise_1.default({
@@ -500,7 +500,7 @@ async function fetchAllLeaderboards(fast) {
     const leaderboards = await fetchAllMemberLeaderboardAttributes();
     // shuffle so if the application is restarting many times itll still be useful
     if (_1.debug)
-        console.log('Caching leaderboards!');
+        console.debug('Caching leaderboards!');
     for (const leaderboard of util_1.shuffle(leaderboards)) {
         if (!fast)
             // wait 2 seconds so it doesnt use as much ram
@@ -508,10 +508,10 @@ async function fetchAllLeaderboards(fast) {
         await fetchMemberLeaderboard(leaderboard);
     }
     if (_1.debug)
-        console.log('Finished caching leaderboards!');
+        console.debug('Finished caching leaderboards!');
 }
 // make sure it's not in a test
-if (typeof global.it !== 'function') {
+if (!globalThis.isTest) {
     connect().then(() => {
         // when it connects, cache the leaderboards and remove bad members
         removeBadMemberLeaderboardAttributes();

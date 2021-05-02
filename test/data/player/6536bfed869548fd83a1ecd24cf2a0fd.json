@@ -288,12 +288,12 @@
       "py5",
       "b3abus"
     ],
-    "lastLogin": 1619476667163,
-    "networkExp": 14261880,
+    "lastLogin": 1619844417252,
+    "networkExp": 14291825,
     "playername": "py5",
     "stats": {
       "Arcade": {
-        "coins": 2112228,
+        "coins": 2112646,
         "deaths_throw_out": 13,
         "kills_throw_out": 10,
         "music": true,
@@ -396,10 +396,10 @@
           "legacyachievement10",
           "legacyachievement9"
         ],
-        "coins": 161695
+        "coins": 162245
       },
       "TNTGames": {
-        "coins": 66009,
+        "coins": 66574,
         "deaths_bowspleef": 15,
         "tags_bowspleef": 271,
         "new_spleef_repulsor": 1,
@@ -487,7 +487,7 @@
         "shoes_active": "GOLD_SHOES",
         "jacket_active": "GOLD_JACKET",
         "pants_active": "GOLD_PANTS",
-        "coins": 65605,
+        "coins": 66570,
         "lastTourneyAd": 1596934457455
       },
       "SkyWars": {
@@ -569,7 +569,7 @@
         "losses_kit_basic_solo_default": 59,
         "deaths_team_insane": 23,
         "survived_players_kit_mining_team_default": 91,
-        "coins": 598298,
+        "coins": 599063,
         "survived_players_team": 235,
         "losses_team_insane": 22,
         "losses_kit_mining_team_default": 8,
@@ -1170,7 +1170,7 @@
         "melee_kills_lab_kit_mining_team_default": 2
       },
       "MCGO": {
-        "coins": 171215,
+        "coins": 171665,
         "packages": [
           "legacyachievementnewnewnew",
           "achievement_flag_3",
@@ -1205,7 +1205,7 @@
           "achievement_flag_3"
         ],
         "kills": 249,
-        "coins": 72042,
+        "coins": 73007,
         "monthly_kills_b": 110,
         "weekly_kills_b": 225,
         "deaths": 183,
@@ -1248,7 +1248,7 @@
           "achievement_flag_1",
           "achievement_flag_2"
         ],
-        "coins": 69117,
+        "coins": 70082,
         "favorite_slots": "null,null,null",
         "showKillPrefix": true,
         "kills": 38,
@@ -1261,7 +1261,7 @@
         "updated_stats": true,
         "human_deaths": 7,
         "zombie_kills": 22,
-        "coins": 67889,
+        "coins": 68854,
         "vampire_deaths": 20,
         "votes_Cavern": 3,
         "vampire_kills": 13,
@@ -1331,21 +1331,21 @@
           "leaderboards_resync_mar_2021"
         ],
         "first_join_7": true,
-        "Experience": 63017,
+        "Experience": 63142,
         "bedwars_boxes": 2,
-        "games_played_bedwars_1": 394,
+        "games_played_bedwars_1": 400,
         "winstreak": 0,
-        "gold_resources_collected_bedwars": 7103,
-        "void_deaths_bedwars": 372,
+        "gold_resources_collected_bedwars": 7119,
+        "void_deaths_bedwars": 373,
         "four_three_void_kills_bedwars": 50,
         "void_kills_bedwars": 239,
-        "deaths_bedwars": 764,
+        "deaths_bedwars": 770,
         "four_three_iron_resources_collected_bedwars": 5239,
-        "resources_collected_bedwars": 52587,
+        "resources_collected_bedwars": 52707,
         "four_three_games_played_bedwars": 35,
-        "coins": 59863,
+        "coins": 59928,
         "four_three__items_purchased_bedwars": 687,
-        "games_played_bedwars": 388,
+        "games_played_bedwars": 394,
         "four_three_void_deaths_bedwars": 73,
         "four_three_entity_attack_deaths_bedwars": 36,
         "kills_bedwars": 523,
@@ -1353,35 +1353,35 @@
         "four_three_deaths_bedwars": 111,
         "four_three_losses_bedwars": 30,
         "entity_attack_deaths_bedwars": 255,
-        "losses_bedwars": 346,
-        "items_purchased_bedwars": 6096,
-        "iron_resources_collected_bedwars": 43408,
+        "losses_bedwars": 352,
+        "items_purchased_bedwars": 6123,
+        "iron_resources_collected_bedwars": 43512,
         "four_three_items_purchased_bedwars": 712,
         "four_three_kills_bedwars": 86,
-        "_items_purchased_bedwars": 5816,
+        "_items_purchased_bedwars": 5843,
         "four_three_resources_collected_bedwars": 6285,
         "eight_one_beds_lost_bedwars": 54,
         "final_deaths_bedwars": 206,
         "eight_one_final_deaths_bedwars": 50,
-        "eight_one_deaths_bedwars": 222,
-        "eight_one_void_deaths_bedwars": 57,
-        "eight_one_games_played_bedwars": 189,
+        "eight_one_deaths_bedwars": 228,
+        "eight_one_void_deaths_bedwars": 58,
+        "eight_one_games_played_bedwars": 195,
         "diamond_resources_collected_bedwars": 845,
         "eight_one_entity_attack_deaths_bedwars": 47,
         "eight_one_entity_attack_final_deaths_bedwars": 24,
         "entity_attack_final_deaths_bedwars": 110,
-        "eight_one_losses_bedwars": 180,
-        "eight_one_iron_resources_collected_bedwars": 11036,
-        "eight_one__items_purchased_bedwars": 1909,
-        "eight_one_items_purchased_bedwars": 1984,
+        "eight_one_losses_bedwars": 186,
+        "eight_one_iron_resources_collected_bedwars": 11140,
+        "eight_one__items_purchased_bedwars": 1936,
+        "eight_one_items_purchased_bedwars": 2011,
         "beds_lost_bedwars": 217,
         "entity_attack_kills_bedwars": 270,
         "eight_one_diamond_resources_collected_bedwars": 189,
         "eight_one_entity_attack_kills_bedwars": 45,
         "eight_one_void_kills_bedwars": 35,
         "eight_one_kills_bedwars": 82,
-        "eight_one_resources_collected_bedwars": 13611,
-        "eight_one_gold_resources_collected_bedwars": 2165,
+        "eight_one_resources_collected_bedwars": 13731,
+        "eight_one_gold_resources_collected_bedwars": 2181,
         "four_three_entity_attack_kills_bedwars": 35,
         "emerald_resources_collected_bedwars": 1214,
         "four_three_emerald_resources_collected_bedwars": 107,
@@ -1578,8 +1578,8 @@
         "four_four_armed_void_final_deaths_bedwars": 1,
         "four_three_wins_bedwars": 4,
         "two_four_entity_attack_final_deaths_bedwars": 1,
-        "eight_one_magic_deaths_bedwars": 110,
-        "magic_deaths_bedwars": 116,
+        "eight_one_magic_deaths_bedwars": 115,
+        "magic_deaths_bedwars": 121,
         "two_four_magic_deaths_bedwars": 1,
         "eight_one_magic_final_deaths_bedwars": 21,
         "magic_final_deaths_bedwars": 28,
@@ -1633,12 +1633,14 @@
           "records": {
             "bridging_distance_30:elevation_NONE:angle_STRAIGHT:": 9911,
             "bridging_distance_100:elevation_NONE:angle_STRAIGHT:": 40196,
-            "bridging_distance_50:elevation_NONE:angle_STRAIGHT:": 19754
+            "bridging_distance_50:elevation_NONE:angle_STRAIGHT:": 19754,
+            "bridging_distance_30:elevation_SLIGHT:angle_STRAIGHT:": 13623,
+            "bridging_distance_30:elevation_NONE:angle_DIAGONAL:": 8705
           },
           "bridging": {
-            "failed_attempts": 1065,
-            "successful_attempts": 92,
-            "blocks_placed": 12960
+            "failed_attempts": 1206,
+            "successful_attempts": 111,
+            "blocks_placed": 14756
           },
           "mlg": {
             "failed_attempts": 81,
@@ -1655,7 +1657,7 @@
         "entity_explosion_final_kills_bedwars": 1
       },
       "HungerGames": {
-        "coins": 119189,
+        "coins": 119554,
         "packages": [
           "fixachievements2",
           "fixachievements1",
@@ -1701,7 +1703,7 @@
         "autoarmor": true
       },
       "Walls": {
-        "coins": 70605,
+        "coins": 71570,
         "monthly_assists_a": 2,
         "assists": 2,
         "weekly_assists_a": 1,
@@ -1710,10 +1712,10 @@
         "weekly_assists_b": 1
       },
       "Arena": {
-        "coins": 65605
+        "coins": 66570
       },
       "Walls3": {
-        "coins": 68360,
+        "coins": 69025,
         "packages": [
           "achievement_fix_flag",
           "legacy_achievement_a"
@@ -1803,13 +1805,13 @@
         "phoenix_wins": 1
       },
       "UHC": {
-        "coins": 58771,
+        "coins": 59836,
         "clearup_achievement": true,
         "saved_stats": true,
         "deaths": 1
       },
       "SuperSmash": {
-        "coins": 112925,
+        "coins": 113390,
         "lastLevel_THE_BULK": 0,
         "active_class": "THE_BULK",
         "win_streak": 0,
@@ -1865,7 +1867,7 @@
         ]
       },
       "SpeedUHC": {
-        "coins": 202400,
+        "coins": 203075,
         "firstJoinLobbyInt": 3,
         "killstreak": 0,
         "win_streak": 0,
@@ -2473,7 +2475,7 @@
       "Duels": {
         "kit_menu_option": "off",
         "sw_duels_kit": "kit_ranked_ranked_champion",
-        "games_played_duels": 16737,
+        "games_played_duels": 16766,
         "show_lb_option": "on",
         "rematch_option_1": "default",
         "duels_recently_played": "BRIDGE_DUEL#SUMO_DUEL#BRIDGE_DUEL",
@@ -2490,17 +2492,17 @@
         "duels_winstreak_best_op_duel": 14,
         "duels_winstreak_best_combo_duel": 6,
         "duels_winstreak_best_classic_duel": 18,
-        "melee_swings": 320585,
-        "losses": 5336,
-        "melee_hits": 113150,
-        "rounds_played": 12999,
+        "melee_swings": 321129,
+        "losses": 5350,
+        "melee_hits": 113368,
+        "rounds_played": 13025,
         "sw_duel_health_regenerated": 6475,
         "sw_duel_losses": 781,
-        "deaths": 7407,
+        "deaths": 7421,
         "sw_duel_damage_dealt": 16893,
-        "health_regenerated": 38132,
+        "health_regenerated": 38167,
         "sw_duel_rounds_played": 2035,
-        "damage_dealt": 166277,
+        "damage_dealt": 166663,
         "sw_duel_deaths": 782,
         "sw_duel_melee_hits": 7860,
         "sw_duel_melee_swings": 23838,
@@ -2512,22 +2514,22 @@
         "combo_duel_deaths": 30,
         "combo_duel_melee_swings": 15388,
         "combo_duel_wins": 32,
-        "wins": 6658,
-        "kills": 6055,
+        "wins": 6670,
+        "kills": 6067,
         "combo_duel_kills": 26,
-        "classic_duel_rounds_played": 7520,
-        "classic_duel_melee_hits": 61989,
-        "classic_duel_health_regenerated": 14740,
-        "classic_duel_damage_dealt": 120038,
-        "classic_duel_melee_swings": 171107,
-        "classic_duel_wins": 4188,
-        "bow_shots": 21463,
-        "classic_duel_losses": 3158,
-        "classic_duel_bow_shots": 18156,
-        "classic_duel_deaths": 3158,
-        "bow_hits": 8877,
-        "classic_duel_bow_hits": 7891,
-        "classic_duel_kills": 4160,
+        "classic_duel_rounds_played": 7546,
+        "classic_duel_melee_hits": 62207,
+        "classic_duel_health_regenerated": 14775,
+        "classic_duel_damage_dealt": 120424,
+        "classic_duel_melee_swings": 171651,
+        "classic_duel_wins": 4200,
+        "bow_shots": 21534,
+        "classic_duel_losses": 3172,
+        "classic_duel_bow_shots": 18227,
+        "classic_duel_deaths": 3172,
+        "bow_hits": 8904,
+        "classic_duel_bow_hits": 7918,
+        "classic_duel_kills": 4172,
         "op_duel_deaths": 187,
         "op_duel_damage_dealt": 8869,
         "op_duel_melee_swings": 27744,
@@ -2605,7 +2607,7 @@
         },
         "current_bow_winstreak": 0,
         "best_bow_winstreak": 1,
-        "coins": 448531,
+        "coins": 450905,
         "bow_duel_wins": 1,
         "bow_duel_kills": 1,
         "current_sumo_winstreak": 4,
@@ -7085,6 +7087,12 @@
           },
           {
             "time": 1619477068157
+          },
+          {
+            "time": 1619837758760
+          },
+          {
+            "time": 1619845316356
           }
         ]
       },
@@ -7347,6 +7355,12 @@
           },
           {
             "time": 1619477541418
+          },
+          {
+            "time": 1619839273247
+          },
+          {
+            "time": 1619845316356
           }
         ]
       },
@@ -7624,6 +7638,15 @@
           },
           {
             "time": 1619476798475
+          },
+          {
+            "time": 1619740920461
+          },
+          {
+            "time": 1619837584614
+          },
+          {
+            "time": 1619844561043
           }
         ]
       },
@@ -7686,7 +7709,7 @@
         ],
         "active": {
           "objectives": {
-            "kill": 73
+            "kill": 87
           },
           "started": 1619224017835
         }
@@ -7765,7 +7788,13 @@
           {
             "time": 1619331620296
           }
-        ]
+        ],
+        "active": {
+          "objectives": {
+            "win": 13
+          },
+          "started": 1619837300742
+        }
       },
       "tnt_daily_win": {
         "completions": [
@@ -8324,9 +8353,9 @@
       "quake_wins": 3,
       "general_challenger": 1027,
       "quake_killing_sprees": 8,
-      "general_wins": 6784,
+      "general_wins": 6798,
       "copsandcrims_bomb_specialist": 0,
-      "general_quest_master": 384,
+      "general_quest_master": 391,
       "tntgames_bow_spleef_wins": 0,
       "tntgames_tnt_run_wins": 5,
       "tntgames_wizards_wins": 0,
@@ -8373,7 +8402,7 @@
       "buildbattle_build_battle_score": 610,
       "buildbattle_guess_the_build_guesses": 35,
       "bedwars_loot_box": 17,
-      "duels_duels_winner": 6671,
+      "duels_duels_winner": 6685,
       "duels_duels_win_streak": 20,
       "duels_duels_trophies": 3,
       "gingerbread_banker": 49675,
@@ -8658,35 +8687,35 @@
       "last_mcmp": 1519590874735
     },
     "mcVersionRp": "1.11.2",
-    "karma": 9799940,
+    "karma": 9857065,
     "petConsumables": {
-      "CARROT_ITEM": 296,
-      "FEATHER": 913,
+      "CARROT_ITEM": 297,
+      "FEATHER": 914,
       "BREAD": 325,
-      "SLIME_BALL": 955,
-      "RED_ROSE": 296,
-      "COOKED_BEEF": 303,
-      "WATER_BUCKET": 1871,
-      "MELON": 336,
-      "WOOD_SWORD": 989,
-      "STICK": 984,
-      "MILK_BUCKET": 1933,
-      "PORK": 337,
-      "GOLD_RECORD": 946,
-      "PUMPKIN_PIE": 330,
-      "LEASH": 976,
-      "LAVA_BUCKET": 1922,
-      "BONE": 336,
+      "SLIME_BALL": 957,
+      "RED_ROSE": 298,
+      "COOKED_BEEF": 306,
+      "WATER_BUCKET": 1881,
+      "MELON": 339,
+      "WOOD_SWORD": 995,
+      "STICK": 986,
+      "MILK_BUCKET": 1940,
+      "PORK": 338,
+      "GOLD_RECORD": 949,
+      "PUMPKIN_PIE": 331,
+      "LEASH": 979,
+      "LAVA_BUCKET": 1926,
+      "BONE": 337,
       "WHEAT": 302,
       "BAKED_POTATO": 303,
       "HAY_BLOCK": 321,
-      "RAW_FISH": 298,
-      "MAGMA_CREAM": 330,
+      "RAW_FISH": 299,
+      "MAGMA_CREAM": 331,
       "ROTTEN_FLESH": 296,
-      "CAKE": 318,
+      "CAKE": 320,
       "APPLE": 302,
       "MUSHROOM_SOUP": 321,
-      "COOKIE": 313
+      "COOKIE": 314
     },
     "levelingReward_0": true,
     "levelingReward_1": true,
@@ -8961,7 +8990,7 @@
       ]
     },
     "lastAdsenseGenerateTime": 1616095765770,
-    "lastLogout": 1619479955599,
+    "lastLogout": 1619845849369,
     "friendRequestsUuid": [],
     "levelingReward_4": true,
     "channel": "ALL",
@@ -9080,12 +9109,6 @@
         "TNTGAMES__tnt_run_challenge": 1,
         "DUELS__teams_challenge": 13,
         "SKYWARS__enderman_challenge": 1
-      },
-      "day_b": {
-        "DUELS__feed_the_void_challenge": 4
-      },
-      "day_c": {
-        "DUELS__feed_the_void_challenge": 2
       }
     },
     "levelingReward_22": true,
@@ -9257,44 +9280,10 @@
     "levelingReward_42": true,
     "levelingReward_43": true,
     "levelingReward_44": true,
-    "adventRewards2019": {
-      "day1": 1575327702099,
-      "day2": 1575327716749,
-      "day3": 1575421750321,
-      "day5": 1575593857161,
-      "day6": 1575674260083,
-      "day7": 1575741340756,
-      "day8": 1575848438888,
-      "day11": 1576113719710,
-      "day13": 1576299198910,
-      "day14": 1576384525717,
-      "day15": 1576462306784,
-      "day16": 1576539854882,
-      "day17": 1576619419261,
-      "day18": 1576693916127,
-      "day19": 1576799550122,
-      "day20": 1576893108869,
-      "day21": 1576906795987
-    },
     "gifts_grinch": 114,
-    "adventRewards2017": {
-      "day9": 1512838283610,
-      "day15": 1513379822711,
-      "day20": 1513810675543,
-      "day22": 1513992408400,
-      "day23": 1514043258260
-    },
-    "xmas2019_MAIN_LOBBY_1": true,
     "snowball_fight_intro_2019": true,
     "levelingReward_45": true,
-    "christmas2019Cooldowns": {
-      "VIP0": true,
-      "NORMAL0": true,
-      "NORMAL1": true
-    },
     "levelingReward_46": true,
-    "xmas2019_SKYWARS_1": true,
-    "xmas2019_PTL_3": true,
     "levelingReward_47": true,
     "levelingReward_48": true,
     "levelingReward_49": true,
@@ -9320,70 +9309,11 @@
     "levelingReward_55": true,
     "levelingReward_56": true,
     "levelingReward_57": true,
-    "easter2020Cooldowns2": {
-      "NORMAL0": true,
-      "VIP0": true,
-      "VIP1": true,
-      "NORMAL1": true,
-      "NORMAL2": true,
-      "VIP2": true,
-      "NORMAL3": true,
-      "VIP3": true,
-      "MVP_PLUS0": true,
-      "MVP_PLUS1": true,
-      "MVP_PLUS2": true,
-      "MVP_PLUS3": true,
-      "VIP_PLUS0": true,
-      "VIP_PLUS1": true,
-      "VIP_PLUS2": true,
-      "VIP_PLUS3": true,
-      "MVP1": true,
-      "MVP0": true,
-      "MVP2": true,
-      "MVP3": true
-    },
     "levelingReward_58": true,
     "levelingReward_59": true,
     "levelingReward_60": true,
     "levelingReward_61": true,
     "levelingReward_62": true,
-    "anniversaryNPCVisited2020": [
-      29,
-      11,
-      2,
-      23,
-      25,
-      1,
-      6,
-      10,
-      21,
-      22,
-      28,
-      31,
-      15,
-      17,
-      13,
-      26,
-      16,
-      12,
-      0,
-      20,
-      5,
-      19,
-      24,
-      7,
-      18,
-      14,
-      27,
-      3,
-      8,
-      30,
-      9,
-      4,
-      33,
-      32
-    ],
-    "anniversaryNPCProgress2020": 9,
     "levelingReward_63": true,
     "levelingReward_64": true,
     "levelingReward_65": true,
@@ -9421,31 +9351,39 @@
     "levelingReward_91": true,
     "levelingReward_92": true,
     "levelingReward_93": true,
-    "summer2020Cooldowns": {
-      "MVP2": true,
-      "MVP1": true,
-      "MVP0": true,
-      "VIP_PLUS2": true,
-      "VIP_PLUS1": true,
-      "NORMAL0": true,
-      "VIP_PLUS0": true,
-      "NORMAL1": true,
-      "NORMAL2": true,
-      "MVP_PLUS0": true,
-      "MVP_PLUS1": true,
-      "MVP_PLUS2": true,
-      "VIP2": true,
-      "VIP1": true,
-      "VIP0": true
-    },
     "levelingReward_94": true,
     "levelingReward_95": true,
     "levelingReward_96": true,
     "skyblock_free_cookie": 1599594524784,
-    "completed_christmas_quests_2021": 2,
     "levelingReward_97": true,
     "levelingReward_98": true,
     "levelingReward_99": true,
-    "mostRecentGameType": "BEDWARS"
+    "mostRecentGameType": "DUELS",
+    "adventRewards2017": {
+      "day9": 1512838283610,
+      "day15": 1513379822711,
+      "day20": 1513810675543,
+      "day22": 1513992408400,
+      "day23": 1514043258260
+    },
+    "adventRewards2019": {
+      "day1": 1575327702099,
+      "day2": 1575327716749,
+      "day3": 1575421750321,
+      "day5": 1575593857161,
+      "day6": 1575674260083,
+      "day7": 1575741340756,
+      "day8": 1575848438888,
+      "day11": 1576113719710,
+      "day13": 1576299198910,
+      "day14": 1576384525717,
+      "day15": 1576462306784,
+      "day16": 1576539854882,
+      "day17": 1576619419261,
+      "day18": 1576693916127,
+      "day19": 1576799550122,
+      "day20": 1576893108869,
+      "day21": 1576906795987
+    }
   }
 }

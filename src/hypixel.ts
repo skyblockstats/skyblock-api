@@ -83,7 +83,7 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 	}
 	if (!uuid) {
 		// the user doesn't exist.
-		if (debug) console.log('error:', user, 'doesnt exist')
+		if (debug) console.debug('error:', user, 'doesnt exist')
 		return null
 	}
 

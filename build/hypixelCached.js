@@ -110,7 +110,7 @@ async function uuidFromUser(user) {
             return uuid;
     }
     if (_1.debug)
-        console.log('Cache miss: uuidFromUser', user);
+        console.debug('Cache miss: uuidFromUser', user);
     // set it as waitForCacheSet (a promise) in case uuidFromUser gets called while its fetching mojang
     exports.usernameCache.set(util_1.undashUuid(user), waitForCacheSet(exports.usernameCache, user, user));
     // not cached, actually fetch mojang api now
@@ -134,11 +134,11 @@ exports.uuidFromUser = uuidFromUser;
 async function usernameFromUser(user) {
     if (exports.usernameCache.has(util_1.undashUuid(user))) {
         if (_1.debug)
-            console.log('Cache hit! usernameFromUser', user);
+            console.debug('Cache hit! usernameFromUser', user);
         return exports.usernameCache.get(util_1.undashUuid(user));
     }
     if (_1.debug)
-        console.log('Cache miss: usernameFromUser', user);
+        console.debug('Cache miss: usernameFromUser', user);
     let { uuid, username } = await mojang.profileFromUser(user);
     uuid = util_1.undashUuid(uuid);
     exports.usernameCache.set(uuid, username);
@@ -181,7 +181,7 @@ async function fetchBasicPlayer(user) {
         return exports.basicPlayerCache.get(playerUuid);
     const player = await fetchPlayer(playerUuid);
     if (!player)
-        console.log('no player? this should never happen', user);
+        console.debug('no player? this should never happen', user);
     delete player.profiles;
     return player;
 }
@@ -189,11 +189,11 @@ exports.fetchBasicPlayer = fetchBasicPlayer;
 async function fetchSkyblockProfiles(playerUuid) {
     if (exports.profilesCache.has(playerUuid)) {
         if (_1.debug)
-            console.log('Cache hit! fetchSkyblockProfiles', playerUuid);
+            console.debug('Cache hit! fetchSkyblockProfiles', playerUuid);
         return exports.profilesCache.get(playerUuid);
     }
     if (_1.debug)
-        console.log('Cache miss: fetchSkyblockProfiles', playerUuid);
+        console.debug('Cache miss: fetchSkyblockProfiles', playerUuid);
     const profiles = await hypixel.fetchMemberProfilesUncached(playerUuid);
     const basicProfiles = [];
     // create the basicProfiles array
@@ -225,11 +225,11 @@ async function fetchBasicProfiles(user) {
         return; // invalid player, just return
     if (exports.basicProfilesCache.has(playerUuid)) {
         if (_1.debug)
-            console.log('Cache hit! fetchBasicProfiles', playerUuid);
+            console.debug('Cache hit! fetchBasicProfiles', playerUuid);
         return exports.basicProfilesCache.get(playerUuid);
     }
     if (_1.debug)
-        console.log('Cache miss: fetchBasicProfiles', user);
+        console.debug('Cache miss: fetchBasicProfiles', user);
     const player = await fetchPlayer(playerUuid);
     const profiles = player.profiles;
     exports.basicProfilesCache.set(playerUuid, profiles);
@@ -247,11 +247,11 @@ async function fetchProfileUuid(user, profile) {
     // if a profile wasn't provided, return
     if (!profile) {
         if (_1.debug)
-            console.log('no profile provided?', user, profile);
+            console.debug('no profile provided?', user, profile);
         return null;
     }
     if (_1.debug)
-        console.log('Cache miss: fetchProfileUuid', user);
+        console.debug('Cache miss: fetchProfileUuid', user);
     const profiles = await fetchBasicProfiles(user);
     if (!profiles)
         return; // user probably doesnt exist
@@ -275,11 +275,11 @@ async function fetchProfile(user, profile) {
     if (exports.profileCache.has(profileUuid)) {
         // we have the profile cached, return it :)
         if (_1.debug)
-            console.log('Cache hit! fetchProfile', profileUuid);
+            console.debug('Cache hit! fetchProfile', profileUuid);
         return exports.profileCache.get(profileUuid);
     }
     if (_1.debug)
-        console.log('Cache miss: fetchProfile', user, profile);
+        console.debug('Cache miss: fetchProfile', user, profile);
     const profileName = await fetchProfileName(user, profile);
     const cleanProfile = await hypixel.fetchMemberProfileUncached(playerUuid, profileUuid);
     // we know the name from fetchProfileName, so set it here
@@ -296,7 +296,7 @@ async function fetchBasicProfileFromUuid(profileUuid) {
     if (exports.profileCache.has(profileUuid)) {
         // we have the profile cached, return it :)
         if (_1.debug)
-            console.log('Cache hit! fetchBasicProfileFromUuid', profileUuid);
+            console.debug('Cache hit! fetchBasicProfileFromUuid', profileUuid);
         const profile = exports.profileCache.get(profileUuid);
         return {
             uuid: profile.uuid,
@@ -326,11 +326,11 @@ async function fetchProfileName(user, profile) {
     if (exports.profileNameCache.has(`${playerUuid}.${profileUuid}`)) {
         // Return the profile name if it's cached
         if (_1.debug)
-            console.log('Cache hit! fetchProfileName', profileUuid);
+            console.debug('Cache hit! fetchProfileName', profileUuid);
         return exports.profileNameCache.get(`${playerUuid}.${profileUuid}`);
     }
     if (_1.debug)
-        console.log('Cache miss: fetchProfileName', user, profile);
+        console.debug('Cache miss: fetchProfileName', user, profile);
     const basicProfiles = await fetchBasicProfiles(playerUuid);
     let profileName;
     for (const basicProfile of basicProfiles)

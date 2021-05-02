@@ -1611,7 +1611,7 @@
           }
         },
         "6536bfed869548fd83a1ecd24cf2a0fd": {
-          "last_save": 1619390474972,
+          "last_save": 1619844517388,
           "inv_armor": {
             "type": 0,
             "data": "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"
@@ -2801,7 +2801,7 @@
               "completed_at_sb": 0
             }
           },
-          "coin_purse": 45969467.87624999,
+          "coin_purse": 11969536.876249991,
           "last_death": 39349057,
           "crafted_generators": [
             "COBBLESTONE_1",
@@ -3718,12 +3718,12 @@
             "STRING": 6258,
             "SPIDER_EYE": 2900,
             "COBBLESTONE": 80421,
-            "COAL": 351625,
+            "COAL": 351744,
             "IRON_INGOT": 11997,
             "GOLD_INGOT": 137408,
             "BONE": 7595,
             "SEEDS": 9162,
-            "DIAMOND": 4219285,
+            "DIAMOND": 4219553,
             "MUSHROOM_COLLECTION": 2923,
             "INK_SACK:4": 6245,
             "RAW_FISH": 2951,
@@ -3732,9 +3732,9 @@
             "INK_SACK": 142,
             "SLIME_BALL": 867,
             "ROTTEN_FLESH": 9101,
-            "REDSTONE": 2630115,
+            "REDSTONE": 2630185,
             "ENDER_PEARL": 5557,
-            "OBSIDIAN": 130086,
+            "OBSIDIAN": 130126,
             "SULPHUR": 46,
             "WHEAT": 17318,
             "CARROT_ITEM": 35768,
@@ -3768,7 +3768,13 @@
             "QUARTZ": 2,
             "MUTTON": 87,
             "ICE": 208,
-            "ENCHANTED_IRON": 17
+            "ENCHANTED_IRON": 17,
+            "ENCHANTED_OBSIDIAN": 59,
+            "ENCHANTED_DIAMOND": 56,
+            "ENCHANTED_COAL_BLOCK": 1,
+            "ENCHANTED_COAL": 17,
+            "ENCHANTED_REDSTONE_BLOCK": 2,
+            "ENCHANTED_REDSTONE": 27
           },
           "quiver": {
             "type": 0,
@@ -3785,7 +3791,7 @@
           "experience_skill_taming": 688847.4157582656,
           "potion_bag": {
             "type": 0,
-            "data": "H4sIAAAAAAAAAO2WzW4TMRDHZ5M2yYaqIBWJIznkAEKm9q73w71VbaERJKlEK46Vdz2brshuoqyD2gfhGfIKHFEehQdBTNqKckQcq11pZc3M37Zm/NPYXQAXnLwLNDagkRtn6cD20WxZWqcLTasnLuwdLSs7K85mNp+VJ1mGqa02ExwH2odFkmNpoQmd4+VCbxQUee5AY2B2HHAPi/k0z3JcNEjinuYG3031pCLNry60TV7Np/rGha2PswV2yNui/8V6hae6stgbDAa99Sp7JcIDGb+Gl+tV9H6hS1uRV78RAacx/Pn9W2+Yl3k5gR0yP80RDQnf0kq7JFuvphejo/FwOB51YGukC4Q9cj9scJcXdOHpybVd6ENrF3mytFg1YWd+G7uc4lec0npNBzpYXukyReN0oHUXhu2rzWIutPGv4jRh+880kt6F7qVN2DX31bq0efqF6jH60QW3mJnbYpHdgSf3m9ubOULrbHw+2GTgzhb5JC/P9QTaF6MPo/FnctK5PSi2lksy+yb1Q82jgCWBiZk0Ycp0pDMmM51xjDPfcL5J59piaW7TcW1eYGV1MYdnct+L9j3eE+LAl72zIUADWse60BOkg6xJeUyk8EzESsUxE8pLmPQTZIkfkRl7GQ+kQS9W/0ZKUJPyqEkxMk2EijlTwnhMelnEYkwEE0ikqMST0vh1T6lJgX6S+RHx4bPUi0ImVShYkimP6VT4nPMgjJSpSalJgT5S48hU6DMUgWAyNQFT6HtMBTqWmHDuYX371KQQKb5MZCi4otsnjOidIqmnaD9moTQSVSBEYGTdU2pSoK8xlZJnmskwptvHU4ppEWaMB0ko6YErlO/9Lyn0/QayCVMJNQ8AAA=="
+            "data": "H4sIAAAAAAAAAO2W32vbMBDHz0mbxFn3AzrYawYbbA9aJVv+ob6VtqNha9KHlj0W2TqlZrEdbHk0f1H+jZE/bExJyrrHscdig7FP95XEnT7caQjggpMNwX470MmU0ziwf1o2hXGG0DVy5sLhaVObMr8qTVYW51pjaurNBMeB/kmeZFgY6MLgrKnkRmE9rx3ojNWBA+5JvphnOsOqYyXuRabw81zOaqv5NYS+yurFXC5d2PtaVjiwoz37vlmv8ELWBkfj8Xi0XukPLDzm8Ud4u15F4yKtUNZYj5ZlU43yrMiK2aheIKpRsoTnVrJeyZC+tz+f7GIvrLVezW8mp9PLy+lkAHsTmSMc2uHHPXahwRBent+bSp4YU2VJY7DuwsFi67ud4w+c2/W6DgywuJNFisoZQG/nhv27zWIu9PGv/HRh/880K925HqRdeKEeEnZrsvS7Tcnk5xDcvFTbfFl7AM8eNjfLBULvano93kTgllU2y4prOYP+zeTLZPrNDtqje1TsNY0136nUDyWNApIEKiZchSmRkdSEa6kpxtpXlG7CuTdYqG04rslyrI3MF/CKH3nRkUdHjB37fHR1CdCB3pnM5QztWbawPDFYqGaxEHFMmPASwv0ESeJH1ow9TQOu0IvFv8EStLA8dVgUTxMmYkoEUx7hno5IjAkjDC0sIvE4V35bWVpYtrAk2o8sIj5JvSgkXISMJFp4RKbMp5QGYSRUC0sLyxYWtOVDi9AnyAJGeKoCItD3iAhkzDGh1MO2DbWw7GDxecJDRoVtQ2Fk7yzcVhbpxyTkiqMIGAsUbytLC8sWFokp51RLwsPYtiFPCCJZqAkNkpDb+y4Tvve/sNjnN0pAdNJKDwAA"
           },
           "experience_skill_enchanting": 56327.269651010385,
           "sacks_counts": {
@@ -4888,20 +4894,8 @@
       },
       "cute_name": "Strawberry",
       "banking": {
-        "balance": 5434343.187620211,
+        "balance": 5882307.834757031,
         "transactions": [
-          {
-            "amount": 720234.8658750001,
-            "timestamp": 1612115533977,
-            "action": "DEPOSIT",
-            "initiator_name": "§6NMART"
-          },
-          {
-            "amount": 7488092,
-            "timestamp": 1612126387979,
-            "action": "WITHDRAW",
-            "initiator_name": "§6NMART"
-          },
           {
             "amount": 288094,
             "timestamp": 1612126436452,
@@ -5187,6 +5181,18 @@
           {
             "amount": 211022.16914634407,
             "timestamp": 1619388948393,
+            "action": "DEPOSIT",
+            "initiator_name": "Bank Interest"
+          },
+          {
+            "amount": 219547.46477985661,
+            "timestamp": 1619562770205,
+            "action": "DEPOSIT",
+            "initiator_name": "Bank Interest"
+          },
+          {
+            "amount": 228417.18235696293,
+            "timestamp": 1619844294684,
             "action": "DEPOSIT",
             "initiator_name": "Bank Interest"
           }
