@@ -12,10 +12,10 @@ import path from 'path'
 
 
 const playerUuids = [
-	'6536bfed869548fd83a1ecd24cf2a0fd',
-	'4133cab5a7534f3f9bb636fc06a1f0fd',
-	'ef3bb867eec048a1a9b92b451f0ffc66',
-	'e403573808ad45ddb5c48ec7c4db0144',
+	'6536bfed869548fd83a1ecd24cf2a0fd', // py5
+	'4133cab5a7534f3f9bb636fc06a1f0fd', // LostEJ
+	'ef3bb867eec048a1a9b92b451f0ffc66', // NMART
+	'e403573808ad45ddb5c48ec7c4db0144', // Dededecent
 ]
 
 async function writeTestData(requestPath: string, name: string, contents: any) {
@@ -40,6 +40,8 @@ async function addConstants() {
 		const constantData = await constants.fetchJSONConstant(constantName + '.json')
 		await writeTestData('constants', constantName, constantData)
 	}
+	const constantValues = await constants.fetchConstantValues()
+	await writeTestData('constants', 'values', constantValues)
 }
 
 async function main() {
@@ -52,6 +54,7 @@ async function main() {
 	}
 
 	await writeTestData('', 'mojang', uuidsToUsername)
+
 	await addConstants()
 }
 
