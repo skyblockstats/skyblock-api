@@ -71,7 +71,6 @@ async function cleanSkyblockProfileResponse(data, options) {
     const minions = minions_1.combineMinionArrays(memberMinions);
     const { max_minions: maxUniqueMinions } = await constants.fetchConstantValues();
     const uniqueMinions = minions_1.countUniqueMinions(minions);
-    console.log(uniqueMinions, (maxUniqueMinions !== null && maxUniqueMinions !== void 0 ? maxUniqueMinions : 0), uniqueMinions > (maxUniqueMinions !== null && maxUniqueMinions !== void 0 ? maxUniqueMinions : 0));
     if (uniqueMinions > (maxUniqueMinions !== null && maxUniqueMinions !== void 0 ? maxUniqueMinions : 0))
         await constants.setConstantValues({ max_minions: uniqueMinions });
     // return more detailed info

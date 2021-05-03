@@ -82,7 +82,6 @@ export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptio
     const { max_minions: maxUniqueMinions } = await constants.fetchConstantValues()
     
     const uniqueMinions = countUniqueMinions(minions)
-    console.log(uniqueMinions, (maxUniqueMinions ?? 0), uniqueMinions > (maxUniqueMinions ?? 0))
     if (uniqueMinions > (maxUniqueMinions ?? 0))
         await constants.setConstantValues({ max_minions: uniqueMinions })
 
