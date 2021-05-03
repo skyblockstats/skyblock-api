@@ -25,7 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addMinions = exports.fetchMinions = exports.addSlayers = exports.fetchSlayers = exports.addZones = exports.fetchZones = exports.addSkills = exports.fetchSkills = exports.addCollections = exports.fetchCollections = exports.addStats = exports.fetchStats = exports.addJSONConstants = exports.fetchJSONConstant = void 0;
+exports.setConstantValues = exports.fetchConstantValues = exports.addMinions = exports.fetchMinions = exports.addSlayers = exports.fetchSlayers = exports.addZones = exports.fetchZones = exports.addSkills = exports.fetchSkills = exports.addCollections = exports.fetchCollections = exports.addStats = exports.fetchStats = exports.addJSONConstants = exports.fetchJSONConstant = void 0;
 // we have to do this so we can mock the function from the tests properly
 const constants = __importStar(require("./constants"));
 const node_cache_1 = __importDefault(require("node-cache"));
@@ -225,3 +225,31 @@ async function addMinions(addingMinions) {
     await constants.addJSONConstants('minions.json', addingMinions, 'minion');
 }
 exports.addMinions = addMinions;
+async function fetchConstantValues() {
+    return await constants.fetchJSONConstant('values.json');
+}
+exports.fetchConstantValues = fetchConstantValues;
+async function setConstantValues(newValues) {
+    let file = await fetchFile('values.json');
+    if (!file.path)
+        return;
+    let oldValues;
+    try {
+        oldValues = JSON.parse(file.content);
+    }
+    catch {
+        // invalid json, set it as an empty array
+        oldValues = {};
+    }
+    const updatedStats = { ...oldValues, ...newValues };
+    // there's not actually any new stats, just return
+    // TODO: optimize this? might be fine already though, idk
+    if (JSON.stringify(updatedStats) === JSON.stringify(oldValues))
+        return;
+    const commitMessage = 'Update values';
+    try {
+        await editFile(file, commitMessage, JSON.stringify(updatedStats, null, 2));
+    }
+    catch { }
+}
+exports.setConstantValues = setConstantValues;

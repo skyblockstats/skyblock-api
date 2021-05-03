@@ -30,6 +30,7 @@ const slayers_1 = require("./slayers");
 const zones_1 = require("./zones");
 const skills_1 = require("./skills");
 const cached = __importStar(require("../../hypixelCached"));
+const constants = __importStar(require("../../constants"));
 async function cleanSkyBlockProfileMemberResponseBasic(member, included = null) {
     const player = await cached.fetchPlayer(member.uuid);
     return {
@@ -49,6 +50,10 @@ async function cleanSkyBlockProfileMemberResponse(member, included = null) {
     const player = await cached.fetchPlayer(member.uuid);
     if (!player)
         return;
+    const fairySouls = fairysouls_1.cleanFairySouls(member);
+    const { max_fairy_souls: maxFairySouls } = await constants.fetchConstantValues();
+    if (fairySouls.total > (maxFairySouls !== null && maxFairySouls !== void 0 ? maxFairySouls : 0))
+        await constants.setConstantValues({ max_fairy_souls: fairySouls.total });
     return {
         uuid: member.uuid,
         username: player.username,
@@ -60,7 +65,7 @@ async function cleanSkyBlockProfileMemberResponse(member, included = null) {
         // this is used for leaderboards
         rawHypixelStats: (_a = member.stats) !== null && _a !== void 0 ? _a : {},
         minions: await minions_1.cleanMinions(member),
-        fairy_souls: fairysouls_1.cleanFairySouls(member),
+        fairy_souls: fairySouls,
         inventories: inventoriesIncluded ? await inventory_1.cleanInventories(member) : undefined,
         objectives: objectives_1.cleanObjectives(member),
         skills: skills_1.cleanSkills(member),
