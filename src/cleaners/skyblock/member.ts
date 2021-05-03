@@ -9,6 +9,7 @@ import { cleanSlayers, SlayerData } from './slayers'
 import { cleanVisitedZones, Zone } from './zones'
 import { cleanSkills, Skill } from './skills'
 import * as cached from '../../hypixelCached'
+import * as constants from '../../constants'
 import { Included } from '../../hypixel'
 import { CleanPlayer } from '../player'
 import { CleanRank } from '../rank'
@@ -53,6 +54,12 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
 	const inventoriesIncluded = included === null || included.includes('inventories')
 	const player = await cached.fetchPlayer(member.uuid)
 	if (!player) return
+
+	const fairySouls = cleanFairySouls(member)
+	const { max_fairy_souls: maxFairySouls } = await constants.fetchConstantValues()
+	if (fairySouls.total > (maxFairySouls ?? 0))
+		await constants.setConstantValues({ max_fairy_souls: fairySouls.total })
+
 	return {
 		uuid: member.uuid,
 		username: player.username,
@@ -68,7 +75,7 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
 		rawHypixelStats: member.stats ?? {},
 
 		minions: await cleanMinions(member),
-		fairy_souls: cleanFairySouls(member),
+		fairy_souls: fairySouls,
 		inventories: inventoriesIncluded ? await cleanInventories(member) : undefined,
 		objectives: cleanObjectives(member),
 		skills: cleanSkills(member),

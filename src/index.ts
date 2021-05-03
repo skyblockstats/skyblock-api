@@ -1,6 +1,7 @@
 import { fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots } from './database'
 import { fetchMemberProfile, fetchUser } from './hypixel'
 import rateLimit from 'express-rate-limit'
+import * as constants from './constants'
 import express from 'express'
 
 const app = express()
@@ -65,6 +66,12 @@ app.get('/leaderboard/:name', async(req, res) => {
 app.get('/leaderboards', async(req, res) => {
 	res.json(
 		await fetchAllLeaderboardsCategorized()
+	)
+})
+
+app.get('/constants', async(req, res) => {
+	res.json(
+		await constants.fetchConstantValues()
 	)
 })
 
