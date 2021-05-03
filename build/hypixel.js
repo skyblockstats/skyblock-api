@@ -22,13 +22,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchAllAuctionsUncached = exports.fetchMemberProfilesUncached = exports.fetchMemberProfileUncached = exports.fetchMemberProfile = exports.fetchUser = exports.sendCleanApiRequest = exports.maxMinion = exports.saveInterval = void 0;
+exports.fetchAllAuctionsUncached = exports.fetchMemberProfilesUncached = exports.fetchBasicProfileFromUuidUncached = exports.fetchMemberProfileUncached = exports.fetchMemberProfile = exports.fetchUser = exports.sendCleanApiRequest = exports.maxMinion = exports.saveInterval = void 0;
 const profile_1 = require("./cleaners/skyblock/profile");
 const auctions_1 = require("./cleaners/skyblock/auctions");
+const database_1 = require("./database");
 const hypixelApi_1 = require("./hypixelApi");
 const profiles_1 = require("./cleaners/skyblock/profiles");
 const player_1 = require("./cleaners/player");
-const database_1 = require("./database");
 const cached = __importStar(require("./hypixelCached"));
 const _1 = require(".");
 // the interval at which the "last_save" parameter updates in the hypixel api, this is 3 minutes
@@ -71,7 +71,7 @@ async function fetchUser({ user, uuid, username }, included = ['player']) {
     if (!uuid) {
         // the user doesn't exist.
         if (_1.debug)
-            console.log('error:', user, 'doesnt exist');
+            console.debug('error:', user, 'doesnt exist');
         return null;
     }
     const includePlayers = included.includes('player');
@@ -161,9 +161,23 @@ async function fetchMemberProfileUncached(playerUuid, profileUuid) {
     // queue updating the leaderboard positions for the member, eventually
     for (const member of profile.members)
         database_1.queueUpdateDatabaseMember(member, profile);
+    database_1.queueUpdateDatabaseProfile(profile);
     return profile;
 }
 exports.fetchMemberProfileUncached = fetchMemberProfileUncached;
+/**
+ * Fetches the Hypixel API to get a CleanProfile from its id. This doesn't do any caching and you should use hypixelCached.fetchBasicProfileFromUuid instead
+ * @param playerUuid The UUID of the Minecraft player
+ * @param profileUuid The UUID of the Hypixel SkyBlock profile
+ */
+async function fetchBasicProfileFromUuidUncached(profileUuid) {
+    const profile = await sendCleanApiRequest({
+        path: 'skyblock/profile',
+        args: { profile: profileUuid }
+    }, null, { basic: true });
+    return profile;
+}
+exports.fetchBasicProfileFromUuidUncached = fetchBasicProfileFromUuidUncached;
 async function fetchMemberProfilesUncached(playerUuid) {
     const profiles = await sendCleanApiRequest({
         path: 'skyblock/profiles',
@@ -178,6 +192,7 @@ async function fetchMemberProfilesUncached(playerUuid) {
         for (const member of profile.members) {
             database_1.queueUpdateDatabaseMember(member, profile);
         }
+        database_1.queueUpdateDatabaseProfile(profile);
     }
     return profiles;
 }

@@ -1,3 +1,4 @@
+// maybe todo?: create a fast replacement for prismarine-nbt
 import * as nbt from 'prismarine-nbt'
 
 function base64decode(base64: string): Buffer {
@@ -22,7 +23,7 @@ export interface Item {
 	timestamp?: string
 	enchantments?: { [ name: string ]: number }
 
-	skull_owner?: string
+	head_texture?: string
 
 	// this isn't extracted automatically atm
 	tier?: Tier
@@ -39,6 +40,19 @@ function cleanItem(rawItem): Item {
 	const damageValue = rawItem.Damage
 	const itemTag = rawItem.tag
 	const extraAttributes = itemTag?.ExtraAttributes ?? {}
+	let headId: string
+
+	if (vanillaId === 397) {
+		const headDataBase64 = itemTag?.SkullOwner?.Properties?.textures?.[0]?.Value
+		if (headDataBase64) {
+			const headData = JSON.parse(base64decode(headDataBase64).toString())
+			const headDataUrl = headData?.textures?.SKIN?.url
+			if (headDataUrl) {
+				const splitUrl = headDataUrl.split('/')
+				headId = splitUrl[splitUrl.length - 1]
+			}
+		}
+	}
 
 	return {
 		id: extraAttributes?.id ?? null,
@@ -57,7 +71,7 @@ function cleanItem(rawItem): Item {
 		anvil_uses: extraAttributes?.anvil_uses,
 		timestamp: extraAttributes?.timestamp,
 
-		skull_owner: itemTag?.SkullOwner?.Properties?.textures?.[0]?.value ?? undefined,
+		head_texture: headId,
 	}
 }
 
@@ -98,7 +112,7 @@ export const INVENTORIES = {
 	wardrobe: 'wardrobe_contents'
 }
 
-export type Inventories = { [name in keyof typeof INVENTORIES ]: Inventories }
+export type Inventories = { [name in keyof typeof INVENTORIES ]: Item[] }
 
 export async function cleanInventories(data: any): Promise<Inventories> {
 	const cleanInventories: any = {}

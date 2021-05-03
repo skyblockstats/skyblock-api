@@ -1,11 +1,13 @@
-import { fetchAllLeaderboardsCategorized, fetchMemberLeaderboard, fetchMemberLeaderboardSpots } from './database'
+import { fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots } from './database'
 import { fetchMemberProfile, fetchUser } from './hypixel'
 import rateLimit from 'express-rate-limit'
+import * as constants from './constants'
 import express from 'express'
 
 const app = express()
 
 export const debug = false
+
 
 // 200 requests over 5 minutes
 const limiter = rateLimit({
@@ -15,7 +17,7 @@ const limiter = rateLimit({
 		return req.headers.key === process.env.key
 	},
 	keyGenerator: (req: express.Request) => {
-		return (req.headers['Cf-Connecting-Ip'] ?? req.ip).toString()
+		return (req.headers['cf-connecting-ip'] ?? req.ip).toString()
 	}
 })
 
@@ -33,7 +35,7 @@ app.get('/player/:user', async(req, res) => {
 	res.json(
 		await fetchUser(
 			{ user: req.params.user },
-			['profiles', 'player']
+			[req.query.basic as string === 'true' ? undefined : 'profiles', 'player']
 		)
 	)
 })
@@ -51,9 +53,14 @@ app.get('/player/:user/:profile/leaderboards', async(req, res) => {
 })
 
 app.get('/leaderboard/:name', async(req, res) => {
-	res.json(
-		await fetchMemberLeaderboard(req.params.name)
-	)
+	try {
+		res.json(
+			await fetchLeaderboard(req.params.name)
+		)
+	} catch (err) {
+		console.error(err)
+		res.json({ 'error': err.toString() })
+	}
 })
 
 app.get('/leaderboards', async(req, res) => {
@@ -62,6 +69,13 @@ app.get('/leaderboards', async(req, res) => {
 	)
 })
 
+app.get('/constants', async(req, res) => {
+	res.json(
+		await constants.fetchConstantValues()
+	)
+})
 
 
-app.listen(8080, () => console.log('App started :)'))
+// only run the server if it's not doing tests
+if (!globalThis.isTest)
+	app.listen(8080, () => console.log('App started :)'))

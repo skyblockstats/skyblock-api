@@ -1,4 +1,5 @@
 import { maxMinion } from '../../hypixel'
+import * as constants from '../../constants'
 
 export interface CleanMinion {
     name: string,
@@ -10,9 +11,11 @@ export interface CleanMinion {
  * Clean the minions provided by Hypixel
  * @param minionsRaw The minion data provided by the Hypixel API
  */
-export function cleanMinions(data: any): CleanMinion[] {
+export async function cleanMinions(member: any): Promise<CleanMinion[]> {
     const minions: CleanMinion[] = []
-    for (const minionRaw of data?.crafted_generators ?? []) {
+    const processedMinionNames: Set<string> = new Set()
+
+    for (const minionRaw of member?.crafted_generators ?? []) {
         // do some regex magic to get the minion name and level
         // examples of potential minion names: CLAY_11, PIG_1, MAGMA_CUBE_4
         const minionName = minionRaw.split(/_\d/)[0].toLowerCase()
@@ -32,8 +35,29 @@ export function cleanMinions(data: any): CleanMinion[] {
 
         // set the minion at that level to true
         matchingMinion.levels[minionLevel - 1] = true
+        processedMinionNames.add(minionName)
     }
-    return minions
+
+    const allMinionNames = new Set(await constants.fetchMinions())
+
+    for (const minionName of processedMinionNames) {
+        if (!allMinionNames.has(minionName)) {
+            constants.addMinions(Array.from(processedMinionNames))
+            break
+        }
+    }
+
+    for (const minionName of allMinionNames) {
+        if (!processedMinionNames.has(minionName)) {
+            processedMinionNames.add(minionName)
+            minions.push({
+                name: minionName,
+                levels: new Array(maxMinion).fill(false)
+            })
+        }
+    }
+
+    return minions.sort((a, b) => a.name > b.name ? 1 : (a.name < b.name ? -1 : 0))
 }
 
 /**
