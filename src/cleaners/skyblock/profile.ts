@@ -1,7 +1,8 @@
 import { CleanBasicMember, CleanMember, cleanSkyBlockProfileMemberResponse, cleanSkyBlockProfileMemberResponseBasic } from './member'
 import { CleanMinion, combineMinionArrays, countUniqueMinions } from './minions'
-import { Bank, cleanBank } from './bank'
 import { ApiOptions } from '../../hypixel'
+import { Bank, cleanBank } from './bank'
+import * as constants from '../../constants'
 
 export interface CleanProfile extends CleanBasicProfile {
     members?: CleanBasicMember[]
@@ -78,6 +79,13 @@ export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptio
     }
     const minions: CleanMinion[] = combineMinionArrays(memberMinions)
 
+    const { max_minions: maxUniqueMinions } = await constants.fetchConstantValues()
+    
+    const uniqueMinions = countUniqueMinions(minions)
+    console.log(uniqueMinions, (maxUniqueMinions ?? 0), uniqueMinions > (maxUniqueMinions ?? 0))
+    if (uniqueMinions > (maxUniqueMinions ?? 0))
+        await constants.setConstantValues({ max_minions: uniqueMinions })
+
     // return more detailed info
     return {
         uuid: data.profile_id,
@@ -85,7 +93,7 @@ export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptio
         members: cleanedMembers,
         bank: cleanBank(data),
         minions: minions,
-		minion_count: countUniqueMinions(minions)
+		minion_count: uniqueMinions
     }
 }
 

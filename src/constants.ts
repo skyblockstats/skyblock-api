@@ -124,7 +124,7 @@ async function editFile(file: GithubFile, message: string, newContent: string): 
 	})
 }
 
-export async function fetchJSONConstant(filename: string): Promise<string[]> {
+export async function fetchJSONConstant(filename: string): Promise<any> {
 	const file = await fetchFile(filename)
 	try {
 		return JSON.parse(file.content)
@@ -228,4 +228,35 @@ export async function fetchMinions(): Promise<string[]> {
 /** Add skills to skyblock-constants. This has caching so it's fine to call many times */
 export async function addMinions(addingMinions: string[]): Promise<void> {
 	await constants.addJSONConstants('minions.json', addingMinions, 'minion')
+}
+
+interface constantValues {
+	max_minions?: number
+	max_fairy_souls?: number
+}
+
+export async function fetchConstantValues(): Promise<constantValues> {
+	return await constants.fetchJSONConstant('values.json')
+}
+
+export async function setConstantValues(newValues: constantValues) {
+	let file: GithubFile = await fetchFile('values.json')
+	if (!file.path) return
+	let oldValues: constantValues
+	try {
+		oldValues = JSON.parse(file.content)
+	} catch {
+		// invalid json, set it as an empty array
+		oldValues = {}
+	}
+	const updatedStats = { ...oldValues, ...newValues }
+
+	// there's not actually any new stats, just return
+	// TODO: optimize this? might be fine already though, idk
+	if (JSON.stringify(updatedStats) === JSON.stringify(oldValues)) return
+
+	const commitMessage = 'Update values'
+	try {
+		await editFile(file, commitMessage, JSON.stringify(updatedStats, null, 2))
+	} catch {}
 }
