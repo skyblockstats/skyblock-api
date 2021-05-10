@@ -47,8 +47,7 @@ async function fetchGithubApi(method: string, route: string, headers?: any, json
 				}, headers),
 			}
 		)
-	} catch (err) {
-		console.log('bruh, errored', err)
+	} catch {
 		// if there's an error, wait a second and try again
 		await new Promise((resolve) => setTimeout(resolve, 1000))
 		return await fetchGithubApi(method, route, headers, json)
@@ -87,7 +86,6 @@ function fetchFile(path: string): Promise<GithubFile> {
 				},
 			)
 			const data = await r.json()
-			console.log('ok github api returned')
 
 			const file = {
 				path: data.path,
