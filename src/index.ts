@@ -6,7 +6,7 @@ import express from 'express'
 
 const app = express()
 
-export const debug = false
+export const debug = true
 
 
 // 200 requests over 5 minutes

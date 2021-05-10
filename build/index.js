@@ -29,7 +29,7 @@ const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const constants = __importStar(require("./constants"));
 const express_1 = __importDefault(require("express"));
 const app = express_1.default();
-exports.debug = false;
+exports.debug = true;
 // 200 requests over 5 minutes
 const limiter = express_rate_limit_1.default({
     windowMs: 60 * 1000 * 5,

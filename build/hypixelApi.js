@@ -58,7 +58,8 @@ async function sendApiRequest({ path, key, args }) {
         fetchResponse = await node_fetch_1.default(fetchUrl, { agent: () => httpsAgent });
         fetchJsonParsed = await fetchResponse.json();
     }
-    catch {
+    catch (err) {
+        console.debug('error? ok retrying', err);
         // if there's an error, wait a second and try again
         await new Promise((resolve) => setTimeout(resolve, 1000));
         return await sendApiRequest({ path, key, args });
@@ -76,11 +77,16 @@ async function sendApiRequest({ path, key, args }) {
             reset: Date.now() + parseInt(fetchResponse.headers['ratelimit-reset']) * 1000
         };
     if (fetchJsonParsed.throttle) {
+        console.log('bruh, throttled');
         if (apiKeyUsage[key])
             apiKeyUsage[key].remaining = 0;
         // if it's throttled, wait 10 seconds and try again
         await new Promise((resolve) => setTimeout(resolve, 10000));
         return await sendApiRequest({ path, key, args });
+    }
+    console.log(path, args, fetchJsonParsed.success);
+    if (!fetchJsonParsed.success) {
+        console.log(fetchJsonParsed);
     }
     return fetchJsonParsed;
 }

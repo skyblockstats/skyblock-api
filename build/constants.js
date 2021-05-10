@@ -64,7 +64,8 @@ async function fetchGithubApi(method, route, headers, json) {
             }, headers),
         });
     }
-    catch {
+    catch (err) {
+        console.log('bruh, errored', err);
         // if there's an error, wait a second and try again
         await new Promise((resolve) => setTimeout(resolve, 1000));
         return await fetchGithubApi(method, route, headers, json);
@@ -89,6 +90,7 @@ function fetchFile(path) {
                 'Accept': 'application/vnd.github.v3+json',
             });
             const data = await r.json();
+            console.log('ok github api returned');
             const file = {
                 path: data.path,
                 content: Buffer.from(data.content, data.encoding).toString(),
