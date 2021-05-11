@@ -15,7 +15,7 @@ import * as discord from './discord'
 import NodeCache from 'node-cache'
 import Queue from 'queue-promise'
 import { debug } from '.'
-import uuid from 'uuid'
+import { v4 as uuid4 } from 'uuid'
 
 // don't update the user for 3 minutes
 const recentlyUpdated = new NodeCache({
@@ -640,7 +640,7 @@ async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
 }
 
 export async function createSession(refreshToken: string, userData: discord.DiscordUser): Promise<string> {
-	const sessionId = uuid.uuid4()
+	const sessionId = uuid4()
 	await sessionsCollection.insertOne({
 		_id: sessionId,
 		refresh_token: refreshToken,
