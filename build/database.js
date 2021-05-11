@@ -25,8 +25,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.queueUpdateDatabaseProfile = exports.queueUpdateDatabaseMember = exports.updateDatabaseProfile = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchLeaderboard = exports.fetchProfileLeaderboard = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchSlayerLeaderboards = exports.fetchAllLeaderboardsCategorized = void 0;
+exports.createSession = exports.queueUpdateDatabaseProfile = exports.queueUpdateDatabaseMember = exports.updateDatabaseProfile = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchLeaderboard = exports.fetchProfileLeaderboard = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchSlayerLeaderboards = exports.fetchAllLeaderboardsCategorized = void 0;
 const stats_1 = require("./cleaners/skyblock/stats");
+const slayers_1 = require("./cleaners/skyblock/slayers");
 const mongodb_1 = require("mongodb");
 const cached = __importStar(require("./hypixelCached"));
 const constants = __importStar(require("./constants"));
@@ -34,7 +35,7 @@ const util_1 = require("./util");
 const node_cache_1 = __importDefault(require("node-cache"));
 const queue_promise_1 = __importDefault(require("queue-promise"));
 const _1 = require(".");
-const slayers_1 = require("./cleaners/skyblock/slayers");
+const uuid_1 = require("uuid");
 // don't update the user for 3 minutes
 const recentlyUpdated = new node_cache_1.default({
     stdTTL: 60 * 3,
@@ -51,6 +52,8 @@ let client;
 let database;
 let memberLeaderboardsCollection;
 let profileLeaderboardsCollection;
+let sessionsCollection;
+let accountsCollection;
 async function connect() {
     if (!process.env.db_uri)
         return console.warn('Warning: db_uri was not found in .env. Features that utilize the database such as leaderboards won\'t work.');
@@ -60,6 +63,8 @@ async function connect() {
     database = client.db(process.env.db_name);
     memberLeaderboardsCollection = database.collection('member-leaderboards');
     profileLeaderboardsCollection = database.collection('profile-leaderboards');
+    sessionsCollection = database.collection('sessions');
+    accountsCollection = database.collection('accounts');
 }
 function getMemberCollectionAttributes(member) {
     const collectionAttributes = {};
@@ -512,6 +517,20 @@ async function fetchAllLeaderboards(fast) {
     if (_1.debug)
         console.debug('Finished caching leaderboards!');
 }
+async function createSession(refreshToken, userData) {
+    const sessionId = uuid_1.v4();
+    await sessionsCollection.insertOne({
+        _id: sessionId,
+        refresh_token: refreshToken,
+        discord_user: {
+            id: userData.id,
+            name: userData.username + '#' + userData.discriminator
+        },
+        lastUpdated: new Date()
+    });
+    return sessionId;
+}
+exports.createSession = createSession;
 // make sure it's not in a test
 if (!globalThis.isTest) {
     connect().then(() => {

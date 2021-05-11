@@ -27,9 +27,11 @@ const database_1 = require("./database");
 const hypixel_1 = require("./hypixel");
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const constants = __importStar(require("./constants"));
+const discord = __importStar(require("./discord"));
 const express_1 = __importDefault(require("express"));
 const app = express_1.default();
 exports.debug = false;
+const mainSiteUrl = 'http://localhost:8081';
 // 200 requests over 5 minutes
 const limiter = express_rate_limit_1.default({
     windowMs: 60 * 1000 * 5,
@@ -43,6 +45,7 @@ const limiter = express_rate_limit_1.default({
     }
 });
 app.use(limiter);
+app.use(express_1.default.json());
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     next();
@@ -73,6 +76,22 @@ app.get('/leaderboards', async (req, res) => {
 });
 app.get('/constants', async (req, res) => {
     res.json(await constants.fetchConstantValues());
+});
+app.post('/accounts/createsession', async (req, res) => {
+    try {
+        const { code } = req.body;
+        const { access_token: accessToken, refresh_token: refreshToken } = await discord.exchangeCode(`${mainSiteUrl}/loggedin`, code);
+        if (!accessToken)
+            // access token is invalid :(
+            return res.json({ ok: false });
+        const userData = await discord.getUser(accessToken);
+        const sessionId = await database_1.createSession(refreshToken, userData);
+        res.json({ ok: true, session_id: sessionId });
+    }
+    catch (err) {
+        console.error(err);
+        res.json({ ok: false });
+    }
 });
 // only run the server if it's not doing tests
 if (!globalThis.isTest)

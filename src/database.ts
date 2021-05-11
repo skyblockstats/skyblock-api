@@ -67,6 +67,7 @@ interface SessionSchema {
 		id: string
 		name: string
 	}
+	lastUpdated: Date
 }
 interface AccountSchema {
 	_id?: string
@@ -647,7 +648,8 @@ export async function createSession(refreshToken: string, userData: discord.Disc
 		discord_user: {
 			id: userData.id,
 			name: userData.username + '#' + userData.discriminator
-		}
+		},
+		lastUpdated: new Date()
 	})
 	return sessionId
 }
