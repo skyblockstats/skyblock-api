@@ -505,6 +505,8 @@ async function fetchAllLeaderboards(fast) {
         if (!fast)
             // wait 2 seconds so it doesnt use as much ram
             await util_1.sleep(2 * 1000);
+        else
+            await util_1.sleep(500);
         await fetchMemberLeaderboard(leaderboard);
     }
     if (_1.debug)

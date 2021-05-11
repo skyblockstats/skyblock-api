@@ -612,6 +612,8 @@ async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
 		if (!fast)
 			// wait 2 seconds so it doesnt use as much ram
 			await sleep(2 * 1000)
+		else
+			await sleep(500)
 
 		await fetchMemberLeaderboard(leaderboard)
 	}
