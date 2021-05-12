@@ -654,6 +654,12 @@ export async function createSession(refreshToken: string, userData: discord.Disc
 	return sessionId
 }
 
+export async function fetchSession(sessionId: string): Promise<SessionSchema> {
+	return await sessionsCollection.findOne({
+		_id: sessionId
+	})
+}
+
 // make sure it's not in a test
 if (!globalThis.isTest) {
 	connect().then(() => {

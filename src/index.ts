@@ -1,4 +1,4 @@
-import { createSession, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots } from './database'
+import { createSession, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession } from './database'
 import { fetchMemberProfile, fetchUser } from './hypixel'
 import rateLimit from 'express-rate-limit'
 import * as constants from './constants'
@@ -89,11 +89,21 @@ app.post('/accounts/createsession', async(req, res) => {
 		const sessionId = await createSession(refreshToken, userData)
 		res.json({ ok: true, session_id: sessionId })
 	} catch (err) {
-		console.error(err)
 		res.json({ ok: false })
 	}
 })
 
+app.post('/accounts/session', async(req, res) => {
+	try {
+		const { uuid } = req.body
+		res.json(
+			await fetchSession(uuid)
+		)
+	} catch (err) {
+		console.error(err)
+		res.json({ ok: false })
+	}
+})
 
 // only run the server if it's not doing tests
 if (!globalThis.isTest)
