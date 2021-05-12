@@ -1,4 +1,4 @@
-import { createSession, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession } from './database'
+import { createSession, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, updateAccount } from './database'
 import { fetchMemberProfile, fetchUser } from './hypixel'
 import rateLimit from 'express-rate-limit'
 import * as constants from './constants'
@@ -99,6 +99,20 @@ app.post('/accounts/session', async(req, res) => {
 		res.json(
 			await fetchSession(uuid)
 		)
+	} catch (err) {
+		console.error(err)
+		res.json({ ok: false })
+	}
+})
+
+
+app.post('/accounts/update', async(req, res) => {
+	// it checks against the key, so it's kind of secure
+	if (req.headers.key !== process.env.key) return console.log('bad key!')
+	console.log('pogger', req.body)
+	try {
+		await updateAccount(req.body.discordId, req.body)
+		res.json({ ok: true })
 	} catch (err) {
 		console.error(err)
 		res.json({ ok: false })

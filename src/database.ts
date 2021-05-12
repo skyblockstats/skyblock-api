@@ -71,6 +71,8 @@ interface SessionSchema {
 }
 interface AccountSchema {
 	_id?: string
+	discordId: string
+	minecraftUuid?: string
 }
 
 let memberLeaderboardsCollection: Collection<any>
@@ -658,6 +660,12 @@ export async function fetchSession(sessionId: string): Promise<SessionSchema> {
 	return await sessionsCollection.findOne({
 		_id: sessionId
 	})
+}
+
+export async function updateAccount(discordId: string, schema: AccountSchema) {
+	await accountsCollection.updateOne({
+		discordId
+	}, { $set: schema }, { upsert: true })
 }
 
 // make sure it's not in a test
