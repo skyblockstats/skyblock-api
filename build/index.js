@@ -89,6 +89,29 @@ app.post('/accounts/createsession', async (req, res) => {
         res.json({ ok: true, session_id: sessionId });
     }
     catch (err) {
+        res.json({ ok: false });
+    }
+});
+app.post('/accounts/session', async (req, res) => {
+    try {
+        const { uuid } = req.body;
+        res.json(await database_1.fetchSession(uuid));
+    }
+    catch (err) {
+        console.error(err);
+        res.json({ ok: false });
+    }
+});
+app.post('/accounts/update', async (req, res) => {
+    // it checks against the key, so it's kind of secure
+    if (req.headers.key !== process.env.key)
+        return console.log('bad key!');
+    console.log('pogger', req.body);
+    try {
+        await database_1.updateAccount(req.body.discordId, req.body);
+        res.json({ ok: true });
+    }
+    catch (err) {
         console.error(err);
         res.json({ ok: false });
     }
