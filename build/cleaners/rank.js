@@ -12,6 +12,7 @@ const rankColors = {
     'YOUTUBE': 'c',
     'HELPER': '9',
     'MODERATOR': '2',
+    'GM': '2',
     'ADMIN': 'c'
 };
 /** Response cleaning (reformatting to be nicer) */
@@ -38,6 +39,8 @@ function cleanRank({ packageRank, newPackageRank, monthlyPackageRank, rankPlusCo
         // YouTube rank is called YouTuber, change this to the proper name
         else if (name === 'YOUTUBER')
             name = 'YOUTUBE';
+        else if (name === 'GAME_MASTER')
+            name = 'GM';
         else if (name === undefined)
             name = 'NONE';
         const plusColor = rankPlusColor ? util_1.colorCodeFromName(rankPlusColor) : null;
