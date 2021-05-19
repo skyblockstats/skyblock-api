@@ -11,6 +11,7 @@ const rankColors: { [ name: string ]: string } = {
 	'YOUTUBE': 'c',
 	'HELPER': '9',
 	'MODERATOR': '2',
+	'GM': '2',
 	'ADMIN': 'c'
 }
 
@@ -49,6 +50,7 @@ export function cleanRank({
 		if (name === 'SUPERSTAR') name = 'MVP++'
 		// YouTube rank is called YouTuber, change this to the proper name
 		else if (name === 'YOUTUBER') name = 'YOUTUBE'
+		else if (name === 'GAME_MASTER') name = 'GM'
 		else if (name === undefined) name = 'NONE'
 
 		const plusColor = rankPlusColor ? colorCodeFromName(rankPlusColor) : null
