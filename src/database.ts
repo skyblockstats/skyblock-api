@@ -228,7 +228,6 @@ function isLeaderboardReversed(name: string): boolean {
 }
 
 async function fetchMemberLeaderboardRaw(name: string): Promise<DatabaseMemberLeaderboardItem[]> {
-	return []
 	if (!client) throw Error('Client isn\'t initialized yet')
 
 	if (cachedRawLeaderboards.has(name))
@@ -251,7 +250,6 @@ async function fetchMemberLeaderboardRaw(name: string): Promise<DatabaseMemberLe
 }
 
 async function fetchProfileLeaderboardRaw(name: string): Promise<DatabaseProfileLeaderboardItem[]> {
-	return []
 	if (cachedRawLeaderboards.has(name))
 		return cachedRawLeaderboards.get(name) as DatabaseProfileLeaderboardItem[]
 	// typescript forces us to make a new variable and set it this way because it gives an error otherwise
@@ -286,12 +284,12 @@ interface ProfileLeaderboard {
 
 /** Fetch a leaderboard that ranks members, as opposed to profiles */
 export async function fetchMemberLeaderboard(name: string): Promise<MemberLeaderboard> {
+	const leaderboardRaw = await fetchMemberLeaderboardRaw(name)
 	return {
 		list: [],
 		name: 'Leaderboards are temporarily disabled, they\'ll be back in a few hours',
 		unit: ''
 	}
-	const leaderboardRaw = await fetchMemberLeaderboardRaw(name)
 
 	const fetchLeaderboardPlayer = async(item: DatabaseMemberLeaderboardItem): Promise<MemberLeaderboardItem> => {
 		return {
@@ -649,10 +647,10 @@ async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
 if (!globalThis.isTest) {
 	connect().then(() => {
 		// when it connects, cache the leaderboards and remove bad members
-		// removeBadMemberLeaderboardAttributes()
+		removeBadMemberLeaderboardAttributes()
 		// cache leaderboards on startup so its faster later on
-		// fetchAllLeaderboards(true)
+		fetchAllLeaderboards(true)
 		// cache leaderboard players again every 4 hours
-		// setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000)
+		setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000)
 	})
 }
