@@ -189,6 +189,7 @@ function isLeaderboardReversed(name) {
     return false;
 }
 async function fetchMemberLeaderboardRaw(name) {
+    return [];
     if (!client)
         throw Error('Client isn\'t initialized yet');
     if (cachedRawLeaderboards.has(name))
@@ -207,6 +208,7 @@ async function fetchMemberLeaderboardRaw(name) {
     return leaderboardRaw;
 }
 async function fetchProfileLeaderboardRaw(name) {
+    return [];
     if (cachedRawLeaderboards.has(name))
         return cachedRawLeaderboards.get(name);
     // typescript forces us to make a new variable and set it this way because it gives an error otherwise
@@ -225,12 +227,12 @@ async function fetchProfileLeaderboardRaw(name) {
 /** Fetch a leaderboard that ranks members, as opposed to profiles */
 async function fetchMemberLeaderboard(name) {
     var _a;
-    const leaderboardRaw = await fetchMemberLeaderboardRaw(name);
     return {
         list: [],
         name: 'Leaderboards are temporarily disabled, they\'ll be back in a few hours',
         unit: ''
     };
+    const leaderboardRaw = await fetchMemberLeaderboardRaw(name);
     const fetchLeaderboardPlayer = async (item) => {
         return {
             player: await cached.fetchBasicPlayer(item.uuid),
@@ -539,10 +541,10 @@ async function fetchAllLeaderboards(fast) {
 if (!globalThis.isTest) {
     connect().then(() => {
         // when it connects, cache the leaderboards and remove bad members
-        removeBadMemberLeaderboardAttributes();
+        // removeBadMemberLeaderboardAttributes()
         // cache leaderboards on startup so its faster later on
-        fetchAllLeaderboards(true);
+        // fetchAllLeaderboards(true)
         // cache leaderboard players again every 4 hours
-        setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000);
+        // setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000)
     });
 }
