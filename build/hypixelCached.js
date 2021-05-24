@@ -231,6 +231,10 @@ async function fetchBasicProfiles(user) {
     if (_1.debug)
         console.debug('Cache miss: fetchBasicProfiles', user);
     const player = await fetchPlayer(playerUuid);
+    if (!player) {
+        console.log('bruh playerUuid', playerUuid);
+        return [];
+    }
     const profiles = player.profiles;
     exports.basicProfilesCache.set(playerUuid, profiles);
     // cache the profile names and uuids to profileNameCache because we can

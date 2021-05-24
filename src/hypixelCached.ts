@@ -247,6 +247,10 @@ async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[]> {
 	if (debug) console.debug('Cache miss: fetchBasicProfiles', user)
 
 	const player = await fetchPlayer(playerUuid)
+	if (!player) {
+		console.log('bruh playerUuid', playerUuid)
+		return []
+	}
 	const profiles = player.profiles
 	basicProfilesCache.set(playerUuid, profiles)
 
