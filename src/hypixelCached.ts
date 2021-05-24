@@ -371,5 +371,10 @@ setInterval(() => {
 	const keys = basicPlayerCache.keys()
 	if (keys)
 		console.log(basicPlayerCache.get(keys[keys.length - 1]))
-	console.log(basicPlayerCache.getStats())
+	console.log('basicPlayerCache', basicPlayerCache.getStats())
+	console.log('usernameCache', usernameCache.getStats())
+	console.log('profileCache', profileCache.getStats())
+	console.log(
+		Math.floor((process.memoryUsage().heapUsed / 1024 / 1024) * 10) / 10
+	+ 'mb')
 }, 60 * 1000)

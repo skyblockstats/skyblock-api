@@ -344,5 +344,9 @@ setInterval(() => {
     const keys = exports.basicPlayerCache.keys();
     if (keys)
         console.log(exports.basicPlayerCache.get(keys[keys.length - 1]));
-    console.log(exports.basicPlayerCache.getStats());
+    console.log('basicPlayerCache', exports.basicPlayerCache.getStats());
+    console.log('usernameCache', exports.usernameCache.getStats());
+    console.log('profileCache', exports.profileCache.getStats());
+    console.log(Math.floor((process.memoryUsage().heapUsed / 1024 / 1024) * 10) / 10
+        + 'mb');
 }, 60 * 1000);
