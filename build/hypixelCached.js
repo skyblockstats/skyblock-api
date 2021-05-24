@@ -340,3 +340,9 @@ async function fetchProfileName(user, profile) {
     return profileName;
 }
 exports.fetchProfileName = fetchProfileName;
+setInterval(() => {
+    const keys = exports.basicPlayerCache.keys();
+    if (keys)
+        console.log(exports.basicPlayerCache.get(keys[keys.length - 1]));
+    console.log(exports.basicPlayerCache.getStats());
+}, 60 * 1000);

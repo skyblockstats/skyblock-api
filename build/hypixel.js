@@ -83,7 +83,7 @@ async function fetchUser({ user, uuid, username }, included = ['player']) {
         if (!includeProfiles)
             basicProfilesData = playerData === null || playerData === void 0 ? void 0 : playerData.profiles;
         if (playerData)
-            playerData.profiles = undefined;
+            delete playerData.profiles;
     }
     if (includeProfiles) {
         profilesData = await cached.fetchSkyblockProfiles(uuid);

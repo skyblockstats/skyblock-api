@@ -366,3 +366,10 @@ export async function fetchProfileName(user: string, profile: string): Promise<s
 	profileNameCache.set(`${playerUuid}.${profileUuid}`, profileName)
 	return profileName
 }
+
+setInterval(() => {
+	const keys = basicPlayerCache.keys()
+	if (keys)
+		console.log(basicPlayerCache.get(keys[keys.length - 1]))
+	console.log(basicPlayerCache.getStats())
+}, 60 * 1000)
