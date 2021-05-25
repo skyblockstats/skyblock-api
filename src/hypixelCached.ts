@@ -9,6 +9,7 @@ import { CleanPlayer } from './cleaners/player'
 import { isUuid, undashUuid } from './util'
 import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/skyblock/profile'
 import { debug } from '.'
+import { cachedRawLeaderboards } from './database'
 
 // cache usernames for 4 hours
 /** uuid: username */
@@ -378,6 +379,7 @@ setInterval(() => {
 	console.log('basicPlayerCache', basicPlayerCache.getStats())
 	console.log('usernameCache', usernameCache.getStats())
 	console.log('profileCache', profileCache.getStats())
+	console.log('cachedRawLeaderboards size', cachedRawLeaderboards.size)
 	console.log(
 		Math.floor((process.memoryUsage().heapUsed / 1024 / 1024) * 10) / 10
 	+ 'mb')

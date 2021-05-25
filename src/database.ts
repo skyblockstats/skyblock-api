@@ -47,7 +47,7 @@ interface ProfileLeaderboardItem {
 	value: number
 }
 
-const cachedRawLeaderboards: Map<string, (DatabaseMemberLeaderboardItem|DatabaseProfileLeaderboardItem)[]> = new Map()
+export const cachedRawLeaderboards: Map<string, (DatabaseMemberLeaderboardItem|DatabaseProfileLeaderboardItem)[]> = new Map()
 
 const leaderboardMax = 100
 const reversedLeaderboards = [
