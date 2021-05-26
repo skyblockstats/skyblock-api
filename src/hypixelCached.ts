@@ -3,6 +3,7 @@
  */
 
 import NodeCache from 'node-cache'
+import LRUCache from 'lru-cache'
 import * as mojang from './mojang'
 import * as hypixel from './hypixel'
 import { CleanPlayer } from './cleaners/player'
@@ -32,10 +33,9 @@ export const playerCache = new NodeCache({
 })
 
 // cache "basic players" (players without profiles) for 4 hours
-export const basicPlayerCache = new NodeCache({
-	stdTTL: 60 * 60 * 4,
-	checkperiod: 60 * 10,
-	useClones: true
+export const basicPlayerCache: LRUCache<string, CleanPlayer> = new LRUCache({
+	max: 10000,
+	maxAge: 60 * 60 * 4 * 1000,
 })
 
 export const profileCache = new NodeCache({

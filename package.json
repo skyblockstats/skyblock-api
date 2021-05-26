@@ -27,6 +27,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "express-rate-limit": "^5.2.6",
+    "lru-cache": "^6.0.0",
     "mongodb": "^3.6.7",
     "node-cache": "^5.1.2",
     "node-fetch": "^2.6.1",
@@ -36,9 +37,10 @@
   "devDependencies": {
     "@types/express": "^4.17.11",
     "@types/express-rate-limit": "^5.1.1",
-    "@types/node": "^15.3.1",
+    "@types/lru-cache": "^5.1.0",
     "@types/mocha": "^8.2.2",
     "@types/mongodb": "^3.6.15",
+    "@types/node": "^15.3.1",
     "@types/node-fetch": "^2.5.10",
     "dotenv": "^9.0.2",
     "mocha": "^8.4.0",
