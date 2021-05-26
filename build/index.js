@@ -57,7 +57,7 @@ app.get('/player/:user', async (req, res) => {
     res.json(await hypixel_1.fetchUser({ user: req.params.user }, [req.query.basic === 'true' ? undefined : 'profiles', 'player']));
 });
 app.get('/player/:user/:profile', async (req, res) => {
-    res.json(await hypixel_1.fetchMemberProfile(req.params.user, req.params.profile));
+    res.json(await hypixel_1.fetchMemberProfile(req.params.user, req.params.profile, req.query.customization === 'true'));
 });
 app.get('/player/:user/:profile/leaderboards', async (req, res) => {
     res.json(await database_1.fetchMemberLeaderboardSpots(req.params.user, req.params.profile));

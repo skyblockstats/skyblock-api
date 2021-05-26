@@ -45,7 +45,7 @@ app.get('/player/:user', async(req, res) => {
 
 app.get('/player/:user/:profile', async(req, res) => {
 	res.json(
-		await fetchMemberProfile(req.params.user, req.params.profile)
+		await fetchMemberProfile(req.params.user, req.params.profile, req.query.customization as string === 'true')
 	)
 })
 

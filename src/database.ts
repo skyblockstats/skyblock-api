@@ -69,10 +69,17 @@ interface SessionSchema {
 	}
 	lastUpdated: Date
 }
-interface AccountSchema {
+
+export interface AccountCustomization {
+	backgroundUrl?: string
+	pack?: string
+}
+
+export interface AccountSchema {
 	_id?: string
 	discordId: string
 	minecraftUuid?: string
+	customization?: AccountCustomization
 }
 
 let memberLeaderboardsCollection: Collection<any>
@@ -659,6 +666,12 @@ export async function createSession(refreshToken: string, userData: discord.Disc
 export async function fetchSession(sessionId: string): Promise<SessionSchema> {
 	return await sessionsCollection.findOne({
 		_id: sessionId
+	})
+}
+
+export async function fetchAccount(minecraftUuid: string): Promise<AccountSchema> {
+	return await accountsCollection.findOne({
+		minecraftUuid
 	})
 }
 

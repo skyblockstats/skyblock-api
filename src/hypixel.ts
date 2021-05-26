@@ -2,14 +2,14 @@
  * Fetch the clean Hypixel API
  */
 
-import { CleanPlayer, cleanPlayerResponse } from './cleaners/player'
-import { chooseApiKey, HypixelResponse, sendApiRequest } from './hypixelApi'
-import * as cached from './hypixelCached'
-import { CleanBasicMember, CleanMemberProfile } from './cleaners/skyblock/member'
 import { cleanSkyblockProfileResponse, CleanProfile, CleanBasicProfile, CleanFullProfile, CleanFullProfileBasicMembers } from './cleaners/skyblock/profile'
+import { AccountSchema, fetchAccount, queueUpdateDatabaseMember, queueUpdateDatabaseProfile } from './database'
+import { CleanBasicMember, CleanMemberProfile } from './cleaners/skyblock/member'
+import { chooseApiKey, HypixelResponse, sendApiRequest } from './hypixelApi'
 import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles'
+import { CleanPlayer, cleanPlayerResponse } from './cleaners/player'
+import * as cached from './hypixelCached'
 import { debug } from '.'
-import { queueUpdateDatabaseMember, queueUpdateDatabaseProfile } from './database'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories'
 
@@ -131,9 +131,12 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
  * This is safe to use many times as the results are cached!
  * @param user A username or uuid
  * @param profile A profile name or profile uuid
+ * @param customization Whether stuff like the user's custom background will be returned
  */
-export async function fetchMemberProfile(user: string, profile: string): Promise<CleanMemberProfile> {
+export async function fetchMemberProfile(user: string, profile: string, customization: boolean): Promise<CleanMemberProfile> {
 	const playerUuid = await cached.uuidFromUser(user)
+	// we don't await the promise immediately so it can load while we do other stuff
+	const websiteAccountPromise = customization ? fetchAccount(playerUuid) : null
 	const profileUuid = await cached.fetchProfileUuid(user, profile)
 
 	// if the profile doesn't have an id, just return
@@ -158,6 +161,12 @@ export async function fetchMemberProfile(user: string, profile: string): Promise
 
 	cleanProfile.members = simpleMembers
 
+	let websiteAccount: AccountSchema = undefined
+
+	if (websiteAccountPromise) {
+		websiteAccount = await websiteAccountPromise
+	}
+
 	return {
 		member: {
 			// the profile name is in member rather than profile since they sometimes differ for each member
@@ -167,7 +176,8 @@ export async function fetchMemberProfile(user: string, profile: string): Promise
 			// add all other data relating to the hypixel player, such as username, rank, etc
 			...player
 		},
-		profile: cleanProfile
+		profile: cleanProfile,
+		customization: websiteAccount?.customization
 	}
 }
 
