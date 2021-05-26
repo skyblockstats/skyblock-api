@@ -47,11 +47,21 @@ export function cleanRank({
 				?? packageRank?.replace('_PLUS', '+')
 
 		// MVP++ is called Superstar for some reason
-		if (name === 'SUPERSTAR') name = 'MVP++'
-		// YouTube rank is called YouTuber, change this to the proper name
-		else if (name === 'YOUTUBER') name = 'YOUTUBE'
-		else if (name === 'GAME_MASTER') name = 'GM'
-		else if (name === undefined) name = 'NONE'
+		switch (name) {
+			case 'SUPERSTAR':
+				name = 'MVP++'
+				break
+			// YouTube rank is called YouTuber, change this to the proper name
+			case 'YOUTUBER':
+				name = 'YOUTUBE'
+				break
+			case 'GAME_MASTER':
+				name = 'GM'
+				break
+			case undefined:
+				name = 'NONE'
+				break
+		}
 
 		const plusColor = rankPlusColor ? colorCodeFromName(rankPlusColor) : null
 		color = minecraftColorCodes[rankColors[name]]

@@ -34,15 +34,21 @@ function cleanRank({ packageRank, newPackageRank, monthlyPackageRank, rankPlusCo
         else
             name = (_a = newPackageRank === null || newPackageRank === void 0 ? void 0 : newPackageRank.replace('_PLUS', '+')) !== null && _a !== void 0 ? _a : packageRank === null || packageRank === void 0 ? void 0 : packageRank.replace('_PLUS', '+');
         // MVP++ is called Superstar for some reason
-        if (name === 'SUPERSTAR')
-            name = 'MVP++';
-        // YouTube rank is called YouTuber, change this to the proper name
-        else if (name === 'YOUTUBER')
-            name = 'YOUTUBE';
-        else if (name === 'GAME_MASTER')
-            name = 'GM';
-        else if (name === undefined)
-            name = 'NONE';
+        switch (name) {
+            case 'SUPERSTAR':
+                name = 'MVP++';
+                break;
+            // YouTube rank is called YouTuber, change this to the proper name
+            case 'YOUTUBER':
+                name = 'YOUTUBE';
+                break;
+            case 'GAME_MASTER':
+                name = 'GM';
+                break;
+            case undefined:
+                name = 'NONE';
+                break;
+        }
         const plusColor = rankPlusColor ? util_1.colorCodeFromName(rankPlusColor) : null;
         color = util_1.minecraftColorCodes[rankColors[name]];
         const rankColorPrefix = rankColors[name] ? '§' + rankColors[name] : '';
