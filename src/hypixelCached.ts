@@ -372,15 +372,15 @@ export async function fetchProfileName(user: string, profile: string): Promise<s
 	return profileName
 }
 
-setInterval(() => {
-	const keys = basicPlayerCache.keys()
-	if (keys)
-		console.log(basicPlayerCache.get(keys[keys.length - 1]))
-	console.log('basicPlayerCache', basicPlayerCache.getStats())
-	console.log('usernameCache', usernameCache.getStats())
-	console.log('profileCache', profileCache.getStats())
-	console.log('cachedRawLeaderboards size', cachedRawLeaderboards.size)
-	console.log(
-		Math.floor((process.memoryUsage().heapUsed / 1024 / 1024) * 10) / 10
-	+ 'mb')
-}, 60 * 1000)
+// setInterval(() => {
+	// const keys = basicPlayerCache.keys()
+	// if (keys)
+	// 	console.log(basicPlayerCache.get(keys[keys.length - 1]))
+	// console.log('basicPlayerCache', basicPlayerCache.getStats())
+	// console.log('usernameCache', usernameCache.getStats())
+	// console.log('profileCache', profileCache.getStats())
+	// console.log('cachedRawLeaderboards size', cachedRawLeaderboards.size)
+	// console.log(
+	// 	Math.floor((process.memoryUsage().heapUsed / 1024 / 1024) * 10) / 10
+	// + 'mb')
+// }, 60 * 1000)

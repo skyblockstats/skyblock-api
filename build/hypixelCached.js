@@ -31,7 +31,6 @@ const mojang = __importStar(require("./mojang"));
 const hypixel = __importStar(require("./hypixel"));
 const util_1 = require("./util");
 const _1 = require(".");
-const database_1 = require("./database");
 // cache usernames for 4 hours
 /** uuid: username */
 exports.usernameCache = new node_cache_1.default({
@@ -345,14 +344,15 @@ async function fetchProfileName(user, profile) {
     return profileName;
 }
 exports.fetchProfileName = fetchProfileName;
-setInterval(() => {
-    const keys = exports.basicPlayerCache.keys();
-    if (keys)
-        console.log(exports.basicPlayerCache.get(keys[keys.length - 1]));
-    console.log('basicPlayerCache', exports.basicPlayerCache.getStats());
-    console.log('usernameCache', exports.usernameCache.getStats());
-    console.log('profileCache', exports.profileCache.getStats());
-    console.log('cachedRawLeaderboards size', database_1.cachedRawLeaderboards.size);
-    console.log(Math.floor((process.memoryUsage().heapUsed / 1024 / 1024) * 10) / 10
-        + 'mb');
-}, 60 * 1000);
+// setInterval(() => {
+// const keys = basicPlayerCache.keys()
+// if (keys)
+// 	console.log(basicPlayerCache.get(keys[keys.length - 1]))
+// console.log('basicPlayerCache', basicPlayerCache.getStats())
+// console.log('usernameCache', usernameCache.getStats())
+// console.log('profileCache', profileCache.getStats())
+// console.log('cachedRawLeaderboards size', cachedRawLeaderboards.size)
+// console.log(
+// 	Math.floor((process.memoryUsage().heapUsed / 1024 / 1024) * 10) / 10
+// + 'mb')
+// }, 60 * 1000)
