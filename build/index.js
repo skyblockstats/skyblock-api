@@ -56,6 +56,9 @@ app.get('/', async (req, res) => {
 app.get('/player/:user', async (req, res) => {
     res.json(await hypixel_1.fetchUser({ user: req.params.user }, [req.query.basic === 'true' ? undefined : 'profiles', 'player'], req.query.customization === 'true'));
 });
+app.get('/discord/:id', async (req, res) => {
+    res.json(await database_1.fetchAccountFromDiscord(req.params.id));
+});
 app.get('/player/:user/:profile', async (req, res) => {
     res.json(await hypixel_1.fetchMemberProfile(req.params.user, req.params.profile, req.query.customization === 'true'));
 });
@@ -95,7 +98,9 @@ app.post('/accounts/createsession', async (req, res) => {
 app.post('/accounts/session', async (req, res) => {
     try {
         const { uuid } = req.body;
-        res.json(await database_1.fetchSession(uuid));
+        const session = await database_1.fetchSession(uuid);
+        const account = await database_1.fetchAccountFromDiscord(session.discord_user.id);
+        res.json({ session, account });
     }
     catch (err) {
         console.error(err);

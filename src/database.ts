@@ -664,15 +664,15 @@ export async function createSession(refreshToken: string, userData: discord.Disc
 }
 
 export async function fetchSession(sessionId: string): Promise<SessionSchema> {
-	return await sessionsCollection.findOne({
-		_id: sessionId
-	})
+	return await sessionsCollection.findOne({ _id: sessionId })
 }
 
 export async function fetchAccount(minecraftUuid: string): Promise<AccountSchema> {
-	return await accountsCollection.findOne({
-		minecraftUuid
-	})
+	return await accountsCollection.findOne({ minecraftUuid })
+}
+
+export async function fetchAccountFromDiscord(discordId: string): Promise<AccountSchema> {
+	return await accountsCollection.findOne({ discordId })
 }
 
 export async function updateAccount(discordId: string, schema: AccountSchema) {

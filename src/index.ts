@@ -1,4 +1,4 @@
-import { createSession, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, updateAccount } from './database'
+import { createSession, fetchAccount, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, updateAccount } from './database'
 import { fetchMemberProfile, fetchUser } from './hypixel'
 import rateLimit from 'express-rate-limit'
 import * as constants from './constants'
@@ -41,6 +41,12 @@ app.get('/player/:user', async(req, res) => {
 			[req.query.basic as string === 'true' ? undefined : 'profiles', 'player'],
 			req.query.customization as string === 'true'
 		)
+	)
+})
+
+app.get('/discord/:id', async(req, res) => {
+	res.json(
+		await fetchAccountFromDiscord(req.params.id)
 	)
 })
 
@@ -97,9 +103,9 @@ app.post('/accounts/createsession', async(req, res) => {
 app.post('/accounts/session', async(req, res) => {
 	try {
 		const { uuid } = req.body
-		res.json(
-			await fetchSession(uuid)
-		)
+		const session = await fetchSession(uuid)
+		const account = await fetchAccountFromDiscord(session.discord_user.id)
+		res.json({ session, account })
 	} catch (err) {
 		console.error(err)
 		res.json({ ok: false })
