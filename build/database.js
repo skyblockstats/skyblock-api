@@ -556,7 +556,7 @@ if (!globalThis.isTest) {
         // when it connects, cache the leaderboards and remove bad members
         removeBadMemberLeaderboardAttributes();
         // cache leaderboards on startup so its faster later on
-        fetchAllLeaderboards(true);
+        fetchAllLeaderboards(false);
         // cache leaderboard players again every 4 hours
         setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000);
     });
