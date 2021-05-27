@@ -3,17 +3,19 @@
 */
 
 import { categorizeStat, getStatUnit } from './cleaners/skyblock/stats'
-import { CleanBasicProfile, CleanFullProfile, CleanProfile } from './cleaners/skyblock/profile'
+import { CleanFullProfile } from './cleaners/skyblock/profile'
+import { slayerLevels } from './cleaners/skyblock/slayers'
 import { CleanMember } from './cleaners/skyblock/member'
 import { Collection, Db, MongoClient } from 'mongodb'
 import { CleanPlayer } from './cleaners/player'
 import * as cached from './hypixelCached'
 import * as constants from './constants'
 import { shuffle, sleep } from './util'
+import * as discord from './discord'
 import NodeCache from 'node-cache'
 import Queue from 'queue-promise'
 import { debug } from '.'
-import { slayerLevels } from './cleaners/skyblock/slayers'
+import { v4 as uuid4 } from 'uuid'
 
 // don't update the user for 3 minutes
 const recentlyUpdated = new NodeCache({
@@ -57,8 +59,33 @@ const reversedLeaderboards = [
 
 let client: MongoClient
 let database: Db
+
+interface SessionSchema {
+	_id?: string
+	refresh_token: string
+	discord_user: {
+		id: string
+		name: string
+	}
+	lastUpdated: Date
+}
+
+export interface AccountCustomization {
+	backgroundUrl?: string
+	pack?: string
+}
+
+export interface AccountSchema {
+	_id?: string
+	discordId: string
+	minecraftUuid?: string
+	customization?: AccountCustomization
+}
+
 let memberLeaderboardsCollection: Collection<any>
 let profileLeaderboardsCollection: Collection<any>
+let sessionsCollection: Collection<SessionSchema>
+let accountsCollection: Collection<AccountSchema>
 
 async function connect(): Promise<void> {
 	if (!process.env.db_uri)
@@ -69,6 +96,8 @@ async function connect(): Promise<void> {
 	database = client.db(process.env.db_name)
 	memberLeaderboardsCollection = database.collection('member-leaderboards')
 	profileLeaderboardsCollection = database.collection('profile-leaderboards')
+	sessionsCollection = database.collection('sessions')
+	accountsCollection = database.collection('accounts')
 }
 
 interface StringNumber {
@@ -618,6 +647,38 @@ async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
 		await fetchMemberLeaderboard(leaderboard)
 	}
 	if (debug) console.debug('Finished caching leaderboards!')
+}
+
+export async function createSession(refreshToken: string, userData: discord.DiscordUser): Promise<string> {
+	const sessionId = uuid4()
+	await sessionsCollection.insertOne({
+		_id: sessionId,
+		refresh_token: refreshToken,
+		discord_user: {
+			id: userData.id,
+			name: userData.username + '#' + userData.discriminator
+		},
+		lastUpdated: new Date()
+	})
+	return sessionId
+}
+
+export async function fetchSession(sessionId: string): Promise<SessionSchema> {
+	return await sessionsCollection.findOne({ _id: sessionId })
+}
+
+export async function fetchAccount(minecraftUuid: string): Promise<AccountSchema> {
+	return await accountsCollection.findOne({ minecraftUuid })
+}
+
+export async function fetchAccountFromDiscord(discordId: string): Promise<AccountSchema> {
+	return await accountsCollection.findOne({ discordId })
+}
+
+export async function updateAccount(discordId: string, schema: AccountSchema) {
+	await accountsCollection.updateOne({
+		discordId
+	}, { $set: schema }, { upsert: true })
 }
 
 // make sure it's not in a test

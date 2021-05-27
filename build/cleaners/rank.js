@@ -33,8 +33,8 @@ function cleanRank({ packageRank, newPackageRank, monthlyPackageRank, rankPlusCo
             name = rank;
         else
             name = (_a = newPackageRank === null || newPackageRank === void 0 ? void 0 : newPackageRank.replace('_PLUS', '+')) !== null && _a !== void 0 ? _a : packageRank === null || packageRank === void 0 ? void 0 : packageRank.replace('_PLUS', '+');
-        // MVP++ is called Superstar for some reason
         switch (name) {
+            // MVP++ is called Superstar for some reason
             case 'SUPERSTAR':
                 name = 'MVP++';
                 break;

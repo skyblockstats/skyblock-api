@@ -46,8 +46,8 @@ export function cleanRank({
 			name = newPackageRank?.replace('_PLUS', '+')
 				?? packageRank?.replace('_PLUS', '+')
 
-		// MVP++ is called Superstar for some reason
 		switch (name) {
+   		// MVP++ is called Superstar for some reason
 			case 'SUPERSTAR':
 				name = 'MVP++'
 				break

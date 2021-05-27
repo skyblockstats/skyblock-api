@@ -5,6 +5,7 @@ import { cleanObjectives, Objective } from './objectives'
 import { CleanFullProfileBasicMembers } from './profile'
 import { cleanProfileStats, StatItem } from './stats'
 import { CleanMinion, cleanMinions } from './minions'
+import { AccountCustomization } from '../../database'
 import { cleanSlayers, SlayerData } from './slayers'
 import { cleanVisitedZones, Zone } from './zones'
 import { cleanSkills, Skill } from './skills'
@@ -108,4 +109,5 @@ export interface CleanMemberProfilePlayer extends CleanPlayer {
 export interface CleanMemberProfile {
 	member: CleanMemberProfilePlayer
 	profile: CleanFullProfileBasicMembers
+	customization: AccountCustomization
 }

@@ -23,13 +23,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fetchMemberProfilesUncached = exports.fetchBasicProfileFromUuidUncached = exports.fetchMemberProfileUncached = exports.fetchMemberProfile = exports.fetchUser = exports.sendCleanApiRequest = exports.maxMinion = exports.saveInterval = void 0;
-const player_1 = require("./cleaners/player");
-const hypixelApi_1 = require("./hypixelApi");
-const cached = __importStar(require("./hypixelCached"));
 const profile_1 = require("./cleaners/skyblock/profile");
-const profiles_1 = require("./cleaners/skyblock/profiles");
-const _1 = require(".");
 const database_1 = require("./database");
+const hypixelApi_1 = require("./hypixelApi");
+const profiles_1 = require("./cleaners/skyblock/profiles");
+const player_1 = require("./cleaners/player");
+const cached = __importStar(require("./hypixelCached"));
+const _1 = require(".");
 // the interval at which the "last_save" parameter updates in the hypixel api, this is 3 minutes
 exports.saveInterval = 60 * 3 * 1000;
 // the highest level a minion can be
@@ -61,11 +61,12 @@ async function cleanResponse({ path, data }, options) {
  * @param included lets you choose what is returned, so there's less processing required on the backend
  * used inclusions: player, profiles
  */
-async function fetchUser({ user, uuid, username }, included = ['player']) {
+async function fetchUser({ user, uuid, username }, included = ['player'], customization) {
     if (!uuid) {
         // If the uuid isn't provided, get it
         uuid = await cached.uuidFromUser(user || username);
     }
+    const websiteAccountPromise = customization ? database_1.fetchAccount(uuid) : null;
     if (!uuid) {
         // the user doesn't exist.
         if (_1.debug)
@@ -99,11 +100,15 @@ async function fetchUser({ user, uuid, username }, included = ['player']) {
             }
         }
     }
+    let websiteAccount = undefined;
+    if (websiteAccountPromise)
+        websiteAccount = await websiteAccountPromise;
     return {
         player: playerData !== null && playerData !== void 0 ? playerData : null,
         profiles: profilesData !== null && profilesData !== void 0 ? profilesData : basicProfilesData,
         activeProfile: includeProfiles ? activeProfile === null || activeProfile === void 0 ? void 0 : activeProfile.uuid : undefined,
-        online: includeProfiles ? lastOnline > (Date.now() - exports.saveInterval) : undefined
+        online: includeProfiles ? lastOnline > (Date.now() - exports.saveInterval) : undefined,
+        customization: websiteAccount === null || websiteAccount === void 0 ? void 0 : websiteAccount.customization
     };
 }
 exports.fetchUser = fetchUser;
@@ -112,9 +117,12 @@ exports.fetchUser = fetchUser;
  * This is safe to use many times as the results are cached!
  * @param user A username or uuid
  * @param profile A profile name or profile uuid
+ * @param customization Whether stuff like the user's custom background will be returned
  */
-async function fetchMemberProfile(user, profile) {
+async function fetchMemberProfile(user, profile, customization) {
     const playerUuid = await cached.uuidFromUser(user);
+    // we don't await the promise immediately so it can load while we do other stuff
+    const websiteAccountPromise = customization ? database_1.fetchAccount(playerUuid) : null;
     const profileUuid = await cached.fetchProfileUuid(user, profile);
     // if the profile doesn't have an id, just return
     if (!profileUuid)
@@ -133,6 +141,9 @@ async function fetchMemberProfile(user, profile) {
         };
     });
     cleanProfile.members = simpleMembers;
+    let websiteAccount = undefined;
+    if (websiteAccountPromise)
+        websiteAccount = await websiteAccountPromise;
     return {
         member: {
             // the profile name is in member rather than profile since they sometimes differ for each member
@@ -142,7 +153,8 @@ async function fetchMemberProfile(user, profile) {
             // add all other data relating to the hypixel player, such as username, rank, etc
             ...player
         },
-        profile: cleanProfile
+        profile: cleanProfile,
+        customization: websiteAccount === null || websiteAccount === void 0 ? void 0 : websiteAccount.customization
     };
 }
 exports.fetchMemberProfile = fetchMemberProfile;

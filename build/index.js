@@ -27,9 +27,11 @@ const database_1 = require("./database");
 const hypixel_1 = require("./hypixel");
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const constants = __importStar(require("./constants"));
+const discord = __importStar(require("./discord"));
 const express_1 = __importDefault(require("express"));
 const app = express_1.default();
 exports.debug = false;
+const mainSiteUrl = 'http://localhost:8081';
 // 200 requests over 5 minutes
 const limiter = express_rate_limit_1.default({
     windowMs: 60 * 1000 * 5,
@@ -43,6 +45,7 @@ const limiter = express_rate_limit_1.default({
     }
 });
 app.use(limiter);
+app.use(express_1.default.json());
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     next();
@@ -51,10 +54,13 @@ app.get('/', async (req, res) => {
     res.json({ ok: true });
 });
 app.get('/player/:user', async (req, res) => {
-    res.json(await hypixel_1.fetchUser({ user: req.params.user }, [req.query.basic === 'true' ? undefined : 'profiles', 'player']));
+    res.json(await hypixel_1.fetchUser({ user: req.params.user }, [req.query.basic === 'true' ? undefined : 'profiles', 'player'], req.query.customization === 'true'));
+});
+app.get('/discord/:id', async (req, res) => {
+    res.json(await database_1.fetchAccountFromDiscord(req.params.id));
 });
 app.get('/player/:user/:profile', async (req, res) => {
-    res.json(await hypixel_1.fetchMemberProfile(req.params.user, req.params.profile));
+    res.json(await hypixel_1.fetchMemberProfile(req.params.user, req.params.profile, req.query.customization === 'true'));
 });
 app.get('/player/:user/:profile/leaderboards', async (req, res) => {
     res.json(await database_1.fetchMemberLeaderboardSpots(req.params.user, req.params.profile));
@@ -73,6 +79,46 @@ app.get('/leaderboards', async (req, res) => {
 });
 app.get('/constants', async (req, res) => {
     res.json(await constants.fetchConstantValues());
+});
+app.post('/accounts/createsession', async (req, res) => {
+    try {
+        const { code } = req.body;
+        const { access_token: accessToken, refresh_token: refreshToken } = await discord.exchangeCode(`${mainSiteUrl}/loggedin`, code);
+        if (!accessToken)
+            // access token is invalid :(
+            return res.json({ ok: false });
+        const userData = await discord.getUser(accessToken);
+        const sessionId = await database_1.createSession(refreshToken, userData);
+        res.json({ ok: true, session_id: sessionId });
+    }
+    catch (err) {
+        res.json({ ok: false });
+    }
+});
+app.post('/accounts/session', async (req, res) => {
+    try {
+        const { uuid } = req.body;
+        const session = await database_1.fetchSession(uuid);
+        const account = await database_1.fetchAccountFromDiscord(session.discord_user.id);
+        res.json({ session, account });
+    }
+    catch (err) {
+        console.error(err);
+        res.json({ ok: false });
+    }
+});
+app.post('/accounts/update', async (req, res) => {
+    // it checks against the key, so it's kind of secure
+    if (req.headers.key !== process.env.key)
+        return console.log('bad key!');
+    try {
+        await database_1.updateAccount(req.body.discordId, req.body);
+        res.json({ ok: true });
+    }
+    catch (err) {
+        console.error(err);
+        res.json({ ok: false });
+    }
 });
 // only run the server if it's not doing tests
 if (!globalThis.isTest)
