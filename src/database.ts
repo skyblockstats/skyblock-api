@@ -98,6 +98,7 @@ async function connect(): Promise<void> {
 	profileLeaderboardsCollection = database.collection('profile-leaderboards')
 	sessionsCollection = database.collection('sessions')
 	accountsCollection = database.collection('accounts')
+	console.log('Connected to database :)')
 }
 
 interface StringNumber {
@@ -592,12 +593,12 @@ const leaderboardUpdateProfileQueue = new Queue({
 })
 
 /** Queue an update for the member's leaderboard data on the server if applicable */
-export async function queueUpdateDatabaseMember(member: CleanMember, profile: CleanFullProfile): Promise<void> {
+export function queueUpdateDatabaseMember(member: CleanMember, profile: CleanFullProfile): void {
 	leaderboardUpdateMemberQueue.enqueue(async() => await updateDatabaseMember(member, profile))
 }
 
 /** Queue an update for the profile's leaderboard data on the server if applicable */
-export async function queueUpdateDatabaseProfile(profile: CleanFullProfile): Promise<void> {
+export function queueUpdateDatabaseProfile(profile: CleanFullProfile): void {
 	leaderboardUpdateProfileQueue.enqueue(async() => await updateDatabaseProfile(profile))
 }
 

@@ -255,7 +255,7 @@ async function fetchProfileUuid(user, profile) {
         return null;
     }
     if (_1.debug)
-        console.debug('Cache miss: fetchProfileUuid', user);
+        console.debug('Cache miss: fetchProfileUuid', user, profile);
     const profiles = await fetchBasicProfiles(user);
     if (!profiles)
         return; // user probably doesnt exist

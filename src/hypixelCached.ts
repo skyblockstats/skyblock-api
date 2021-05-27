@@ -274,7 +274,7 @@ export async function fetchProfileUuid(user: string, profile: string): Promise<s
 		return null
 	}
 
-	if (debug) console.debug('Cache miss: fetchProfileUuid', user)
+	if (debug) console.debug('Cache miss: fetchProfileUuid', user, profile)
 
 	const profiles = await fetchBasicProfiles(user)
 	if (!profiles) return // user probably doesnt exist

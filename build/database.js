@@ -65,6 +65,7 @@ async function connect() {
     profileLeaderboardsCollection = database.collection('profile-leaderboards');
     sessionsCollection = database.collection('sessions');
     accountsCollection = database.collection('accounts');
+    console.log('Connected to database :)');
 }
 function getMemberCollectionAttributes(member) {
     const collectionAttributes = {};
@@ -468,12 +469,12 @@ const leaderboardUpdateProfileQueue = new queue_promise_1.default({
     interval: 2000
 });
 /** Queue an update for the member's leaderboard data on the server if applicable */
-async function queueUpdateDatabaseMember(member, profile) {
+function queueUpdateDatabaseMember(member, profile) {
     leaderboardUpdateMemberQueue.enqueue(async () => await updateDatabaseMember(member, profile));
 }
 exports.queueUpdateDatabaseMember = queueUpdateDatabaseMember;
 /** Queue an update for the profile's leaderboard data on the server if applicable */
-async function queueUpdateDatabaseProfile(profile) {
+function queueUpdateDatabaseProfile(profile) {
     leaderboardUpdateProfileQueue.enqueue(async () => await updateDatabaseProfile(profile));
 }
 exports.queueUpdateDatabaseProfile = queueUpdateDatabaseProfile;
