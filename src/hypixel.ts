@@ -102,7 +102,7 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 		if (!includeProfiles)
 			basicProfilesData = playerData?.profiles
 		if (playerData)
-			playerData.profiles = undefined
+			delete playerData.profiles
 	}
 	if (includeProfiles) {
 		profilesData = await cached.fetchSkyblockProfiles(uuid)

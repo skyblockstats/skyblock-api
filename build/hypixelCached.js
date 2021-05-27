@@ -27,6 +27,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fetchProfileName = exports.fetchBasicProfileFromUuid = exports.fetchProfile = exports.fetchProfileUuid = exports.fetchSkyblockProfiles = exports.fetchBasicPlayer = exports.fetchPlayer = exports.usernameFromUser = exports.uuidFromUser = exports.profileNameCache = exports.profilesCache = exports.profileCache = exports.basicPlayerCache = exports.playerCache = exports.basicProfilesCache = exports.usernameCache = void 0;
 const node_cache_1 = __importDefault(require("node-cache"));
+const lru_cache_1 = __importDefault(require("lru-cache"));
 const mojang = __importStar(require("./mojang"));
 const hypixel = __importStar(require("./hypixel"));
 const util_1 = require("./util");
@@ -49,10 +50,9 @@ exports.playerCache = new node_cache_1.default({
     useClones: true,
 });
 // cache "basic players" (players without profiles) for 4 hours
-exports.basicPlayerCache = new node_cache_1.default({
-    stdTTL: 60 * 60 * 4,
-    checkperiod: 60 * 10,
-    useClones: true
+exports.basicPlayerCache = new lru_cache_1.default({
+    max: 10000,
+    maxAge: 60 * 60 * 4 * 1000,
 });
 exports.profileCache = new node_cache_1.default({
     stdTTL: 30,
@@ -231,6 +231,10 @@ async function fetchBasicProfiles(user) {
     if (_1.debug)
         console.debug('Cache miss: fetchBasicProfiles', user);
     const player = await fetchPlayer(playerUuid);
+    if (!player) {
+        console.log('bruh playerUuid', playerUuid);
+        return [];
+    }
     const profiles = player.profiles;
     exports.basicProfilesCache.set(playerUuid, profiles);
     // cache the profile names and uuids to profileNameCache because we can
@@ -340,3 +344,15 @@ async function fetchProfileName(user, profile) {
     return profileName;
 }
 exports.fetchProfileName = fetchProfileName;
+// setInterval(() => {
+// const keys = basicPlayerCache.keys()
+// if (keys)
+// 	console.log(basicPlayerCache.get(keys[keys.length - 1]))
+// console.log('basicPlayerCache', basicPlayerCache.getStats())
+// console.log('usernameCache', usernameCache.getStats())
+// console.log('profileCache', profileCache.getStats())
+// console.log('cachedRawLeaderboards size', cachedRawLeaderboards.size)
+// console.log(
+// 	Math.floor((process.memoryUsage().heapUsed / 1024 / 1024) * 10) / 10
+// + 'mb')
+// }, 60 * 1000)

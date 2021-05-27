@@ -26,6 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateAccount = exports.fetchAccountFromDiscord = exports.fetchAccount = exports.fetchSession = exports.createSession = exports.queueUpdateDatabaseProfile = exports.queueUpdateDatabaseMember = exports.updateDatabaseProfile = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchLeaderboard = exports.fetchProfileLeaderboard = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchSlayerLeaderboards = exports.fetchAllLeaderboardsCategorized = void 0;
+exports.queueUpdateDatabaseProfile = exports.queueUpdateDatabaseMember = exports.updateDatabaseProfile = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchLeaderboard = exports.fetchProfileLeaderboard = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchSlayerLeaderboards = exports.fetchAllLeaderboardsCategorized = exports.cachedRawLeaderboards = void 0;
 const stats_1 = require("./cleaners/skyblock/stats");
 const slayers_1 = require("./cleaners/skyblock/slayers");
 const mongodb_1 = require("mongodb");
@@ -42,7 +43,7 @@ const recentlyUpdated = new node_cache_1.default({
     checkperiod: 60,
     useClones: false,
 });
-const cachedRawLeaderboards = new Map();
+exports.cachedRawLeaderboards = new Map();
 const leaderboardMax = 100;
 const reversedLeaderboards = [
     'first_join',
@@ -193,8 +194,8 @@ function isLeaderboardReversed(name) {
 async function fetchMemberLeaderboardRaw(name) {
     if (!client)
         throw Error('Client isn\'t initialized yet');
-    if (cachedRawLeaderboards.has(name))
-        return cachedRawLeaderboards.get(name);
+    if (exports.cachedRawLeaderboards.has(name))
+        return exports.cachedRawLeaderboards.get(name);
     // typescript forces us to make a new variable and set it this way because it gives an error otherwise
     const query = {};
     query[`stats.${name}`] = { '$exists': true, '$ne': NaN };
@@ -205,12 +206,12 @@ async function fetchMemberLeaderboardRaw(name) {
         .sort(sortQuery)
         .limit(leaderboardMax)
         .toArray();
-    cachedRawLeaderboards.set(name, leaderboardRaw);
+    exports.cachedRawLeaderboards.set(name, leaderboardRaw);
     return leaderboardRaw;
 }
 async function fetchProfileLeaderboardRaw(name) {
-    if (cachedRawLeaderboards.has(name))
-        return cachedRawLeaderboards.get(name);
+    if (exports.cachedRawLeaderboards.has(name))
+        return exports.cachedRawLeaderboards.get(name);
     // typescript forces us to make a new variable and set it this way because it gives an error otherwise
     const query = {};
     query[`stats.${name}`] = { '$exists': true, '$ne': NaN };
@@ -221,7 +222,7 @@ async function fetchProfileLeaderboardRaw(name) {
         .sort(sortQuery)
         .limit(leaderboardMax)
         .toArray();
-    cachedRawLeaderboards.set(name, leaderboardRaw);
+    exports.cachedRawLeaderboards.set(name, leaderboardRaw);
     return leaderboardRaw;
 }
 /** Fetch a leaderboard that ranks members, as opposed to profiles */
@@ -404,7 +405,7 @@ async function updateDatabaseMember(member, profile) {
             }])
             .sort((a, b) => leaderboardReverse ? a.stats[attributeName] - b.stats[attributeName] : b.stats[attributeName] - a.stats[attributeName])
             .slice(0, 100);
-        cachedRawLeaderboards.set(attributeName, newRawLeaderboard);
+        exports.cachedRawLeaderboards.set(attributeName, newRawLeaderboard);
     }
     if (_1.debug)
         console.debug('added member to leaderboards', member.username, leaderboardAttributes);
@@ -453,7 +454,7 @@ async function updateDatabaseProfile(profile) {
             }])
             .sort((a, b) => leaderboardReverse ? a.stats[attributeName] - b.stats[attributeName] : b.stats[attributeName] - a.stats[attributeName])
             .slice(0, 100);
-        cachedRawLeaderboards.set(attributeName, newRawLeaderboard);
+        exports.cachedRawLeaderboards.set(attributeName, newRawLeaderboard);
     }
     if (_1.debug)
         console.debug('added profile to leaderboards', profile.name, leaderboardAttributes);

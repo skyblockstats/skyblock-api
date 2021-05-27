@@ -15,7 +15,7 @@ async function cleanPlayerResponse(data) {
         username: data.displayname,
         rank: rank_1.cleanRank(data),
         socials: socialmedia_1.cleanSocialMedia(data),
-        first_join: data.firstLogin / 1000,
+        // first_join: data.firstLogin / 1000,
         profiles: profiles_1.cleanPlayerSkyblockProfiles((_b = (_a = data.stats) === null || _a === void 0 ? void 0 : _a.SkyBlock) === null || _b === void 0 ? void 0 : _b.profiles)
     };
 }

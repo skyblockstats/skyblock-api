@@ -3,12 +3,14 @@
  */
 
 import NodeCache from 'node-cache'
+import LRUCache from 'lru-cache'
 import * as mojang from './mojang'
 import * as hypixel from './hypixel'
 import { CleanPlayer } from './cleaners/player'
 import { isUuid, undashUuid } from './util'
 import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/skyblock/profile'
 import { debug } from '.'
+import { cachedRawLeaderboards } from './database'
 
 // cache usernames for 4 hours
 /** uuid: username */
@@ -31,10 +33,9 @@ export const playerCache = new NodeCache({
 })
 
 // cache "basic players" (players without profiles) for 4 hours
-export const basicPlayerCache = new NodeCache({
-	stdTTL: 60 * 60 * 4,
-	checkperiod: 60 * 10,
-	useClones: true
+export const basicPlayerCache: LRUCache<string, CleanPlayer> = new LRUCache({
+	max: 10000,
+	maxAge: 60 * 60 * 4 * 1000,
 })
 
 export const profileCache = new NodeCache({
@@ -247,6 +248,10 @@ async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[]> {
 	if (debug) console.debug('Cache miss: fetchBasicProfiles', user)
 
 	const player = await fetchPlayer(playerUuid)
+	if (!player) {
+		console.log('bruh playerUuid', playerUuid)
+		return []
+	}
 	const profiles = player.profiles
 	basicProfilesCache.set(playerUuid, profiles)
 
@@ -366,3 +371,16 @@ export async function fetchProfileName(user: string, profile: string): Promise<s
 	profileNameCache.set(`${playerUuid}.${profileUuid}`, profileName)
 	return profileName
 }
+
+// setInterval(() => {
+	// const keys = basicPlayerCache.keys()
+	// if (keys)
+	// 	console.log(basicPlayerCache.get(keys[keys.length - 1]))
+	// console.log('basicPlayerCache', basicPlayerCache.getStats())
+	// console.log('usernameCache', usernameCache.getStats())
+	// console.log('profileCache', profileCache.getStats())
+	// console.log('cachedRawLeaderboards size', cachedRawLeaderboards.size)
+	// console.log(
+	// 	Math.floor((process.memoryUsage().heapUsed / 1024 / 1024) * 10) / 10
+	// + 'mb')
+// }, 60 * 1000)
