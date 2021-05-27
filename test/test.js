@@ -69,7 +69,7 @@ function resetState() {
 	hypixelCached.usernameCache.flushAll()
 	hypixelCached.basicProfilesCache.flushAll()
 	hypixelCached.playerCache.flushAll()
-	hypixelCached.basicPlayerCache.flushAll()
+	hypixelCached.basicPlayerCache.reset()
 	hypixelCached.profileCache.flushAll()
 	hypixelCached.profileNameCache.flushAll()
 	requestsSent = 0
