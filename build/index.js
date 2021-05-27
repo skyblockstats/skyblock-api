@@ -54,7 +54,7 @@ app.get('/', async (req, res) => {
     res.json({ ok: true });
 });
 app.get('/player/:user', async (req, res) => {
-    res.json(await hypixel_1.fetchUser({ user: req.params.user }, [req.query.basic === 'true' ? undefined : 'profiles', 'player']));
+    res.json(await hypixel_1.fetchUser({ user: req.params.user }, [req.query.basic === 'true' ? undefined : 'profiles', 'player'], req.query.customization === 'true'));
 });
 app.get('/player/:user/:profile', async (req, res) => {
     res.json(await hypixel_1.fetchMemberProfile(req.params.user, req.params.profile, req.query.customization === 'true'));

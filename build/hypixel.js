@@ -61,11 +61,12 @@ async function cleanResponse({ path, data }, options) {
  * @param included lets you choose what is returned, so there's less processing required on the backend
  * used inclusions: player, profiles
  */
-async function fetchUser({ user, uuid, username }, included = ['player']) {
+async function fetchUser({ user, uuid, username }, included = ['player'], customization) {
     if (!uuid) {
         // If the uuid isn't provided, get it
         uuid = await cached.uuidFromUser(user || username);
     }
+    const websiteAccountPromise = customization ? database_1.fetchAccount(uuid) : null;
     if (!uuid) {
         // the user doesn't exist.
         if (_1.debug)
@@ -99,11 +100,15 @@ async function fetchUser({ user, uuid, username }, included = ['player']) {
             }
         }
     }
+    let websiteAccount = undefined;
+    if (websiteAccountPromise)
+        websiteAccount = await websiteAccountPromise;
     return {
         player: playerData !== null && playerData !== void 0 ? playerData : null,
         profiles: profilesData !== null && profilesData !== void 0 ? profilesData : basicProfilesData,
         activeProfile: includeProfiles ? activeProfile === null || activeProfile === void 0 ? void 0 : activeProfile.uuid : undefined,
-        online: includeProfiles ? lastOnline > (Date.now() - exports.saveInterval) : undefined
+        online: includeProfiles ? lastOnline > (Date.now() - exports.saveInterval) : undefined,
+        customization: websiteAccount === null || websiteAccount === void 0 ? void 0 : websiteAccount.customization
     };
 }
 exports.fetchUser = fetchUser;
@@ -137,9 +142,8 @@ async function fetchMemberProfile(user, profile, customization) {
     });
     cleanProfile.members = simpleMembers;
     let websiteAccount = undefined;
-    if (websiteAccountPromise) {
+    if (websiteAccountPromise)
         websiteAccount = await websiteAccountPromise;
-    }
     return {
         member: {
             // the profile name is in member rather than profile since they sometimes differ for each member

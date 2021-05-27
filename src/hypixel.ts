@@ -3,7 +3,7 @@
  */
 
 import { cleanSkyblockProfileResponse, CleanProfile, CleanBasicProfile, CleanFullProfile, CleanFullProfileBasicMembers } from './cleaners/skyblock/profile'
-import { AccountSchema, fetchAccount, queueUpdateDatabaseMember, queueUpdateDatabaseProfile } from './database'
+import { AccountCustomization, AccountSchema, fetchAccount, queueUpdateDatabaseMember, queueUpdateDatabaseProfile } from './database'
 import { CleanBasicMember, CleanMemberProfile } from './cleaners/skyblock/member'
 import { chooseApiKey, HypixelResponse, sendApiRequest } from './hypixelApi'
 import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles'
@@ -67,6 +67,7 @@ export interface CleanUser {
 	profiles?: CleanProfile[]
 	activeProfile?: string
 	online?: boolean
+	customization?: AccountCustomization
 }
 
 
@@ -76,11 +77,12 @@ export interface CleanUser {
  * @param included lets you choose what is returned, so there's less processing required on the backend
  * used inclusions: player, profiles
  */
-export async function fetchUser({ user, uuid, username }: UserAny, included: Included[]=['player']): Promise<CleanUser> {
+export async function fetchUser({ user, uuid, username }: UserAny, included: Included[]=['player'], customization?: boolean): Promise<CleanUser> {
 	if (!uuid) {
 		// If the uuid isn't provided, get it
 		uuid = await cached.uuidFromUser(user || username)
 	}
+	const websiteAccountPromise = customization ? fetchAccount(uuid) : null
 	if (!uuid) {
 		// the user doesn't exist.
 		if (debug) console.debug('error:', user, 'doesnt exist')
@@ -118,11 +120,16 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 			}
 		}
 	}
+	let websiteAccount: AccountSchema = undefined
+
+	if (websiteAccountPromise)
+		websiteAccount = await websiteAccountPromise
 	return {
 		player: playerData ?? null,
 		profiles: profilesData ?? basicProfilesData,
 		activeProfile: includeProfiles ? activeProfile?.uuid : undefined,
-		online: includeProfiles ? lastOnline > (Date.now() - saveInterval): undefined
+		online: includeProfiles ? lastOnline > (Date.now() - saveInterval): undefined,
+		customization: websiteAccount?.customization
 	}
 }
 
@@ -163,9 +170,8 @@ export async function fetchMemberProfile(user: string, profile: string, customiz
 
 	let websiteAccount: AccountSchema = undefined
 
-	if (websiteAccountPromise) {
+	if (websiteAccountPromise)
 		websiteAccount = await websiteAccountPromise
-	}
 
 	return {
 		member: {

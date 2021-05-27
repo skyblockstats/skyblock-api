@@ -6,8 +6,7 @@ const SLAYER_NAMES = {
 	wolf: 'sven'
 } as const
 
-type ApiSlayerName = keyof typeof SLAYER_NAMES
-type SlayerName = (typeof SLAYER_NAMES)[ApiSlayerName]
+type SlayerName = (typeof SLAYER_NAMES)[keyof typeof SLAYER_NAMES]
 
 interface SlayerTier {
 	tier: number,
