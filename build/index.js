@@ -111,7 +111,6 @@ app.post('/accounts/update', async (req, res) => {
     // it checks against the key, so it's kind of secure
     if (req.headers.key !== process.env.key)
         return console.log('bad key!');
-    console.log('pogger', req.body);
     try {
         await database_1.updateAccount(req.body.discordId, req.body);
         res.json({ ok: true });
