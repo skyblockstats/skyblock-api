@@ -31,7 +31,7 @@ const discord = __importStar(require("./discord"));
 const express_1 = __importDefault(require("express"));
 const app = express_1.default();
 exports.debug = false;
-const mainSiteUrl = 'http://localhost:8081';
+const mainSiteUrl = 'https://skyblock.matdoes.dev';
 // 200 requests over 5 minutes
 const limiter = express_rate_limit_1.default({
     windowMs: 60 * 1000 * 5,

@@ -9,7 +9,7 @@ const app = express()
 
 export const debug = false
 
-const mainSiteUrl = 'http://localhost:8081'
+const mainSiteUrl = 'https://skyblock.matdoes.dev'
 
 // 200 requests over 5 minutes
 const limiter = rateLimit({
