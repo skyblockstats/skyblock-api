@@ -30,7 +30,7 @@ const constants = __importStar(require("./constants"));
 const discord = __importStar(require("./discord"));
 const express_1 = __importDefault(require("express"));
 const app = express_1.default();
-exports.debug = false;
+exports.debug = true;
 const mainSiteUrl = 'https://skyblock.matdoes.dev';
 // 200 requests over 5 minutes
 const limiter = express_rate_limit_1.default({

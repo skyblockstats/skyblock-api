@@ -506,8 +506,10 @@ async function fetchAllLeaderboards(fast) {
     const leaderboards = await fetchAllMemberLeaderboardAttributes();
     if (_1.debug)
         console.debug('Caching raw leaderboards!');
+    const promises = [];
     for (const leaderboard of util_1.shuffle(leaderboards))
-        await fetchMemberLeaderboardRaw(leaderboard);
+        promises.push(fetchMemberLeaderboardRaw(leaderboard));
+    await Promise.all(promises);
     // shuffle so if the application is restarting many times itll still be useful
     if (_1.debug)
         console.debug('Caching leaderboards!');

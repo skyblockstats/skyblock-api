@@ -21,7 +21,6 @@ async function exchangeCode(redirectUri, code) {
         'redirect_uri': redirectUri,
         'scope': 'identify'
     };
-    console.log(new URLSearchParams(data).toString());
     const fetchResponse = await node_fetch_1.default(API_ENDPOINT + '/oauth2/token', {
         method: 'POST',
         agent: () => httpsAgent,

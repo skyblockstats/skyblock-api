@@ -140,7 +140,6 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 	let fetchJsonParsed: any
 
 	try {
-		console.log(fetchUrl)
 		fetchResponse = await fetch(
 			fetchUrl,
 			{ agent: () => httpsAgent }

@@ -37,7 +37,6 @@ export async function exchangeCode(redirectUri: string, code: string): Promise<T
 		'redirect_uri': redirectUri,
 		'scope': 'identify'
 	}
-	console.log(new URLSearchParams(data).toString())
 	const fetchResponse = await fetch(
 		API_ENDPOINT + '/oauth2/token',
 		{

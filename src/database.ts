@@ -637,8 +637,12 @@ async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
 	const leaderboards: string[] = await fetchAllMemberLeaderboardAttributes()
 
 	if (debug) console.debug('Caching raw leaderboards!')
+
+	const promises: Promise<DatabaseMemberLeaderboardItem[]>[] = []
+
 	for (const leaderboard of shuffle(leaderboards))
-		await fetchMemberLeaderboardRaw(leaderboard)
+		promises.push(fetchMemberLeaderboardRaw(leaderboard))
+	await Promise.all(promises)
 
 	// shuffle so if the application is restarting many times itll still be useful
 	if (debug) console.debug('Caching leaderboards!')
