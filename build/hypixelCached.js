@@ -51,7 +51,7 @@ exports.playerCache = new node_cache_1.default({
 });
 // cache "basic players" (players without profiles) for 4 hours
 exports.basicPlayerCache = new lru_cache_1.default({
-    max: 10000,
+    max: 20000,
     maxAge: 60 * 60 * 4 * 1000,
 });
 exports.profileCache = new node_cache_1.default({
@@ -93,7 +93,7 @@ async function uuidFromUser(user) {
         const username = exports.usernameCache.get(util_1.undashUuid(user));
         // sometimes the username will be null, return that
         if (username === null)
-            return username;
+            return null;
         // if it has .then, then that means its a waitForCacheSet promise. This is done to prevent requests made while it is already requesting
         if (username.then) {
             const { key: uuid, value: _username } = await username;
@@ -232,7 +232,7 @@ async function fetchBasicProfiles(user) {
         console.debug('Cache miss: fetchBasicProfiles', user);
     const player = await fetchPlayer(playerUuid);
     if (!player) {
-        console.log('bruh playerUuid', playerUuid);
+        console.log('bruh playerUuid', user, playerUuid);
         return [];
     }
     const profiles = player.profiles;

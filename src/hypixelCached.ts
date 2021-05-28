@@ -34,7 +34,7 @@ export const playerCache = new NodeCache({
 
 // cache "basic players" (players without profiles) for 4 hours
 export const basicPlayerCache: LRUCache<string, CleanPlayer> = new LRUCache({
-	max: 10000,
+	max: 20000,
 	maxAge: 60 * 60 * 4 * 1000,
 })
 
@@ -85,14 +85,14 @@ export async function uuidFromUser(user: string): Promise<string> {
 
 	if (usernameCache.has(undashUuid(user))) {
 		// check if the uuid is a key
-		const username: any = usernameCache.get(undashUuid(user))
+		const username: Promise<KeyValue> | string | null = usernameCache.get(undashUuid(user))
 
 		// sometimes the username will be null, return that
-		if (username === null) return username
+		if (username === null) return null
 
 		// if it has .then, then that means its a waitForCacheSet promise. This is done to prevent requests made while it is already requesting
-		if (username.then) {
-			const { key: uuid, value: _username } = await username
+		if ((username as Promise<KeyValue>).then) {
+			const { key: uuid, value: _username } = await (username as Promise<KeyValue>)
 			usernameCache.set(uuid, _username)
 			return uuid
 		} else
@@ -249,7 +249,7 @@ async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[]> {
 
 	const player = await fetchPlayer(playerUuid)
 	if (!player) {
-		console.log('bruh playerUuid', playerUuid)
+		console.log('bruh playerUuid', user, playerUuid)
 		return []
 	}
 	const profiles = player.profiles
