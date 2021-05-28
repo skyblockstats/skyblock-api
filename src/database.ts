@@ -585,11 +585,11 @@ export async function updateDatabaseProfile(profile: CleanFullProfile): Promise<
 
 const leaderboardUpdateMemberQueue = new Queue({
 	concurrent: 1,
-	interval: 500
+	interval: 2000
 })
 const leaderboardUpdateProfileQueue = new Queue({
 	concurrent: 1,
-	interval: 2000
+	interval: 10000
 })
 
 /** Queue an update for the member's leaderboard data on the server if applicable */

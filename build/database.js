@@ -462,11 +462,11 @@ async function updateDatabaseProfile(profile) {
 exports.updateDatabaseProfile = updateDatabaseProfile;
 const leaderboardUpdateMemberQueue = new queue_promise_1.default({
     concurrent: 1,
-    interval: 500
+    interval: 2000
 });
 const leaderboardUpdateProfileQueue = new queue_promise_1.default({
     concurrent: 1,
-    interval: 2000
+    interval: 10000
 });
 /** Queue an update for the member's leaderboard data on the server if applicable */
 function queueUpdateDatabaseMember(member, profile) {
