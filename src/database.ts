@@ -638,11 +638,8 @@ async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
 
 	if (debug) console.debug('Caching raw leaderboards!')
 
-	const promises: Promise<DatabaseMemberLeaderboardItem[]>[] = []
-
 	for (const leaderboard of shuffle(leaderboards))
-		promises.push(fetchMemberLeaderboardRaw(leaderboard))
-	await Promise.all(promises)
+		await fetchMemberLeaderboardRaw(leaderboard)
 
 	// shuffle so if the application is restarting many times itll still be useful
 	if (debug) console.debug('Caching leaderboards!')
@@ -660,7 +657,7 @@ async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
 
 export async function createSession(refreshToken: string, userData: discord.DiscordUser): Promise<string> {
 	const sessionId = uuid4()
-	await sessionsCollection.insertOne({
+	await sessionsCollection?.insertOne({
 		_id: sessionId,
 		refresh_token: refreshToken,
 		discord_user: {
@@ -673,19 +670,19 @@ export async function createSession(refreshToken: string, userData: discord.Disc
 }
 
 export async function fetchSession(sessionId: string): Promise<SessionSchema> {
-	return await sessionsCollection.findOne({ _id: sessionId })
+	return await sessionsCollection?.findOne({ _id: sessionId })
 }
 
 export async function fetchAccount(minecraftUuid: string): Promise<AccountSchema> {
-	return await accountsCollection.findOne({ minecraftUuid })
+	return await accountsCollection?.findOne({ minecraftUuid })
 }
 
 export async function fetchAccountFromDiscord(discordId: string): Promise<AccountSchema> {
-	return await accountsCollection.findOne({ discordId })
+	return await accountsCollection?.findOne({ discordId })
 }
 
 export async function updateAccount(discordId: string, schema: AccountSchema) {
-	await accountsCollection.updateOne({
+	await accountsCollection?.updateOne({
 		discordId
 	}, { $set: schema }, { upsert: true })
 }

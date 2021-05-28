@@ -54,13 +54,25 @@ app.get('/', async (req, res) => {
     res.json({ ok: true });
 });
 app.get('/player/:user', async (req, res) => {
-    res.json(await hypixel_1.fetchUser({ user: req.params.user }, [req.query.basic === 'true' ? undefined : 'profiles', 'player'], req.query.customization === 'true'));
+    try {
+        res.json(await hypixel_1.fetchUser({ user: req.params.user }, [req.query.basic === 'true' ? undefined : 'profiles', 'player'], req.query.customization === 'true'));
+    }
+    catch (err) {
+        console.error(err);
+        res.json({ 'error': true });
+    }
 });
 app.get('/discord/:id', async (req, res) => {
     res.json(await database_1.fetchAccountFromDiscord(req.params.id));
 });
 app.get('/player/:user/:profile', async (req, res) => {
-    res.json(await hypixel_1.fetchMemberProfile(req.params.user, req.params.profile, req.query.customization === 'true'));
+    try {
+        res.json(await hypixel_1.fetchMemberProfile(req.params.user, req.params.profile, req.query.customization === 'true'));
+    }
+    catch (err) {
+        console.error(err);
+        res.json({ 'error': true });
+    }
 });
 app.get('/player/:user/:profile/leaderboards', async (req, res) => {
     res.json(await database_1.fetchMemberLeaderboardSpots(req.params.user, req.params.profile));

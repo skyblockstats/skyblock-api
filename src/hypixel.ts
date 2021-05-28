@@ -122,8 +122,9 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 	}
 	let websiteAccount: AccountSchema = undefined
 
-	if (websiteAccountPromise)
+	if (websiteAccountPromise) {
 		websiteAccount = await websiteAccountPromise
+	}
 	return {
 		player: playerData ?? null,
 		profiles: profilesData ?? basicProfilesData,

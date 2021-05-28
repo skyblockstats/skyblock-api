@@ -101,8 +101,9 @@ async function fetchUser({ user, uuid, username }, included = ['player'], custom
         }
     }
     let websiteAccount = undefined;
-    if (websiteAccountPromise)
+    if (websiteAccountPromise) {
         websiteAccount = await websiteAccountPromise;
+    }
     return {
         player: playerData !== null && playerData !== void 0 ? playerData : null,
         profiles: profilesData !== null && profilesData !== void 0 ? profilesData : basicProfilesData,

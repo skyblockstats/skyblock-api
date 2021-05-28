@@ -36,7 +36,7 @@ const queue = new Queue({
 async function fetchGithubApi(method: string, route: string, headers?: any, json?: any): Promise<nodeFetch.Response> {
 	try {
 		if (debug) console.debug('fetching github api', method, route)
-		return await fetch(
+		const data = await fetch(
 			githubApiBase + route,
 			{
 				agent: () => httpsAgent,
@@ -47,6 +47,8 @@ async function fetchGithubApi(method: string, route: string, headers?: any, json
 				}, headers),
 			}
 		)
+		if (debug) console.debug('fetched github api', method, route)
+		return data
 	} catch {
 		// if there's an error, wait a second and try again
 		await new Promise((resolve) => setTimeout(resolve, 1000))

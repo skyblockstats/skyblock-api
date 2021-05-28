@@ -506,10 +506,8 @@ async function fetchAllLeaderboards(fast) {
     const leaderboards = await fetchAllMemberLeaderboardAttributes();
     if (_1.debug)
         console.debug('Caching raw leaderboards!');
-    const promises = [];
     for (const leaderboard of util_1.shuffle(leaderboards))
-        promises.push(fetchMemberLeaderboardRaw(leaderboard));
-    await Promise.all(promises);
+        await fetchMemberLeaderboardRaw(leaderboard);
     // shuffle so if the application is restarting many times itll still be useful
     if (_1.debug)
         console.debug('Caching leaderboards!');
@@ -526,7 +524,7 @@ async function fetchAllLeaderboards(fast) {
 }
 async function createSession(refreshToken, userData) {
     const sessionId = uuid_1.v4();
-    await sessionsCollection.insertOne({
+    await (sessionsCollection === null || sessionsCollection === void 0 ? void 0 : sessionsCollection.insertOne({
         _id: sessionId,
         refresh_token: refreshToken,
         discord_user: {
@@ -534,26 +532,26 @@ async function createSession(refreshToken, userData) {
             name: userData.username + '#' + userData.discriminator
         },
         lastUpdated: new Date()
-    });
+    }));
     return sessionId;
 }
 exports.createSession = createSession;
 async function fetchSession(sessionId) {
-    return await sessionsCollection.findOne({ _id: sessionId });
+    return await (sessionsCollection === null || sessionsCollection === void 0 ? void 0 : sessionsCollection.findOne({ _id: sessionId }));
 }
 exports.fetchSession = fetchSession;
 async function fetchAccount(minecraftUuid) {
-    return await accountsCollection.findOne({ minecraftUuid });
+    return await (accountsCollection === null || accountsCollection === void 0 ? void 0 : accountsCollection.findOne({ minecraftUuid }));
 }
 exports.fetchAccount = fetchAccount;
 async function fetchAccountFromDiscord(discordId) {
-    return await accountsCollection.findOne({ discordId });
+    return await (accountsCollection === null || accountsCollection === void 0 ? void 0 : accountsCollection.findOne({ discordId }));
 }
 exports.fetchAccountFromDiscord = fetchAccountFromDiscord;
 async function updateAccount(discordId, schema) {
-    await accountsCollection.updateOne({
+    await (accountsCollection === null || accountsCollection === void 0 ? void 0 : accountsCollection.updateOne({
         discordId
-    }, { $set: schema }, { upsert: true });
+    }, { $set: schema }, { upsert: true }));
 }
 exports.updateAccount = updateAccount;
 // make sure it's not in a test

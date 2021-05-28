@@ -111,8 +111,9 @@ async function uuidFromUser(user) {
     }
     if (_1.debug)
         console.debug('Cache miss: uuidFromUser', user);
+    const undashedUser = util_1.undashUuid(user);
     // set it as waitForCacheSet (a promise) in case uuidFromUser gets called while its fetching mojang
-    exports.usernameCache.set(util_1.undashUuid(user), waitForCacheSet(exports.usernameCache, user, user));
+    exports.usernameCache.set(undashedUser, waitForCacheSet(exports.usernameCache, user, user));
     // not cached, actually fetch mojang api now
     let { uuid, username } = await mojang.profileFromUser(user);
     if (!uuid) {
@@ -121,8 +122,7 @@ async function uuidFromUser(user) {
     }
     // remove dashes from the uuid so its more normal
     uuid = util_1.undashUuid(uuid);
-    if (user !== uuid)
-        exports.usernameCache.del(user);
+    exports.usernameCache.del(undashedUser);
     exports.usernameCache.set(uuid, username);
     return uuid;
 }
@@ -266,6 +266,7 @@ async function fetchProfileUuid(user, profile) {
         else if (util_1.undashUuid(p.uuid) === util_1.undashUuid(profileUuid))
             return util_1.undashUuid(p.uuid);
     }
+    return null;
 }
 exports.fetchProfileUuid = fetchProfileUuid;
 /**
@@ -276,6 +277,8 @@ exports.fetchProfileUuid = fetchProfileUuid;
 async function fetchProfile(user, profile) {
     const playerUuid = await uuidFromUser(user);
     const profileUuid = await fetchProfileUuid(playerUuid, profile);
+    if (!profileUuid)
+        return null;
     if (exports.profileCache.has(profileUuid)) {
         // we have the profile cached, return it :)
         if (_1.debug)
@@ -326,6 +329,8 @@ exports.fetchBasicProfileFromUuid = fetchBasicProfileFromUuid;
 async function fetchProfileName(user, profile) {
     // we're fetching the profile and player uuid again in case we were given a name, but it's cached so it's not much of a problem
     const profileUuid = await fetchProfileUuid(user, profile);
+    if (!profileUuid)
+        return null;
     const playerUuid = await uuidFromUser(user);
     if (exports.profileNameCache.has(`${playerUuid}.${profileUuid}`)) {
         // Return the profile name if it's cached
@@ -344,15 +349,3 @@ async function fetchProfileName(user, profile) {
     return profileName;
 }
 exports.fetchProfileName = fetchProfileName;
-// setInterval(() => {
-// const keys = basicPlayerCache.keys()
-// if (keys)
-// 	console.log(basicPlayerCache.get(keys[keys.length - 1]))
-// console.log('basicPlayerCache', basicPlayerCache.getStats())
-// console.log('usernameCache', usernameCache.getStats())
-// console.log('profileCache', profileCache.getStats())
-// console.log('cachedRawLeaderboards size', cachedRawLeaderboards.size)
-// console.log(
-// 	Math.floor((process.memoryUsage().heapUsed / 1024 / 1024) * 10) / 10
-// + 'mb')
-// }, 60 * 1000)
