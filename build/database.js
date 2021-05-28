@@ -504,15 +504,19 @@ async function removeBadMemberLeaderboardAttributes() {
 /** Fetch all the leaderboards, used for caching. Don't call this often! */
 async function fetchAllLeaderboards(fast) {
     const leaderboards = await fetchAllMemberLeaderboardAttributes();
+    if (_1.debug)
+        console.debug('Caching raw leaderboards!');
+    for (const leaderboard of util_1.shuffle(leaderboards))
+        await fetchMemberLeaderboardRaw(leaderboard);
     // shuffle so if the application is restarting many times itll still be useful
     if (_1.debug)
         console.debug('Caching leaderboards!');
     for (const leaderboard of util_1.shuffle(leaderboards)) {
         if (!fast)
             // wait 2 seconds so it doesnt use as much ram
-            await util_1.sleep(2 * 1000);
+            await util_1.sleep(10 * 1000);
         else
-            await util_1.sleep(500);
+            await util_1.sleep(2 * 1000);
         await fetchMemberLeaderboard(leaderboard);
     }
     if (_1.debug)

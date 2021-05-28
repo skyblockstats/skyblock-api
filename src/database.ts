@@ -636,14 +636,18 @@ async function removeBadMemberLeaderboardAttributes(): Promise<void> {
 async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
 	const leaderboards: string[] = await fetchAllMemberLeaderboardAttributes()
 
+	if (debug) console.debug('Caching raw leaderboards!')
+	for (const leaderboard of shuffle(leaderboards))
+		await fetchMemberLeaderboardRaw(leaderboard)
+
 	// shuffle so if the application is restarting many times itll still be useful
 	if (debug) console.debug('Caching leaderboards!')
 	for (const leaderboard of shuffle(leaderboards)) {
 		if (!fast)
 			// wait 2 seconds so it doesnt use as much ram
-			await sleep(2 * 1000)
+			await sleep(10 * 1000)
 		else
-			await sleep(500)
+			await sleep(2 * 1000)
 
 		await fetchMemberLeaderboard(leaderboard)
 	}

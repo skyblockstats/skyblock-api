@@ -55,6 +55,7 @@ async function sendApiRequest({ path, key, args }) {
     let fetchResponse;
     let fetchJsonParsed;
     try {
+        console.log(fetchUrl);
         fetchResponse = await node_fetch_1.default(fetchUrl, { agent: () => httpsAgent });
         fetchJsonParsed = await fetchResponse.json();
     }
