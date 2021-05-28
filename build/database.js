@@ -191,37 +191,59 @@ function isLeaderboardReversed(name) {
     }
     return false;
 }
+/** A set of names of the raw leaderboards that are currently being fetched. This is used to make sure two leaderboads aren't fetched at the same time */
+const fetchingRawLeaderboardNames = new Set();
 async function fetchMemberLeaderboardRaw(name) {
     if (!client)
         throw Error('Client isn\'t initialized yet');
     if (exports.cachedRawLeaderboards.has(name))
         return exports.cachedRawLeaderboards.get(name);
+    // if it's currently being fetched, check every 100ms until it's in cachedRawLeaderboards
+    if (fetchingRawLeaderboardNames.has(name)) {
+        while (true) {
+            await util_1.sleep(100);
+            if (exports.cachedRawLeaderboards.has(name))
+                return exports.cachedRawLeaderboards.get(name);
+        }
+    }
     // typescript forces us to make a new variable and set it this way because it gives an error otherwise
     const query = {};
     query[`stats.${name}`] = { '$exists': true, '$ne': NaN };
     const sortQuery = {};
     sortQuery[`stats.${name}`] = isLeaderboardReversed(name) ? 1 : -1;
+    fetchingRawLeaderboardNames.add(name);
     const leaderboardRaw = await memberLeaderboardsCollection
         .find(query)
         .sort(sortQuery)
         .limit(leaderboardMax)
         .toArray();
+    fetchingRawLeaderboardNames.delete(name);
     exports.cachedRawLeaderboards.set(name, leaderboardRaw);
     return leaderboardRaw;
 }
 async function fetchProfileLeaderboardRaw(name) {
     if (exports.cachedRawLeaderboards.has(name))
         return exports.cachedRawLeaderboards.get(name);
+    // if it's currently being fetched, check every 100ms until it's in cachedRawLeaderboards
+    if (fetchingRawLeaderboardNames.has(name)) {
+        while (true) {
+            await util_1.sleep(100);
+            if (exports.cachedRawLeaderboards.has(name))
+                return exports.cachedRawLeaderboards.get(name);
+        }
+    }
     // typescript forces us to make a new variable and set it this way because it gives an error otherwise
     const query = {};
     query[`stats.${name}`] = { '$exists': true, '$ne': NaN };
     const sortQuery = {};
     sortQuery[`stats.${name}`] = isLeaderboardReversed(name) ? 1 : -1;
+    fetchingRawLeaderboardNames.add(name);
     const leaderboardRaw = await profileLeaderboardsCollection
         .find(query)
         .sort(sortQuery)
         .limit(leaderboardMax)
         .toArray();
+    fetchingRawLeaderboardNames.delete(name);
     exports.cachedRawLeaderboards.set(name, leaderboardRaw);
     return leaderboardRaw;
 }

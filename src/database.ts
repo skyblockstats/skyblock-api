@@ -254,11 +254,24 @@ function isLeaderboardReversed(name: string): boolean {
 	return false
 }
 
+/** A set of names of the raw leaderboards that are currently being fetched. This is used to make sure two leaderboads aren't fetched at the same time */
+const fetchingRawLeaderboardNames: Set<string> = new Set()
+
 async function fetchMemberLeaderboardRaw(name: string): Promise<DatabaseMemberLeaderboardItem[]> {
 	if (!client) throw Error('Client isn\'t initialized yet')
 
 	if (cachedRawLeaderboards.has(name))
 		return cachedRawLeaderboards.get(name) as DatabaseMemberLeaderboardItem[]
+	
+	// if it's currently being fetched, check every 100ms until it's in cachedRawLeaderboards
+	if (fetchingRawLeaderboardNames.has(name)) {
+		while (true) {
+			await sleep(100)
+			if (cachedRawLeaderboards.has(name))
+				return cachedRawLeaderboards.get(name) as DatabaseMemberLeaderboardItem[]
+		}
+	}
+
 	// typescript forces us to make a new variable and set it this way because it gives an error otherwise
 	const query = {}
 	query[`stats.${name}`] = { '$exists': true, '$ne': NaN }
@@ -266,12 +279,13 @@ async function fetchMemberLeaderboardRaw(name: string): Promise<DatabaseMemberLe
 	const sortQuery: any = {}
 	sortQuery[`stats.${name}`] = isLeaderboardReversed(name) ? 1 : -1
 
+	fetchingRawLeaderboardNames.add(name)
 	const leaderboardRaw: DatabaseMemberLeaderboardItem[] = await memberLeaderboardsCollection
 		.find(query)
 		.sort(sortQuery)
 		.limit(leaderboardMax)
 		.toArray()
-
+	fetchingRawLeaderboardNames.delete(name)
 	cachedRawLeaderboards.set(name, leaderboardRaw)
 	return leaderboardRaw
 }
@@ -279,6 +293,16 @@ async function fetchMemberLeaderboardRaw(name: string): Promise<DatabaseMemberLe
 async function fetchProfileLeaderboardRaw(name: string): Promise<DatabaseProfileLeaderboardItem[]> {
 	if (cachedRawLeaderboards.has(name))
 		return cachedRawLeaderboards.get(name) as DatabaseProfileLeaderboardItem[]
+
+	// if it's currently being fetched, check every 100ms until it's in cachedRawLeaderboards
+	if (fetchingRawLeaderboardNames.has(name)) {
+		while (true) {
+			await sleep(100)
+			if (cachedRawLeaderboards.has(name))
+				return cachedRawLeaderboards.get(name) as DatabaseProfileLeaderboardItem[]
+		}
+	}
+
 	// typescript forces us to make a new variable and set it this way because it gives an error otherwise
 	const query = {}
 	query[`stats.${name}`] = { '$exists': true, '$ne': NaN }
@@ -286,11 +310,13 @@ async function fetchProfileLeaderboardRaw(name: string): Promise<DatabaseProfile
 	const sortQuery: any = {}
 	sortQuery[`stats.${name}`] = isLeaderboardReversed(name) ? 1 : -1
 
+	fetchingRawLeaderboardNames.add(name)
 	const leaderboardRaw: DatabaseProfileLeaderboardItem[] = await profileLeaderboardsCollection
 		.find(query)
 		.sort(sortQuery)
 		.limit(leaderboardMax)
 		.toArray()
+	fetchingRawLeaderboardNames.delete(name)
 
 	cachedRawLeaderboards.set(name, leaderboardRaw)
 	return leaderboardRaw
