@@ -13,6 +13,7 @@ import { debug } from '.'
 
 // cache usernames for 4 hours
 /** uuid: username */
+
 export const usernameCache = new NodeCache({
 	stdTTL: 60 * 60 * 4,
 	checkperiod: 60,
@@ -64,7 +65,7 @@ interface KeyValue {
 function waitForCacheSet(cache: NodeCache, key?: string, value?: string): Promise<KeyValue> {
 	return new Promise((resolve, reject) => {
 		const listener = (setKey, setValue) => {
-			if (setKey === key || (value && setValue === value)) {
+			if (((setKey === key) || (value && setValue === value)) && typeof setValue === 'string') {
 				cache.removeListener('set', listener)
 				return resolve({ key: setKey, value: setValue })
 			}
@@ -84,7 +85,7 @@ export async function uuidFromUser(user: string): Promise<string> {
 
 	if (usernameCache.has(undashUuid(user))) {
 		// check if the uuid is a key
-		const username: Promise<KeyValue> | string | null = usernameCache.get(undashUuid(user))
+		const username: Promise<KeyValue> | string | null = usernameCache.get<string | Promise<KeyValue>>(undashUuid(user))
 
 		// sometimes the username will be null, return that
 		if (username === null) return null
@@ -92,16 +93,16 @@ export async function uuidFromUser(user: string): Promise<string> {
 		// if it has .then, then that means its a waitForCacheSet promise. This is done to prevent requests made while it is already requesting
 		if ((username as Promise<KeyValue>).then) {
 			const { key: uuid, value: _username } = await (username as Promise<KeyValue>)
-			usernameCache.set(uuid, _username)
+			usernameCache.set<string | Promise<KeyValue>>(uuid, _username)
 			return uuid
 		} else
 			return undashUuid(user)
 	}
 
 	// check if the username is a value
-	const uuidToUsername: {[ key: string ]: string} = usernameCache.mget(usernameCache.keys())
+	const uuidToUsername: { [ key: string ]: string | Promise<KeyValue> } = usernameCache.mget(usernameCache.keys())
 	for (const [ uuid, username ] of Object.entries(uuidToUsername)) {
-		if (username && username.toLowerCase && user.toLowerCase() === username.toLowerCase())
+		if (username && (<string>username).toLowerCase && user.toLowerCase() === (<string>username).toLowerCase())
 			return uuid
 	}
 

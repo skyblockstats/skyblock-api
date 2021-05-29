@@ -72,7 +72,7 @@ exports.profileNameCache = new node_cache_1.default({
 function waitForCacheSet(cache, key, value) {
     return new Promise((resolve, reject) => {
         const listener = (setKey, setValue) => {
-            if (setKey === key || (value && setValue === value)) {
+            if (((setKey === key) || (value && setValue === value)) && typeof setValue === 'string') {
                 cache.removeListener('set', listener);
                 return resolve({ key: setKey, value: setValue });
             }
