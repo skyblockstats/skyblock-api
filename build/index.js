@@ -30,7 +30,7 @@ const constants = __importStar(require("./constants"));
 const discord = __importStar(require("./discord"));
 const express_1 = __importDefault(require("express"));
 const app = express_1.default();
-exports.debug = true;
+exports.debug = false;
 const mainSiteUrl = 'https://skyblock.matdoes.dev';
 // 200 requests over 5 minutes
 const limiter = express_rate_limit_1.default({
@@ -50,8 +50,13 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     next();
 });
+const startTime = Date.now();
 app.get('/', async (req, res) => {
-    res.json({ ok: true });
+    const currentTime = Date.now();
+    res.json({
+        ok: true,
+        uptimeHours: (currentTime - startTime) / 1000 / 60 / 60
+    });
 });
 app.get('/player/:user', async (req, res) => {
     try {

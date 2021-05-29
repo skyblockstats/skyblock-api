@@ -7,7 +7,7 @@ import express from 'express'
 
 const app = express()
 
-export const debug = true
+export const debug = false
 
 const mainSiteUrl = 'https://skyblock.matdoes.dev'
 
@@ -30,8 +30,13 @@ app.use((req, res, next) => {
 	next()
 })
 
+const startTime = Date.now()
 app.get('/', async(req, res) => {
-	res.json({ ok: true })
+	const currentTime = Date.now()
+	res.json({
+		ok: true,
+		uptimeHours: (currentTime - startTime) / 1000 / 60 / 60
+	})
 })
 
 app.get('/player/:user', async(req, res) => {
