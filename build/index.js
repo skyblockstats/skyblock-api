@@ -55,7 +55,9 @@ app.get('/', async (req, res) => {
     const currentTime = Date.now();
     res.json({
         ok: true,
-        uptimeHours: (currentTime - startTime) / 1000 / 60 / 60
+        uptimeHours: (currentTime - startTime) / 1000 / 60 / 60,
+        finishedCachingRawLeaderboards: database_1.finishedCachingRawLeaderboards,
+        finishedCachingAllLeaderboards: database_1.finishedCachingAllLeaderboards
     });
 });
 app.get('/player/:user', async (req, res) => {

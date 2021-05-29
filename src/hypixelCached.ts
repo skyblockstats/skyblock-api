@@ -10,7 +10,6 @@ import { CleanPlayer } from './cleaners/player'
 import { isUuid, undashUuid } from './util'
 import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/skyblock/profile'
 import { debug } from '.'
-import { cachedRawLeaderboards } from './database'
 
 // cache usernames for 4 hours
 /** uuid: username */

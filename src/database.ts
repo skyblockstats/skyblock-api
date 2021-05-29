@@ -658,6 +658,9 @@ async function removeBadMemberLeaderboardAttributes(): Promise<void> {
 	}
 }
 
+export let finishedCachingRawLeaderboards = false
+export let finishedCachingAllLeaderboards = false
+
 /** Fetch all the leaderboards, used for caching. Don't call this often! */
 async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
 	const leaderboards: string[] = await fetchAllMemberLeaderboardAttributes()
@@ -666,6 +669,7 @@ async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
 
 	for (const leaderboard of shuffle(leaderboards))
 		await fetchMemberLeaderboardRaw(leaderboard)
+	finishedCachingRawLeaderboards = true
 
 	// shuffle so if the application is restarting many times itll still be useful
 	if (debug) console.debug('Caching leaderboards!')
@@ -678,6 +682,7 @@ async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
 
 		await fetchMemberLeaderboard(leaderboard)
 	}
+	finishedCachingAllLeaderboards = true
 	if (debug) console.debug('Finished caching leaderboards!')
 }
 

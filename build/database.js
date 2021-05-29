@@ -25,7 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateAccount = exports.fetchAccountFromDiscord = exports.fetchAccount = exports.fetchSession = exports.createSession = exports.queueUpdateDatabaseProfile = exports.queueUpdateDatabaseMember = exports.updateDatabaseProfile = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchLeaderboard = exports.fetchProfileLeaderboard = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchSlayerLeaderboards = exports.fetchAllLeaderboardsCategorized = exports.cachedRawLeaderboards = void 0;
+exports.updateAccount = exports.fetchAccountFromDiscord = exports.fetchAccount = exports.fetchSession = exports.createSession = exports.finishedCachingAllLeaderboards = exports.finishedCachingRawLeaderboards = exports.queueUpdateDatabaseProfile = exports.queueUpdateDatabaseMember = exports.updateDatabaseProfile = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchLeaderboard = exports.fetchProfileLeaderboard = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchSlayerLeaderboards = exports.fetchAllLeaderboardsCategorized = exports.cachedRawLeaderboards = void 0;
 const stats_1 = require("./cleaners/skyblock/stats");
 const slayers_1 = require("./cleaners/skyblock/slayers");
 const mongodb_1 = require("mongodb");
@@ -523,6 +523,8 @@ async function removeBadMemberLeaderboardAttributes() {
         }
     }
 }
+exports.finishedCachingRawLeaderboards = false;
+exports.finishedCachingAllLeaderboards = false;
 /** Fetch all the leaderboards, used for caching. Don't call this often! */
 async function fetchAllLeaderboards(fast) {
     const leaderboards = await fetchAllMemberLeaderboardAttributes();
@@ -530,6 +532,7 @@ async function fetchAllLeaderboards(fast) {
         console.debug('Caching raw leaderboards!');
     for (const leaderboard of util_1.shuffle(leaderboards))
         await fetchMemberLeaderboardRaw(leaderboard);
+    exports.finishedCachingRawLeaderboards = true;
     // shuffle so if the application is restarting many times itll still be useful
     if (_1.debug)
         console.debug('Caching leaderboards!');
@@ -541,6 +544,7 @@ async function fetchAllLeaderboards(fast) {
             await util_1.sleep(2 * 1000);
         await fetchMemberLeaderboard(leaderboard);
     }
+    exports.finishedCachingAllLeaderboards = true;
     if (_1.debug)
         console.debug('Finished caching leaderboards!');
 }
