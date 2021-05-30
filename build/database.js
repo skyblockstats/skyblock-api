@@ -533,6 +533,7 @@ async function fetchAllLeaderboards(fast) {
     for (const leaderboard of util_1.shuffle(leaderboards))
         await fetchMemberLeaderboardRaw(leaderboard);
     exports.finishedCachingRawLeaderboards = true;
+    return;
     // shuffle so if the application is restarting many times itll still be useful
     if (_1.debug)
         console.debug('Caching leaderboards!');

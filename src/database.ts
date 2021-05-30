@@ -670,6 +670,7 @@ async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
 	for (const leaderboard of shuffle(leaderboards))
 		await fetchMemberLeaderboardRaw(leaderboard)
 	finishedCachingRawLeaderboards = true
+	return
 
 	// shuffle so if the application is restarting many times itll still be useful
 	if (debug) console.debug('Caching leaderboards!')
