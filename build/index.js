@@ -70,7 +70,13 @@ app.get('/player/:user', async (req, res) => {
     }
 });
 app.get('/discord/:id', async (req, res) => {
-    res.json(await database_1.fetchAccountFromDiscord(req.params.id));
+    try {
+        res.json(await database_1.fetchAccountFromDiscord(req.params.id));
+    }
+    catch (err) {
+        console.error(err);
+        res.json({ ok: false });
+    }
 });
 app.get('/player/:user/:profile', async (req, res) => {
     try {
@@ -82,7 +88,13 @@ app.get('/player/:user/:profile', async (req, res) => {
     }
 });
 app.get('/player/:user/:profile/leaderboards', async (req, res) => {
-    res.json(await database_1.fetchMemberLeaderboardSpots(req.params.user, req.params.profile));
+    try {
+        res.json(await database_1.fetchMemberLeaderboardSpots(req.params.user, req.params.profile));
+    }
+    catch (err) {
+        console.error(err);
+        res.json({ ok: false });
+    }
 });
 app.get('/leaderboard/:name', async (req, res) => {
     try {
@@ -94,10 +106,22 @@ app.get('/leaderboard/:name', async (req, res) => {
     }
 });
 app.get('/leaderboards', async (req, res) => {
-    res.json(await database_1.fetchAllLeaderboardsCategorized());
+    try {
+        res.json(await database_1.fetchAllLeaderboardsCategorized());
+    }
+    catch (err) {
+        console.error(err);
+        res.json({ ok: false });
+    }
 });
 app.get('/constants', async (req, res) => {
-    res.json(await constants.fetchConstantValues());
+    try {
+        res.json(await constants.fetchConstantValues());
+    }
+    catch (err) {
+        console.error(err);
+        res.json({ ok: false });
+    }
 });
 app.post('/accounts/createsession', async (req, res) => {
     try {
