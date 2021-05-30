@@ -20,6 +20,8 @@ export const usernameCache = new NodeCache({
 	useClones: false,
 })
 
+usernameCache.setMaxListeners(20)
+
 export const basicProfilesCache = new NodeCache({
 	stdTTL: 60 * 10,
 	checkperiod: 60,

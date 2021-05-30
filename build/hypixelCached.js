@@ -39,6 +39,7 @@ exports.usernameCache = new node_cache_1.default({
     checkperiod: 60,
     useClones: false,
 });
+exports.usernameCache.setMaxListeners(20);
 exports.basicProfilesCache = new node_cache_1.default({
     stdTTL: 60 * 10,
     checkperiod: 60,
