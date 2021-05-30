@@ -163,6 +163,8 @@ app.post('/accounts/update', async (req, res) => {
         res.json({ ok: false });
     }
 });
+process.on('uncaughtException', err => console.error(err));
+process.on('unhandledRejection', (err, promise) => console.error(promise, err));
 // only run the server if it's not doing tests
 if (!globalThis.isTest)
     app.listen(8080, () => console.log('App started :)'));
