@@ -121,7 +121,6 @@ function getProfileLeaderboardAttributes(profile) {
     };
 }
 async function fetchAllLeaderboardsCategorized() {
-    return {};
     const memberLeaderboardAttributes = await fetchAllMemberLeaderboardAttributes();
     const profileLeaderboardAttributes = await fetchAllProfileLeaderboardAttributes();
     const categorizedLeaderboards = {};
@@ -140,7 +139,6 @@ async function fetchAllLeaderboardsCategorized() {
 exports.fetchAllLeaderboardsCategorized = fetchAllLeaderboardsCategorized;
 /** Fetch the raw names for the slayer leaderboards */
 async function fetchSlayerLeaderboards() {
-    return [];
     const rawSlayerNames = await constants.fetchSlayers();
     let leaderboardNames = [
         'slayer_total_xp',
@@ -159,7 +157,6 @@ async function fetchSlayerLeaderboards() {
 exports.fetchSlayerLeaderboards = fetchSlayerLeaderboards;
 /** Fetch the names of all the leaderboards that rank members */
 async function fetchAllMemberLeaderboardAttributes() {
-    return [];
     return [
         // we use the raw stat names rather than the clean stats in case hypixel adds a new stat and it takes a while for us to clean it
         ...await constants.fetchStats(),
@@ -197,7 +194,6 @@ function isLeaderboardReversed(name) {
 /** A set of names of the raw leaderboards that are currently being fetched. This is used to make sure two leaderboads aren't fetched at the same time */
 const fetchingRawLeaderboardNames = new Set();
 async function fetchMemberLeaderboardRaw(name) {
-    return [];
     if (!client)
         throw Error('Client isn\'t initialized yet');
     if (exports.cachedRawLeaderboards.has(name))
@@ -226,7 +222,6 @@ async function fetchMemberLeaderboardRaw(name) {
     return leaderboardRaw;
 }
 async function fetchProfileLeaderboardRaw(name) {
-    return [];
     if (exports.cachedRawLeaderboards.has(name))
         return exports.cachedRawLeaderboards.get(name);
     // if it's currently being fetched, check every 100ms until it's in cachedRawLeaderboards
@@ -255,11 +250,6 @@ async function fetchProfileLeaderboardRaw(name) {
 /** Fetch a leaderboard that ranks members, as opposed to profiles */
 async function fetchMemberLeaderboard(name) {
     var _a;
-    return {
-        list: [],
-        name: 'Leaderboards are temporarily disabled, they\'ll be back in a few hours',
-        unit: ''
-    };
     const leaderboardRaw = await fetchMemberLeaderboardRaw(name);
     const fetchLeaderboardPlayer = async (item) => {
         return {
@@ -283,11 +273,6 @@ exports.fetchMemberLeaderboard = fetchMemberLeaderboard;
 /** Fetch a leaderboard that ranks profiles, as opposed to members */
 async function fetchProfileLeaderboard(name) {
     var _a;
-    return {
-        list: [],
-        name: 'Leaderboards are temporarily disabled, they\'ll be back in a few hours',
-        unit: ''
-    };
     const leaderboardRaw = await fetchProfileLeaderboardRaw(name);
     const fetchLeaderboardProfile = async (item) => {
         const players = [];
@@ -313,11 +298,6 @@ async function fetchProfileLeaderboard(name) {
 exports.fetchProfileLeaderboard = fetchProfileLeaderboard;
 /** Fetch a leaderboard */
 async function fetchLeaderboard(name) {
-    return {
-        list: [],
-        name: 'Leaderboards are temporarily disabled, they\'ll be back in a few hours',
-        unit: ''
-    };
     const profileLeaderboards = await fetchAllProfileLeaderboardAttributes();
     if (profileLeaderboards.includes(name)) {
         return await fetchProfileLeaderboard(name);
@@ -330,7 +310,6 @@ exports.fetchLeaderboard = fetchLeaderboard;
 /** Get the leaderboard positions a member is on. This may take a while depending on whether stuff is cached */
 async function fetchMemberLeaderboardSpots(player, profile) {
     var _a;
-    return [];
     const fullProfile = await cached.fetchProfile(player, profile);
     const fullMember = fullProfile.members.find(m => m.username.toLowerCase() === player.toLowerCase() || m.uuid === player);
     // update the leaderboard positions for the member
@@ -364,7 +343,6 @@ async function getLeaderboardRequirement(name, leaderboardType) {
 }
 /** Get the attributes for the member, but only ones that would put them on the top 100 for leaderboards */
 async function getApplicableMemberLeaderboardAttributes(member) {
-    return {};
     const leaderboardAttributes = getMemberLeaderboardAttributes(member);
     const applicableAttributes = {};
     for (const [leaderboard, attributeValue] of Object.entries(leaderboardAttributes)) {
@@ -385,7 +363,6 @@ async function getApplicableMemberLeaderboardAttributes(member) {
 }
 /** Get the attributes for the profile, but only ones that would put them on the top 100 for leaderboards */
 async function getApplicableProfileLeaderboardAttributes(profile) {
-    return {};
     const leaderboardAttributes = getProfileLeaderboardAttributes(profile);
     const applicableAttributes = {};
     for (const [leaderboard, attributeValue] of Object.entries(leaderboardAttributes)) {
@@ -406,7 +383,6 @@ async function getApplicableProfileLeaderboardAttributes(profile) {
 }
 /** Update the member's leaderboard data on the server if applicable */
 async function updateDatabaseMember(member, profile) {
-    return;
     if (!client)
         return; // the db client hasn't been initialized
     if (_1.debug)
@@ -462,7 +438,6 @@ exports.updateDatabaseMember = updateDatabaseMember;
  * This will not also update the members, you have to call updateDatabaseMember separately for that
  */
 async function updateDatabaseProfile(profile) {
-    return;
     if (!client)
         return; // the db client hasn't been initialized
     if (_1.debug)
@@ -517,12 +492,12 @@ const leaderboardUpdateProfileQueue = new queue_promise_1.default({
 });
 /** Queue an update for the member's leaderboard data on the server if applicable */
 function queueUpdateDatabaseMember(member, profile) {
-    // leaderboardUpdateMemberQueue.enqueue(async() => await updateDatabaseMember(member, profile))
+    leaderboardUpdateMemberQueue.enqueue(async () => await updateDatabaseMember(member, profile));
 }
 exports.queueUpdateDatabaseMember = queueUpdateDatabaseMember;
 /** Queue an update for the profile's leaderboard data on the server if applicable */
 function queueUpdateDatabaseProfile(profile) {
-    // leaderboardUpdateProfileQueue.enqueue(async() => await updateDatabaseProfile(profile))
+    leaderboardUpdateProfileQueue.enqueue(async () => await updateDatabaseProfile(profile));
 }
 exports.queueUpdateDatabaseProfile = queueUpdateDatabaseProfile;
 /**
@@ -610,10 +585,10 @@ exports.updateAccount = updateAccount;
 if (!globalThis.isTest) {
     connect().then(() => {
         // when it connects, cache the leaderboards and remove bad members
-        // removeBadMemberLeaderboardAttributes()
+        removeBadMemberLeaderboardAttributes();
         // cache leaderboards on startup so its faster later on
-        // fetchAllLeaderboards(false)
+        fetchAllLeaderboards(false);
         // cache leaderboard players again every 4 hours
-        // setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000)
+        setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000);
     });
 }
