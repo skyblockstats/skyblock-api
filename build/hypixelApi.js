@@ -63,8 +63,10 @@ async function sendApiRequest({ path, key, args }) {
         try {
             fetchResponse = await node_fetch_1.default(fetchUrl, { agent: () => httpsAgent });
             fetchJsonParsed = await fetchResponse.json();
+            break;
         }
         catch (err) {
+            console.warn(err);
             retries++;
             // too many retries, just throw the error
             if (retries > maxRetries)

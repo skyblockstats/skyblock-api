@@ -5,6 +5,7 @@ import { jsonToQuery, shuffle } from './util'
 import type { Response } from 'node-fetch'
 import fetch from 'node-fetch'
 import { Agent } from 'https'
+import { debug } from '.'
 
 if (!process.env.hypixel_keys)
 	// if there's no hypixel keys in env, run dotenv
@@ -128,7 +129,6 @@ export interface HypixelPlayer {
 /** Send an HTTP request to the Hypixel API */
 export async function sendApiRequest({ path, key, args }): Promise<HypixelResponse> {
 	// Send a raw http request to api.hypixel.net, and return the parsed json
-
 	if (
 		key
 		// keys arent required for skyblock/auctions
@@ -155,7 +155,9 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 				{ agent: () => httpsAgent }
 			)
 			fetchJsonParsed = await fetchResponse.json()
+			break
 		} catch (err) {
+			console.warn(err)
 			retries ++
 
 			// too many retries, just throw the error

@@ -7,6 +7,7 @@ function base64decode(base64: string): Buffer {
 
 type Tier = 'COMMON' | 'UNCOMMON' | 'RARE' | 'EPIC' | 'LEGENDARY' | 'MYTHIC' | 'SUPREME' | 'SPECIAL' | 'VERY SPECIAL'
 
+// TODO: add a "Slot" interface that extends Item but has the count
 export interface Item {
 	id: string
 	count: number

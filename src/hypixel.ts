@@ -11,6 +11,7 @@ import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles'
 import { CleanPlayer, cleanPlayerResponse } from './cleaners/player'
 import * as cached from './hypixelCached'
 import { debug } from '.'
+import { Item } from './cleaners/skyblock/inventory'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories'
 
@@ -250,13 +251,17 @@ async function fetchAuctionsPage(page: number): Promise<AuctionsResponse> {
  */
 export async function fetchAllAuctionsUncached(): Promise<AuctionsResponse> {
 	const firstPage = await fetchAuctionsPage(1)
+	console.log(`gotten first auctions page, there\'s a total of ${firstPage.pageCount} pages`)
 	const allAuctions: Auction[] = [ ...firstPage.auctions ]
 
 	const promises: Promise<AuctionsResponse>[] = []
 
-	for (let pageNumber = 2; pageNumber <= firstPage.pageCount; pageNumber ++)
-		promises.push(fetchAuctionsPage(pageNumber))
+	// for (let pageNumber = 2; pageNumber <= firstPage.pageCount; pageNumber ++)
+	// 	promises.push(fetchAuctionsPage(pageNumber))
+	promises.push(fetchAuctionsPage(2))
+
 	const otherResponses = await Promise.all(promises)
+	console.log('promises resolved')
 	for (const auctionsResponse of otherResponses) {
 		allAuctions.push(...auctionsResponse.auctions)
 	}
@@ -267,3 +272,13 @@ export async function fetchAllAuctionsUncached(): Promise<AuctionsResponse> {
 		auctions: allAuctions
 	}
 }
+
+
+async function getAuctionLowestBin(item: Item) {
+	console.log('ok getting auctions')
+	const auctions = await cached.fetchAllAuctions()
+	console.log(auctions)
+}
+
+
+setTimeout(() => { getAuctionLowestBin(null) }, 1000)
