@@ -280,11 +280,16 @@ async function fetchMemberLeaderboardRaw(name: string): Promise<DatabaseMemberLe
 	sortQuery[`stats.${name}`] = isLeaderboardReversed(name) ? 1 : -1
 
 	fetchingRawLeaderboardNames.add(name)
-	const leaderboardRaw: DatabaseMemberLeaderboardItem[] = await memberLeaderboardsCollection
+	const leaderboardRaw: DatabaseMemberLeaderboardItem[] = (await memberLeaderboardsCollection
 		.find(query)
 		.sort(sortQuery)
 		.limit(leaderboardMax)
-		.toArray()
+		.toArray())
+		.map((i: DatabaseMemberLeaderboardItem): DatabaseMemberLeaderboardItem => {
+			const stats = {}
+			stats[name] = i.stats[name]
+			return { ...i, stats }
+		})
 	fetchingRawLeaderboardNames.delete(name)
 	cachedRawLeaderboards.set(name, leaderboardRaw)
 	return leaderboardRaw
@@ -311,11 +316,16 @@ async function fetchProfileLeaderboardRaw(name: string): Promise<DatabaseProfile
 	sortQuery[`stats.${name}`] = isLeaderboardReversed(name) ? 1 : -1
 
 	fetchingRawLeaderboardNames.add(name)
-	const leaderboardRaw: DatabaseProfileLeaderboardItem[] = await profileLeaderboardsCollection
+	const leaderboardRaw: DatabaseProfileLeaderboardItem[] = (await profileLeaderboardsCollection
 		.find(query)
 		.sort(sortQuery)
 		.limit(leaderboardMax)
-		.toArray()
+		.toArray())
+		.map((i: DatabaseProfileLeaderboardItem): DatabaseProfileLeaderboardItem => {
+			const stats = {}
+			stats[name] = i.stats[name]
+			return { ...i, stats }
+		})
 	fetchingRawLeaderboardNames.delete(name)
 
 	cachedRawLeaderboards.set(name, leaderboardRaw)
@@ -537,12 +547,16 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 	for (const [ attributeName, attributeValue ] of Object.entries(leaderboardAttributes)) {
 		const existingRawLeaderboard = await fetchMemberLeaderboardRaw(attributeName)
 		const leaderboardReverse = isLeaderboardReversed(attributeName)
+
+		const thisLeaderboardAttributes = {}
+		thisLeaderboardAttributes[attributeName] = attributeValue
+
 		const newRawLeaderboard = existingRawLeaderboard
 			// remove the player from the leaderboard, if they're there
 			.filter(value => value.uuid !== member.uuid || value.profile !== profile.uuid)
 			.concat([{
 				last_updated: new Date(),
-				stats: leaderboardAttributes,
+				stats: thisLeaderboardAttributes,
 				uuid: member.uuid,
 				profile: profile.uuid
 			}])
@@ -592,12 +606,16 @@ export async function updateDatabaseProfile(profile: CleanFullProfile): Promise<
 	for (const [ attributeName, attributeValue ] of Object.entries(leaderboardAttributes)) {
 		const existingRawLeaderboard = await fetchProfileLeaderboardRaw(attributeName)
 		const leaderboardReverse = isLeaderboardReversed(attributeName)
+
+		const thisLeaderboardAttributes = {}
+		thisLeaderboardAttributes[attributeName] = attributeValue
+
 		const newRawLeaderboard = existingRawLeaderboard
 			// remove the player from the leaderboard, if they're there
 			.filter(value => value.uuid !== profile.uuid)
 			.concat([{
 				last_updated: new Date(),
-				stats: leaderboardAttributes,
+				stats: thisLeaderboardAttributes,
 				uuid: profile.uuid,
 				players: profile.members.map(p => p.uuid)
 			}])
@@ -730,3 +748,8 @@ if (!globalThis.isTest) {
 		setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000)
 	})
 }
+
+setInterval(() => {
+	console.log(cachedRawLeaderboards.size)
+	console.log(Array.from(cachedRawLeaderboards.values())[cachedRawLeaderboards.size - 1])
+}, 5000)
