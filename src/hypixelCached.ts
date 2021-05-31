@@ -11,15 +11,19 @@ import * as hypixel from './hypixel'
 import * as mojang from './mojang'
 import NodeCache from 'node-cache'
 import Queue from 'queue-promise'
+import LRUCache from 'lru-cache'
 import { debug } from '.'
 
 // cache usernames for 4 hours
 /** uuid: username */
+
 export const usernameCache = new NodeCache({
 	stdTTL: 60 * 60 * 4,
 	checkperiod: 60,
 	useClones: false,
 })
+
+usernameCache.setMaxListeners(20)
 
 export const basicProfilesCache = new NodeCache({
 	stdTTL: 60 * 10,
@@ -33,11 +37,10 @@ export const playerCache = new NodeCache({
 	useClones: true,
 })
 
-// cache "basic players" (players without profiles) for 4 hours
-export const basicPlayerCache = new NodeCache({
-	stdTTL: 60 * 60 * 4,
-	checkperiod: 60 * 10,
-	useClones: true
+// cache "basic players" (players without profiles) for 30 minutes
+export const basicPlayerCache: LRUCache<string, CleanPlayer> = new LRUCache({
+	max: 20000,
+	maxAge: 60 * 30,
 })
 
 export const profileCache = new NodeCache({
@@ -67,7 +70,7 @@ interface KeyValue {
 function waitForCacheSet(cache: NodeCache, key?: string, value?: string): Promise<KeyValue> {
 	return new Promise((resolve, reject) => {
 		const listener = (setKey, setValue) => {
-			if (setKey === key || (value && setValue === value)) {
+			if (((setKey === key) || (value && setValue === value)) && typeof setValue === 'string') {
 				cache.removeListener('set', listener)
 				return resolve({ key: setKey, value: setValue })
 			}
@@ -87,31 +90,33 @@ export async function uuidFromUser(user: string): Promise<string> {
 
 	if (usernameCache.has(undashUuid(user))) {
 		// check if the uuid is a key
-		const username: any = usernameCache.get(undashUuid(user))
+		const username: Promise<KeyValue> | string | null = usernameCache.get<string | Promise<KeyValue>>(undashUuid(user))
 
 		// sometimes the username will be null, return that
-		if (username === null) return username
+		if (username === null) return null
 
 		// if it has .then, then that means its a waitForCacheSet promise. This is done to prevent requests made while it is already requesting
-		if (username.then) {
-			const { key: uuid, value: _username } = await username
-			usernameCache.set(uuid, _username)
+		if ((username as Promise<KeyValue>).then) {
+			const { key: uuid, value: _username } = await (username as Promise<KeyValue>)
+			usernameCache.set<string | Promise<KeyValue>>(uuid, _username)
 			return uuid
 		} else
 			return undashUuid(user)
 	}
 
 	// check if the username is a value
-	const uuidToUsername: {[ key: string ]: string} = usernameCache.mget(usernameCache.keys())
+	const uuidToUsername: { [ key: string ]: string | Promise<KeyValue> } = usernameCache.mget(usernameCache.keys())
 	for (const [ uuid, username ] of Object.entries(uuidToUsername)) {
-		if (username && username.toLowerCase && user.toLowerCase() === username.toLowerCase())
+		if (username && (<string>username).toLowerCase && user.toLowerCase() === (<string>username).toLowerCase())
 			return uuid
 	}
 
 	if (debug) console.debug('Cache miss: uuidFromUser', user)
 
+	const undashedUser = undashUuid(user)
+
 	// set it as waitForCacheSet (a promise) in case uuidFromUser gets called while its fetching mojang
-	usernameCache.set(undashUuid(user), waitForCacheSet(usernameCache, user, user))
+	usernameCache.set(undashedUser, waitForCacheSet(usernameCache, user, user))
 	
 	// not cached, actually fetch mojang api now
 	let { uuid, username } = await mojang.profileFromUser(user)
@@ -123,7 +128,7 @@ export async function uuidFromUser(user: string): Promise<string> {
 	// remove dashes from the uuid so its more normal
 	uuid = undashUuid(uuid)
 
-	if (user !== uuid) usernameCache.del(user)
+	usernameCache.del(undashedUser)
 
 	usernameCache.set(uuid, username)
 	return uuid
@@ -250,6 +255,10 @@ async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[]> {
 	if (debug) console.debug('Cache miss: fetchBasicProfiles', user)
 
 	const player = await fetchPlayer(playerUuid)
+	if (!player) {
+		console.log('bruh playerUuid', user, playerUuid)
+		return []
+	}
 	const profiles = player.profiles
 	basicProfilesCache.set(playerUuid, profiles)
 
@@ -272,7 +281,7 @@ export async function fetchProfileUuid(user: string, profile: string): Promise<s
 		return null
 	}
 
-	if (debug) console.debug('Cache miss: fetchProfileUuid', user)
+	if (debug) console.debug('Cache miss: fetchProfileUuid', user, profile)
 
 	const profiles = await fetchBasicProfiles(user)
 	if (!profiles) return // user probably doesnt exist
@@ -285,6 +294,7 @@ export async function fetchProfileUuid(user: string, profile: string): Promise<s
 		else if (undashUuid(p.uuid) === undashUuid(profileUuid))
 			return undashUuid(p.uuid)
 	}
+	return null
 }
 
 /**
@@ -295,6 +305,8 @@ export async function fetchProfileUuid(user: string, profile: string): Promise<s
 export async function fetchProfile(user: string, profile: string): Promise<CleanFullProfile> {
 	const playerUuid = await uuidFromUser(user)
 	const profileUuid = await fetchProfileUuid(playerUuid, profile)
+
+	if (!profileUuid) return null
 
 	if (profileCache.has(profileUuid)) {
 		// we have the profile cached, return it :)
@@ -350,6 +362,8 @@ export async function fetchBasicProfileFromUuid(profileUuid: string): Promise<Cl
 export async function fetchProfileName(user: string, profile: string): Promise<string> {
 	// we're fetching the profile and player uuid again in case we were given a name, but it's cached so it's not much of a problem
 	const profileUuid = await fetchProfileUuid(user, profile)
+	if (!profileUuid)
+		return null
 	const playerUuid = await uuidFromUser(user)
 
 	if (profileNameCache.has(`${playerUuid}.${profileUuid}`)) {

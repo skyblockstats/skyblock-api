@@ -32,6 +32,7 @@ const hypixel = __importStar(require("./hypixel"));
 const mojang = __importStar(require("./mojang"));
 const node_cache_1 = __importDefault(require("node-cache"));
 const queue_promise_1 = __importDefault(require("queue-promise"));
+const lru_cache_1 = __importDefault(require("lru-cache"));
 const _1 = require(".");
 // cache usernames for 4 hours
 /** uuid: username */
@@ -40,6 +41,7 @@ exports.usernameCache = new node_cache_1.default({
     checkperiod: 60,
     useClones: false,
 });
+exports.usernameCache.setMaxListeners(20);
 exports.basicProfilesCache = new node_cache_1.default({
     stdTTL: 60 * 10,
     checkperiod: 60,
@@ -50,11 +52,10 @@ exports.playerCache = new node_cache_1.default({
     checkperiod: 10,
     useClones: true,
 });
-// cache "basic players" (players without profiles) for 4 hours
-exports.basicPlayerCache = new node_cache_1.default({
-    stdTTL: 60 * 60 * 4,
-    checkperiod: 60 * 10,
-    useClones: true
+// cache "basic players" (players without profiles) for 30 minutes
+exports.basicPlayerCache = new lru_cache_1.default({
+    max: 20000,
+    maxAge: 60 * 30,
 });
 exports.profileCache = new node_cache_1.default({
     stdTTL: 30,
@@ -74,7 +75,7 @@ exports.profileNameCache = new node_cache_1.default({
 function waitForCacheSet(cache, key, value) {
     return new Promise((resolve, reject) => {
         const listener = (setKey, setValue) => {
-            if (setKey === key || (value && setValue === value)) {
+            if (((setKey === key) || (value && setValue === value)) && typeof setValue === 'string') {
                 cache.removeListener('set', listener);
                 return resolve({ key: setKey, value: setValue });
             }
@@ -95,7 +96,7 @@ async function uuidFromUser(user) {
         const username = exports.usernameCache.get(util_1.undashUuid(user));
         // sometimes the username will be null, return that
         if (username === null)
-            return username;
+            return null;
         // if it has .then, then that means its a waitForCacheSet promise. This is done to prevent requests made while it is already requesting
         if (username.then) {
             const { key: uuid, value: _username } = await username;
@@ -113,8 +114,9 @@ async function uuidFromUser(user) {
     }
     if (_1.debug)
         console.debug('Cache miss: uuidFromUser', user);
+    const undashedUser = util_1.undashUuid(user);
     // set it as waitForCacheSet (a promise) in case uuidFromUser gets called while its fetching mojang
-    exports.usernameCache.set(util_1.undashUuid(user), waitForCacheSet(exports.usernameCache, user, user));
+    exports.usernameCache.set(undashedUser, waitForCacheSet(exports.usernameCache, user, user));
     // not cached, actually fetch mojang api now
     let { uuid, username } = await mojang.profileFromUser(user);
     if (!uuid) {
@@ -123,8 +125,7 @@ async function uuidFromUser(user) {
     }
     // remove dashes from the uuid so its more normal
     uuid = util_1.undashUuid(uuid);
-    if (user !== uuid)
-        exports.usernameCache.del(user);
+    exports.usernameCache.del(undashedUser);
     exports.usernameCache.set(uuid, username);
     return uuid;
 }
@@ -233,6 +234,10 @@ async function fetchBasicProfiles(user) {
     if (_1.debug)
         console.debug('Cache miss: fetchBasicProfiles', user);
     const player = await fetchPlayer(playerUuid);
+    if (!player) {
+        console.log('bruh playerUuid', user, playerUuid);
+        return [];
+    }
     const profiles = player.profiles;
     exports.basicProfilesCache.set(playerUuid, profiles);
     // cache the profile names and uuids to profileNameCache because we can
@@ -253,7 +258,7 @@ async function fetchProfileUuid(user, profile) {
         return null;
     }
     if (_1.debug)
-        console.debug('Cache miss: fetchProfileUuid', user);
+        console.debug('Cache miss: fetchProfileUuid', user, profile);
     const profiles = await fetchBasicProfiles(user);
     if (!profiles)
         return; // user probably doesnt exist
@@ -264,6 +269,7 @@ async function fetchProfileUuid(user, profile) {
         else if (util_1.undashUuid(p.uuid) === util_1.undashUuid(profileUuid))
             return util_1.undashUuid(p.uuid);
     }
+    return null;
 }
 exports.fetchProfileUuid = fetchProfileUuid;
 /**
@@ -274,6 +280,8 @@ exports.fetchProfileUuid = fetchProfileUuid;
 async function fetchProfile(user, profile) {
     const playerUuid = await uuidFromUser(user);
     const profileUuid = await fetchProfileUuid(playerUuid, profile);
+    if (!profileUuid)
+        return null;
     if (exports.profileCache.has(profileUuid)) {
         // we have the profile cached, return it :)
         if (_1.debug)
@@ -324,6 +332,8 @@ exports.fetchBasicProfileFromUuid = fetchBasicProfileFromUuid;
 async function fetchProfileName(user, profile) {
     // we're fetching the profile and player uuid again in case we were given a name, but it's cached so it's not much of a problem
     const profileUuid = await fetchProfileUuid(user, profile);
+    if (!profileUuid)
+        return null;
     const playerUuid = await uuidFromUser(user);
     if (exports.profileNameCache.has(`${playerUuid}.${profileUuid}`)) {
         // Return the profile name if it's cached

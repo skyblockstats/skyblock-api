@@ -36,7 +36,7 @@ function chooseApiKey() {
         if (Date.now() > keyUsage.reset)
             keyUsage.remaining = keyUsage.limit;
         // if this key has more uses remaining than the current known best one, save it
-        if (!bestKeyUsage || keyUsage.remaining > bestKeyUsage.remaining) {
+        if (bestKeyUsage === null || keyUsage.remaining > bestKeyUsage.remaining) {
             bestKeyUsage = keyUsage;
             bestKey = key;
         }

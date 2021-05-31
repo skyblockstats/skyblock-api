@@ -3,17 +3,19 @@
 */
 
 import { categorizeStat, getStatUnit } from './cleaners/skyblock/stats'
-import { CleanBasicProfile, CleanFullProfile, CleanProfile } from './cleaners/skyblock/profile'
+import { CleanFullProfile } from './cleaners/skyblock/profile'
+import { slayerLevels } from './cleaners/skyblock/slayers'
 import { CleanMember } from './cleaners/skyblock/member'
 import { Collection, Db, MongoClient } from 'mongodb'
 import { CleanPlayer } from './cleaners/player'
 import * as cached from './hypixelCached'
 import * as constants from './constants'
 import { shuffle, sleep } from './util'
+import * as discord from './discord'
 import NodeCache from 'node-cache'
 import Queue from 'queue-promise'
 import { debug } from '.'
-import { slayerLevels } from './cleaners/skyblock/slayers'
+import { v4 as uuid4 } from 'uuid'
 
 // don't update the user for 3 minutes
 const recentlyUpdated = new NodeCache({
@@ -36,6 +38,19 @@ interface DatabaseProfileLeaderboardItem {
 	last_updated: Date
 }
 
+
+interface memberRawLeaderboardItem {
+	uuid: string
+	profile: string
+	value: number
+}
+interface profileRawLeaderboardItem {
+	uuid: string
+	/** An array of uuids for each player in the profile */
+	players: string[]
+	value: number
+}
+
 interface MemberLeaderboardItem {
 	player: CleanPlayer
 	profileUuid: string
@@ -47,7 +62,7 @@ interface ProfileLeaderboardItem {
 	value: number
 }
 
-const cachedRawLeaderboards: Map<string, (DatabaseMemberLeaderboardItem|DatabaseProfileLeaderboardItem)[]> = new Map()
+export const cachedRawLeaderboards: Map<string, (memberRawLeaderboardItem|profileRawLeaderboardItem)[]> = new Map()
 
 const leaderboardMax = 100
 const reversedLeaderboards = [
@@ -57,8 +72,33 @@ const reversedLeaderboards = [
 
 let client: MongoClient
 let database: Db
-let memberLeaderboardsCollection: Collection<any>
-let profileLeaderboardsCollection: Collection<any>
+
+interface SessionSchema {
+	_id?: string
+	refresh_token: string
+	discord_user: {
+		id: string
+		name: string
+	}
+	lastUpdated: Date
+}
+
+export interface AccountCustomization {
+	backgroundUrl?: string
+	pack?: string
+}
+
+export interface AccountSchema {
+	_id?: string
+	discordId: string
+	minecraftUuid?: string
+	customization?: AccountCustomization
+}
+
+let memberLeaderboardsCollection: Collection<DatabaseMemberLeaderboardItem>
+let profileLeaderboardsCollection: Collection<DatabaseProfileLeaderboardItem>
+let sessionsCollection: Collection<SessionSchema>
+let accountsCollection: Collection<AccountSchema>
 
 async function connect(): Promise<void> {
 	if (!process.env.db_uri)
@@ -69,6 +109,9 @@ async function connect(): Promise<void> {
 	database = client.db(process.env.db_name)
 	memberLeaderboardsCollection = database.collection('member-leaderboards')
 	profileLeaderboardsCollection = database.collection('profile-leaderboards')
+	sessionsCollection = database.collection('sessions')
+	accountsCollection = database.collection('accounts')
+	console.log('Connected to database :)')
 }
 
 interface StringNumber {
@@ -224,11 +267,24 @@ function isLeaderboardReversed(name: string): boolean {
 	return false
 }
 
-async function fetchMemberLeaderboardRaw(name: string): Promise<DatabaseMemberLeaderboardItem[]> {
+/** A set of names of the raw leaderboards that are currently being fetched. This is used to make sure two leaderboads aren't fetched at the same time */
+const fetchingRawLeaderboardNames: Set<string> = new Set()
+
+async function fetchMemberLeaderboardRaw(name: string): Promise<memberRawLeaderboardItem[]> {
 	if (!client) throw Error('Client isn\'t initialized yet')
 
 	if (cachedRawLeaderboards.has(name))
-		return cachedRawLeaderboards.get(name) as DatabaseMemberLeaderboardItem[]
+		return cachedRawLeaderboards.get(name) as memberRawLeaderboardItem[]
+	
+	// if it's currently being fetched, check every 100ms until it's in cachedRawLeaderboards
+	if (fetchingRawLeaderboardNames.has(name)) {
+		while (true) {
+			await sleep(100)
+			if (cachedRawLeaderboards.has(name))
+				return cachedRawLeaderboards.get(name) as memberRawLeaderboardItem[]
+		}
+	}
+
 	// typescript forces us to make a new variable and set it this way because it gives an error otherwise
 	const query = {}
 	query[`stats.${name}`] = { '$exists': true, '$ne': NaN }
@@ -236,19 +292,37 @@ async function fetchMemberLeaderboardRaw(name: string): Promise<DatabaseMemberLe
 	const sortQuery: any = {}
 	sortQuery[`stats.${name}`] = isLeaderboardReversed(name) ? 1 : -1
 
-	const leaderboardRaw: DatabaseMemberLeaderboardItem[] = await memberLeaderboardsCollection
+	fetchingRawLeaderboardNames.add(name)
+	const leaderboardRaw: memberRawLeaderboardItem[] = (await memberLeaderboardsCollection
 		.find(query)
 		.sort(sortQuery)
 		.limit(leaderboardMax)
-		.toArray()
-
+		.toArray())
+		.map((i: DatabaseMemberLeaderboardItem): memberRawLeaderboardItem => {
+			return {
+				profile: i.profile,
+				uuid: i.uuid,
+				value: i.stats[name]
+			}
+		})
+	fetchingRawLeaderboardNames.delete(name)
 	cachedRawLeaderboards.set(name, leaderboardRaw)
 	return leaderboardRaw
 }
 
-async function fetchProfileLeaderboardRaw(name: string): Promise<DatabaseProfileLeaderboardItem[]> {
+async function fetchProfileLeaderboardRaw(name: string): Promise<profileRawLeaderboardItem[]> {
 	if (cachedRawLeaderboards.has(name))
-		return cachedRawLeaderboards.get(name) as DatabaseProfileLeaderboardItem[]
+		return cachedRawLeaderboards.get(name) as profileRawLeaderboardItem[]
+
+	// if it's currently being fetched, check every 100ms until it's in cachedRawLeaderboards
+	if (fetchingRawLeaderboardNames.has(name)) {
+		while (true) {
+			await sleep(100)
+			if (cachedRawLeaderboards.has(name))
+				return cachedRawLeaderboards.get(name) as profileRawLeaderboardItem[]
+		}
+	}
+
 	// typescript forces us to make a new variable and set it this way because it gives an error otherwise
 	const query = {}
 	query[`stats.${name}`] = { '$exists': true, '$ne': NaN }
@@ -256,11 +330,20 @@ async function fetchProfileLeaderboardRaw(name: string): Promise<DatabaseProfile
 	const sortQuery: any = {}
 	sortQuery[`stats.${name}`] = isLeaderboardReversed(name) ? 1 : -1
 
-	const leaderboardRaw: DatabaseProfileLeaderboardItem[] = await profileLeaderboardsCollection
+	fetchingRawLeaderboardNames.add(name)
+	const leaderboardRaw: profileRawLeaderboardItem[] = (await profileLeaderboardsCollection
 		.find(query)
 		.sort(sortQuery)
 		.limit(leaderboardMax)
-		.toArray()
+		.toArray())
+		.map((i: DatabaseProfileLeaderboardItem): profileRawLeaderboardItem => {
+			return {
+				players: i.players,
+				uuid: i.uuid,
+				value: i.stats[name]
+			}
+		})
+	fetchingRawLeaderboardNames.delete(name)
 
 	cachedRawLeaderboards.set(name, leaderboardRaw)
 	return leaderboardRaw
@@ -283,11 +366,11 @@ interface ProfileLeaderboard {
 export async function fetchMemberLeaderboard(name: string): Promise<MemberLeaderboard> {
 	const leaderboardRaw = await fetchMemberLeaderboardRaw(name)
 
-	const fetchLeaderboardPlayer = async(item: DatabaseMemberLeaderboardItem): Promise<MemberLeaderboardItem> => {
+	const fetchLeaderboardPlayer = async(i: memberRawLeaderboardItem): Promise<MemberLeaderboardItem> => {
 		return {
-			player: await cached.fetchBasicPlayer(item.uuid),
-			profileUuid: item.profile,
-			value: item.stats[name]
+			player: await cached.fetchBasicPlayer(i.uuid),
+			profileUuid: i.profile,
+			value: i.value
 		}
 	}
 	const promises: Promise<MemberLeaderboardItem>[] = []
@@ -307,14 +390,14 @@ export async function fetchMemberLeaderboard(name: string): Promise<MemberLeader
 export async function fetchProfileLeaderboard(name: string): Promise<ProfileLeaderboard> {
 	const leaderboardRaw = await fetchProfileLeaderboardRaw(name)
 
-	const fetchLeaderboardProfile = async(item: DatabaseProfileLeaderboardItem): Promise<ProfileLeaderboardItem> => {
+	const fetchLeaderboardProfile = async(i: profileRawLeaderboardItem): Promise<ProfileLeaderboardItem> => {
 		const players = []
-		for (const playerUuid of item.players)
+		for (const playerUuid of i.players)
 			players.push(await cached.fetchBasicPlayer(playerUuid))
 		return {
 			players: players,
-			profileUuid: item.uuid,
-			value: item.stats[name]
+			profileUuid: i.uuid,
+			value: i.value
 		}
 	}
 	const promises: Promise<ProfileLeaderboardItem>[] = []
@@ -367,7 +450,7 @@ export async function fetchMemberLeaderboardSpots(player: string, profile: strin
 }
 
 async function getLeaderboardRequirement(name: string, leaderboardType: 'member' | 'profile'): Promise<number> {
-	let leaderboard: DatabaseMemberLeaderboardItem[] | DatabaseProfileLeaderboardItem[]
+	let leaderboard: memberRawLeaderboardItem[] | profileRawLeaderboardItem[]
 	if (leaderboardType === 'member')
 		leaderboard = await fetchMemberLeaderboardRaw(name)
 	else if (leaderboardType === 'profile')
@@ -375,7 +458,7 @@ async function getLeaderboardRequirement(name: string, leaderboardType: 'member'
 
 	// if there's more than 100 items, return the 100th. if there's less, return null
 	if (leaderboard.length >= leaderboardMax)
-		return leaderboard[leaderboardMax - 1].stats[name]
+		return leaderboard[leaderboardMax - 1].value
 	else
 		return null
 }
@@ -481,16 +564,16 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 	for (const [ attributeName, attributeValue ] of Object.entries(leaderboardAttributes)) {
 		const existingRawLeaderboard = await fetchMemberLeaderboardRaw(attributeName)
 		const leaderboardReverse = isLeaderboardReversed(attributeName)
+
 		const newRawLeaderboard = existingRawLeaderboard
 			// remove the player from the leaderboard, if they're there
 			.filter(value => value.uuid !== member.uuid || value.profile !== profile.uuid)
 			.concat([{
-				last_updated: new Date(),
-				stats: leaderboardAttributes,
+				value: attributeValue,
 				uuid: member.uuid,
 				profile: profile.uuid
 			}])
-			.sort((a, b) => leaderboardReverse ? a.stats[attributeName] - b.stats[attributeName] : b.stats[attributeName] - a.stats[attributeName])
+			.sort((a, b) => leaderboardReverse ? a.value - b.value : b.value - a.value)
 			.slice(0, 100)
 		cachedRawLeaderboards.set(attributeName, newRawLeaderboard)
 	}
@@ -536,16 +619,16 @@ export async function updateDatabaseProfile(profile: CleanFullProfile): Promise<
 	for (const [ attributeName, attributeValue ] of Object.entries(leaderboardAttributes)) {
 		const existingRawLeaderboard = await fetchProfileLeaderboardRaw(attributeName)
 		const leaderboardReverse = isLeaderboardReversed(attributeName)
+
 		const newRawLeaderboard = existingRawLeaderboard
 			// remove the player from the leaderboard, if they're there
 			.filter(value => value.uuid !== profile.uuid)
 			.concat([{
-				last_updated: new Date(),
-				stats: leaderboardAttributes,
+				value: attributeValue,
 				uuid: profile.uuid,
 				players: profile.members.map(p => p.uuid)
 			}])
-			.sort((a, b) => leaderboardReverse ? a.stats[attributeName] - b.stats[attributeName] : b.stats[attributeName] - a.stats[attributeName])
+			.sort((a, b) => leaderboardReverse ? a.value - b.value : b.value - a.value)
 			.slice(0, 100)
 		cachedRawLeaderboards.set(attributeName, newRawLeaderboard)
 	}
@@ -555,20 +638,20 @@ export async function updateDatabaseProfile(profile: CleanFullProfile): Promise<
 
 const leaderboardUpdateMemberQueue = new Queue({
 	concurrent: 1,
-	interval: 500
+	interval: 2000
 })
 const leaderboardUpdateProfileQueue = new Queue({
 	concurrent: 1,
-	interval: 2000
+	interval: 10000
 })
 
 /** Queue an update for the member's leaderboard data on the server if applicable */
-export async function queueUpdateDatabaseMember(member: CleanMember, profile: CleanFullProfile): Promise<void> {
+export function queueUpdateDatabaseMember(member: CleanMember, profile: CleanFullProfile): void {
 	leaderboardUpdateMemberQueue.enqueue(async() => await updateDatabaseMember(member, profile))
 }
 
 /** Queue an update for the profile's leaderboard data on the server if applicable */
-export async function queueUpdateDatabaseProfile(profile: CleanFullProfile): Promise<void> {
+export function queueUpdateDatabaseProfile(profile: CleanFullProfile): void {
 	leaderboardUpdateProfileQueue.enqueue(async() => await updateDatabaseProfile(profile))
 }
 
@@ -602,20 +685,49 @@ async function removeBadMemberLeaderboardAttributes(): Promise<void> {
 	}
 }
 
+export let finishedCachingRawLeaderboards = false
+
 /** Fetch all the leaderboards, used for caching. Don't call this often! */
 async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
 	const leaderboards: string[] = await fetchAllMemberLeaderboardAttributes()
 
-	// shuffle so if the application is restarting many times itll still be useful
-	if (debug) console.debug('Caching leaderboards!')
-	for (const leaderboard of shuffle(leaderboards)) {
-		if (!fast)
-			// wait 2 seconds so it doesnt use as much ram
-			await sleep(2 * 1000)
+	if (debug) console.debug('Caching raw leaderboards!')
 
-		await fetchMemberLeaderboard(leaderboard)
-	}
-	if (debug) console.debug('Finished caching leaderboards!')
+	for (const leaderboard of shuffle(leaderboards))
+		await fetchMemberLeaderboardRaw(leaderboard)
+	finishedCachingRawLeaderboards = true
+}
+
+export async function createSession(refreshToken: string, userData: discord.DiscordUser): Promise<string> {
+	const sessionId = uuid4()
+	await sessionsCollection?.insertOne({
+		_id: sessionId,
+		refresh_token: refreshToken,
+		discord_user: {
+			id: userData.id,
+			name: userData.username + '#' + userData.discriminator
+		},
+		lastUpdated: new Date()
+	})
+	return sessionId
+}
+
+export async function fetchSession(sessionId: string): Promise<SessionSchema> {
+	return await sessionsCollection?.findOne({ _id: sessionId })
+}
+
+export async function fetchAccount(minecraftUuid: string): Promise<AccountSchema> {
+	return await accountsCollection?.findOne({ minecraftUuid })
+}
+
+export async function fetchAccountFromDiscord(discordId: string): Promise<AccountSchema> {
+	return await accountsCollection?.findOne({ discordId })
+}
+
+export async function updateAccount(discordId: string, schema: AccountSchema) {
+	await accountsCollection?.updateOne({
+		discordId
+	}, { $set: schema }, { upsert: true })
 }
 
 // make sure it's not in a test
@@ -629,3 +741,4 @@ if (!globalThis.isTest) {
 		setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000)
 	})
 }
+

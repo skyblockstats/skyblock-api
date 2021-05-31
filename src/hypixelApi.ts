@@ -48,7 +48,7 @@ export function chooseApiKey(): string {
 			keyUsage.remaining = keyUsage.limit
 
 		// if this key has more uses remaining than the current known best one, save it
-		if (!bestKeyUsage || keyUsage.remaining > bestKeyUsage.remaining) {
+		if (bestKeyUsage === null || keyUsage.remaining > bestKeyUsage.remaining) {
 			bestKeyUsage = keyUsage
 			bestKey = key
 		}

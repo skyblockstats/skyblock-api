@@ -3,15 +3,15 @@
  */
 
 import { cleanSkyblockProfileResponse, CleanProfile, CleanBasicProfile, CleanFullProfile, CleanFullProfileBasicMembers } from './cleaners/skyblock/profile'
+import { AccountCustomization, AccountSchema, fetchAccount, queueUpdateDatabaseMember, queueUpdateDatabaseProfile } from './database'
 import { Auction, AuctionsResponse, cleanSkyBlockAuctionsResponse } from './cleaners/skyblock/auctions'
-import { queueUpdateDatabaseMember, queueUpdateDatabaseProfile } from './database'
 import { CleanBasicMember, CleanMemberProfile } from './cleaners/skyblock/member'
 import { chooseApiKey, HypixelResponse, sendApiRequest } from './hypixelApi'
 import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles'
 import { CleanPlayer, cleanPlayerResponse } from './cleaners/player'
+import { Item } from './cleaners/skyblock/inventory'
 import * as cached from './hypixelCached'
 import { debug } from '.'
-import { Item } from './cleaners/skyblock/inventory'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories'
 
@@ -70,6 +70,7 @@ export interface CleanUser {
 	profiles?: CleanProfile[]
 	activeProfile?: string
 	online?: boolean
+	customization?: AccountCustomization
 }
 
 
@@ -79,11 +80,12 @@ export interface CleanUser {
  * @param included lets you choose what is returned, so there's less processing required on the backend
  * used inclusions: player, profiles
  */
-export async function fetchUser({ user, uuid, username }: UserAny, included: Included[]=['player']): Promise<CleanUser> {
+export async function fetchUser({ user, uuid, username }: UserAny, included: Included[]=['player'], customization?: boolean): Promise<CleanUser> {
 	if (!uuid) {
 		// If the uuid isn't provided, get it
 		uuid = await cached.uuidFromUser(user || username)
 	}
+	const websiteAccountPromise = customization ? fetchAccount(uuid) : null
 	if (!uuid) {
 		// the user doesn't exist.
 		if (debug) console.debug('error:', user, 'doesnt exist')
@@ -103,7 +105,7 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 		if (!includeProfiles)
 			basicProfilesData = playerData?.profiles
 		if (playerData)
-			playerData.profiles = undefined
+			delete playerData.profiles
 	}
 	if (includeProfiles) {
 		profilesData = await cached.fetchSkyblockProfiles(uuid)
@@ -121,11 +123,17 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 			}
 		}
 	}
+	let websiteAccount: AccountSchema = undefined
+
+	if (websiteAccountPromise) {
+		websiteAccount = await websiteAccountPromise
+	}
 	return {
 		player: playerData ?? null,
 		profiles: profilesData ?? basicProfilesData,
 		activeProfile: includeProfiles ? activeProfile?.uuid : undefined,
-		online: includeProfiles ? lastOnline > (Date.now() - saveInterval): undefined
+		online: includeProfiles ? lastOnline > (Date.now() - saveInterval): undefined,
+		customization: websiteAccount?.customization
 	}
 }
 
@@ -134,9 +142,12 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
  * This is safe to use many times as the results are cached!
  * @param user A username or uuid
  * @param profile A profile name or profile uuid
+ * @param customization Whether stuff like the user's custom background will be returned
  */
-export async function fetchMemberProfile(user: string, profile: string): Promise<CleanMemberProfile> {
+export async function fetchMemberProfile(user: string, profile: string, customization: boolean): Promise<CleanMemberProfile> {
 	const playerUuid = await cached.uuidFromUser(user)
+	// we don't await the promise immediately so it can load while we do other stuff
+	const websiteAccountPromise = customization ? fetchAccount(playerUuid) : null
 	const profileUuid = await cached.fetchProfileUuid(user, profile)
 
 	// if the profile doesn't have an id, just return
@@ -161,6 +172,11 @@ export async function fetchMemberProfile(user: string, profile: string): Promise
 
 	cleanProfile.members = simpleMembers
 
+	let websiteAccount: AccountSchema = undefined
+
+	if (websiteAccountPromise)
+		websiteAccount = await websiteAccountPromise
+
 	return {
 		member: {
 			// the profile name is in member rather than profile since they sometimes differ for each member
@@ -170,7 +186,8 @@ export async function fetchMemberProfile(user: string, profile: string): Promise
 			// add all other data relating to the hypixel player, such as username, rank, etc
 			...player
 		},
-		profile: cleanProfile
+		profile: cleanProfile,
+		customization: websiteAccount?.customization
 	}
 }
 

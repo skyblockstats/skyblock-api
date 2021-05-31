@@ -55,7 +55,7 @@ async function fetchGithubApi(method, route, headers, json) {
     try {
         if (_1.debug)
             console.debug('fetching github api', method, route);
-        return await node_fetch_1.default(githubApiBase + route, {
+        const data = await node_fetch_1.default(githubApiBase + route, {
             agent: () => httpsAgent,
             body: json ? JSON.stringify(json) : null,
             method,
@@ -63,6 +63,9 @@ async function fetchGithubApi(method, route, headers, json) {
                 'Authorization': `token ${process.env.github_token}`
             }, headers),
         });
+        if (_1.debug)
+            console.debug('fetched github api', method, route);
+        return data;
     }
     catch {
         // if there's an error, wait a second and try again
