@@ -688,16 +688,15 @@ async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
 	for (const leaderboard of shuffle(leaderboards))
 		await fetchMemberLeaderboardRaw(leaderboard)
 	finishedCachingRawLeaderboards = true
-	return
 
 	// shuffle so if the application is restarting many times itll still be useful
 	if (debug) console.debug('Caching leaderboards!')
 	for (const leaderboard of shuffle(leaderboards)) {
 		if (!fast)
 			// wait 2 seconds so it doesnt use as much ram
-			await sleep(10 * 1000)
-		else
 			await sleep(2 * 1000)
+		else
+			await sleep(500)
 
 		await fetchMemberLeaderboard(leaderboard)
 	}
@@ -743,7 +742,7 @@ if (!globalThis.isTest) {
 		// when it connects, cache the leaderboards and remove bad members
 		removeBadMemberLeaderboardAttributes()
 		// cache leaderboards on startup so its faster later on
-		fetchAllLeaderboards(false)
+		fetchAllLeaderboards(true)
 		// cache leaderboard players again every 4 hours
 		setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000)
 	})
