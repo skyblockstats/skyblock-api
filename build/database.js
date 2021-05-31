@@ -606,7 +606,3 @@ if (!globalThis.isTest) {
         setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000);
     });
 }
-setInterval(() => {
-    console.log(exports.cachedRawLeaderboards.size);
-    console.log(Array.from(exports.cachedRawLeaderboards.values())[exports.cachedRawLeaderboards.size - 1]);
-}, 5000);

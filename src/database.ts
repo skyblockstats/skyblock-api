@@ -749,7 +749,3 @@ if (!globalThis.isTest) {
 	})
 }
 
-setInterval(() => {
-	console.log(cachedRawLeaderboards.size)
-	console.log(Array.from(cachedRawLeaderboards.values())[cachedRawLeaderboards.size - 1])
-}, 5000)
