@@ -218,9 +218,11 @@ async function fetchMemberLeaderboardRaw(name) {
         .limit(leaderboardMax)
         .toArray())
         .map((i) => {
-        const stats = {};
-        stats[name] = i.stats[name];
-        return { ...i, stats };
+        return {
+            profile: i.profile,
+            uuid: i.uuid,
+            value: i.stats[name]
+        };
     });
     fetchingRawLeaderboardNames.delete(name);
     exports.cachedRawLeaderboards.set(name, leaderboardRaw);
@@ -249,9 +251,11 @@ async function fetchProfileLeaderboardRaw(name) {
         .limit(leaderboardMax)
         .toArray())
         .map((i) => {
-        const stats = {};
-        stats[name] = i.stats[name];
-        return { ...i, stats };
+        return {
+            players: i.players,
+            uuid: i.uuid,
+            value: i.stats[name]
+        };
     });
     fetchingRawLeaderboardNames.delete(name);
     exports.cachedRawLeaderboards.set(name, leaderboardRaw);
@@ -261,11 +265,11 @@ async function fetchProfileLeaderboardRaw(name) {
 async function fetchMemberLeaderboard(name) {
     var _a;
     const leaderboardRaw = await fetchMemberLeaderboardRaw(name);
-    const fetchLeaderboardPlayer = async (item) => {
+    const fetchLeaderboardPlayer = async (i) => {
         return {
-            player: await cached.fetchBasicPlayer(item.uuid),
-            profileUuid: item.profile,
-            value: item.stats[name]
+            player: await cached.fetchBasicPlayer(i.uuid),
+            profileUuid: i.profile,
+            value: i.value
         };
     };
     const promises = [];
@@ -284,14 +288,14 @@ exports.fetchMemberLeaderboard = fetchMemberLeaderboard;
 async function fetchProfileLeaderboard(name) {
     var _a;
     const leaderboardRaw = await fetchProfileLeaderboardRaw(name);
-    const fetchLeaderboardProfile = async (item) => {
+    const fetchLeaderboardProfile = async (i) => {
         const players = [];
-        for (const playerUuid of item.players)
+        for (const playerUuid of i.players)
             players.push(await cached.fetchBasicPlayer(playerUuid));
         return {
             players: players,
-            profileUuid: item.uuid,
-            value: item.stats[name]
+            profileUuid: i.uuid,
+            value: i.value
         };
     };
     const promises = [];
@@ -347,7 +351,7 @@ async function getLeaderboardRequirement(name, leaderboardType) {
         leaderboard = await fetchProfileLeaderboardRaw(name);
     // if there's more than 100 items, return the 100th. if there's less, return null
     if (leaderboard.length >= leaderboardMax)
-        return leaderboard[leaderboardMax - 1].stats[name];
+        return leaderboard[leaderboardMax - 1].value;
     else
         return null;
 }
@@ -426,18 +430,15 @@ async function updateDatabaseMember(member, profile) {
     for (const [attributeName, attributeValue] of Object.entries(leaderboardAttributes)) {
         const existingRawLeaderboard = await fetchMemberLeaderboardRaw(attributeName);
         const leaderboardReverse = isLeaderboardReversed(attributeName);
-        const thisLeaderboardAttributes = {};
-        thisLeaderboardAttributes[attributeName] = attributeValue;
         const newRawLeaderboard = existingRawLeaderboard
             // remove the player from the leaderboard, if they're there
             .filter(value => value.uuid !== member.uuid || value.profile !== profile.uuid)
             .concat([{
-                last_updated: new Date(),
-                stats: thisLeaderboardAttributes,
+                value: attributeValue,
                 uuid: member.uuid,
                 profile: profile.uuid
             }])
-            .sort((a, b) => leaderboardReverse ? a.stats[attributeName] - b.stats[attributeName] : b.stats[attributeName] - a.stats[attributeName])
+            .sort((a, b) => leaderboardReverse ? a.value - b.value : b.value - a.value)
             .slice(0, 100);
         exports.cachedRawLeaderboards.set(attributeName, newRawLeaderboard);
     }
@@ -477,18 +478,15 @@ async function updateDatabaseProfile(profile) {
     for (const [attributeName, attributeValue] of Object.entries(leaderboardAttributes)) {
         const existingRawLeaderboard = await fetchProfileLeaderboardRaw(attributeName);
         const leaderboardReverse = isLeaderboardReversed(attributeName);
-        const thisLeaderboardAttributes = {};
-        thisLeaderboardAttributes[attributeName] = attributeValue;
         const newRawLeaderboard = existingRawLeaderboard
             // remove the player from the leaderboard, if they're there
             .filter(value => value.uuid !== profile.uuid)
             .concat([{
-                last_updated: new Date(),
-                stats: thisLeaderboardAttributes,
+                value: attributeValue,
                 uuid: profile.uuid,
                 players: profile.members.map(p => p.uuid)
             }])
-            .sort((a, b) => leaderboardReverse ? a.stats[attributeName] - b.stats[attributeName] : b.stats[attributeName] - a.stats[attributeName])
+            .sort((a, b) => leaderboardReverse ? a.value - b.value : b.value - a.value)
             .slice(0, 100);
         exports.cachedRawLeaderboards.set(attributeName, newRawLeaderboard);
     }
