@@ -677,7 +677,6 @@ async function removeBadMemberLeaderboardAttributes(): Promise<void> {
 }
 
 export let finishedCachingRawLeaderboards = false
-export let finishedCachingAllLeaderboards = false
 
 /** Fetch all the leaderboards, used for caching. Don't call this often! */
 async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
@@ -688,20 +687,6 @@ async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
 	for (const leaderboard of shuffle(leaderboards))
 		await fetchMemberLeaderboardRaw(leaderboard)
 	finishedCachingRawLeaderboards = true
-
-	// shuffle so if the application is restarting many times itll still be useful
-	if (debug) console.debug('Caching leaderboards!')
-	for (const leaderboard of shuffle(leaderboards)) {
-		if (!fast)
-			// wait 2 seconds so it doesnt use as much ram
-			await sleep(2 * 1000)
-		else
-			await sleep(500)
-
-		await fetchMemberLeaderboard(leaderboard)
-	}
-	finishedCachingAllLeaderboards = true
-	if (debug) console.debug('Finished caching leaderboards!')
 }
 
 export async function createSession(refreshToken: string, userData: discord.DiscordUser): Promise<string> {

@@ -1,4 +1,4 @@
-import { createSession, fetchAccount, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingAllLeaderboards, finishedCachingRawLeaderboards, updateAccount } from './database'
+import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, updateAccount } from './database'
 import { fetchMemberProfile, fetchUser } from './hypixel'
 import rateLimit from 'express-rate-limit'
 import * as constants from './constants'
@@ -36,8 +36,7 @@ app.get('/', async(req, res) => {
 	res.json({
 		ok: true,
 		uptimeHours: (currentTime - startTime) / 1000 / 60 / 60,
-		finishedCachingRawLeaderboards,
-		finishedCachingAllLeaderboards
+		finishedCachingRawLeaderboards
 	})
 })
 

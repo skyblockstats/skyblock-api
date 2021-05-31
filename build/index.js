@@ -56,8 +56,7 @@ app.get('/', async (req, res) => {
     res.json({
         ok: true,
         uptimeHours: (currentTime - startTime) / 1000 / 60 / 60,
-        finishedCachingRawLeaderboards: database_1.finishedCachingRawLeaderboards,
-        finishedCachingAllLeaderboards: database_1.finishedCachingAllLeaderboards
+        finishedCachingRawLeaderboards: database_1.finishedCachingRawLeaderboards
     });
 });
 app.get('/player/:user', async (req, res) => {
