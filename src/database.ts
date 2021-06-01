@@ -543,8 +543,7 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 	if (!client) return // the db client hasn't been initialized
 	if (debug) console.debug('updateDatabaseMember', member.username)
 	// the member's been updated too recently, just return
-	if (recentlyUpdated.get(profile.uuid + member.uuid))
-		return
+	if (recentlyUpdated.get(profile.uuid + member.uuid)) return
 	// store the member in recentlyUpdated so it cant update for 3 more minutes
 	recentlyUpdated.set(profile.uuid + member.uuid, true)
 
@@ -662,11 +661,13 @@ export const leaderboardUpdateProfileQueue = new Queue({
 
 /** Queue an update for the member's leaderboard data on the server if applicable */
 export function queueUpdateDatabaseMember(member: CleanMember, profile: CleanFullProfile): void {
+	if (recentlyUpdated.get(profile.uuid + member.uuid)) return
 	leaderboardUpdateMemberQueue.enqueue(async() => await updateDatabaseMember(member, profile))
 }
 
 /** Queue an update for the profile's leaderboard data on the server if applicable */
 export function queueUpdateDatabaseProfile(profile: CleanFullProfile): void {
+	if (recentlyUpdated.get(profile.uuid + 'profile')) return
 	leaderboardUpdateProfileQueue.enqueue(async() => await updateDatabaseProfile(profile))
 }
 

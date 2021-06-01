@@ -512,11 +512,15 @@ exports.leaderboardUpdateProfileQueue = new queue_promise_1.default({
 });
 /** Queue an update for the member's leaderboard data on the server if applicable */
 function queueUpdateDatabaseMember(member, profile) {
+    if (recentlyUpdated.get(profile.uuid + member.uuid))
+        return;
     exports.leaderboardUpdateMemberQueue.enqueue(async () => await updateDatabaseMember(member, profile));
 }
 exports.queueUpdateDatabaseMember = queueUpdateDatabaseMember;
 /** Queue an update for the profile's leaderboard data on the server if applicable */
 function queueUpdateDatabaseProfile(profile) {
+    if (recentlyUpdated.get(profile.uuid + 'profile'))
+        return;
     exports.leaderboardUpdateProfileQueue.enqueue(async () => await updateDatabaseProfile(profile));
 }
 exports.queueUpdateDatabaseProfile = queueUpdateDatabaseProfile;
