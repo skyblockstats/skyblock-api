@@ -13,9 +13,9 @@ import * as constants from './constants'
 import { shuffle, sleep } from './util'
 import * as discord from './discord'
 import NodeCache from 'node-cache'
+import { v4 as uuid4 } from 'uuid'
 import Queue from 'queue-promise'
 import { debug } from '.'
-import { v4 as uuid4 } from 'uuid'
 
 // don't update the user for 3 minutes
 const recentlyUpdated = new NodeCache({
@@ -653,11 +653,11 @@ export async function updateDatabaseProfile(profile: CleanFullProfile): Promise<
 
 export const leaderboardUpdateMemberQueue = new Queue({
 	concurrent: 1,
-	interval: 2000
+	interval: 100
 })
 export const leaderboardUpdateProfileQueue = new Queue({
 	concurrent: 1,
-	interval: 10000
+	interval: 500
 })
 
 /** Queue an update for the member's leaderboard data on the server if applicable */

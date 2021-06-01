@@ -33,9 +33,9 @@ const cached = __importStar(require("./hypixelCached"));
 const constants = __importStar(require("./constants"));
 const util_1 = require("./util");
 const node_cache_1 = __importDefault(require("node-cache"));
+const uuid_1 = require("uuid");
 const queue_promise_1 = __importDefault(require("queue-promise"));
 const _1 = require(".");
-const uuid_1 = require("uuid");
 // don't update the user for 3 minutes
 const recentlyUpdated = new node_cache_1.default({
     stdTTL: 60 * 3,
@@ -504,11 +504,11 @@ async function updateDatabaseProfile(profile) {
 exports.updateDatabaseProfile = updateDatabaseProfile;
 exports.leaderboardUpdateMemberQueue = new queue_promise_1.default({
     concurrent: 1,
-    interval: 2000
+    interval: 100
 });
 exports.leaderboardUpdateProfileQueue = new queue_promise_1.default({
     concurrent: 1,
-    interval: 10000
+    interval: 500
 });
 /** Queue an update for the member's leaderboard data on the server if applicable */
 function queueUpdateDatabaseMember(member, profile) {
