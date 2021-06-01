@@ -38,7 +38,7 @@ export const playerCache = new NodeCache({
 // cache "basic players" (players without profiles) for 30 minutes
 export const basicPlayerCache: LRUCache<string, CleanPlayer> = new LRUCache({
 	max: 10000,
-	maxAge: 60 * 30,
+	maxAge: 60 * 30 * 1000,
 })
 
 export const profileCache = new NodeCache({

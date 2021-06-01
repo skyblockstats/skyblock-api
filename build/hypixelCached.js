@@ -54,7 +54,7 @@ exports.playerCache = new node_cache_1.default({
 // cache "basic players" (players without profiles) for 30 minutes
 exports.basicPlayerCache = new lru_cache_1.default({
     max: 10000,
-    maxAge: 60 * 30,
+    maxAge: 60 * 30 * 1000,
 });
 exports.profileCache = new node_cache_1.default({
     stdTTL: 30,
