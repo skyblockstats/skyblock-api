@@ -100,6 +100,13 @@ let profileLeaderboardsCollection: Collection<DatabaseProfileLeaderboardItem>
 let sessionsCollection: Collection<SessionSchema>
 let accountsCollection: Collection<AccountSchema>
 
+
+const leaderboardInfos: { [ leaderboardName: string ]: string } = {
+	highest_crit_damage: 'This leaderboard is capped at the integer limit because Hypixel, look at <a href="/leaderboard/highest_critical_damage">Highest critical damage</a> instead.',
+	highest_critical_damage: 'uhhhhh yeah idk either'
+}
+
+
 async function connect(): Promise<void> {
 	if (!process.env.db_uri)
 		return console.warn('Warning: db_uri was not found in .env. Features that utilize the database such as leaderboards won\'t work.')
@@ -353,12 +360,14 @@ interface MemberLeaderboard {
 	name: string
 	unit?: string
 	list: MemberLeaderboardItem[]
+	info?: string
 }
 
 interface ProfileLeaderboard {
 	name: string
 	unit?: string
 	list: ProfileLeaderboardItem[]
+	info?: string
 }
 
 
@@ -415,11 +424,17 @@ export async function fetchProfileLeaderboard(name: string): Promise<ProfileLead
 /** Fetch a leaderboard */
 export async function fetchLeaderboard(name: string): Promise<MemberLeaderboard|ProfileLeaderboard> {
 	const profileLeaderboards = await fetchAllProfileLeaderboardAttributes()
+	let leaderboard: MemberLeaderboard|ProfileLeaderboard
 	if (profileLeaderboards.includes(name)) {
-		return await fetchProfileLeaderboard(name)
+		leaderboard = await fetchProfileLeaderboard(name)
 	} else {
-		return await fetchMemberLeaderboard(name)
+		leaderboard = await fetchMemberLeaderboard(name)
 	}
+
+	if (leaderboardInfos[name])
+		leaderboard.info = leaderboardInfos[name]
+
+	return leaderboard
 }
 
 /** Get the leaderboard positions a member is on. This may take a while depending on whether stuff is cached */

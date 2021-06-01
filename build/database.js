@@ -54,6 +54,10 @@ let memberLeaderboardsCollection;
 let profileLeaderboardsCollection;
 let sessionsCollection;
 let accountsCollection;
+const leaderboardInfos = {
+    highest_crit_damage: 'This leaderboard is capped at the integer limit because Hypixel, look at <a href="/leaderboard/highest_critical_damage">Highest critical damage</a> instead.',
+    highest_critical_damage: 'uhhhhh yeah idk either'
+};
 async function connect() {
     if (!process.env.db_uri)
         return console.warn('Warning: db_uri was not found in .env. Features that utilize the database such as leaderboards won\'t work.');
@@ -313,12 +317,16 @@ exports.fetchProfileLeaderboard = fetchProfileLeaderboard;
 /** Fetch a leaderboard */
 async function fetchLeaderboard(name) {
     const profileLeaderboards = await fetchAllProfileLeaderboardAttributes();
+    let leaderboard;
     if (profileLeaderboards.includes(name)) {
-        return await fetchProfileLeaderboard(name);
+        leaderboard = await fetchProfileLeaderboard(name);
     }
     else {
-        return await fetchMemberLeaderboard(name);
+        leaderboard = await fetchMemberLeaderboard(name);
     }
+    if (leaderboardInfos[name])
+        leaderboard.info = leaderboardInfos[name];
+    return leaderboard;
 }
 exports.fetchLeaderboard = fetchLeaderboard;
 /** Get the leaderboard positions a member is on. This may take a while depending on whether stuff is cached */
