@@ -25,7 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateAccount = exports.fetchAccountFromDiscord = exports.fetchAccount = exports.fetchSession = exports.createSession = exports.finishedCachingRawLeaderboards = exports.queueUpdateDatabaseProfile = exports.queueUpdateDatabaseMember = exports.updateDatabaseProfile = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchLeaderboard = exports.fetchProfileLeaderboard = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchSlayerLeaderboards = exports.fetchAllLeaderboardsCategorized = exports.cachedRawLeaderboards = void 0;
+exports.updateAccount = exports.fetchAccountFromDiscord = exports.fetchAccount = exports.fetchSession = exports.createSession = exports.finishedCachingRawLeaderboards = exports.queueUpdateDatabaseProfile = exports.queueUpdateDatabaseMember = exports.leaderboardUpdateProfileQueue = exports.leaderboardUpdateMemberQueue = exports.updateDatabaseProfile = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchLeaderboard = exports.fetchProfileLeaderboard = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchSlayerLeaderboards = exports.fetchAllLeaderboardsCategorized = exports.cachedRawLeaderboards = void 0;
 const stats_1 = require("./cleaners/skyblock/stats");
 const slayers_1 = require("./cleaners/skyblock/slayers");
 const mongodb_1 = require("mongodb");
@@ -502,22 +502,22 @@ async function updateDatabaseProfile(profile) {
         console.debug('added profile to leaderboards', profile.name, leaderboardAttributes);
 }
 exports.updateDatabaseProfile = updateDatabaseProfile;
-const leaderboardUpdateMemberQueue = new queue_promise_1.default({
+exports.leaderboardUpdateMemberQueue = new queue_promise_1.default({
     concurrent: 1,
     interval: 2000
 });
-const leaderboardUpdateProfileQueue = new queue_promise_1.default({
+exports.leaderboardUpdateProfileQueue = new queue_promise_1.default({
     concurrent: 1,
     interval: 10000
 });
 /** Queue an update for the member's leaderboard data on the server if applicable */
 function queueUpdateDatabaseMember(member, profile) {
-    leaderboardUpdateMemberQueue.enqueue(async () => await updateDatabaseMember(member, profile));
+    exports.leaderboardUpdateMemberQueue.enqueue(async () => await updateDatabaseMember(member, profile));
 }
 exports.queueUpdateDatabaseMember = queueUpdateDatabaseMember;
 /** Queue an update for the profile's leaderboard data on the server if applicable */
 function queueUpdateDatabaseProfile(profile) {
-    leaderboardUpdateProfileQueue.enqueue(async () => await updateDatabaseProfile(profile));
+    exports.leaderboardUpdateProfileQueue.enqueue(async () => await updateDatabaseProfile(profile));
 }
 exports.queueUpdateDatabaseProfile = queueUpdateDatabaseProfile;
 /**

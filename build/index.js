@@ -56,7 +56,9 @@ app.get('/', async (req, res) => {
     res.json({
         ok: true,
         uptimeHours: (currentTime - startTime) / 1000 / 60 / 60,
-        finishedCachingRawLeaderboards: database_1.finishedCachingRawLeaderboards
+        finishedCachingRawLeaderboards: database_1.finishedCachingRawLeaderboards,
+        leaderboardUpdateMemberQueueSize: database_1.leaderboardUpdateMemberQueue.size,
+        leaderboardUpdateProfileQueueSize: database_1.leaderboardUpdateProfileQueue.size,
     });
 });
 app.get('/player/:user', async (req, res) => {
@@ -88,10 +90,7 @@ app.get('/player/:user/:profile', async (req, res) => {
 });
 app.get('/player/:user/:profile/leaderboards', async (req, res) => {
     try {
-        res.json({ ok: false });
-        // res.json(
-        // 	await fetchMemberLeaderboardSpots(req.params.user, req.params.profile)
-        // )
+        res.json(await database_1.fetchMemberLeaderboardSpots(req.params.user, req.params.profile));
     }
     catch (err) {
         console.error(err);

@@ -1,4 +1,4 @@
-import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, updateAccount } from './database'
+import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount } from './database'
 import { fetchMemberProfile, fetchUser } from './hypixel'
 import rateLimit from 'express-rate-limit'
 import * as constants from './constants'
@@ -36,7 +36,9 @@ app.get('/', async(req, res) => {
 	res.json({
 		ok: true,
 		uptimeHours: (currentTime - startTime) / 1000 / 60 / 60,
-		finishedCachingRawLeaderboards
+		finishedCachingRawLeaderboards,
+		leaderboardUpdateMemberQueueSize: leaderboardUpdateMemberQueue.size,
+		leaderboardUpdateProfileQueueSize: leaderboardUpdateProfileQueue.size,
 	})
 })
 
@@ -79,10 +81,9 @@ app.get('/player/:user/:profile', async(req, res) => {
 
 app.get('/player/:user/:profile/leaderboards', async(req, res) => {
 	try {
-		res.json({ ok: false })
-		// res.json(
-		// 	await fetchMemberLeaderboardSpots(req.params.user, req.params.profile)
-		// )
+		res.json(
+			await fetchMemberLeaderboardSpots(req.params.user, req.params.profile)
+		)
 	} catch (err) {
 		console.error(err)
 		res.json({ ok: false })

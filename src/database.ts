@@ -651,11 +651,11 @@ export async function updateDatabaseProfile(profile: CleanFullProfile): Promise<
 	if (debug) console.debug('added profile to leaderboards', profile.name, leaderboardAttributes)
 }
 
-const leaderboardUpdateMemberQueue = new Queue({
+export const leaderboardUpdateMemberQueue = new Queue({
 	concurrent: 1,
 	interval: 2000
 })
-const leaderboardUpdateProfileQueue = new Queue({
+export const leaderboardUpdateProfileQueue = new Queue({
 	concurrent: 1,
 	interval: 10000
 })
