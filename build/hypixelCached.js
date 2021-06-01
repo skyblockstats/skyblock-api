@@ -32,10 +32,11 @@ const mojang = __importStar(require("./mojang"));
 const hypixel = __importStar(require("./hypixel"));
 const util_1 = require("./util");
 const _1 = require(".");
-// cache usernames for 4 hours
+// cache usernames for 30 minutes
 /** uuid: username */
 exports.usernameCache = new node_cache_1.default({
-    stdTTL: 60 * 60 * 4,
+    // stdTTL: 60 * 60 * 4,
+    stdTTL: 60 * 30,
     checkperiod: 60,
     useClones: false,
 });
@@ -52,7 +53,7 @@ exports.playerCache = new node_cache_1.default({
 });
 // cache "basic players" (players without profiles) for 30 minutes
 exports.basicPlayerCache = new lru_cache_1.default({
-    max: 20000,
+    max: 10000,
     maxAge: 60 * 30,
 });
 exports.profileCache = new node_cache_1.default({

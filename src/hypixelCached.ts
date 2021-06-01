@@ -11,11 +11,12 @@ import { isUuid, undashUuid } from './util'
 import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/skyblock/profile'
 import { debug } from '.'
 
-// cache usernames for 4 hours
+// cache usernames for 30 minutes
 /** uuid: username */
 
 export const usernameCache = new NodeCache({
-	stdTTL: 60 * 60 * 4,
+	// stdTTL: 60 * 60 * 4,
+	stdTTL: 60 * 30,
 	checkperiod: 60,
 	useClones: false,
 })
@@ -36,7 +37,7 @@ export const playerCache = new NodeCache({
 
 // cache "basic players" (players without profiles) for 30 minutes
 export const basicPlayerCache: LRUCache<string, CleanPlayer> = new LRUCache({
-	max: 20000,
+	max: 10000,
 	maxAge: 60 * 30,
 })
 
