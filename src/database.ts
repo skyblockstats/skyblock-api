@@ -24,6 +24,13 @@ const recentlyUpdated = new NodeCache({
 	useClones: false,
 })
 
+// don't add stuff to the queue within the same 5 minutes
+const recentlyQueued = new NodeCache({
+	stdTTL: 60 * 5,
+	checkperiod: 60,
+	useClones: false,
+})
+
 interface DatabaseMemberLeaderboardItem {
 	uuid: string
 	profile: string
@@ -661,13 +668,15 @@ export const leaderboardUpdateProfileQueue = new Queue({
 
 /** Queue an update for the member's leaderboard data on the server if applicable */
 export function queueUpdateDatabaseMember(member: CleanMember, profile: CleanFullProfile): void {
-	if (recentlyUpdated.get(profile.uuid + member.uuid)) return
+	if (recentlyQueued.get(profile.uuid + member.uuid)) return
+	else recentlyQueued.set(profile.uuid + member.uuid, true)
 	leaderboardUpdateMemberQueue.enqueue(async() => await updateDatabaseMember(member, profile))
 }
 
 /** Queue an update for the profile's leaderboard data on the server if applicable */
 export function queueUpdateDatabaseProfile(profile: CleanFullProfile): void {
-	if (recentlyUpdated.get(profile.uuid + 'profile')) return
+	if (recentlyQueued.get(profile.uuid + 'profile')) return
+	else recentlyQueued.set(profile.uuid + 'profile', true)
 	leaderboardUpdateProfileQueue.enqueue(async() => await updateDatabaseProfile(profile))
 }
 

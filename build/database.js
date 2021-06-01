@@ -42,6 +42,12 @@ const recentlyUpdated = new node_cache_1.default({
     checkperiod: 60,
     useClones: false,
 });
+// don't add stuff to the queue within the same 5 minutes
+const recentlyQueued = new node_cache_1.default({
+    stdTTL: 60 * 5,
+    checkperiod: 60,
+    useClones: false,
+});
 exports.cachedRawLeaderboards = new Map();
 const leaderboardMax = 100;
 const reversedLeaderboards = [
@@ -512,15 +518,19 @@ exports.leaderboardUpdateProfileQueue = new queue_promise_1.default({
 });
 /** Queue an update for the member's leaderboard data on the server if applicable */
 function queueUpdateDatabaseMember(member, profile) {
-    if (recentlyUpdated.get(profile.uuid + member.uuid))
+    if (recentlyQueued.get(profile.uuid + member.uuid))
         return;
+    else
+        recentlyQueued.set(profile.uuid + member.uuid, true);
     exports.leaderboardUpdateMemberQueue.enqueue(async () => await updateDatabaseMember(member, profile));
 }
 exports.queueUpdateDatabaseMember = queueUpdateDatabaseMember;
 /** Queue an update for the profile's leaderboard data on the server if applicable */
 function queueUpdateDatabaseProfile(profile) {
-    if (recentlyUpdated.get(profile.uuid + 'profile'))
+    if (recentlyQueued.get(profile.uuid + 'profile'))
         return;
+    else
+        recentlyQueued.set(profile.uuid + 'profile', true);
     exports.leaderboardUpdateProfileQueue.enqueue(async () => await updateDatabaseProfile(profile));
 }
 exports.queueUpdateDatabaseProfile = queueUpdateDatabaseProfile;
