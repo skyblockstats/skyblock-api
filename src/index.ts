@@ -79,9 +79,10 @@ app.get('/player/:user/:profile', async(req, res) => {
 
 app.get('/player/:user/:profile/leaderboards', async(req, res) => {
 	try {
-		res.json(
-			await fetchMemberLeaderboardSpots(req.params.user, req.params.profile)
-		)
+		res.json({ ok: false })
+		// res.json(
+		// 	await fetchMemberLeaderboardSpots(req.params.user, req.params.profile)
+		// )
 	} catch (err) {
 		console.error(err)
 		res.json({ ok: false })
