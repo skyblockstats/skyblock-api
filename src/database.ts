@@ -653,7 +653,7 @@ export async function updateDatabaseProfile(profile: CleanFullProfile): Promise<
 
 export const leaderboardUpdateMemberQueue = new Queue({
 	concurrent: 1,
-	interval: 100
+	interval: 50
 })
 export const leaderboardUpdateProfileQueue = new Queue({
 	concurrent: 1,

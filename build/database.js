@@ -504,7 +504,7 @@ async function updateDatabaseProfile(profile) {
 exports.updateDatabaseProfile = updateDatabaseProfile;
 exports.leaderboardUpdateMemberQueue = new queue_promise_1.default({
     concurrent: 1,
-    interval: 100
+    interval: 50
 });
 exports.leaderboardUpdateProfileQueue = new queue_promise_1.default({
     concurrent: 1,
