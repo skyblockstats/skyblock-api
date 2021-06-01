@@ -34,10 +34,11 @@ const node_cache_1 = __importDefault(require("node-cache"));
 const queue_promise_1 = __importDefault(require("queue-promise"));
 const lru_cache_1 = __importDefault(require("lru-cache"));
 const _1 = require(".");
-// cache usernames for 4 hours
+// cache usernames for 30 minutes
 /** uuid: username */
 exports.usernameCache = new node_cache_1.default({
-    stdTTL: 60 * 60 * 4,
+    // stdTTL: 60 * 60 * 4,
+    stdTTL: 60 * 30,
     checkperiod: 60,
     useClones: false,
 });
@@ -54,7 +55,7 @@ exports.playerCache = new node_cache_1.default({
 });
 // cache "basic players" (players without profiles) for 30 minutes
 exports.basicPlayerCache = new lru_cache_1.default({
-    max: 20000,
+    max: 10000,
     maxAge: 60 * 30,
 });
 exports.profileCache = new node_cache_1.default({
