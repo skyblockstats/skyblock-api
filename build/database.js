@@ -229,7 +229,7 @@ async function fetchMemberLeaderboardRaw(name) {
         };
     });
     fetchingRawLeaderboardNames.delete(name);
-    // cachedRawLeaderboards.set(name, leaderboardRaw)
+    exports.cachedRawLeaderboards.set(name, leaderboardRaw);
     return leaderboardRaw;
 }
 async function fetchProfileLeaderboardRaw(name) {
@@ -262,7 +262,7 @@ async function fetchProfileLeaderboardRaw(name) {
         };
     });
     fetchingRawLeaderboardNames.delete(name);
-    // cachedRawLeaderboards.set(name, leaderboardRaw)
+    exports.cachedRawLeaderboards.set(name, leaderboardRaw);
     return leaderboardRaw;
 }
 /** Fetch a leaderboard that ranks members, as opposed to profiles */
@@ -448,7 +448,7 @@ async function updateDatabaseMember(member, profile) {
             }])
             .sort((a, b) => leaderboardReverse ? a.value - b.value : b.value - a.value)
             .slice(0, 100);
-        // cachedRawLeaderboards.set(attributeName, newRawLeaderboard)
+        exports.cachedRawLeaderboards.set(attributeName, newRawLeaderboard);
     }
     if (_1.debug)
         console.debug('added member to leaderboards', member.username, leaderboardAttributes);
@@ -496,7 +496,7 @@ async function updateDatabaseProfile(profile) {
             }])
             .sort((a, b) => leaderboardReverse ? a.value - b.value : b.value - a.value)
             .slice(0, 100);
-        // cachedRawLeaderboards.set(attributeName, newRawLeaderboard)
+        exports.cachedRawLeaderboards.set(attributeName, newRawLeaderboard);
     }
     if (_1.debug)
         console.debug('added profile to leaderboards', profile.name, leaderboardAttributes);

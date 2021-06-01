@@ -313,7 +313,7 @@ async function fetchMemberLeaderboardRaw(name: string): Promise<memberRawLeaderb
 			}
 		})
 	fetchingRawLeaderboardNames.delete(name)
-	// cachedRawLeaderboards.set(name, leaderboardRaw)
+	cachedRawLeaderboards.set(name, leaderboardRaw)
 	return leaderboardRaw
 }
 
@@ -352,7 +352,7 @@ async function fetchProfileLeaderboardRaw(name: string): Promise<profileRawLeade
 		})
 	fetchingRawLeaderboardNames.delete(name)
 
-	// cachedRawLeaderboards.set(name, leaderboardRaw)
+	cachedRawLeaderboards.set(name, leaderboardRaw)
 	return leaderboardRaw
 }
 
@@ -590,7 +590,7 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 			}])
 			.sort((a, b) => leaderboardReverse ? a.value - b.value : b.value - a.value)
 			.slice(0, 100)
-		// cachedRawLeaderboards.set(attributeName, newRawLeaderboard)
+		cachedRawLeaderboards.set(attributeName, newRawLeaderboard)
 	}
 
 	if (debug) console.debug('added member to leaderboards', member.username, leaderboardAttributes)
@@ -645,7 +645,7 @@ export async function updateDatabaseProfile(profile: CleanFullProfile): Promise<
 			}])
 			.sort((a, b) => leaderboardReverse ? a.value - b.value : b.value - a.value)
 			.slice(0, 100)
-		// cachedRawLeaderboards.set(attributeName, newRawLeaderboard)
+		cachedRawLeaderboards.set(attributeName, newRawLeaderboard)
 	}
 
 	if (debug) console.debug('added profile to leaderboards', profile.name, leaderboardAttributes)
