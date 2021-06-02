@@ -68,7 +68,7 @@ async function cleanSkyBlockProfileMemberResponse(member, included = null) {
         fairy_souls: fairySouls,
         inventories: inventoriesIncluded ? await inventory_1.cleanInventories(member) : undefined,
         objectives: objectives_1.cleanObjectives(member),
-        skills: skills_1.cleanSkills(member),
+        skills: await skills_1.cleanSkills(member),
         visited_zones: zones_1.cleanVisitedZones(member),
         collections: collections_1.cleanCollections(member),
         slayers: slayers_1.cleanSlayers(member)
