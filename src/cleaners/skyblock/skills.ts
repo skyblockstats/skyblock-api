@@ -146,7 +146,7 @@ export async function cleanSkills(data: any): Promise<Skill[]> {
 
 			const skillMaxLevel = skillsMaxLevel[skillName] ?? skillsDefaultMaxLevel
 
-			const xpTable = skillMaxLevel <= 25 ? skillXpTableEasier : skillXpTable
+			const xpTable = (skillMaxLevel <= 25 ? skillXpTableEasier : skillXpTable).slice(0, skillMaxLevel)
 
 			// the level you're at for this skill
 			const skillLevel = levelForSkillXp(skillXp, skillMaxLevel)

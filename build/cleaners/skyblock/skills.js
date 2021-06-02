@@ -128,7 +128,7 @@ async function cleanSkills(data) {
             // the amount of total xp you have in this skill
             const skillXp = data[item];
             const skillMaxLevel = (_a = skillsMaxLevel[skillName]) !== null && _a !== void 0 ? _a : skillsDefaultMaxLevel;
-            const xpTable = skillMaxLevel <= 25 ? skillXpTableEasier : skillXpTable;
+            const xpTable = (skillMaxLevel <= 25 ? skillXpTableEasier : skillXpTable).slice(0, skillMaxLevel);
             // the level you're at for this skill
             const skillLevel = levelForSkillXp(skillXp, skillMaxLevel);
             // the total xp required for the previous level
