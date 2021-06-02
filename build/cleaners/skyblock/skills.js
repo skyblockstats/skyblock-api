@@ -114,7 +114,7 @@ const skillsDefaultMaxLevel = 50;
  * @param easierLevel Whether it should use the alternate leveling xp table (used for cosmetic skills and dungeoneering)
  */
 function levelForSkillXp(xp, maxLevel) {
-    const xpTable = maxLevel <= 25 ? skillXpTableEasier : skillXpTable;
+    const xpTable = (maxLevel <= 25 ? skillXpTableEasier : skillXpTable).slice(0, maxLevel);
     const skillLevel = [...xpTable].reverse().findIndex(levelXp => xp >= levelXp);
     return skillLevel === -1 ? 0 : xpTable.length - skillLevel;
 }
