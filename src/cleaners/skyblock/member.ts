@@ -79,7 +79,7 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
 		fairy_souls: fairySouls,
 		inventories: inventoriesIncluded ? await cleanInventories(member) : undefined,
 		objectives: cleanObjectives(member),
-		skills: cleanSkills(member),
+		skills: await cleanSkills(member),
 		visited_zones: cleanVisitedZones(member),
 		collections: cleanCollections(member),
 		slayers: cleanSlayers(member)
