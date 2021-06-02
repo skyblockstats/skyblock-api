@@ -135,20 +135,6 @@ export function levelForSkillXp(xp: number, maxLevel: number) {
 	return skillLevel === -1 ? 0 : xpTable.length - skillLevel
 }
 
-// for skills that aren't in maxSkills, default to this
-const skillsDefaultMaxLevel: number = 50
-
-/**
- * Get the skill level for the amount of total xp
- * @param xp The xp we're finding the level for
- * @param easierLevel Whether it should use the alternate leveling xp table (used for cosmetic skills and dungeoneering)
- */
-export async function levelForSkillXp(xp: number, maxLevel: number) {
-	const xpTable = maxLevel <= 25 ? await fetchSkillXpEasier() : await fetchSkillXp()
-	const skillLevel = [...xpTable].reverse().findIndex(levelXp => xp >= levelXp)
-	return skillLevel === -1 ? 0 : xpTable.length - skillLevel
-}
-
 export async function cleanSkills(data: any): Promise<Skill[]> {
 	const skills: Skill[] = []
 	for (const item in data) {

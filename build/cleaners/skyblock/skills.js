@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cleanSkills = exports.levelForSkillXp = void 0;
-const constants_1 = require("../../constants");
 // the highest level you can have in each skill
 // numbers taken from https://hypixel-skyblock.fandom.com/wiki/Skills
 const skillsMaxLevel = {
@@ -116,19 +115,6 @@ const skillsDefaultMaxLevel = 50;
  */
 function levelForSkillXp(xp, maxLevel) {
     const xpTable = maxLevel <= 25 ? skillXpTableEasier : skillXpTable;
-    const skillLevel = [...xpTable].reverse().findIndex(levelXp => xp >= levelXp);
-    return skillLevel === -1 ? 0 : xpTable.length - skillLevel;
-}
-exports.levelForSkillXp = levelForSkillXp;
-// for skills that aren't in maxSkills, default to this
-const skillsDefaultMaxLevel = 50;
-/**
- * Get the skill level for the amount of total xp
- * @param xp The xp we're finding the level for
- * @param easierLevel Whether it should use the alternate leveling xp table (used for cosmetic skills and dungeoneering)
- */
-async function levelForSkillXp(xp, maxLevel) {
-    const xpTable = maxLevel <= 25 ? await constants_1.fetchSkillXpEasier() : await constants_1.fetchSkillXp();
     const skillLevel = [...xpTable].reverse().findIndex(levelXp => xp >= levelXp);
     return skillLevel === -1 ? 0 : xpTable.length - skillLevel;
 }
