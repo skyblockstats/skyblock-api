@@ -109,8 +109,9 @@ let accountsCollection: Collection<AccountSchema>
 
 
 const leaderboardInfos: { [ leaderboardName: string ]: string } = {
-	highest_crit_damage: 'This leaderboard is capped at the integer limit because Hypixel, look at <a href="/leaderboard/highest_critical_damage">Highest critical damage</a> instead.',
-	highest_critical_damage: 'uhhhhh yeah idk either'
+	highest_crit_damage: 'This leaderboard is capped at the integer limit because Hypixel, look at the <a href="/leaderboard/highest_critical_damage">highest critical damage leaderboard</a> instead.',
+	highest_critical_damage: 'uhhhhh yeah idk either',
+	leaderboards_count: 'This leaderboard counts how many leaderboards people are in the top 100 for.',
 }
 
 
