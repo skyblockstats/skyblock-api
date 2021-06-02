@@ -170,12 +170,12 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 		return await sendApiRequest({ path, key, args })
 	}
 
-	if (fetchResponse.headers['ratelimit-limit'])
+	if (fetchResponse.headers.get('ratelimit-limit'))
 		// remember how many uses it has
 		apiKeyUsage[key] = {
-			remaining: fetchResponse.headers['ratelimit-remaining'],
-			limit: fetchResponse.headers['ratelimit-limit'],
-			reset: Date.now() + parseInt(fetchResponse.headers['ratelimit-reset']) * 1000
+			remaining: parseInt(fetchResponse.headers.get('ratelimit-remaining')),
+			limit: parseInt(fetchResponse.headers.get('ratelimit-limit')),
+			reset: Date.now() + parseInt(fetchResponse.headers.get('ratelimit-reset')) * 1000
 		}
 	
 	if (fetchJsonParsed.throttle) {
