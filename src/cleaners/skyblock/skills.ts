@@ -5,6 +5,8 @@ export interface Skill {
 	xp: number
 	level: number
 
+	maxLevel: number
+
 	levelXp: number
 	levelXpRequired: number
 }
@@ -70,6 +72,7 @@ export async function cleanSkills(data: any): Promise<Skill[]> {
 				name: skillName,
 				xp: skillXp,
 				level: skillLevel,
+				maxLevel: skillMaxLevel,
 				levelXp: skillLevelXp,
 				levelXpRequired: skillLevelXpRequired
 			})

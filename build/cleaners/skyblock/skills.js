@@ -54,6 +54,7 @@ async function cleanSkills(data) {
                 name: skillName,
                 xp: skillXp,
                 level: skillLevel,
+                maxLevel: skillMaxLevel,
                 levelXp: skillLevelXp,
                 levelXpRequired: skillLevelXpRequired
             });
