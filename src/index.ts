@@ -40,7 +40,7 @@ app.get('/', async(req, res) => {
 		finishedCachingRawLeaderboards,
 		leaderboardUpdateMemberQueueSize: leaderboardUpdateMemberQueue.size,
 		leaderboardUpdateProfileQueueSize: leaderboardUpdateProfileQueue.size,
-		key: getKeyUsage()
+		// key: getKeyUsage()
 	})
 })
 
