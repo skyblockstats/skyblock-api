@@ -227,14 +227,6 @@ export async function fetchMinions(): Promise<string[]> {
 	return await constants.fetchJSONConstant('minions.json')
 }
 
-export async function fetchSkillXp(): Promise<number[]> {
-	return await constants.fetchJSONConstant('manual/skill_xp.json')
-}
-
-export async function fetchSkillXpEasier(): Promise<number[]> {
-	return await constants.fetchJSONConstant('manual/skill_xp_easier.json')
-}
-
 /** Add skills to skyblock-constants. This has caching so it's fine to call many times */
 export async function addMinions(addingMinions: string[]): Promise<void> {
 	await constants.addJSONConstants('minions.json', addingMinions, 'minion')
