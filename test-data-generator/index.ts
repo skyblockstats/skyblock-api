@@ -42,8 +42,6 @@ async function addConstants() {
 		'slayers',
 		'stats',
 		'zones',
-		'manual/skill_xp',
-		'manual/skill_xp_easier',
 	]
 	for (const constantName of constantNames) {
 		const constantData = await constants.fetchJSONConstant(constantName + '.json')
