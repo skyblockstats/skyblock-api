@@ -29,6 +29,7 @@ const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const constants = __importStar(require("./constants"));
 const discord = __importStar(require("./discord"));
 const express_1 = __importDefault(require("express"));
+const hypixelApi_1 = require("./hypixelApi");
 const app = express_1.default();
 exports.debug = false;
 const mainSiteUrl = 'https://skyblock.matdoes.dev';
@@ -59,6 +60,7 @@ app.get('/', async (req, res) => {
         finishedCachingRawLeaderboards: database_1.finishedCachingRawLeaderboards,
         leaderboardUpdateMemberQueueSize: database_1.leaderboardUpdateMemberQueue.size,
         leaderboardUpdateProfileQueueSize: database_1.leaderboardUpdateProfileQueue.size,
+        key: hypixelApi_1.getKeyUsage()
     });
 });
 app.get('/player/:user', async (req, res) => {

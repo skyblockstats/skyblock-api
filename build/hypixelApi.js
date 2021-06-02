@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendApiRequest = exports.chooseApiKey = void 0;
+exports.sendApiRequest = exports.getKeyUsage = exports.chooseApiKey = void 0;
 /**
  * Fetch the raw Hypixel API
  */
@@ -27,7 +27,7 @@ function chooseApiKey() {
     // find the api key with the lowest amount of uses
     let bestKeyUsage = null;
     let bestKey = null;
-    for (var key of util_1.shuffle(apiKeys)) {
+    for (let key of util_1.shuffle(apiKeys)) {
         const keyUsage = apiKeyUsage[key];
         // if the key has never been used before, use it
         if (!keyUsage)
@@ -44,6 +44,19 @@ function chooseApiKey() {
     return bestKey;
 }
 exports.chooseApiKey = chooseApiKey;
+function getKeyUsage() {
+    let keyLimit = 0;
+    let keyUsage = 0;
+    for (let key of Object.values(apiKeyUsage)) {
+        keyLimit += key.limit;
+        keyUsage += key.limit - key.remaining;
+    }
+    return {
+        limit: keyLimit,
+        usage: keyUsage
+    };
+}
+exports.getKeyUsage = getKeyUsage;
 /** Send an HTTP request to the Hypixel API */
 async function sendApiRequest({ path, key, args }) {
     // Send a raw http request to api.hypixel.net, and return the parsed json
