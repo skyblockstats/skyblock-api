@@ -4,6 +4,7 @@ import rateLimit from 'express-rate-limit'
 import * as constants from './constants'
 import * as discord from './discord'
 import express from 'express'
+import { getKeyUsage } from './hypixelApi'
 
 const app = express()
 
@@ -39,6 +40,7 @@ app.get('/', async(req, res) => {
 		finishedCachingRawLeaderboards,
 		leaderboardUpdateMemberQueueSize: leaderboardUpdateMemberQueue.size,
 		leaderboardUpdateProfileQueueSize: leaderboardUpdateProfileQueue.size,
+		key: getKeyUsage()
 	})
 })
 

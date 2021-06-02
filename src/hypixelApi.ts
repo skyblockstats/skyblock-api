@@ -36,7 +36,7 @@ export function chooseApiKey(): string {
 	// find the api key with the lowest amount of uses
 	let bestKeyUsage: KeyUsage = null
 	let bestKey: string = null
-	for (var key of shuffle(apiKeys)) {
+	for (let key of shuffle(apiKeys)) {
 		const keyUsage = apiKeyUsage[key]
 
 		// if the key has never been used before, use it
@@ -53,6 +53,19 @@ export function chooseApiKey(): string {
 		}
 	}
 	return bestKey
+}
+
+export function getKeyUsage() {
+	let keyLimit = 0
+	let keyUsage = 0
+	for (let key of Object.values(apiKeyUsage)) {
+		keyLimit += key.limit
+		keyUsage += key.limit - key.remaining
+	}
+	return {
+		limit: keyLimit,
+		usage: keyUsage
+	}
 }
 
 export interface HypixelResponse {
