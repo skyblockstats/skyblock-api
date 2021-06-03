@@ -60,10 +60,9 @@ async function profileFromUsername(username) {
         data = JSON.parse(rawData);
     }
     catch { }
-    console.log('mojang returned', rawData);
     if (!(data === null || data === void 0 ? void 0 : data.id)) {
-        console.log('mojang api failed, trying ashcon as backup');
         return { uuid: null, username: null };
+        // console.log('mojang api failed, trying ashcon as backup')
         // return await profileFromUsernameAlternative(username)
     }
     return {

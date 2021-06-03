@@ -73,11 +73,10 @@ export async function profileFromUsername(username: string): Promise<MojangApiRe
 		data = JSON.parse(rawData)
 	} catch {}
 
-	console.log('mojang returned', rawData)
 
 	if (!data?.id) {
-		console.log('mojang api failed, trying ashcon as backup')
 		return { uuid: null, username: null }
+		// console.log('mojang api failed, trying ashcon as backup')
 		// return await profileFromUsernameAlternative(username)
 	}
 	return {
