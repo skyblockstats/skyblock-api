@@ -6,7 +6,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.profileFromUser = exports.profileFromUsername = exports.profileFromUuid = void 0;
+exports.profileFromUser = exports.profileFromUsernameAlternative = exports.profileFromUsername = exports.profileFromUuid = void 0;
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const https_1 = require("https");
 const util_1 = require("./util");
@@ -58,8 +58,10 @@ async function profileFromUsername(username) {
     try {
         data = await fetchResponse.json();
     }
-    catch {
-        return { uuid: null, username: null };
+    catch { }
+    if (!data.id) {
+        console.log('mojang api failed, trying ashcon as backup');
+        return await profileFromUsernameAlternative(username);
     }
     return {
         uuid: data.id,
@@ -67,6 +69,29 @@ async function profileFromUsername(username) {
     };
 }
 exports.profileFromUsername = profileFromUsername;
+async function profileFromUsernameAlternative(username) {
+    let fetchResponse;
+    try {
+        fetchResponse = await node_fetch_1.default(`https://api.ashcon.app/mojang/v2/user/${username}`, { agent: () => httpsAgent });
+    }
+    catch {
+        // if there's an error, wait a second and try again
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        return await profileFromUsernameAlternative(username);
+    }
+    let data;
+    try {
+        data = await fetchResponse.json();
+    }
+    catch {
+        return { uuid: null, username: null };
+    }
+    return {
+        uuid: data.uuid,
+        username: data.username
+    };
+}
+exports.profileFromUsernameAlternative = profileFromUsernameAlternative;
 async function profileFromUser(user) {
     if (util_1.isUuid(user)) {
         return await profileFromUuid(user);

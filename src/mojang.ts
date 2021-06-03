@@ -70,8 +70,11 @@ export async function profileFromUsername(username: string): Promise<MojangApiRe
 	let data
 	try {
 		data = await fetchResponse.json()
-	} catch {
-		return { uuid: null, username: null }
+	} catch {}
+
+	if (!data.id) {
+		console.log('mojang api failed, trying ashcon as backup')
+		return await profileFromUsernameAlternative(username)
 	}
 	return {
 		uuid: data.id,
@@ -79,6 +82,31 @@ export async function profileFromUsername(username: string): Promise<MojangApiRe
 	}
 }
 
+export async function profileFromUsernameAlternative(username: string): Promise<MojangApiResponse> {
+	let fetchResponse: nodeFetch.Response
+
+	try {
+		fetchResponse = await fetch(
+			`https://api.ashcon.app/mojang/v2/user/${username}`,
+			{ agent: () => httpsAgent }
+		)
+	} catch {
+		// if there's an error, wait a second and try again
+		await new Promise((resolve) => setTimeout(resolve, 1000))
+		return await profileFromUsernameAlternative(username)
+	}
+
+	let data
+	try {
+		data = await fetchResponse.json()
+	} catch {
+		return { uuid: null, username: null }
+	}
+	return {
+		uuid: data.uuid,
+		username: data.username
+	}
+}
 
 export async function profileFromUser(user: string): Promise<MojangApiResponse> {
 	if (isUuid(user)) {
