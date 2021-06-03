@@ -103,7 +103,7 @@ export async function profileFromUsernameAlternative(username: string): Promise<
 		return { uuid: null, username: null }
 	}
 	return {
-		uuid: data.uuid,
+		uuid: undashUuid(data.uuid),
 		username: data.username
 	}
 }

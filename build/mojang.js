@@ -87,7 +87,7 @@ async function profileFromUsernameAlternative(username) {
         return { uuid: null, username: null };
     }
     return {
-        uuid: data.uuid,
+        uuid: util_1.undashUuid(data.uuid),
         username: data.username
     };
 }
