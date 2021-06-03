@@ -59,7 +59,7 @@ async function profileFromUsername(username) {
         data = await fetchResponse.json();
     }
     catch { }
-    if (!data.id) {
+    if (!(data === null || data === void 0 ? void 0 : data.id)) {
         console.log('mojang api failed, trying ashcon as backup');
         return await profileFromUsernameAlternative(username);
     }
