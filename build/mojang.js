@@ -87,6 +87,8 @@ async function profileFromUsernameAlternative(username) {
     catch {
         return { uuid: null, username: null };
     }
+    if (!data.uuid)
+        return { uuid: null, username: null };
     return {
         uuid: util_1.undashUuid(data.uuid),
         username: data.username

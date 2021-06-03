@@ -104,6 +104,8 @@ export async function profileFromUsernameAlternative(username: string): Promise<
 	} catch {
 		return { uuid: null, username: null }
 	}
+	if (!data.uuid)
+		return { uuid: null, username: null }
 	return {
 		uuid: undashUuid(data.uuid),
 		username: data.username
