@@ -68,11 +68,12 @@ export async function profileFromUsername(username: string): Promise<MojangApiRe
 	}
 
 	let data
+	const rawData = await fetchResponse.text()
 	try {
-		data = await fetchResponse.json()
+		data = JSON.parse(rawData)
 	} catch {}
 
-	console.log('mojang returned', data)
+	console.log('mojang returned', rawData)
 
 	if (!data?.id) {
 		console.log('mojang api failed, trying ashcon as backup')

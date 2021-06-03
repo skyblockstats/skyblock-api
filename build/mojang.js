@@ -55,11 +55,12 @@ async function profileFromUsername(username) {
         return await profileFromUsername(username);
     }
     let data;
+    const rawData = await fetchResponse.text();
     try {
-        data = await fetchResponse.json();
+        data = JSON.parse(rawData);
     }
     catch { }
-    console.log('mojang returned', data);
+    console.log('mojang returned', rawData);
     if (!(data === null || data === void 0 ? void 0 : data.id)) {
         console.log('mojang api failed, trying ashcon as backup');
         return await profileFromUsernameAlternative(username);
