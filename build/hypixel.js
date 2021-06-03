@@ -125,8 +125,10 @@ async function fetchMemberProfile(user, profile, customization) {
     // we don't await the promise immediately so it can load while we do other stuff
     const websiteAccountPromise = customization ? database_1.fetchAccount(playerUuid) : null;
     const profileUuid = await cached.fetchProfileUuid(user, profile);
-    // if the profile doesn't have an id, just return
+    // if the profile or player doesn't have an id, just return
     if (!profileUuid)
+        return null;
+    if (!playerUuid)
         return null;
     const player = await cached.fetchPlayer(playerUuid);
     const cleanProfile = await cached.fetchProfile(playerUuid, profileUuid);

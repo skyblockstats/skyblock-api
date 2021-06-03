@@ -61,9 +61,8 @@ async function profileFromUsername(username) {
     }
     catch { }
     if (!(data === null || data === void 0 ? void 0 : data.id)) {
-        return { uuid: null, username: null };
-        // console.log('mojang api failed, trying ashcon as backup')
-        // return await profileFromUsernameAlternative(username)
+        // return { uuid: null, username: null }
+        return await profileFromUsernameAlternative(username);
     }
     return {
         uuid: data.id,
