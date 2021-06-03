@@ -64,11 +64,15 @@ app.get('/', async (req, res) => {
 });
 app.get('/player/:user', async (req, res) => {
     try {
-        res.json(await hypixel_1.fetchUser({ user: req.params.user }, [req.query.basic === 'true' ? undefined : 'profiles', 'player'], req.query.customization === 'true'));
+        const user = await hypixel_1.fetchUser({ user: req.params.user }, [req.query.basic === 'true' ? undefined : 'profiles', 'player'], req.query.customization === 'true');
+        if (user)
+            res.json(user);
+        else
+            res.status(404).json({ error: true });
     }
     catch (err) {
         console.error(err);
-        res.json({ 'error': true });
+        res.json({ error: true });
     }
 });
 app.get('/discord/:id', async (req, res) => {
@@ -82,11 +86,15 @@ app.get('/discord/:id', async (req, res) => {
 });
 app.get('/player/:user/:profile', async (req, res) => {
     try {
-        res.json(await hypixel_1.fetchMemberProfile(req.params.user, req.params.profile, req.query.customization === 'true'));
+        const profile = await hypixel_1.fetchMemberProfile(req.params.user, req.params.profile, req.query.customization === 'true');
+        if (profile)
+            res.json(profile);
+        else
+            res.status(404).json({ error: true });
     }
     catch (err) {
         console.error(err);
-        res.json({ 'error': true });
+        res.json({ error: true });
     }
 });
 app.get('/player/:user/:profile/leaderboards', async (req, res) => {

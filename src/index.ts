@@ -46,16 +46,18 @@ app.get('/', async(req, res) => {
 
 app.get('/player/:user', async(req, res) => {
 	try {
-		res.json(
-			await fetchUser(
-				{ user: req.params.user },
-				[req.query.basic as string === 'true' ? undefined : 'profiles', 'player'],
-				req.query.customization as string === 'true'
-			)
+		const user = await fetchUser(
+			{ user: req.params.user },
+			[req.query.basic as string === 'true' ? undefined : 'profiles', 'player'],
+			req.query.customization as string === 'true'
 		)
+		if (user)
+			res.json(user)
+		else
+			res.status(404).json({ error: true })
 	} catch (err) {
 		console.error(err)
-		res.json({ 'error': true })
+		res.json({ error: true })
 	}
 })
 
@@ -72,12 +74,14 @@ app.get('/discord/:id', async(req, res) => {
 
 app.get('/player/:user/:profile', async(req, res) => {
 	try {
-		res.json(
-			await fetchMemberProfile(req.params.user, req.params.profile, req.query.customization as string === 'true')
-		)
+		const profile = await fetchMemberProfile(req.params.user, req.params.profile, req.query.customization as string === 'true')
+		if (profile)
+			res.json(profile)
+		else
+			res.status(404).json({ error: true })
 	} catch (err) {
 		console.error(err)
-		res.json({ 'error': true })
+		res.json({ error: true })
 	}
 })
 

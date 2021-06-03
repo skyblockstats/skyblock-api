@@ -88,7 +88,6 @@ async function profileFromUsernameAlternative(username) {
     catch {
         return { uuid: null, username: null };
     }
-    console.log('aight ashcon returned', data);
     return {
         uuid: util_1.undashUuid(data.uuid),
         username: data.username
