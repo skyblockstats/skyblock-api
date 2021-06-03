@@ -100,22 +100,22 @@ function cleanCollections(data) {
     }
     // collection names show up like this: { LOG: 49789, LOG:2: 26219, MUSHROOM_COLLECTION: 2923}
     // these values are different for each player in a coop
-    const playerCollectionValuesRaw = (_b = data === null || data === void 0 ? void 0 : data.collection) !== null && _b !== void 0 ? _b : {};
-    const playerCollectionValues = [];
-    for (const collectionNameRaw in playerCollectionValuesRaw) {
-        const collectionValue = playerCollectionValuesRaw[collectionNameRaw];
+    const playerCollectionXpsRaw = (_b = data === null || data === void 0 ? void 0 : data.collection) !== null && _b !== void 0 ? _b : {};
+    const playerCollections = [];
+    for (const collectionNameRaw in playerCollectionXpsRaw) {
+        const collectionXp = playerCollectionXpsRaw[collectionNameRaw];
         const collectionName = itemId_1.cleanItemId(collectionNameRaw);
         const collectionLevel = playerCollectionTiers[collectionName];
         const collectionCategory = (_c = getCategory(collectionName)) !== null && _c !== void 0 ? _c : 'unknown';
         // in some very weird cases the collection level will be undefined, we should ignore these collections
         if (collectionLevel !== undefined)
-            playerCollectionValues.push({
+            playerCollections.push({
                 name: collectionName,
-                xp: collectionValue,
+                xp: collectionXp,
                 level: collectionLevel,
                 category: collectionCategory
             });
     }
-    return playerCollectionValues;
+    return playerCollections;
 }
 exports.cleanCollections = cleanCollections;
