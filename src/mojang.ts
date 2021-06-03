@@ -105,7 +105,7 @@ export async function profileFromUsernameAlternative(username: string): Promise<
 	} catch {
 		return { uuid: null, username: null }
 	}
-	console.log('aight ashcon returned', data.uuid)
+	console.log('aight ashcon returned', data)
 	return {
 		uuid: undashUuid(data.uuid),
 		username: data.username
