@@ -254,7 +254,7 @@ async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[]> {
 
 	const player = await fetchPlayer(playerUuid)
 	if (!player) {
-		console.log('bruh playerUuid', user, playerUuid)
+		console.log('bruh playerUuid', user)
 		return []
 	}
 	const profiles = player.profiles

@@ -234,7 +234,7 @@ async function fetchBasicProfiles(user) {
         console.debug('Cache miss: fetchBasicProfiles', user);
     const player = await fetchPlayer(playerUuid);
     if (!player) {
-        console.log('bruh playerUuid', user, playerUuid);
+        console.log('bruh playerUuid', user);
         return [];
     }
     const profiles = player.profiles;

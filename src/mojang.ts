@@ -41,18 +41,15 @@ export async function profileFromUuid(uuid: string): Promise<MojangApiResponse> 
 	try {
 		dataString = await fetchResponse.text()
 	} catch (err) {
-		console.log('failed reading response text', err)
 		return { uuid: null, username: null }
 	}
 	let data
 	try {
 		data = JSON.parse(dataString)
 	} catch {
-		console.log('mojang response:', dataString)
 		// if it errors, just return null
 		return { uuid: null, username: null }
 	}
-	console.log('mojang response:', data)
 	return {
 		uuid: data.id,
 		username: data.name

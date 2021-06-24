@@ -19,8 +19,6 @@ const httpsAgent = new Agent({
 /** This array should only ever contain one item because using multiple hypixel api keys isn't allowed :) */ 
 const apiKeys = process.env?.hypixel_keys?.split(' ') ?? []
 
-console.log(apiKeys)
-
 interface KeyUsage {
 	remaining: number
 	limit: number

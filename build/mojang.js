@@ -34,7 +34,6 @@ async function profileFromUuid(uuid) {
         dataString = await fetchResponse.text();
     }
     catch (err) {
-        console.log('failed reading response text', err);
         return { uuid: null, username: null };
     }
     let data;
@@ -42,11 +41,9 @@ async function profileFromUuid(uuid) {
         data = JSON.parse(dataString);
     }
     catch {
-        console.log('mojang response:', dataString);
         // if it errors, just return null
         return { uuid: null, username: null };
     }
-    console.log('mojang response:', data);
     return {
         uuid: data.id,
         username: data.name
