@@ -158,6 +158,7 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 			{ agent: () => httpsAgent }
 		)
 		fetchJsonParsed = await fetchResponse.json()
+		console.log('gotten api response', fetchJsonParsed)
 	} catch {
 		// if there's an error, wait a second and try again
 		await new Promise((resolve) => setTimeout(resolve, 1000))

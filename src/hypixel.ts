@@ -38,7 +38,6 @@ export async function sendCleanApiRequest({ path, args }, included?: Included[],
 		await new Promise(resolve => setTimeout(resolve, 1000))
 		return await sendCleanApiRequest({ path, args }, included, options)
 	}
-
 	// clean the response
 	return await cleanResponse({ path, data: rawResponse }, options ?? {})
 }
