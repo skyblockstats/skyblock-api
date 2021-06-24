@@ -20,6 +20,7 @@ const httpsAgent = new https_1.Agent({
 });
 /** This array should only ever contain one item because using multiple hypixel api keys isn't allowed :) */
 const apiKeys = (_c = (_b = (_a = process.env) === null || _a === void 0 ? void 0 : _a.hypixel_keys) === null || _b === void 0 ? void 0 : _b.split(' ')) !== null && _c !== void 0 ? _c : [];
+console.log(apiKeys);
 const apiKeyUsage = {};
 const baseHypixelAPI = 'https://api.hypixel.net';
 /** Choose the best current API key */
@@ -27,7 +28,7 @@ function chooseApiKey() {
     // find the api key with the lowest amount of uses
     let bestKeyUsage = null;
     let bestKey = null;
-    for (let key of util_1.shuffle(apiKeys)) {
+    for (let key of util_1.shuffle(apiKeys.slice())) {
         const keyUsage = apiKeyUsage[key];
         // if the key has never been used before, use it
         if (!keyUsage)
@@ -70,7 +71,6 @@ async function sendApiRequest({ path, key, args }) {
     try {
         fetchResponse = await node_fetch_1.default(fetchUrl, { agent: () => httpsAgent });
         fetchJsonParsed = await fetchResponse.json();
-        console.log('gotten api response', fetchJsonParsed, key);
     }
     catch {
         // if there's an error, wait a second and try again

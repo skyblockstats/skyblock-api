@@ -11,7 +11,7 @@ export function jsonToQuery(data): string {
     return Object.entries(data || {}).map(e => e.join('=')).join('&')
 }
 
-export function shuffle(a): string {
+export function shuffle<T>(a: T[]): T[] {
     for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
         ;[a[i], a[j]] = [a[j], a[i]]

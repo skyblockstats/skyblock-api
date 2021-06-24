@@ -19,6 +19,8 @@ const httpsAgent = new Agent({
 /** This array should only ever contain one item because using multiple hypixel api keys isn't allowed :) */ 
 const apiKeys = process.env?.hypixel_keys?.split(' ') ?? []
 
+console.log(apiKeys)
+
 interface KeyUsage {
 	remaining: number
 	limit: number
@@ -36,7 +38,7 @@ export function chooseApiKey(): string {
 	// find the api key with the lowest amount of uses
 	let bestKeyUsage: KeyUsage = null
 	let bestKey: string = null
-	for (let key of shuffle(apiKeys)) {
+	for (let key of shuffle(apiKeys.slice())) {
 		const keyUsage = apiKeyUsage[key]
 
 		// if the key has never been used before, use it
@@ -158,7 +160,6 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 			{ agent: () => httpsAgent }
 		)
 		fetchJsonParsed = await fetchResponse.json()
-		console.log('gotten api response', fetchJsonParsed, key)
 	} catch {
 		// if there's an error, wait a second and try again
 		await new Promise((resolve) => setTimeout(resolve, 1000))
