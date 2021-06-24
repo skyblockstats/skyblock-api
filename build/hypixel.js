@@ -122,6 +122,8 @@ exports.fetchUser = fetchUser;
  */
 async function fetchMemberProfile(user, profile, customization) {
     const playerUuid = await cached.uuidFromUser(user);
+    if (!playerUuid)
+        return;
     // we don't await the promise immediately so it can load while we do other stuff
     const websiteAccountPromise = customization ? database_1.fetchAccount(playerUuid) : null;
     const profileUuid = await cached.fetchProfileUuid(user, profile);
