@@ -70,7 +70,7 @@ async function sendApiRequest({ path, key, args }) {
     try {
         fetchResponse = await node_fetch_1.default(fetchUrl, { agent: () => httpsAgent });
         fetchJsonParsed = await fetchResponse.json();
-        console.log('gotten api response', fetchJsonParsed);
+        console.log('gotten api response', fetchJsonParsed, key);
     }
     catch {
         // if there's an error, wait a second and try again
