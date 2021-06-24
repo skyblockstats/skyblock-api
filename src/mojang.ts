@@ -76,7 +76,7 @@ export async function profileFromUsername(username: string): Promise<MojangApiRe
 		return await profileFromUsername(username)
 	}
 
-	let data
+	let data = null
 	const rawData = await fetchResponse.text()
 	try {
 		data = JSON.parse(rawData)
@@ -84,6 +84,7 @@ export async function profileFromUsername(username: string): Promise<MojangApiRe
 
 
 	if (!data?.id) {
+		console.log('no id returned from mojang', rawData)
 		// return { uuid: null, username: null }
 		return await profileFromUsernameAlternative(username)
 	}

@@ -64,13 +64,14 @@ async function profileFromUsername(username) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         return await profileFromUsername(username);
     }
-    let data;
+    let data = null;
     const rawData = await fetchResponse.text();
     try {
         data = JSON.parse(rawData);
     }
     catch { }
     if (!(data === null || data === void 0 ? void 0 : data.id)) {
+        console.log('no id returned from mojang', rawData);
         // return { uuid: null, username: null }
         return await profileFromUsernameAlternative(username);
     }
