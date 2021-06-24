@@ -40,7 +40,8 @@ export async function profileFromUuid(uuid: string): Promise<MojangApiResponse> 
 	let dataString: string
 	try {
 		dataString = await fetchResponse.text()
-	} catch {
+	} catch (err) {
+		console.log('failed reading response text', err)
 		return { uuid: null, username: null }
 	}
 	let data
@@ -51,8 +52,7 @@ export async function profileFromUuid(uuid: string): Promise<MojangApiResponse> 
 		// if it errors, just return null
 		return { uuid: null, username: null }
 	}
-	if (!data.id)
-		console.log('mojang response:', data)
+	console.log('mojang response:', data)
 	return {
 		uuid: data.id,
 		username: data.name
@@ -84,10 +84,10 @@ export async function profileFromUsername(username: string): Promise<MojangApiRe
 
 
 	if (!data?.id) {
-		console.log('no id returned from mojang', rawData)
 		// return { uuid: null, username: null }
 		return await profileFromUsernameAlternative(username)
 	}
+
 	return {
 		uuid: data.id,
 		username: data.name

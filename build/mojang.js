@@ -33,7 +33,8 @@ async function profileFromUuid(uuid) {
     try {
         dataString = await fetchResponse.text();
     }
-    catch {
+    catch (err) {
+        console.log('failed reading response text', err);
         return { uuid: null, username: null };
     }
     let data;
@@ -45,8 +46,7 @@ async function profileFromUuid(uuid) {
         // if it errors, just return null
         return { uuid: null, username: null };
     }
-    if (!data.id)
-        console.log('mojang response:', data);
+    console.log('mojang response:', data);
     return {
         uuid: data.id,
         username: data.name
@@ -71,7 +71,6 @@ async function profileFromUsername(username) {
     }
     catch { }
     if (!(data === null || data === void 0 ? void 0 : data.id)) {
-        console.log('no id returned from mojang', rawData);
         // return { uuid: null, username: null }
         return await profileFromUsernameAlternative(username);
     }
