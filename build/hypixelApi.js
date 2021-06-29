@@ -60,6 +60,7 @@ exports.getKeyUsage = getKeyUsage;
 /** Send an HTTP request to the Hypixel API */
 async function sendApiRequest({ path, key, args }) {
     // Send a raw http request to api.hypixel.net, and return the parsed json
+    var _a, _b, _c;
     if (key)
         // If there's an api key, add it to the arguments
         args.key = key;
@@ -84,9 +85,9 @@ async function sendApiRequest({ path, key, args }) {
     if (fetchResponse.headers.get('ratelimit-limit'))
         // remember how many uses it has
         apiKeyUsage[key] = {
-            remaining: parseInt(fetchResponse.headers.get('ratelimit-remaining')),
-            limit: parseInt(fetchResponse.headers.get('ratelimit-limit')),
-            reset: Date.now() + parseInt(fetchResponse.headers.get('ratelimit-reset')) * 1000
+            remaining: parseInt((_a = fetchResponse.headers.get('ratelimit-remaining')) !== null && _a !== void 0 ? _a : '0'),
+            limit: parseInt((_b = fetchResponse.headers.get('ratelimit-limit')) !== null && _b !== void 0 ? _b : '0'),
+            reset: Date.now() + parseInt((_c = fetchResponse.headers.get('ratelimit-reset')) !== null && _c !== void 0 ? _c : '0') * 1000
         };
     if (fetchJsonParsed.throttle) {
         if (apiKeyUsage[key])

@@ -17,10 +17,10 @@ export interface CleanPlayer extends CleanBasicPlayer {
     // first_join?: number
 }
 
-export async function cleanPlayerResponse(data: HypixelPlayer): Promise<CleanPlayer> {
+export async function cleanPlayerResponse(data: HypixelPlayer): Promise<CleanPlayer | null> {
     // Cleans up a 'player' api response
     if (!data)
-        return // bruh
+        return null // bruh
     return {
         uuid: undashUuid(data.uuid),
         username: data.displayname,

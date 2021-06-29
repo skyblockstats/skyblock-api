@@ -74,6 +74,7 @@ function getStatUnit(name) {
                 return unitName;
         }
     }
+    return null;
 }
 exports.getStatUnit = getStatUnit;
 function cleanProfileStats(data) {
