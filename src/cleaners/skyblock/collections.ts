@@ -84,7 +84,7 @@ export interface Collection {
 }
 
 // get a category name (farming) from a collection name (wheat)
-function getCategory(collectionName): CollectionCategory {
+function getCategory(collectionName): CollectionCategory | undefined {
 	for (const categoryName in COLLECTIONS) {
 		const categoryItems = COLLECTIONS[categoryName]
 		if (categoryItems.includes(collectionName))

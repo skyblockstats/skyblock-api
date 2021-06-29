@@ -57,7 +57,7 @@ async function fetchGithubApi(method, route, headers, json) {
             console.debug('fetching github api', method, route);
         const data = await node_fetch_1.default(githubApiBase + route, {
             agent: () => httpsAgent,
-            body: json ? JSON.stringify(json) : null,
+            body: json ? JSON.stringify(json) : undefined,
             method,
             headers: Object.assign({
                 'Authorization': `token ${process.env.github_token}`

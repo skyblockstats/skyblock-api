@@ -59,7 +59,7 @@ interface profileRawLeaderboardItem {
 }
 
 interface MemberLeaderboardItem {
-	player: CleanPlayer
+	player: CleanPlayer | null
 	profileUuid: string
 	value: number
 }
@@ -205,9 +205,11 @@ export async function fetchAllLeaderboardsCategorized(): Promise<{ [ category: s
 	const categorizedLeaderboards: { [ category: string ]: string[] } = {}
 	for (const leaderboard of [...memberLeaderboardAttributes, ...profileLeaderboardAttributes]) {
 		const { category } = categorizeStat(leaderboard)
-		if (!categorizedLeaderboards[category])
-			categorizedLeaderboards[category] = []
-		categorizedLeaderboards[category].push(leaderboard)
+		if (category) {
+			if (!categorizedLeaderboards[category])
+				categorizedLeaderboards[category] = []
+			categorizedLeaderboards[category].push(leaderboard)
+		}
 	}
 
 	// move misc to end by removing and readding it
@@ -366,14 +368,14 @@ async function fetchProfileLeaderboardRaw(name: string): Promise<profileRawLeade
 
 interface MemberLeaderboard {
 	name: string
-	unit?: string
+	unit: string | null
 	list: MemberLeaderboardItem[]
 	info?: string
 }
 
 interface ProfileLeaderboard {
 	name: string
-	unit?: string
+	unit: string | null
 	list: ProfileLeaderboardItem[]
 	info?: string
 }
@@ -384,8 +386,9 @@ export async function fetchMemberLeaderboard(name: string): Promise<MemberLeader
 	const leaderboardRaw = await fetchMemberLeaderboardRaw(name)
 
 	const fetchLeaderboardPlayer = async(i: memberRawLeaderboardItem): Promise<MemberLeaderboardItem> => {
+		const player = await cached.fetchBasicPlayer(i.uuid)
 		return {
-			player: await cached.fetchBasicPlayer(i.uuid),
+			player,
 			profileUuid: i.profile,
 			value: i.value
 		}
@@ -408,9 +411,12 @@ export async function fetchProfileLeaderboard(name: string): Promise<ProfileLead
 	const leaderboardRaw = await fetchProfileLeaderboardRaw(name)
 
 	const fetchLeaderboardProfile = async(i: profileRawLeaderboardItem): Promise<ProfileLeaderboardItem> => {
-		const players = []
-		for (const playerUuid of i.players)
-			players.push(await cached.fetchBasicPlayer(playerUuid))
+		const players: CleanPlayer[] = []
+		for (const playerUuid of i.players) {
+			const player = await cached.fetchBasicPlayer(playerUuid)
+			if (player)
+				players.push(player)
+		}
 		return {
 			players: players,
 			profileUuid: i.uuid,
@@ -445,17 +451,26 @@ export async function fetchLeaderboard(name: string): Promise<MemberLeaderboard|
 	return leaderboard
 }
 
+interface LeaderboardSpot {
+	name: string
+	positionIndex: number
+	value: number
+	unit: string | null
+}
+
 /** Get the leaderboard positions a member is on. This may take a while depending on whether stuff is cached */
-export async function fetchMemberLeaderboardSpots(player: string, profile: string) {
+export async function fetchMemberLeaderboardSpots(player: string, profile: string): Promise<LeaderboardSpot[] | null> {
 	const fullProfile = await cached.fetchProfile(player, profile)
+	if (!fullProfile) return null
 	const fullMember = fullProfile.members.find(m => m.username.toLowerCase() === player.toLowerCase() || m.uuid === player)
+	if (!fullMember) return null
 
 	// update the leaderboard positions for the member
 	await updateDatabaseMember(fullMember, fullProfile)
 
 	const applicableAttributes = await getApplicableMemberLeaderboardAttributes(fullMember)
 
-	const memberLeaderboardSpots = []
+	const memberLeaderboardSpots: LeaderboardSpot[] = []
 
 	for (const leaderboardName in applicableAttributes) {
 		const leaderboard = await fetchMemberLeaderboardRaw(leaderboardName)
@@ -472,7 +487,7 @@ export async function fetchMemberLeaderboardSpots(player: string, profile: strin
 	return memberLeaderboardSpots
 }
 
-async function getLeaderboardRequirement(name: string, leaderboardType: 'member' | 'profile'): Promise<number> {
+async function getLeaderboardRequirement(name: string, leaderboardType: 'member' | 'profile'): Promise<number | null> {
 	let leaderboard: memberRawLeaderboardItem[] | profileRawLeaderboardItem[]
 	if (leaderboardType === 'member')
 		leaderboard = await fetchMemberLeaderboardRaw(name)
@@ -480,8 +495,8 @@ async function getLeaderboardRequirement(name: string, leaderboardType: 'member'
 		leaderboard = await fetchProfileLeaderboardRaw(name)
 
 	// if there's more than 100 items, return the 100th. if there's less, return null
-	if (leaderboard.length >= leaderboardMax)
-		return leaderboard[leaderboardMax - 1].value
+	if (leaderboard!.length >= leaderboardMax)
+		return leaderboard![leaderboardMax - 1].value
 	else
 		return null
 }
@@ -504,7 +519,7 @@ async function getApplicableMemberLeaderboardAttributes(member: CleanMember): Pr
 
 
 	let leaderboardsCount: number = Object.keys(applicableAttributes).length
-	const leaderboardsCountRequirement: number = await getLeaderboardRequirement('leaderboards_count', 'member')
+	const leaderboardsCountRequirement: number | null = await getLeaderboardRequirement('leaderboards_count', 'member')
 
 	if (
 		(leaderboardsCountRequirement === null)
@@ -534,11 +549,11 @@ async function getApplicableProfileLeaderboardAttributes(profile: CleanFullProfi
 
 
 	let leaderboardsCount: number = Object.keys(applicableAttributes).length
-	const leaderboardsCountRequirement: number = await getLeaderboardRequirement('leaderboards_count', 'member')
+	const leaderboardsCountRequirement: number | null = await getLeaderboardRequirement('leaderboards_count', 'member')
 
 	if (
-		(leaderboardsCountRequirement === null)
-		|| (leaderboardsCount > leaderboardsCountRequirement)
+		leaderboardsCountRequirement === null
+		|| leaderboardsCount > leaderboardsCountRequirement
 	) {
 		applicableAttributes['leaderboards_count'] = leaderboardsCount
 	}
@@ -557,7 +572,8 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 
 	if (debug) console.debug('adding member to leaderboards', member.username)
 
-	await constants.addStats(Object.keys(member.rawHypixelStats))
+	if (member.rawHypixelStats)
+		await constants.addStats(Object.keys(member.rawHypixelStats))
 	await constants.addCollections(member.collections.map(coll => coll.name))
 	await constants.addSkills(member.skills.map(skill => skill.name))
 	await constants.addZones(member.visited_zones.map(zone => zone.name))
@@ -738,15 +754,15 @@ export async function createSession(refreshToken: string, userData: discord.Disc
 	return sessionId
 }
 
-export async function fetchSession(sessionId: string): Promise<SessionSchema> {
+export async function fetchSession(sessionId: string): Promise<SessionSchema | null> {
 	return await sessionsCollection?.findOne({ _id: sessionId })
 }
 
-export async function fetchAccount(minecraftUuid: string): Promise<AccountSchema> {
+export async function fetchAccount(minecraftUuid: string): Promise<AccountSchema | null> {
 	return await accountsCollection?.findOne({ minecraftUuid })
 }
 
-export async function fetchAccountFromDiscord(discordId: string): Promise<AccountSchema> {
+export async function fetchAccountFromDiscord(discordId: string): Promise<AccountSchema | null> {
 	return await accountsCollection?.findOne({ discordId })
 }
 

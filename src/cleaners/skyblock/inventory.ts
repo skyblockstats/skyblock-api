@@ -26,7 +26,7 @@ interface Item {
 
 export type Inventory = Item[]
 
-function cleanItem(rawItem): Item {
+function cleanItem(rawItem): Item | null {
 	// if the item doesn't have an id, it isn't an item
 	if (rawItem.id === undefined) return null
 
@@ -35,7 +35,7 @@ function cleanItem(rawItem): Item {
 	const damageValue = rawItem.Damage
 	const itemTag = rawItem.tag
 	const extraAttributes = itemTag?.ExtraAttributes ?? {}
-	let headId: string
+	let headId: string | undefined
 
 	if (vanillaId === 397) {
 		const headDataBase64 = itemTag?.SkullOwner?.Properties?.textures?.[0]?.Value

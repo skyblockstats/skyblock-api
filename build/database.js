@@ -137,9 +137,11 @@ async function fetchAllLeaderboardsCategorized() {
     const categorizedLeaderboards = {};
     for (const leaderboard of [...memberLeaderboardAttributes, ...profileLeaderboardAttributes]) {
         const { category } = stats_1.categorizeStat(leaderboard);
-        if (!categorizedLeaderboards[category])
-            categorizedLeaderboards[category] = [];
-        categorizedLeaderboards[category].push(leaderboard);
+        if (category) {
+            if (!categorizedLeaderboards[category])
+                categorizedLeaderboards[category] = [];
+            categorizedLeaderboards[category].push(leaderboard);
+        }
     }
     // move misc to end by removing and readding it
     const misc = categorizedLeaderboards.misc;
@@ -277,8 +279,9 @@ async function fetchMemberLeaderboard(name) {
     var _a;
     const leaderboardRaw = await fetchMemberLeaderboardRaw(name);
     const fetchLeaderboardPlayer = async (i) => {
+        const player = await cached.fetchBasicPlayer(i.uuid);
         return {
-            player: await cached.fetchBasicPlayer(i.uuid),
+            player,
             profileUuid: i.profile,
             value: i.value
         };
@@ -301,8 +304,11 @@ async function fetchProfileLeaderboard(name) {
     const leaderboardRaw = await fetchProfileLeaderboardRaw(name);
     const fetchLeaderboardProfile = async (i) => {
         const players = [];
-        for (const playerUuid of i.players)
-            players.push(await cached.fetchBasicPlayer(playerUuid));
+        for (const playerUuid of i.players) {
+            const player = await cached.fetchBasicPlayer(playerUuid);
+            if (player)
+                players.push(player);
+        }
         return {
             players: players,
             profileUuid: i.uuid,
@@ -340,7 +346,11 @@ exports.fetchLeaderboard = fetchLeaderboard;
 async function fetchMemberLeaderboardSpots(player, profile) {
     var _a;
     const fullProfile = await cached.fetchProfile(player, profile);
+    if (!fullProfile)
+        return null;
     const fullMember = fullProfile.members.find(m => m.username.toLowerCase() === player.toLowerCase() || m.uuid === player);
+    if (!fullMember)
+        return null;
     // update the leaderboard positions for the member
     await updateDatabaseMember(fullMember, fullProfile);
     const applicableAttributes = await getApplicableMemberLeaderboardAttributes(fullMember);
@@ -404,8 +414,8 @@ async function getApplicableProfileLeaderboardAttributes(profile) {
     }
     let leaderboardsCount = Object.keys(applicableAttributes).length;
     const leaderboardsCountRequirement = await getLeaderboardRequirement('leaderboards_count', 'member');
-    if ((leaderboardsCountRequirement === null)
-        || (leaderboardsCount > leaderboardsCountRequirement)) {
+    if (leaderboardsCountRequirement === null
+        || leaderboardsCount > leaderboardsCountRequirement) {
         applicableAttributes['leaderboards_count'] = leaderboardsCount;
     }
     return applicableAttributes;
@@ -423,7 +433,8 @@ async function updateDatabaseMember(member, profile) {
     recentlyUpdated.set(profile.uuid + member.uuid, true);
     if (_1.debug)
         console.debug('adding member to leaderboards', member.username);
-    await constants.addStats(Object.keys(member.rawHypixelStats));
+    if (member.rawHypixelStats)
+        await constants.addStats(Object.keys(member.rawHypixelStats));
     await constants.addCollections(member.collections.map(coll => coll.name));
     await constants.addSkills(member.skills.map(skill => skill.name));
     await constants.addZones(member.visited_zones.map(zone => zone.name));
