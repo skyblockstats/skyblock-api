@@ -31,8 +31,10 @@ const zones_1 = require("./zones");
 const skills_1 = require("./skills");
 const cached = __importStar(require("../../hypixelCached"));
 const constants = __importStar(require("../../constants"));
-async function cleanSkyBlockProfileMemberResponseBasic(member, included = null) {
+async function cleanSkyBlockProfileMemberResponseBasic(member) {
     const player = await cached.fetchPlayer(member.uuid);
+    if (!player)
+        return null;
     return {
         uuid: member.uuid,
         username: player.username,
@@ -43,13 +45,13 @@ async function cleanSkyBlockProfileMemberResponseBasic(member, included = null) 
 }
 exports.cleanSkyBlockProfileMemberResponseBasic = cleanSkyBlockProfileMemberResponseBasic;
 /** Cleans up a member (from skyblock/profile) */
-async function cleanSkyBlockProfileMemberResponse(member, included = null) {
+async function cleanSkyBlockProfileMemberResponse(member, included = undefined) {
     var _a;
     // profiles.members[]
-    const inventoriesIncluded = included === null || included.includes('inventories');
+    const inventoriesIncluded = included === undefined || included.includes('inventories');
     const player = await cached.fetchPlayer(member.uuid);
     if (!player)
-        return;
+        return null;
     const fairySouls = fairysouls_1.cleanFairySouls(member);
     const { max_fairy_souls: maxFairySouls } = await constants.fetchConstantValues();
     if (fairySouls.total > (maxFairySouls !== null && maxFairySouls !== void 0 ? maxFairySouls : 0))

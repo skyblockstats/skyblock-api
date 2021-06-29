@@ -14,8 +14,8 @@ const statCategories: { [ key: string ]: string[] | null } = { // sorted in orde
 }
 
 export interface StatCategory {
-	category: string,
-	name: string
+	category: string | null
+	name: string | null
 }
 
 export function categorizeStat(statNameRaw: string): StatCategory {
@@ -71,11 +71,11 @@ export interface StatItem {
 	rawName: string
 	value: number
 	categorizedName: string
-	category: string
-	unit: string
+	category: string | null
+	unit: string | null
 }
 
-export function getStatUnit(name: string): string {
+export function getStatUnit(name: string): string | null {
 	for (const [ unitName, statMatchers ] of Object.entries(statUnits)) {
 		for (const statMatch of statMatchers) {
 			let trailingEnd = statMatch[0] === '_'
@@ -88,6 +88,7 @@ export function getStatUnit(name: string): string {
 				return unitName
 		}
 	}
+	return null
 }
 
 

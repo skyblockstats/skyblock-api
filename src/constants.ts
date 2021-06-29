@@ -40,7 +40,7 @@ async function fetchGithubApi(method: string, route: string, headers?: any, json
 			githubApiBase + route,
 			{
 				agent: () => httpsAgent,
-				body: json ? JSON.stringify(json) : null,
+				body: json ? JSON.stringify(json) : undefined,
 				method,
 				headers: Object.assign({
 					'Authorization': `token ${process.env.github_token}`
@@ -78,7 +78,7 @@ function fetchFile(path: string): Promise<GithubFile> {
 	return new Promise(resolve => {
 		queue.enqueue(async() => {
 			if (fileCache.has(path))
-				return resolve(fileCache.get(path))
+				return resolve(fileCache.get(path)!)
 
 			const r = await fetchGithubApi(
 				'GET',

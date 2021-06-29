@@ -32,10 +32,10 @@ const baseHypixelAPI = 'https://api.hypixel.net'
 
 
 /** Choose the best current API key */
-export function chooseApiKey(): string {
+export function chooseApiKey(): string | null {
 	// find the api key with the lowest amount of uses
-	let bestKeyUsage: KeyUsage = null
-	let bestKey: string = null
+	let bestKeyUsage: KeyUsage | null = null
+	let bestKey: string | null = null
 	for (let key of shuffle(apiKeys.slice())) {
 		const keyUsage = apiKeyUsage[key]
 
@@ -173,9 +173,9 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 	if (fetchResponse.headers.get('ratelimit-limit'))
 		// remember how many uses it has
 		apiKeyUsage[key] = {
-			remaining: parseInt(fetchResponse.headers.get('ratelimit-remaining')),
-			limit: parseInt(fetchResponse.headers.get('ratelimit-limit')),
-			reset: Date.now() + parseInt(fetchResponse.headers.get('ratelimit-reset')) * 1000
+			remaining: parseInt(fetchResponse.headers.get('ratelimit-remaining') ?? '0'),
+			limit: parseInt(fetchResponse.headers.get('ratelimit-limit') ?? '0'),
+			reset: Date.now() + parseInt(fetchResponse.headers.get('ratelimit-reset') ?? '0') * 1000
 		}
 	
 	if (fetchJsonParsed.throttle) {

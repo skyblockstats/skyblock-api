@@ -14,9 +14,8 @@ const httpsAgent = new Agent({
 
 interface MojangApiResponse {
 	/** These uuids are already undashed */
-	uuid: string
-
-	username: string
+	uuid: string | null
+	username: string | null
 }
 
 /**
@@ -73,7 +72,7 @@ export async function profileFromUsername(username: string): Promise<MojangApiRe
 		return await profileFromUsername(username)
 	}
 
-	let data = null
+	let data: any = null
 	const rawData = await fetchResponse.text()
 	try {
 		data = JSON.parse(rawData)

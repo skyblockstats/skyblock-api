@@ -62,22 +62,25 @@ async function cleanResponse({ path, data }, options) {
  * used inclusions: player, profiles
  */
 async function fetchUser({ user, uuid, username }, included = ['player'], customization) {
+    var _a, _b;
     if (!uuid) {
         // If the uuid isn't provided, get it
-        uuid = await cached.uuidFromUser(user || username);
+        if (!username && !user)
+            return null;
+        uuid = await cached.uuidFromUser((user !== null && user !== void 0 ? user : username));
     }
-    const websiteAccountPromise = customization ? database_1.fetchAccount(uuid) : null;
     if (!uuid) {
         // the user doesn't exist.
         if (_1.debug)
             console.debug('error:', user, 'doesnt exist');
         return null;
     }
+    const websiteAccountPromise = customization ? database_1.fetchAccount(uuid) : null;
     const includePlayers = included.includes('player');
     const includeProfiles = included.includes('profiles');
     let profilesData;
     let basicProfilesData;
-    let playerData;
+    let playerData = null;
     if (includePlayers) {
         playerData = await cached.fetchPlayer(uuid);
         // if not including profiles, include lightweight profiles just in case
@@ -86,28 +89,26 @@ async function fetchUser({ user, uuid, username }, included = ['player'], custom
         if (playerData)
             delete playerData.profiles;
     }
-    if (includeProfiles) {
+    if (includeProfiles)
         profilesData = await cached.fetchSkyblockProfiles(uuid);
-    }
-    let activeProfile = null;
+    let activeProfile;
     let lastOnline = 0;
     if (includeProfiles) {
         for (const profile of profilesData) {
-            const member = profile.members.find(member => member.uuid === uuid);
-            if (member.last_save > lastOnline) {
+            const member = (_a = profile.members) === null || _a === void 0 ? void 0 : _a.find(member => member.uuid === uuid);
+            if (member && member.last_save > lastOnline) {
                 lastOnline = member.last_save;
                 activeProfile = profile;
             }
         }
     }
-    let websiteAccount = undefined;
-    if (websiteAccountPromise) {
+    let websiteAccount = null;
+    if (websiteAccountPromise)
         websiteAccount = await websiteAccountPromise;
-    }
     return {
-        player: playerData !== null && playerData !== void 0 ? playerData : null,
+        player: playerData,
         profiles: profilesData !== null && profilesData !== void 0 ? profilesData : basicProfilesData,
-        activeProfile: includeProfiles ? activeProfile === null || activeProfile === void 0 ? void 0 : activeProfile.uuid : undefined,
+        activeProfile: includeProfiles ? (_b = activeProfile) === null || _b === void 0 ? void 0 : _b.uuid : undefined,
         online: includeProfiles ? lastOnline > (Date.now() - exports.saveInterval) : undefined,
         customization: websiteAccount === null || websiteAccount === void 0 ? void 0 : websiteAccount.customization
     };
@@ -123,7 +124,7 @@ exports.fetchUser = fetchUser;
 async function fetchMemberProfile(user, profile, customization) {
     const playerUuid = await cached.uuidFromUser(user);
     if (!playerUuid)
-        return;
+        return null;
     // we don't await the promise immediately so it can load while we do other stuff
     const websiteAccountPromise = customization ? database_1.fetchAccount(playerUuid) : null;
     const profileUuid = await cached.fetchProfileUuid(user, profile);
@@ -133,8 +134,12 @@ async function fetchMemberProfile(user, profile, customization) {
     if (!playerUuid)
         return null;
     const player = await cached.fetchPlayer(playerUuid);
+    if (!player)
+        return null; // this should never happen, but if it does just return null
     const cleanProfile = await cached.fetchProfile(playerUuid, profileUuid);
     const member = cleanProfile.members.find(m => m.uuid === playerUuid);
+    if (!member)
+        return null; // this should never happen, but if it does just return null
     // remove unnecessary member data
     const simpleMembers = cleanProfile.members.map(m => {
         return {
@@ -146,7 +151,7 @@ async function fetchMemberProfile(user, profile, customization) {
         };
     });
     cleanProfile.members = simpleMembers;
-    let websiteAccount = undefined;
+    let websiteAccount = null;
     if (websiteAccountPromise)
         websiteAccount = await websiteAccountPromise;
     return {
@@ -172,7 +177,7 @@ async function fetchMemberProfileUncached(playerUuid, profileUuid) {
     const profile = await sendCleanApiRequest({
         path: 'skyblock/profile',
         args: { profile: profileUuid }
-    }, null, { mainMemberUuid: playerUuid });
+    }, undefined, { mainMemberUuid: playerUuid });
     // queue updating the leaderboard positions for the member, eventually
     for (const member of profile.members)
         database_1.queueUpdateDatabaseMember(member, profile);
@@ -189,7 +194,7 @@ async function fetchBasicProfileFromUuidUncached(profileUuid) {
     const profile = await sendCleanApiRequest({
         path: 'skyblock/profile',
         args: { profile: profileUuid }
-    }, null, { basic: true });
+    }, undefined, { basic: true });
     return profile;
 }
 exports.fetchBasicProfileFromUuidUncached = fetchBasicProfileFromUuidUncached;
@@ -199,7 +204,7 @@ async function fetchMemberProfilesUncached(playerUuid) {
         args: {
             uuid: playerUuid
         }
-    }, null, {
+    }, undefined, {
         // only the inventories for the main player are generated, this is for optimization purposes
         mainMemberUuid: playerUuid
     });

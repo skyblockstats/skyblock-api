@@ -61,7 +61,7 @@ export const minecraftColorCodes: { [ key: string ]: string } = {
  * For example: blue -> 9
  * @param colorName The name of the color (blue, red, aqua, etc)
  */
-export function colorCodeFromName(colorName: string): string {
+export function colorCodeFromName(colorName: string): string | undefined {
     const hexColor = minecraftColorCodes[colorName.toLowerCase()]
     for (const key in minecraftColorCodes) {
         const value = minecraftColorCodes[key]
