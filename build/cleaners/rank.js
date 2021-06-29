@@ -21,6 +21,7 @@ function cleanRank({ packageRank, newPackageRank, monthlyPackageRank, rankPlusCo
     let name;
     let color;
     let colored;
+    let bracketColor;
     if (prefix) { // derive values from prefix
         colored = prefix;
         color = util_1.minecraftColorCodes[colored.match(/§./)[0][1]];
@@ -41,6 +42,7 @@ function cleanRank({ packageRank, newPackageRank, monthlyPackageRank, rankPlusCo
             // YouTube rank is called YouTuber, change this to the proper name
             case 'YOUTUBER':
                 name = 'YOUTUBE';
+                bracketColor = 'c';
                 break;
             case 'GAME_MASTER':
                 name = 'GM';
@@ -54,13 +56,22 @@ function cleanRank({ packageRank, newPackageRank, monthlyPackageRank, rankPlusCo
         }
         const plusColor = rankPlusColor ? util_1.colorCodeFromName(rankPlusColor) : null;
         color = util_1.minecraftColorCodes[rankColors[name]];
-        const rankColorPrefix = rankColors[name] ? '§' + rankColors[name] : '';
+        let rankColorPrefix = rankColors[name] ? '§' + rankColors[name] : '';
+        // the text is white, but only in the prefix
+        if (name === 'YOUTUBE')
+            rankColorPrefix = '§f';
         const nameWithoutPlus = name.split('+')[0];
         const plusesInName = '+'.repeat(name.split('+').length - 1);
         if (plusColor && plusesInName.length >= 1)
-            colored = `${rankColorPrefix}[${nameWithoutPlus}§${plusColor}${plusesInName}${rankColorPrefix}]`;
+            if (bracketColor)
+                colored = `§${bracketColor}[${rankColorPrefix}${nameWithoutPlus}§${plusColor}${plusesInName}${rankColorPrefix}§${bracketColor}]`;
+            else
+                colored = `${rankColorPrefix}[${nameWithoutPlus}§${plusColor}${plusesInName}${rankColorPrefix}]`;
         else if (name !== 'NONE')
-            colored = `${rankColorPrefix}[${name}]`;
+            if (bracketColor)
+                colored = `§${bracketColor}[${rankColorPrefix}${name}§${bracketColor}]`;
+            else
+                colored = `${rankColorPrefix}[${name}]`;
         else
             // nons don't have a prefix
             colored = `${rankColorPrefix}`;
