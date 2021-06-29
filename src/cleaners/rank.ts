@@ -10,7 +10,7 @@ const rankColors: { [ name: string ]: string } = {
 	'MVP++': '6',
 	'YOUTUBE': 'c',
 	'HELPER': '9',
-	'MODERATOR': '2',
+	'MOD': '2',
 	'GM': '2',
 	'ADMIN': 'c'
 }
@@ -57,6 +57,9 @@ export function cleanRank({
 				break
 			case 'GAME_MASTER':
 				name = 'GM'
+				break
+			case 'MODERATOR':
+				name = 'MOD'
 				break
 			case undefined:
 				name = 'NONE'

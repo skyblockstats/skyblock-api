@@ -11,7 +11,7 @@ const rankColors = {
     'MVP++': '6',
     'YOUTUBE': 'c',
     'HELPER': '9',
-    'MODERATOR': '2',
+    'MOD': '2',
     'GM': '2',
     'ADMIN': 'c'
 };
@@ -44,6 +44,9 @@ function cleanRank({ packageRank, newPackageRank, monthlyPackageRank, rankPlusCo
                 break;
             case 'GAME_MASTER':
                 name = 'GM';
+                break;
+            case 'MODERATOR':
+                name = 'MOD';
                 break;
             case undefined:
                 name = 'NONE';
