@@ -404,7 +404,7 @@ export async function fetchProfileName(user: string, profile: string): Promise<s
 
 let allAuctionsCache: Auction[] = []
 let nextAuctionsUpdate = 0
-let nextAuctionsUpdateTimeout = null
+let nextAuctionsUpdateTimeout: NodeJS.Timeout
 
 // we use a queue so it doesnt fetch twice at the same time, and instead it waits so it can just use the cached version
 const fetchAllAuctionsQueue = new Queue({

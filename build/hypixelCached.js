@@ -56,7 +56,7 @@ exports.playerCache = new node_cache_1.default({
 // cache "basic players" (players without profiles) for 20 minutes
 exports.basicPlayerCache = new lru_cache_1.default({
     max: 10000,
-    maxAge: 60 * 30 * 1000,
+    maxAge: 60 * 20 * 1000,
 });
 exports.profileCache = new node_cache_1.default({
     stdTTL: 30,
@@ -379,7 +379,7 @@ async function fetchProfileName(user, profile) {
 exports.fetchProfileName = fetchProfileName;
 let allAuctionsCache = [];
 let nextAuctionsUpdate = 0;
-let nextAuctionsUpdateTimeout = null;
+let nextAuctionsUpdateTimeout;
 // we use a queue so it doesnt fetch twice at the same time, and instead it waits so it can just use the cached version
 const fetchAllAuctionsQueue = new queue_promise_1.default({
     concurrent: 1
