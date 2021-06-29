@@ -1,9 +1,10 @@
-import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, updateAccount } from './database'
+import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount } from './database'
 import { fetchMemberProfile, fetchUser } from './hypixel'
 import rateLimit from 'express-rate-limit'
 import * as constants from './constants'
 import * as discord from './discord'
 import express from 'express'
+import { getKeyUsage } from './hypixelApi'
 
 const app = express()
 
@@ -36,22 +37,27 @@ app.get('/', async(req, res) => {
 	res.json({
 		ok: true,
 		uptimeHours: (currentTime - startTime) / 1000 / 60 / 60,
-		finishedCachingRawLeaderboards
+		finishedCachingRawLeaderboards,
+		leaderboardUpdateMemberQueueSize: leaderboardUpdateMemberQueue.size,
+		leaderboardUpdateProfileQueueSize: leaderboardUpdateProfileQueue.size,
+		// key: getKeyUsage()
 	})
 })
 
 app.get('/player/:user', async(req, res) => {
 	try {
-		res.json(
-			await fetchUser(
-				{ user: req.params.user },
-				[req.query.basic as string === 'true' ? undefined : 'profiles', 'player'],
-				req.query.customization as string === 'true'
-			)
+		const user = await fetchUser(
+			{ user: req.params.user },
+			[req.query.basic as string === 'true' ? undefined : 'profiles', 'player'],
+			req.query.customization as string === 'true'
 		)
+		if (user)
+			res.json(user)
+		else
+			res.status(404).json({ error: true })
 	} catch (err) {
 		console.error(err)
-		res.json({ 'error': true })
+		res.json({ error: true })
 	}
 })
 
@@ -68,12 +74,14 @@ app.get('/discord/:id', async(req, res) => {
 
 app.get('/player/:user/:profile', async(req, res) => {
 	try {
-		res.json(
-			await fetchMemberProfile(req.params.user, req.params.profile, req.query.customization as string === 'true')
-		)
+		const profile = await fetchMemberProfile(req.params.user, req.params.profile, req.query.customization as string === 'true')
+		if (profile)
+			res.json(profile)
+		else
+			res.status(404).json({ error: true })
 	} catch (err) {
 		console.error(err)
-		res.json({ 'error': true })
+		res.json({ error: true })
 	}
 })
 
@@ -124,7 +132,12 @@ app.get('/constants', async(req, res) => {
 app.post('/accounts/createsession', async(req, res) => {
 	try {
 		const { code } = req.body
-		const { access_token: accessToken, refresh_token: refreshToken } = await discord.exchangeCode(`${mainSiteUrl}/loggedin`, code)
+		const codeExchange = await discord.exchangeCode(`${mainSiteUrl}/loggedin`, code)
+		if (!codeExchange) {
+			res.json({ ok: false, error: 'discord_client_secret isn\'t in env' })
+			return
+		}
+		const { access_token: accessToken, refresh_token: refreshToken } = codeExchange
 		if (!accessToken)
 			// access token is invalid :(
 			return res.json({ ok: false })
@@ -140,6 +153,8 @@ app.post('/accounts/session', async(req, res) => {
 	try {
 		const { uuid } = req.body
 		const session = await fetchSession(uuid)
+		if (!session)
+			return res.json({ ok: false })
 		const account = await fetchAccountFromDiscord(session.discord_user.id)
 		res.json({ session, account })
 	} catch (err) {

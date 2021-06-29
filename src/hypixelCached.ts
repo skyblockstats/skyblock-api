@@ -38,10 +38,10 @@ export const playerCache = new NodeCache({
 	useClones: true,
 })
 
-// cache "basic players" (players without profiles) for 30 minutes
+// cache "basic players" (players without profiles) for 20 minutes
 export const basicPlayerCache: LRUCache<string, CleanPlayer> = new LRUCache({
 	max: 10000,
-	maxAge: 60 * 30 * 1000,
+	maxAge: 60 * 20 * 1000,
 })
 
 export const profileCache = new NodeCache({
@@ -84,17 +84,17 @@ function waitForCacheSet(cache: NodeCache, key?: string, value?: string): Promis
  * Fetch the uuid from a user
  * @param user A user can be either a uuid or a username 
  */
-export async function uuidFromUser(user: string): Promise<string> {
+export async function uuidFromUser(user: string): Promise<string | undefined> {
 	// if the user is 32 characters long, it has to be a uuid
 	if (isUuid(user))
 		return undashUuid(user)
 
 	if (usernameCache.has(undashUuid(user))) {
 		// check if the uuid is a key
-		const username: Promise<KeyValue> | string | null = usernameCache.get<string | Promise<KeyValue>>(undashUuid(user))
+		const username: Promise<KeyValue> | string | undefined = usernameCache.get<string | Promise<KeyValue>>(undashUuid(user))
 
 		// sometimes the username will be null, return that
-		if (username === null) return null
+		if (username === null) return undefined
 
 		// if it has .then, then that means its a waitForCacheSet promise. This is done to prevent requests made while it is already requesting
 		if ((username as Promise<KeyValue>).then) {
@@ -139,15 +139,16 @@ export async function uuidFromUser(user: string): Promise<string> {
  * Fetch the username from a user
  * @param user A user can be either a uuid or a username 
  */
-export async function usernameFromUser(user: string): Promise<string> {
+export async function usernameFromUser(user: string): Promise<string | null> {
 	if (usernameCache.has(undashUuid(user))) {
 		if (debug) console.debug('Cache hit! usernameFromUser', user)
-		return usernameCache.get(undashUuid(user))
+		return usernameCache.get(undashUuid(user)) ?? null
 	}
 
 	if (debug) console.debug('Cache miss: usernameFromUser', user)
 
 	let { uuid, username } = await mojang.profileFromUser(user)
+	if (!uuid) return null
 	uuid = undashUuid(uuid)
 	usernameCache.set(uuid, username)
 	return username
@@ -155,12 +156,12 @@ export async function usernameFromUser(user: string): Promise<string> {
 
 let fetchingPlayers: Set<string> = new Set()
 
-export async function fetchPlayer(user: string): Promise<CleanPlayer> {
+export async function fetchPlayer(user: string): Promise<CleanPlayer | null> {
 	const playerUuid = await uuidFromUser(user)
-
+	if (!playerUuid) return null
 
 	if (playerCache.has(playerUuid))
-		return playerCache.get(playerUuid)
+		return playerCache.get(playerUuid)!
 
 	// if it's already in the process of fetching, check every 100ms until it's not fetching the player anymore and fetch it again, since it'll be cached now
 	if (fetchingPlayers.has(playerUuid)) {
@@ -179,7 +180,7 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer> {
 
 	fetchingPlayers.delete(playerUuid)
 
-	if (!cleanPlayer) return
+	if (!cleanPlayer) return null
 
 	// clone in case it gets modified somehow later
 	playerCache.set(playerUuid, cleanPlayer)
@@ -193,14 +194,19 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer> {
 }
 
 /** Fetch a player without their profiles. This is heavily cached. */
-export async function fetchBasicPlayer(user: string): Promise<CleanPlayer> {
+export async function fetchBasicPlayer(user: string): Promise<CleanPlayer | null> {
 	const playerUuid = await uuidFromUser(user)
 
+	if (!playerUuid) return null
+
 	if (basicPlayerCache.has(playerUuid))
-		return basicPlayerCache.get(playerUuid)
+		return basicPlayerCache.get(playerUuid)!
 	
 	const player = await fetchPlayer(playerUuid)
-	if (!player) console.debug('no player? this should never happen', user)
+	if (!player) {
+		console.debug('no player? this should never happen', user, playerUuid)
+		return null
+	}
 
 	delete player.profiles
 	return player
@@ -209,7 +215,7 @@ export async function fetchBasicPlayer(user: string): Promise<CleanPlayer> {
 export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanProfile[]> {
 	if (profilesCache.has(playerUuid)) {
 		if (debug) console.debug('Cache hit! fetchSkyblockProfiles', playerUuid)
-		return profilesCache.get(playerUuid)
+		return profilesCache.get(playerUuid)!
 	}
 
 	if (debug) console.debug('Cache miss: fetchSkyblockProfiles', playerUuid)
@@ -223,7 +229,7 @@ export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanPr
 		const basicProfile: CleanProfile = {
 			name: profile.name,
 			uuid: profile.uuid,
-			members: profile.members.map(m => {
+			members: profile.members?.map(m => {
 				return {
 					uuid: m.uuid,
 					username: m.username,
@@ -243,25 +249,26 @@ export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanPr
 }
 
 /** Fetch an array of `BasicProfile`s */
-async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[]> {
+async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[] | null> {
 	const playerUuid = await uuidFromUser(user)
 
-	if (!playerUuid) return // invalid player, just return
+	if (!playerUuid) return null // invalid player, just return
 
 	if (basicProfilesCache.has(playerUuid)) {
 		if (debug) console.debug('Cache hit! fetchBasicProfiles', playerUuid)
-		return basicProfilesCache.get(playerUuid)
+		return basicProfilesCache.get(playerUuid)!
 	}
 
 	if (debug) console.debug('Cache miss: fetchBasicProfiles', user)
 
 	const player = await fetchPlayer(playerUuid)
 	if (!player) {
-		console.log('bruh playerUuid', user, playerUuid)
+		console.log('bruh playerUuid', user)
 		return []
 	}
 	const profiles = player.profiles
 	basicProfilesCache.set(playerUuid, profiles)
+	if (!profiles) return null
 
 	// cache the profile names and uuids to profileNameCache because we can
 	for (const profile of profiles)
@@ -275,7 +282,7 @@ async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[]> {
  * @param user A username or uuid
  * @param profile A profile name or profile uuid
  */
-export async function fetchProfileUuid(user: string, profile: string): Promise<string> {
+export async function fetchProfileUuid(user: string, profile: string): Promise<string | null> {
 	// if a profile wasn't provided, return
 	if (!profile) {
 		if (debug) console.debug('no profile provided?', user, profile)
@@ -285,12 +292,12 @@ export async function fetchProfileUuid(user: string, profile: string): Promise<s
 	if (debug) console.debug('Cache miss: fetchProfileUuid', user, profile)
 
 	const profiles = await fetchBasicProfiles(user)
-	if (!profiles) return // user probably doesnt exist
+	if (!profiles) return null // user probably doesnt exist
 
 	const profileUuid = undashUuid(profile)
 
 	for (const p of profiles) {
-		if (p.name.toLowerCase() === profileUuid.toLowerCase())
+		if (p.name?.toLowerCase() === profileUuid.toLowerCase())
 			return undashUuid(p.uuid)
 		else if (undashUuid(p.uuid) === undashUuid(profileUuid))
 			return undashUuid(p.uuid)
@@ -303,8 +310,9 @@ export async function fetchProfileUuid(user: string, profile: string): Promise<s
  * @param user A username or uuid
  * @param profile A profile name or profile uuid
  */
-export async function fetchProfile(user: string, profile: string): Promise<CleanFullProfile> {
+export async function fetchProfile(user: string, profile: string): Promise<CleanFullProfile | null> {
 	const playerUuid = await uuidFromUser(user)
+	if (!playerUuid) return null
 	const profileUuid = await fetchProfileUuid(playerUuid, profile)
 
 	if (!profileUuid) return null
@@ -312,12 +320,14 @@ export async function fetchProfile(user: string, profile: string): Promise<Clean
 	if (profileCache.has(profileUuid)) {
 		// we have the profile cached, return it :)
 		if (debug) console.debug('Cache hit! fetchProfile', profileUuid)
-		return profileCache.get(profileUuid)
+		return profileCache.get(profileUuid)!
 	}
 
 	if (debug) console.debug('Cache miss: fetchProfile', user, profile)
 
 	const profileName = await fetchProfileName(user, profile)
+
+	if (!profileName) return null // uhh this should never happen but if it does just return null
 
 	const cleanProfile: CleanFullProfile = await hypixel.fetchMemberProfileUncached(playerUuid, profileUuid)
 
@@ -333,11 +343,12 @@ export async function fetchProfile(user: string, profile: string): Promise<Clean
  * Fetch a CleanProfile from the uuid
  * @param profileUuid A profile name or profile uuid
 */
-export async function fetchBasicProfileFromUuid(profileUuid: string): Promise<CleanProfile> {
+export async function fetchBasicProfileFromUuid(profileUuid: string): Promise<CleanProfile | undefined> {
 	if (profileCache.has(profileUuid)) {
 		// we have the profile cached, return it :)
 		if (debug) console.debug('Cache hit! fetchBasicProfileFromUuid', profileUuid)
-		const profile: CleanFullProfile = profileCache.get(profileUuid)
+		const profile: CleanFullProfile | undefined = profileCache.get(profileUuid)
+		if (!profile) return undefined
 		return {
 			uuid: profile.uuid,
 			members: profile.members.map(m => ({
@@ -360,26 +371,32 @@ export async function fetchBasicProfileFromUuid(profileUuid: string): Promise<Cl
  * @param user A player uuid or username
  * @param profile A profile uuid or name
  */
-export async function fetchProfileName(user: string, profile: string): Promise<string> {
+export async function fetchProfileName(user: string, profile: string): Promise<string | null> {
 	// we're fetching the profile and player uuid again in case we were given a name, but it's cached so it's not much of a problem
 	const profileUuid = await fetchProfileUuid(user, profile)
-	if (!profileUuid)
-		return null
+	if (!profileUuid) return null
+
 	const playerUuid = await uuidFromUser(user)
+
+	if (!playerUuid) return null
 
 	if (profileNameCache.has(`${playerUuid}.${profileUuid}`)) {
 		// Return the profile name if it's cached
 		if (debug) console.debug('Cache hit! fetchProfileName', profileUuid)
-		return profileNameCache.get(`${playerUuid}.${profileUuid}`)
+		return profileNameCache.get!(`${playerUuid}.${profileUuid}`) ?? null
 	}
 
 	if (debug) console.debug('Cache miss: fetchProfileName', user, profile)
 
 	const basicProfiles = await fetchBasicProfiles(playerUuid)
-	let profileName
+	
+	if (!basicProfiles) return null
+
+	let profileName: string | null = null
+
 	for (const basicProfile of basicProfiles)
 		if (basicProfile.uuid === playerUuid)
-			profileName = basicProfile.name
+			profileName = basicProfile.name ?? null
 
 	profileNameCache.set(`${playerUuid}.${profileUuid}`, profileName)
 	return profileName

@@ -30,7 +30,7 @@ export interface CleanMember extends CleanBasicMember {
 	rawHypixelStats?: { [ key: string ]: number }
 	minions: CleanMinion[]
 	fairy_souls: FairySouls
-	inventories: Inventories
+	inventories?: Inventories
 	objectives: Objective[]
 	skills: Skill[]
 	visited_zones: Zone[]
@@ -38,8 +38,9 @@ export interface CleanMember extends CleanBasicMember {
 	slayers: SlayerData
 }
 
-export async function cleanSkyBlockProfileMemberResponseBasic(member: any, included: Included[] = null): Promise<CleanBasicMember> {
+export async function cleanSkyBlockProfileMemberResponseBasic(member: any): Promise<CleanBasicMember | null> {
 	const player = await cached.fetchPlayer(member.uuid)
+	if (!player) return null
 	return {
 		uuid: member.uuid,
 		username: player.username,
@@ -50,11 +51,11 @@ export async function cleanSkyBlockProfileMemberResponseBasic(member: any, inclu
 }
 
 /** Cleans up a member (from skyblock/profile) */
-export async function cleanSkyBlockProfileMemberResponse(member, included: Included[] = null): Promise<CleanMember> {
+export async function cleanSkyBlockProfileMemberResponse(member, included: Included[] | undefined = undefined): Promise<CleanMember | null> {
 	// profiles.members[]
-	const inventoriesIncluded = included === null || included.includes('inventories')
+	const inventoriesIncluded = included === undefined || included.includes('inventories')
 	const player = await cached.fetchPlayer(member.uuid)
-	if (!player) return
+	if (!player) return null
 
 	const fairySouls = cleanFairySouls(member)
 	const { max_fairy_souls: maxFairySouls } = await constants.fetchConstantValues()
@@ -79,7 +80,7 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
 		fairy_souls: fairySouls,
 		inventories: inventoriesIncluded ? await cleanInventories(member) : undefined,
 		objectives: cleanObjectives(member),
-		skills: cleanSkills(member),
+		skills: await cleanSkills(member),
 		visited_zones: cleanVisitedZones(member),
 		collections: cleanCollections(member),
 		slayers: cleanSlayers(member)
@@ -109,5 +110,5 @@ export interface CleanMemberProfilePlayer extends CleanPlayer {
 export interface CleanMemberProfile {
 	member: CleanMemberProfilePlayer
 	profile: CleanFullProfileBasicMembers
-	customization: AccountCustomization
+	customization?: AccountCustomization
 }

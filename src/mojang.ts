@@ -14,9 +14,8 @@ const httpsAgent = new Agent({
 
 interface MojangApiResponse {
 	/** These uuids are already undashed */
-	uuid: string
-
-	username: string
+	uuid: string | null
+	username: string | null
 }
 
 /**
@@ -37,9 +36,15 @@ export async function profileFromUuid(uuid: string): Promise<MojangApiResponse> 
 		return await profileFromUuid(uuid)
 	}
 
+	let dataString: string
+	try {
+		dataString = await fetchResponse.text()
+	} catch (err) {
+		return { uuid: null, username: null }
+	}
 	let data
 	try {
-		data = await fetchResponse.json()
+		data = JSON.parse(dataString)
 	} catch {
 		// if it errors, just return null
 		return { uuid: null, username: null }
@@ -67,18 +72,51 @@ export async function profileFromUsername(username: string): Promise<MojangApiRe
 		return await profileFromUsername(username)
 	}
 
-	let data
+	let data: any = null
+	const rawData = await fetchResponse.text()
 	try {
-		data = await fetchResponse.json()
-	} catch {
-		return { uuid: null, username: null }
+		data = JSON.parse(rawData)
+	} catch {}
+
+
+	if (!data?.id) {
+		// return { uuid: null, username: null }
+		return await profileFromUsernameAlternative(username)
 	}
+
 	return {
 		uuid: data.id,
 		username: data.name
 	}
 }
 
+export async function profileFromUsernameAlternative(username: string): Promise<MojangApiResponse> {
+	let fetchResponse: nodeFetch.Response
+
+	try {
+		fetchResponse = await fetch(
+			`https://api.ashcon.app/mojang/v2/user/${username}`,
+			{ agent: () => httpsAgent }
+		)
+	} catch {
+		// if there's an error, wait a second and try again
+		await new Promise((resolve) => setTimeout(resolve, 1000))
+		return await profileFromUsernameAlternative(username)
+	}
+
+	let data
+	try {
+		data = await fetchResponse.json()
+	} catch {
+		return { uuid: null, username: null }
+	}
+	if (!data.uuid)
+		return { uuid: null, username: null }
+	return {
+		uuid: undashUuid(data.uuid),
+		username: data.username
+	}
+}
 
 export async function profileFromUser(user: string): Promise<MojangApiResponse> {
 	if (isUuid(user)) {

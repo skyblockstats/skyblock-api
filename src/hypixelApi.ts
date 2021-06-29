@@ -33,11 +33,11 @@ const baseHypixelAPI = 'https://api.hypixel.net'
 
 
 /** Choose the best current API key */
-export function chooseApiKey(): string {
+export function chooseApiKey(): string | null {
 	// find the api key with the lowest amount of uses
-	let bestKeyUsage: KeyUsage = null
-	let bestKey: string = null
-	for (var key of shuffle(apiKeys)) {
+	let bestKeyUsage: KeyUsage | null = null
+	let bestKey: string | null = null
+	for (let key of shuffle(apiKeys.slice())) {
 		const keyUsage = apiKeyUsage[key]
 
 		// if the key has never been used before, use it
@@ -54,6 +54,19 @@ export function chooseApiKey(): string {
 		}
 	}
 	return bestKey
+}
+
+export function getKeyUsage() {
+	let keyLimit = 0
+	let keyUsage = 0
+	for (let key of Object.values(apiKeyUsage)) {
+		keyLimit += key.limit
+		keyUsage += key.limit - key.remaining
+	}
+	return {
+		limit: keyLimit,
+		usage: keyUsage
+	}
 }
 
 export interface HypixelResponse {
@@ -172,12 +185,12 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 		return await sendApiRequest({ path, key, args })
 	}
 
-	if (fetchResponse.headers['ratelimit-limit'])
+	if (fetchResponse.headers.get('ratelimit-limit'))
 		// remember how many uses it has
 		apiKeyUsage[key] = {
-			remaining: fetchResponse.headers['ratelimit-remaining'],
-			limit: fetchResponse.headers['ratelimit-limit'],
-			reset: Date.now() + parseInt(fetchResponse.headers['ratelimit-reset']) * 1000
+			remaining: parseInt(fetchResponse.headers.get('ratelimit-remaining') ?? '0'),
+			limit: parseInt(fetchResponse.headers.get('ratelimit-limit') ?? '0'),
+			reset: Date.now() + parseInt(fetchResponse.headers.get('ratelimit-reset') ?? '0') * 1000
 		}
 	
 	if (fetchJsonParsed.throttle) {

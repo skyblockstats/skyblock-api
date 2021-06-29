@@ -25,7 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setConstantValues = exports.fetchConstantValues = exports.addMinions = exports.fetchMinions = exports.addSlayers = exports.fetchSlayers = exports.addZones = exports.fetchZones = exports.addSkills = exports.fetchSkills = exports.addCollections = exports.fetchCollections = exports.addStats = exports.fetchStats = exports.addJSONConstants = exports.fetchJSONConstant = void 0;
+exports.setConstantValues = exports.fetchConstantValues = exports.addMinions = exports.fetchSkillXpEasier = exports.fetchSkillXp = exports.fetchMinions = exports.addSlayers = exports.fetchSlayers = exports.addZones = exports.fetchZones = exports.addSkills = exports.fetchSkills = exports.addCollections = exports.fetchCollections = exports.addStats = exports.fetchStats = exports.addJSONConstants = exports.fetchJSONConstant = void 0;
 // we have to do this so we can mock the function from the tests properly
 const constants = __importStar(require("./constants"));
 const node_cache_1 = __importDefault(require("node-cache"));
@@ -57,7 +57,7 @@ async function fetchGithubApi(method, route, headers, json) {
             console.debug('fetching github api', method, route);
         const data = await node_fetch_1.default(githubApiBase + route, {
             agent: () => httpsAgent,
-            body: json ? JSON.stringify(json) : null,
+            body: json ? JSON.stringify(json) : undefined,
             method,
             headers: Object.assign({
                 'Authorization': `token ${process.env.github_token}`
@@ -223,6 +223,14 @@ async function fetchMinions() {
     return await constants.fetchJSONConstant('minions.json');
 }
 exports.fetchMinions = fetchMinions;
+async function fetchSkillXp() {
+    return await constants.fetchJSONConstant('manual/skill_xp.json');
+}
+exports.fetchSkillXp = fetchSkillXp;
+async function fetchSkillXpEasier() {
+    return await constants.fetchJSONConstant('manual/skill_xp_easier.json');
+}
+exports.fetchSkillXpEasier = fetchSkillXpEasier;
 /** Add skills to skyblock-constants. This has caching so it's fine to call many times */
 async function addMinions(addingMinions) {
     await constants.addJSONConstants('minions.json', addingMinions, 'minion');

@@ -13,7 +13,7 @@ import { Item } from './cleaners/skyblock/inventory'
 import * as cached from './hypixelCached'
 import { debug } from '.'
 
-export type Included = 'profiles' | 'player' | 'stats' | 'inventories'
+export type Included = 'profiles' | 'player' | 'stats' | 'inventories' | undefined
 
 // the interval at which the "last_save" parameter updates in the hypixel api, this is 3 minutes
 export const saveInterval = 60 * 3 * 1000
@@ -40,7 +40,6 @@ export async function sendCleanApiRequest({ path, args }, included?: Included[],
 		await new Promise(resolve => setTimeout(resolve, 1000))
 		return await sendCleanApiRequest({ path, args }, included, options)
 	}
-
 	// clean the response
 	return await cleanResponse({ path, data: rawResponse }, options ?? {})
 }
@@ -66,7 +65,7 @@ export interface UserAny {
 }
 
 export interface CleanUser {
-	player: CleanPlayer
+	player: CleanPlayer | null
 	profiles?: CleanProfile[]
 	activeProfile?: string
 	online?: boolean
@@ -80,24 +79,25 @@ export interface CleanUser {
  * @param included lets you choose what is returned, so there's less processing required on the backend
  * used inclusions: player, profiles
  */
-export async function fetchUser({ user, uuid, username }: UserAny, included: Included[]=['player'], customization?: boolean): Promise<CleanUser> {
+export async function fetchUser({ user, uuid, username }: UserAny, included: Included[]=['player'], customization?: boolean): Promise<CleanUser | null> {
 	if (!uuid) {
 		// If the uuid isn't provided, get it
-		uuid = await cached.uuidFromUser(user || username)
+		if (!username && !user) return null
+		uuid = await cached.uuidFromUser((user ?? username)!)
 	}
-	const websiteAccountPromise = customization ? fetchAccount(uuid) : null
 	if (!uuid) {
 		// the user doesn't exist.
 		if (debug) console.debug('error:', user, 'doesnt exist')
 		return null
 	}
+	const websiteAccountPromise = customization ? fetchAccount(uuid) : null
 
 	const includePlayers = included.includes('player')
 	const includeProfiles = included.includes('profiles')
 
-	let profilesData: CleanProfile[]
-	let basicProfilesData: CleanBasicProfile[]
-	let playerData: CleanPlayer
+	let profilesData: CleanProfile[] | undefined
+	let basicProfilesData: CleanBasicProfile[] | undefined
+	let playerData: CleanPlayer | null = null
 
 	if (includePlayers) {
 		playerData = await cached.fetchPlayer(uuid)
@@ -107,31 +107,30 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 		if (playerData)
 			delete playerData.profiles
 	}
-	if (includeProfiles) {
+	if (includeProfiles)
 		profilesData = await cached.fetchSkyblockProfiles(uuid)
-	}
 
-	let activeProfile: CleanProfile = null
+	let activeProfile: CleanProfile
 	let lastOnline: number = 0
 
 	if (includeProfiles) {
-		for (const profile of profilesData) {
-			const member = profile.members.find(member => member.uuid === uuid)
-			if (member.last_save > lastOnline) {
+		for (const profile of profilesData!) {
+			const member = profile.members?.find(member => member.uuid === uuid)
+			if (member && member.last_save > lastOnline) {
 				lastOnline = member.last_save
 				activeProfile = profile
 			}
 		}
 	}
-	let websiteAccount: AccountSchema = undefined
+	let websiteAccount: AccountSchema | null = null
 
-	if (websiteAccountPromise) {
+	if (websiteAccountPromise)
 		websiteAccount = await websiteAccountPromise
-	}
+
 	return {
-		player: playerData ?? null,
+		player: playerData,
 		profiles: profilesData ?? basicProfilesData,
-		activeProfile: includeProfiles ? activeProfile?.uuid : undefined,
+		activeProfile: includeProfiles ? activeProfile!?.uuid : undefined,
 		online: includeProfiles ? lastOnline > (Date.now() - saveInterval): undefined,
 		customization: websiteAccount?.customization
 	}
@@ -144,20 +143,25 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
  * @param profile A profile name or profile uuid
  * @param customization Whether stuff like the user's custom background will be returned
  */
-export async function fetchMemberProfile(user: string, profile: string, customization: boolean): Promise<CleanMemberProfile> {
+export async function fetchMemberProfile(user: string, profile: string, customization: boolean): Promise<CleanMemberProfile | null> {
 	const playerUuid = await cached.uuidFromUser(user)
+	if (!playerUuid) return null
 	// we don't await the promise immediately so it can load while we do other stuff
 	const websiteAccountPromise = customization ? fetchAccount(playerUuid) : null
 	const profileUuid = await cached.fetchProfileUuid(user, profile)
 
-	// if the profile doesn't have an id, just return
+	// if the profile or player doesn't have an id, just return
 	if (!profileUuid) return null
+	if (!playerUuid) return null
 
 	const player = await cached.fetchPlayer(playerUuid)
+
+	if (!player) return null // this should never happen, but if it does just return null
 
 	const cleanProfile = await cached.fetchProfile(playerUuid, profileUuid) as CleanFullProfileBasicMembers
 
 	const member = cleanProfile.members.find(m => m.uuid === playerUuid)
+	if (!member) return null // this should never happen, but if it does just return null
 
 	// remove unnecessary member data
 	const simpleMembers: CleanBasicMember[] = cleanProfile.members.map(m => {
@@ -172,7 +176,7 @@ export async function fetchMemberProfile(user: string, profile: string, customiz
 
 	cleanProfile.members = simpleMembers
 
-	let websiteAccount: AccountSchema = undefined
+	let websiteAccount: AccountSchema | null = null
 
 	if (websiteAccountPromise)
 		websiteAccount = await websiteAccountPromise
@@ -180,7 +184,7 @@ export async function fetchMemberProfile(user: string, profile: string, customiz
 	return {
 		member: {
 			// the profile name is in member rather than profile since they sometimes differ for each member
-			profileName: cleanProfile.name,
+			profileName: cleanProfile.name!,
 			// add all the member data
 			...member,
 			// add all other data relating to the hypixel player, such as username, rank, etc
@@ -202,7 +206,7 @@ export async function fetchMemberProfile(user: string, profile: string, customiz
 			path: 'skyblock/profile',
 			args: { profile: profileUuid }
 		},
-		null,
+		undefined,
 		{ mainMemberUuid: playerUuid }
 	)
 
@@ -225,7 +229,7 @@ export async function fetchMemberProfile(user: string, profile: string, customiz
 			path: 'skyblock/profile',
 			args: { profile: profileUuid }
 		},
-		null,
+		undefined,
 		{ basic: true }
 	)
 
@@ -239,7 +243,7 @@ export async function fetchMemberProfilesUncached(playerUuid: string): Promise<C
 		args: {
 			uuid: playerUuid
 		}},
-		null,
+		undefined,
 		{
 			// only the inventories for the main player are generated, this is for optimization purposes
 			mainMemberUuid: playerUuid

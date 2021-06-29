@@ -84,7 +84,7 @@ export interface Collection {
 }
 
 // get a category name (farming) from a collection name (wheat)
-function getCategory(collectionName): CollectionCategory {
+function getCategory(collectionName): CollectionCategory | undefined {
 	for (const categoryName in COLLECTIONS) {
 		const categoryItems = COLLECTIONS[categoryName]
 		if (categoryItems.includes(collectionName))
@@ -111,23 +111,23 @@ export function cleanCollections(data: any): Collection[] {
 
 	// collection names show up like this: { LOG: 49789, LOG:2: 26219, MUSHROOM_COLLECTION: 2923}
 	// these values are different for each player in a coop
-	const playerCollectionValuesRaw: { [ key in hypixelItemNames ]: number } = data?.collection ?? {}
-	const playerCollectionValues: Collection[] = []
+	const playerCollectionXpsRaw: { [ key in hypixelItemNames ]: number } = data?.collection ?? {}
+	const playerCollections: Collection[] = []
 	
-	for (const collectionNameRaw in playerCollectionValuesRaw) {
-		const collectionValue: number = playerCollectionValuesRaw[collectionNameRaw]
+	for (const collectionNameRaw in playerCollectionXpsRaw) {
+		const collectionXp: number = playerCollectionXpsRaw[collectionNameRaw]
 		const collectionName = cleanItemId(collectionNameRaw)
 		const collectionLevel = playerCollectionTiers[collectionName]
 		const collectionCategory = getCategory(collectionName) ?? 'unknown'
 
 		// in some very weird cases the collection level will be undefined, we should ignore these collections
 		if (collectionLevel !== undefined)
-			playerCollectionValues.push({
+			playerCollections.push({
 				name: collectionName,
-				xp: collectionValue,
+				xp: collectionXp,
 				level: collectionLevel,
 				category: collectionCategory
 			})
 	}
-	return playerCollectionValues
+	return playerCollections
 }

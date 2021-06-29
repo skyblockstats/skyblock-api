@@ -56,16 +56,23 @@ app.get('/', async (req, res) => {
     res.json({
         ok: true,
         uptimeHours: (currentTime - startTime) / 1000 / 60 / 60,
-        finishedCachingRawLeaderboards: database_1.finishedCachingRawLeaderboards
+        finishedCachingRawLeaderboards: database_1.finishedCachingRawLeaderboards,
+        leaderboardUpdateMemberQueueSize: database_1.leaderboardUpdateMemberQueue.size,
+        leaderboardUpdateProfileQueueSize: database_1.leaderboardUpdateProfileQueue.size,
+        // key: getKeyUsage()
     });
 });
 app.get('/player/:user', async (req, res) => {
     try {
-        res.json(await hypixel_1.fetchUser({ user: req.params.user }, [req.query.basic === 'true' ? undefined : 'profiles', 'player'], req.query.customization === 'true'));
+        const user = await hypixel_1.fetchUser({ user: req.params.user }, [req.query.basic === 'true' ? undefined : 'profiles', 'player'], req.query.customization === 'true');
+        if (user)
+            res.json(user);
+        else
+            res.status(404).json({ error: true });
     }
     catch (err) {
         console.error(err);
-        res.json({ 'error': true });
+        res.json({ error: true });
     }
 });
 app.get('/discord/:id', async (req, res) => {
@@ -79,11 +86,15 @@ app.get('/discord/:id', async (req, res) => {
 });
 app.get('/player/:user/:profile', async (req, res) => {
     try {
-        res.json(await hypixel_1.fetchMemberProfile(req.params.user, req.params.profile, req.query.customization === 'true'));
+        const profile = await hypixel_1.fetchMemberProfile(req.params.user, req.params.profile, req.query.customization === 'true');
+        if (profile)
+            res.json(profile);
+        else
+            res.status(404).json({ error: true });
     }
     catch (err) {
         console.error(err);
-        res.json({ 'error': true });
+        res.json({ error: true });
     }
 });
 app.get('/player/:user/:profile/leaderboards', async (req, res) => {
@@ -125,7 +136,12 @@ app.get('/constants', async (req, res) => {
 app.post('/accounts/createsession', async (req, res) => {
     try {
         const { code } = req.body;
-        const { access_token: accessToken, refresh_token: refreshToken } = await discord.exchangeCode(`${mainSiteUrl}/loggedin`, code);
+        const codeExchange = await discord.exchangeCode(`${mainSiteUrl}/loggedin`, code);
+        if (!codeExchange) {
+            res.json({ ok: false, error: 'discord_client_secret isn\'t in env' });
+            return;
+        }
+        const { access_token: accessToken, refresh_token: refreshToken } = codeExchange;
         if (!accessToken)
             // access token is invalid :(
             return res.json({ ok: false });
@@ -141,6 +157,8 @@ app.post('/accounts/session', async (req, res) => {
     try {
         const { uuid } = req.body;
         const session = await database_1.fetchSession(uuid);
+        if (!session)
+            return res.json({ ok: false });
         const account = await database_1.fetchAccountFromDiscord(session.discord_user.id);
         res.json({ session, account });
     }

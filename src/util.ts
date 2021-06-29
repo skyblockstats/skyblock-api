@@ -11,7 +11,7 @@ export function jsonToQuery(data): string {
     return Object.entries(data || {}).map(e => e.join('=')).join('&')
 }
 
-export function shuffle(a): string {
+export function shuffle<T>(a: T[]): T[] {
     for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
         ;[a[i], a[j]] = [a[j], a[i]]
@@ -61,7 +61,7 @@ export const minecraftColorCodes: { [ key: string ]: string } = {
  * For example: blue -> 9
  * @param colorName The name of the color (blue, red, aqua, etc)
  */
-export function colorCodeFromName(colorName: string): string {
+export function colorCodeFromName(colorName: string): string | undefined {
     const hexColor = minecraftColorCodes[colorName.toLowerCase()]
     for (const key in minecraftColorCodes) {
         const value = minecraftColorCodes[key]

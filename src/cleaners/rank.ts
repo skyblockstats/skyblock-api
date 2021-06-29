@@ -10,7 +10,7 @@ const rankColors: { [ name: string ]: string } = {
 	'MVP++': '6',
 	'YOUTUBE': 'c',
 	'HELPER': '9',
-	'MODERATOR': '2',
+	'MOD': '2',
 	'GM': '2',
 	'ADMIN': 'c'
 }
@@ -30,12 +30,13 @@ export function cleanRank({
 	rank,
 	prefix
 }: HypixelPlayer): CleanRank {
-	let name
-	let color
-	let colored
+	let name: string | undefined
+	let color: string
+	let colored: string
+	let bracketColor: string | undefined
 	if (prefix) { // derive values from prefix
 		colored = prefix
-		color = minecraftColorCodes[colored.match(/§./)[0][1]]
+		color = minecraftColorCodes[colored.match(/§./)![0][1]]
 		name = colored.replace(/§./g, '').replace(/[\[\]]/g, '')
 	} else {
 		if (monthlyPackageRank && monthlyPackageRank !== 'NONE')
@@ -54,9 +55,13 @@ export function cleanRank({
 			// YouTube rank is called YouTuber, change this to the proper name
 			case 'YOUTUBER':
 				name = 'YOUTUBE'
+				bracketColor = 'c'
 				break
 			case 'GAME_MASTER':
 				name = 'GM'
+				break
+			case 'MODERATOR':
+				name = 'MOD'
 				break
 			case undefined:
 				name = 'NONE'
@@ -65,12 +70,23 @@ export function cleanRank({
 
 		const plusColor = rankPlusColor ? colorCodeFromName(rankPlusColor) : null
 		color = minecraftColorCodes[rankColors[name]]
-		const rankColorPrefix = rankColors[name] ? '§' + rankColors[name] : ''
+		let rankColorPrefix = rankColors[name] ? '§' + rankColors[name] : ''
+
+		// the text is white, but only in the prefix
+		if (name === 'YOUTUBE')
+			rankColorPrefix = '§f'
+
 		const nameWithoutPlus = name.split('+')[0]
 		const plusesInName = '+'.repeat(name.split('+').length - 1)
 		if (plusColor && plusesInName.length >= 1)
-			colored = `${rankColorPrefix}[${nameWithoutPlus}§${plusColor}${plusesInName}${rankColorPrefix}]`
+			if (bracketColor)
+				colored = `§${bracketColor}[${rankColorPrefix}${nameWithoutPlus}§${plusColor}${plusesInName}${rankColorPrefix}§${bracketColor}]`
+			else
+				colored = `${rankColorPrefix}[${nameWithoutPlus}§${plusColor}${plusesInName}${rankColorPrefix}]`
 		else if (name !== 'NONE')
+			if (bracketColor)
+				colored = `§${bracketColor}[${rankColorPrefix}${name}§${bracketColor}]`
+			else
 			colored = `${rankColorPrefix}[${name}]`
 		else
 			// nons don't have a prefix

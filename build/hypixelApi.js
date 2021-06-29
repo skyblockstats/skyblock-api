@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendApiRequest = exports.chooseApiKey = void 0;
+exports.sendApiRequest = exports.getKeyUsage = exports.chooseApiKey = void 0;
 /**
  * Fetch the raw Hypixel API
  */
@@ -27,7 +27,7 @@ function chooseApiKey() {
     // find the api key with the lowest amount of uses
     let bestKeyUsage = null;
     let bestKey = null;
-    for (var key of util_1.shuffle(apiKeys)) {
+    for (let key of util_1.shuffle(apiKeys.slice())) {
         const keyUsage = apiKeyUsage[key];
         // if the key has never been used before, use it
         if (!keyUsage)
@@ -44,8 +44,22 @@ function chooseApiKey() {
     return bestKey;
 }
 exports.chooseApiKey = chooseApiKey;
+function getKeyUsage() {
+    let keyLimit = 0;
+    let keyUsage = 0;
+    for (let key of Object.values(apiKeyUsage)) {
+        keyLimit += key.limit;
+        keyUsage += key.limit - key.remaining;
+    }
+    return {
+        limit: keyLimit,
+        usage: keyUsage
+    };
+}
+exports.getKeyUsage = getKeyUsage;
 /** Send an HTTP request to the Hypixel API */
 async function sendApiRequest({ path, key, args }) {
+    var _a, _b, _c;
     // Send a raw http request to api.hypixel.net, and return the parsed json
     if (key
         // keys arent required for skyblock/auctions
@@ -78,12 +92,12 @@ async function sendApiRequest({ path, key, args }) {
         await new Promise((resolve) => setTimeout(resolve, 30000));
         return await sendApiRequest({ path, key, args });
     }
-    if (fetchResponse.headers['ratelimit-limit'])
+    if (fetchResponse.headers.get('ratelimit-limit'))
         // remember how many uses it has
         apiKeyUsage[key] = {
-            remaining: fetchResponse.headers['ratelimit-remaining'],
-            limit: fetchResponse.headers['ratelimit-limit'],
-            reset: Date.now() + parseInt(fetchResponse.headers['ratelimit-reset']) * 1000
+            remaining: parseInt((_a = fetchResponse.headers.get('ratelimit-remaining')) !== null && _a !== void 0 ? _a : '0'),
+            limit: parseInt((_b = fetchResponse.headers.get('ratelimit-limit')) !== null && _b !== void 0 ? _b : '0'),
+            reset: Date.now() + parseInt((_c = fetchResponse.headers.get('ratelimit-reset')) !== null && _c !== void 0 ? _c : '0') * 1000
         };
     if (fetchJsonParsed.throttle) {
         if (apiKeyUsage[key])

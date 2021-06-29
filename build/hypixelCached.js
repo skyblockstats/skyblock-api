@@ -53,7 +53,7 @@ exports.playerCache = new node_cache_1.default({
     checkperiod: 10,
     useClones: true,
 });
-// cache "basic players" (players without profiles) for 30 minutes
+// cache "basic players" (players without profiles) for 20 minutes
 exports.basicPlayerCache = new lru_cache_1.default({
     max: 10000,
     maxAge: 60 * 30 * 1000,
@@ -97,7 +97,7 @@ async function uuidFromUser(user) {
         const username = exports.usernameCache.get(util_1.undashUuid(user));
         // sometimes the username will be null, return that
         if (username === null)
-            return null;
+            return undefined;
         // if it has .then, then that means its a waitForCacheSet promise. This is done to prevent requests made while it is already requesting
         if (username.then) {
             const { key: uuid, value: _username } = await username;
@@ -136,14 +136,17 @@ exports.uuidFromUser = uuidFromUser;
  * @param user A user can be either a uuid or a username
  */
 async function usernameFromUser(user) {
+    var _a;
     if (exports.usernameCache.has(util_1.undashUuid(user))) {
         if (_1.debug)
             console.debug('Cache hit! usernameFromUser', user);
-        return exports.usernameCache.get(util_1.undashUuid(user));
+        return (_a = exports.usernameCache.get(util_1.undashUuid(user))) !== null && _a !== void 0 ? _a : null;
     }
     if (_1.debug)
         console.debug('Cache miss: usernameFromUser', user);
     let { uuid, username } = await mojang.profileFromUser(user);
+    if (!uuid)
+        return null;
     uuid = util_1.undashUuid(uuid);
     exports.usernameCache.set(uuid, username);
     return username;
@@ -152,6 +155,8 @@ exports.usernameFromUser = usernameFromUser;
 let fetchingPlayers = new Set();
 async function fetchPlayer(user) {
     const playerUuid = await uuidFromUser(user);
+    if (!playerUuid)
+        return null;
     if (exports.playerCache.has(playerUuid))
         return exports.playerCache.get(playerUuid);
     // if it's already in the process of fetching, check every 100ms until it's not fetching the player anymore and fetch it again, since it'll be cached now
@@ -168,7 +173,7 @@ async function fetchPlayer(user) {
     });
     fetchingPlayers.delete(playerUuid);
     if (!cleanPlayer)
-        return;
+        return null;
     // clone in case it gets modified somehow later
     exports.playerCache.set(playerUuid, cleanPlayer);
     exports.usernameCache.set(playerUuid, cleanPlayer.username);
@@ -181,16 +186,21 @@ exports.fetchPlayer = fetchPlayer;
 /** Fetch a player without their profiles. This is heavily cached. */
 async function fetchBasicPlayer(user) {
     const playerUuid = await uuidFromUser(user);
+    if (!playerUuid)
+        return null;
     if (exports.basicPlayerCache.has(playerUuid))
         return exports.basicPlayerCache.get(playerUuid);
     const player = await fetchPlayer(playerUuid);
-    if (!player)
-        console.debug('no player? this should never happen', user);
+    if (!player) {
+        console.debug('no player? this should never happen', user, playerUuid);
+        return null;
+    }
     delete player.profiles;
     return player;
 }
 exports.fetchBasicPlayer = fetchBasicPlayer;
 async function fetchSkyblockProfiles(playerUuid) {
+    var _a;
     if (exports.profilesCache.has(playerUuid)) {
         if (_1.debug)
             console.debug('Cache hit! fetchSkyblockProfiles', playerUuid);
@@ -205,7 +215,7 @@ async function fetchSkyblockProfiles(playerUuid) {
         const basicProfile = {
             name: profile.name,
             uuid: profile.uuid,
-            members: profile.members.map(m => {
+            members: (_a = profile.members) === null || _a === void 0 ? void 0 : _a.map(m => {
                 return {
                     uuid: m.uuid,
                     username: m.username,
@@ -226,7 +236,7 @@ exports.fetchSkyblockProfiles = fetchSkyblockProfiles;
 async function fetchBasicProfiles(user) {
     const playerUuid = await uuidFromUser(user);
     if (!playerUuid)
-        return; // invalid player, just return
+        return null; // invalid player, just return
     if (exports.basicProfilesCache.has(playerUuid)) {
         if (_1.debug)
             console.debug('Cache hit! fetchBasicProfiles', playerUuid);
@@ -236,11 +246,13 @@ async function fetchBasicProfiles(user) {
         console.debug('Cache miss: fetchBasicProfiles', user);
     const player = await fetchPlayer(playerUuid);
     if (!player) {
-        console.log('bruh playerUuid', user, playerUuid);
+        console.log('bruh playerUuid', user);
         return [];
     }
     const profiles = player.profiles;
     exports.basicProfilesCache.set(playerUuid, profiles);
+    if (!profiles)
+        return null;
     // cache the profile names and uuids to profileNameCache because we can
     for (const profile of profiles)
         exports.profileNameCache.set(`${playerUuid}.${profile.uuid}`, profile.name);
@@ -252,6 +264,7 @@ async function fetchBasicProfiles(user) {
  * @param profile A profile name or profile uuid
  */
 async function fetchProfileUuid(user, profile) {
+    var _a;
     // if a profile wasn't provided, return
     if (!profile) {
         if (_1.debug)
@@ -262,10 +275,10 @@ async function fetchProfileUuid(user, profile) {
         console.debug('Cache miss: fetchProfileUuid', user, profile);
     const profiles = await fetchBasicProfiles(user);
     if (!profiles)
-        return; // user probably doesnt exist
+        return null; // user probably doesnt exist
     const profileUuid = util_1.undashUuid(profile);
     for (const p of profiles) {
-        if (p.name.toLowerCase() === profileUuid.toLowerCase())
+        if (((_a = p.name) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === profileUuid.toLowerCase())
             return util_1.undashUuid(p.uuid);
         else if (util_1.undashUuid(p.uuid) === util_1.undashUuid(profileUuid))
             return util_1.undashUuid(p.uuid);
@@ -280,6 +293,8 @@ exports.fetchProfileUuid = fetchProfileUuid;
  */
 async function fetchProfile(user, profile) {
     const playerUuid = await uuidFromUser(user);
+    if (!playerUuid)
+        return null;
     const profileUuid = await fetchProfileUuid(playerUuid, profile);
     if (!profileUuid)
         return null;
@@ -292,6 +307,8 @@ async function fetchProfile(user, profile) {
     if (_1.debug)
         console.debug('Cache miss: fetchProfile', user, profile);
     const profileName = await fetchProfileName(user, profile);
+    if (!profileName)
+        return null; // uhh this should never happen but if it does just return null
     const cleanProfile = await hypixel.fetchMemberProfileUncached(playerUuid, profileUuid);
     // we know the name from fetchProfileName, so set it here
     cleanProfile.name = profileName;
@@ -309,6 +326,8 @@ async function fetchBasicProfileFromUuid(profileUuid) {
         if (_1.debug)
             console.debug('Cache hit! fetchBasicProfileFromUuid', profileUuid);
         const profile = exports.profileCache.get(profileUuid);
+        if (!profile)
+            return undefined;
         return {
             uuid: profile.uuid,
             members: profile.members.map(m => ({
@@ -331,24 +350,29 @@ exports.fetchBasicProfileFromUuid = fetchBasicProfileFromUuid;
  * @param profile A profile uuid or name
  */
 async function fetchProfileName(user, profile) {
+    var _a, _b;
     // we're fetching the profile and player uuid again in case we were given a name, but it's cached so it's not much of a problem
     const profileUuid = await fetchProfileUuid(user, profile);
     if (!profileUuid)
         return null;
     const playerUuid = await uuidFromUser(user);
+    if (!playerUuid)
+        return null;
     if (exports.profileNameCache.has(`${playerUuid}.${profileUuid}`)) {
         // Return the profile name if it's cached
         if (_1.debug)
             console.debug('Cache hit! fetchProfileName', profileUuid);
-        return exports.profileNameCache.get(`${playerUuid}.${profileUuid}`);
+        return (_a = exports.profileNameCache.get(`${playerUuid}.${profileUuid}`)) !== null && _a !== void 0 ? _a : null;
     }
     if (_1.debug)
         console.debug('Cache miss: fetchProfileName', user, profile);
     const basicProfiles = await fetchBasicProfiles(playerUuid);
-    let profileName;
+    if (!basicProfiles)
+        return null;
+    let profileName = null;
     for (const basicProfile of basicProfiles)
         if (basicProfile.uuid === playerUuid)
-            profileName = basicProfile.name;
+            profileName = (_b = basicProfile.name) !== null && _b !== void 0 ? _b : null;
     exports.profileNameCache.set(`${playerUuid}.${profileUuid}`, profileName);
     return profileName;
 }

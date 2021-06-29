@@ -274,7 +274,8 @@
       "skyblock_fully_evolved",
       "tntgames_spleef_repulsor",
       "pit_get_endless_quiver_arrows",
-      "pit_small_streak"
+      "pit_small_streak",
+      "skyblock_bigger_storage_is_seeded"
     ],
     "displayname": "py5",
     "firstLogin": 1424644924085,
@@ -288,12 +289,12 @@
       "py5",
       "b3abus"
     ],
-    "lastLogin": 1620001797684,
-    "networkExp": 14303970,
+    "lastLogin": 1622501301452,
+    "networkExp": 14449927,
     "playername": "py5",
     "stats": {
       "Arcade": {
-        "coins": 2113250,
+        "coins": 2122258,
         "deaths_throw_out": 13,
         "kills_throw_out": 10,
         "music": true,
@@ -396,10 +397,10 @@
           "legacyachievement10",
           "legacyachievement9"
         ],
-        "coins": 162465
+        "coins": 166325
       },
       "TNTGames": {
-        "coins": 66894,
+        "coins": 70584,
         "deaths_bowspleef": 15,
         "tags_bowspleef": 271,
         "new_spleef_repulsor": 1,
@@ -487,7 +488,7 @@
         "shoes_active": "GOLD_SHOES",
         "jacket_active": "GOLD_JACKET",
         "pants_active": "GOLD_PANTS",
-        "coins": 66890,
+        "coins": 70395,
         "lastTourneyAd": 1596934457455
       },
       "SkyWars": {
@@ -569,7 +570,7 @@
         "losses_kit_basic_solo_default": 59,
         "deaths_team_insane": 23,
         "survived_players_kit_mining_team_default": 91,
-        "coins": 599383,
+        "coins": 603673,
         "survived_players_team": 235,
         "losses_team_insane": 22,
         "losses_kit_mining_team_default": 8,
@@ -1170,7 +1171,7 @@
         "melee_kills_lab_kit_mining_team_default": 2
       },
       "MCGO": {
-        "coins": 172085,
+        "coins": 176555,
         "packages": [
           "legacyachievementnewnewnew",
           "achievement_flag_3",
@@ -1205,7 +1206,7 @@
           "achievement_flag_3"
         ],
         "kills": 249,
-        "coins": 73327,
+        "coins": 76832,
         "monthly_kills_b": 110,
         "weekly_kills_b": 225,
         "deaths": 183,
@@ -1248,7 +1249,7 @@
           "achievement_flag_1",
           "achievement_flag_2"
         ],
-        "coins": 70402,
+        "coins": 73907,
         "favorite_slots": "null,null,null",
         "showKillPrefix": true,
         "kills": 38,
@@ -1261,7 +1262,7 @@
         "updated_stats": true,
         "human_deaths": 7,
         "zombie_kills": 22,
-        "coins": 69174,
+        "coins": 72679,
         "vampire_deaths": 20,
         "votes_Cavern": 3,
         "vampire_kills": 13,
@@ -1657,7 +1658,7 @@
         "entity_explosion_final_kills_bedwars": 1
       },
       "HungerGames": {
-        "coins": 119759,
+        "coins": 123789,
         "packages": [
           "fixachievements2",
           "fixachievements1",
@@ -1703,7 +1704,7 @@
         "autoarmor": true
       },
       "Walls": {
-        "coins": 71890,
+        "coins": 75395,
         "monthly_assists_a": 2,
         "assists": 2,
         "weekly_assists_a": 1,
@@ -1712,10 +1713,10 @@
         "weekly_assists_b": 1
       },
       "Arena": {
-        "coins": 66890
+        "coins": 70395
       },
       "Walls3": {
-        "coins": 69430,
+        "coins": 72950,
         "packages": [
           "achievement_fix_flag",
           "legacy_achievement_a"
@@ -1805,13 +1806,13 @@
         "phoenix_wins": 1
       },
       "UHC": {
-        "coins": 60126,
+        "coins": 63301,
         "clearup_achievement": true,
         "saved_stats": true,
         "deaths": 1
       },
       "SuperSmash": {
-        "coins": 113810,
+        "coins": 117850,
         "lastLevel_THE_BULK": 0,
         "active_class": "THE_BULK",
         "win_streak": 0,
@@ -1867,7 +1868,7 @@
         ]
       },
       "SpeedUHC": {
-        "coins": 203305,
+        "coins": 206600,
         "firstJoinLobbyInt": 3,
         "killstreak": 0,
         "win_streak": 0,
@@ -2475,7 +2476,7 @@
       "Duels": {
         "kit_menu_option": "off",
         "sw_duels_kit": "kit_ranked_ranked_champion",
-        "games_played_duels": 16774,
+        "games_played_duels": 16801,
         "show_lb_option": "on",
         "rematch_option_1": "default",
         "duels_recently_played": "BRIDGE_DUEL#SUMO_DUEL#BRIDGE_DUEL",
@@ -2492,17 +2493,17 @@
         "duels_winstreak_best_op_duel": 14,
         "duels_winstreak_best_combo_duel": 6,
         "duels_winstreak_best_classic_duel": 18,
-        "melee_swings": 321294,
-        "losses": 5354,
-        "melee_hits": 113417,
-        "rounds_played": 13033,
+        "melee_swings": 322031,
+        "losses": 5366,
+        "melee_hits": 113648,
+        "rounds_played": 13060,
         "sw_duel_health_regenerated": 6475,
         "sw_duel_losses": 781,
-        "deaths": 7425,
+        "deaths": 7435,
         "sw_duel_damage_dealt": 16893,
-        "health_regenerated": 38179,
+        "health_regenerated": 38180,
         "sw_duel_rounds_played": 2035,
-        "damage_dealt": 166764,
+        "damage_dealt": 166773,
         "sw_duel_deaths": 782,
         "sw_duel_melee_hits": 7860,
         "sw_duel_melee_swings": 23838,
@@ -2514,19 +2515,19 @@
         "combo_duel_deaths": 30,
         "combo_duel_melee_swings": 15388,
         "combo_duel_wins": 32,
-        "wins": 6674,
-        "kills": 6071,
+        "wins": 6689,
+        "kills": 6086,
         "combo_duel_kills": 26,
-        "classic_duel_rounds_played": 7554,
-        "classic_duel_melee_hits": 62256,
-        "classic_duel_health_regenerated": 14787,
-        "classic_duel_damage_dealt": 120525,
-        "classic_duel_melee_swings": 171816,
+        "classic_duel_rounds_played": 7555,
+        "classic_duel_melee_hits": 62262,
+        "classic_duel_health_regenerated": 14788,
+        "classic_duel_damage_dealt": 120534,
+        "classic_duel_melee_swings": 171826,
         "classic_duel_wins": 4204,
-        "bow_shots": 21561,
-        "classic_duel_losses": 3176,
-        "classic_duel_bow_shots": 18254,
-        "classic_duel_deaths": 3176,
+        "bow_shots": 21564,
+        "classic_duel_losses": 3177,
+        "classic_duel_bow_shots": 18257,
+        "classic_duel_deaths": 3177,
         "bow_hits": 8914,
         "classic_duel_bow_hits": 7928,
         "classic_duel_kills": 4176,
@@ -2607,24 +2608,24 @@
         },
         "current_bow_winstreak": 0,
         "best_bow_winstreak": 1,
-        "coins": 451678,
+        "coins": 458208,
         "bow_duel_wins": 1,
         "bow_duel_kills": 1,
-        "current_sumo_winstreak": 4,
-        "sumo_duel_losses": 759,
-        "sumo_duel_melee_swings": 64266,
-        "sumo_duel_rounds_played": 1919,
-        "sumo_duel_melee_hits": 20398,
-        "sumo_duel_deaths": 689,
+        "current_sumo_winstreak": 0,
+        "sumo_duel_losses": 770,
+        "sumo_duel_melee_swings": 64993,
+        "sumo_duel_rounds_played": 1945,
+        "sumo_duel_melee_hits": 20623,
+        "sumo_duel_deaths": 698,
         "best_sumo_winstreak": 18,
-        "sumo_duel_wins": 849,
+        "sumo_duel_wins": 864,
         "sumo_tournament_deaths": 51,
         "sumo_tournament_rounds_played": 74,
         "sumo_tournament_melee_hits": 628,
         "sumo_tournament_melee_swings": 1066,
         "sumo_tournament_losses": 51,
         "sumo_tournament_kills": 7,
-        "sumo_duel_kills": 713,
+        "sumo_duel_kills": 728,
         "duels_winstreak_best_sumo_duel": 17,
         "sw_duels_kit_new": "kit_ranked_ranked_champion",
         "sw_duel_armorer_kit_wins": 6,
@@ -2710,7 +2711,7 @@
           "projectile_trail_water"
         ],
         "challenges_enabled": true,
-        "duels_chests": 6,
+        "duels_chests": 7,
         "Duels_openedChests": 107,
         "Duels_openedCommons": 62,
         "Duels_openedRares": 34,
@@ -2878,7 +2879,7 @@
         "bridge_tournament_deaths": 3,
         "duels_winstreak_best_bridge_duel": 4,
         "best_winstreak_mode_sumo_duel": 18,
-        "current_winstreak_mode_sumo_duel": 4,
+        "current_winstreak_mode_sumo_duel": 0,
         "all_modes_master_title_prestige": 5,
         "bridge_duel_bridge_deaths": 955,
         "bridge_duel_bridge_kills": 510,
@@ -2893,7 +2894,7 @@
         "blitz_duel_blocks_placed": 25,
         "duels_recently_played2": "SW_DUEL#SUMO_DUEL#OP_DUEL",
         "bridge_duel": true,
-        "leaderboardPage_win_streak": 0,
+        "leaderboardPage_win_streak": 1,
         "current_winstreak_mode_bridge_four": 0,
         "bridge_four_blocks_placed": 99,
         "bridge_four_bridge_deaths": 3,
@@ -6543,7 +6544,7 @@
     "timePlaying": 30,
     "uuid": "6536bfed869548fd83a1ecd24cf2a0fd",
     "eugene": {
-      "dailyTwoKExp": 1616095769320
+      "dailyTwoKExp": 1621125386796
     },
     "quests": {
       "gingerbread_bling_bling": {
@@ -7096,8 +7097,15 @@
           },
           {
             "time": 1619929233490
+          },
+          {
+            "time": 1620944032412
           }
-        ]
+        ],
+        "active": {
+          "objectives": {},
+          "started": 1621036060760
+        }
       },
       "duels_killer": {
         "completions": [
@@ -7364,13 +7372,14 @@
           },
           {
             "time": 1619845316356
+          },
+          {
+            "time": 1620943937050
           }
         ],
         "active": {
-          "objectives": {
-            "kill": 4
-          },
-          "started": 1619928730661
+          "objectives": {},
+          "started": 1621036060760
         }
       },
       "duels_winner": {
@@ -7659,8 +7668,15 @@
           },
           {
             "time": 1619928822304
+          },
+          {
+            "time": 1620943937050
           }
-        ]
+        ],
+        "active": {
+          "objectives": {},
+          "started": 1621036060760
+        }
       },
       "duels_weekly_kills": {
         "completions": [
@@ -7717,13 +7733,14 @@
           },
           {
             "time": 1618882258575
+          },
+          {
+            "time": 1620944251790
           }
         ],
         "active": {
-          "objectives": {
-            "kill": 91
-          },
-          "started": 1619224017835
+          "objectives": {},
+          "started": 1621036060760
         }
       },
       "duels_weekly_wins": {
@@ -7803,7 +7820,7 @@
         ],
         "active": {
           "objectives": {
-            "win": 17
+            "win": 32
           },
           "started": 1619837300742
         }
@@ -8363,11 +8380,11 @@
       "warlords_paladin_level": 0,
       "quake_kills": 251,
       "quake_wins": 3,
-      "general_challenger": 1027,
+      "general_challenger": 1037,
       "quake_killing_sprees": 8,
-      "general_wins": 6802,
+      "general_wins": 6817,
       "copsandcrims_bomb_specialist": 0,
-      "general_quest_master": 393,
+      "general_quest_master": 397,
       "tntgames_bow_spleef_wins": 0,
       "tntgames_tnt_run_wins": 5,
       "tntgames_wizards_wins": 0,
@@ -8414,7 +8431,7 @@
       "buildbattle_build_battle_score": 610,
       "buildbattle_guess_the_build_guesses": 35,
       "bedwars_loot_box": 17,
-      "duels_duels_winner": 6689,
+      "duels_duels_winner": 6704,
       "duels_duels_win_streak": 20,
       "duels_duels_trophies": 3,
       "gingerbread_banker": 49675,
@@ -8448,10 +8465,10 @@
       "skyblock_gatherer": 23,
       "skyblock_harvester": 18,
       "skyblock_treasury": 59,
-      "skyblock_minion_lover": 244,
+      "skyblock_minion_lover": 266,
       "skyblock_combat": 19,
       "tntgames_block_runner": 41625,
-      "skyblock_angler": 28,
+      "skyblock_angler": 29,
       "skyblock_augmentation": 14,
       "halloween2017_pumpkinator": 11,
       "christmas2017_advent_2019": 17,
@@ -8603,7 +8620,7 @@
         "specialoccasion_summer_2016_skull_portable_grill"
       ],
       "playerSettings": {
-        "VISIBILITY": "IntegerState-0",
+        "VISIBILITY": "IntegerState-4",
         "customVisibility": 1,
         "BORDER": "BooleanState-true",
         "TIPS": "BooleanState-false"
@@ -8699,35 +8716,35 @@
       "last_mcmp": 1519590874735
     },
     "mcVersionRp": "1.11.2",
-    "karma": 9896215,
+    "karma": 10231740,
     "petConsumables": {
       "CARROT_ITEM": 297,
-      "FEATHER": 914,
+      "FEATHER": 919,
       "BREAD": 325,
-      "SLIME_BALL": 957,
-      "RED_ROSE": 298,
-      "COOKED_BEEF": 306,
-      "WATER_BUCKET": 1881,
+      "SLIME_BALL": 959,
+      "RED_ROSE": 299,
+      "COOKED_BEEF": 307,
+      "WATER_BUCKET": 1885,
       "MELON": 339,
-      "WOOD_SWORD": 995,
-      "STICK": 986,
-      "MILK_BUCKET": 1940,
-      "PORK": 338,
-      "GOLD_RECORD": 949,
-      "PUMPKIN_PIE": 331,
+      "WOOD_SWORD": 996,
+      "STICK": 987,
+      "MILK_BUCKET": 1943,
+      "PORK": 339,
+      "GOLD_RECORD": 950,
+      "PUMPKIN_PIE": 332,
       "LEASH": 979,
-      "LAVA_BUCKET": 1926,
+      "LAVA_BUCKET": 1929,
       "BONE": 337,
-      "WHEAT": 302,
+      "WHEAT": 303,
       "BAKED_POTATO": 303,
-      "HAY_BLOCK": 321,
+      "HAY_BLOCK": 322,
       "RAW_FISH": 299,
-      "MAGMA_CREAM": 331,
+      "MAGMA_CREAM": 333,
       "ROTTEN_FLESH": 296,
-      "CAKE": 320,
-      "APPLE": 302,
+      "CAKE": 321,
+      "APPLE": 303,
       "MUSHROOM_SOUP": 321,
-      "COOKIE": 314
+      "COOKIE": 316
     },
     "levelingReward_0": true,
     "levelingReward_1": true,
@@ -9001,11 +9018,11 @@
         }
       ]
     },
-    "lastAdsenseGenerateTime": 1616095765770,
-    "lastLogout": 1620002036251,
+    "lastAdsenseGenerateTime": 1621125384799,
+    "lastLogout": 1622501380845,
     "friendRequestsUuid": [],
     "levelingReward_4": true,
-    "channel": "ALL",
+    "channel": "PARTY",
     "newPackageRank": "MVP_PLUS",
     "levelUp_VIP": 1505951821790,
     "currentPet": "SLIME_SMALL",
@@ -9105,7 +9122,7 @@
         "BUILD_BATTLE__top_3_challenge": 12,
         "SKYWARS__rush_challenge": 36,
         "BEDWARS__support": 28,
-        "DUELS__feed_the_void_challenge": 695,
+        "DUELS__feed_the_void_challenge": 705,
         "MURDER_MYSTERY__murder_spree": 15,
         "MURDER_MYSTERY__sherlock": 1,
         "MURDER_MYSTERY__hero": 1,
@@ -9174,7 +9191,7 @@
       }
     },
     "levelingReward_31": true,
-    "achievementPoints": 3675,
+    "achievementPoints": 3700,
     "levelingReward_32": true,
     "levelingReward_33": true,
     "levelingReward_34": true,
@@ -9268,6 +9285,13 @@
         "MVP_PLUS": true
       },
       "3-2021": {
+        "REGULAR": true,
+        "VIP": true,
+        "VIP_PLUS": true,
+        "MVP": true,
+        "MVP_PLUS": true
+      },
+      "5-2021": {
         "REGULAR": true,
         "VIP": true,
         "VIP_PLUS": true,
@@ -9370,7 +9394,6 @@
     "levelingReward_97": true,
     "levelingReward_98": true,
     "levelingReward_99": true,
-    "mostRecentGameType": "DUELS",
     "adventRewards2017": {
       "day9": 1512838283610,
       "day15": 1513379822711,
@@ -9396,6 +9419,7 @@
       "day19": 1576799550122,
       "day20": 1576893108869,
       "day21": 1576906795987
-    }
+    },
+    "mostRecentGameType": "PROTOTYPE"
   }
 }

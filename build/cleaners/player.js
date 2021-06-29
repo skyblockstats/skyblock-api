@@ -9,7 +9,7 @@ async function cleanPlayerResponse(data) {
     var _a, _b;
     // Cleans up a 'player' api response
     if (!data)
-        return; // bruh
+        return null; // bruh
     return {
         uuid: util_1.undashUuid(data.uuid),
         username: data.displayname,

@@ -25,7 +25,7 @@ export interface CleanFullProfileBasicMembers extends CleanProfile {
 /** Return a `CleanProfile` instead of a `CleanFullProfile`, useful when we need to get members but don't want to waste much ram */
 export async function cleanSkyblockProfileResponseLighter(data): Promise<CleanProfile> {
     // We use Promise.all so it can fetch all the usernames at once instead of waiting for the previous promise to complete
-    const promises: Promise<CleanBasicMember>[] = []
+    const promises: Promise<CleanBasicMember | null>[] = []
 
     for (const memberUUID in data.members) {
         const memberRaw = data.members[memberUUID]
@@ -34,7 +34,7 @@ export async function cleanSkyblockProfileResponseLighter(data): Promise<CleanPr
         promises.push(cleanSkyBlockProfileMemberResponseBasic(memberRaw))
     }
 
-    const cleanedMembers: CleanBasicMember[] = await Promise.all(promises)
+    const cleanedMembers: CleanBasicMember[] = (await Promise.all(promises)).filter(m => m) as CleanBasicMember[]
 
     return {
         uuid: data.profile_id,
@@ -48,7 +48,7 @@ export async function cleanSkyblockProfileResponseLighter(data): Promise<CleanPr
  */
 export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptions): Promise<CleanFullProfile|CleanProfile> {
     // We use Promise.all so it can fetch all the users at once instead of waiting for the previous promise to complete
-    const promises: Promise<CleanMember>[] = []
+    const promises: Promise<CleanMember | null>[] = []
     
     for (const memberUUID in data.members) {
         const memberRaw = data.members[memberUUID]
@@ -62,7 +62,7 @@ export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptio
         ))
     }
 
-    const cleanedMembers: CleanMember[] = (await Promise.all(promises)).filter(m => m !== null && m !== undefined)
+    const cleanedMembers: CleanMember[] = (await Promise.all(promises)).filter(m => m !== null && m !== undefined) as CleanMember[]
 
     if (options?.basic) {
         return {

@@ -89,7 +89,7 @@ function combineMinionArrays(minions) {
                 // This should never happen, but in case the length of `minion.levels` is longer than
                 // `matchingMinionReference.levels`, then it should be extended to be equal length
                 while (matchingMinionReference.levels.length < minion.levels.length)
-                    matchingMinionReference.levels.push(null);
+                    matchingMinionReference.levels.push(false);
                 for (let i = 0; i < minion.levels.length; i++) {
                     if (minion.levels[i])
                         matchingMinionReference.levels[i] = true;

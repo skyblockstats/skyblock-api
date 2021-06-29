@@ -13,6 +13,10 @@ const httpsAgent = new https_1.Agent({
 async function exchangeCode(redirectUri, code) {
     const API_ENDPOINT = 'https://discord.com/api/v6';
     const CLIENT_SECRET = process.env.discord_client_secret;
+    if (!CLIENT_SECRET) {
+        console.error('discord_client_secret isn\'t in env, couldn\'t login with discord');
+        return null;
+    }
     const data = {
         'client_id': DISCORD_CLIENT_ID,
         'client_secret': CLIENT_SECRET,

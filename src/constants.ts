@@ -40,7 +40,7 @@ async function fetchGithubApi(method: string, route: string, headers?: any, json
 			githubApiBase + route,
 			{
 				agent: () => httpsAgent,
-				body: json ? JSON.stringify(json) : null,
+				body: json ? JSON.stringify(json) : undefined,
 				method,
 				headers: Object.assign({
 					'Authorization': `token ${process.env.github_token}`
@@ -78,7 +78,7 @@ function fetchFile(path: string): Promise<GithubFile> {
 	return new Promise(resolve => {
 		queue.enqueue(async() => {
 			if (fileCache.has(path))
-				return resolve(fileCache.get(path))
+				return resolve(fileCache.get(path)!)
 
 			const r = await fetchGithubApi(
 				'GET',
@@ -225,6 +225,14 @@ export async function addSlayers(addingSlayers: string[]): Promise<void> {
 /** Fetch all the known SkyBlock slayer names as an array of strings */
 export async function fetchMinions(): Promise<string[]> {
 	return await constants.fetchJSONConstant('minions.json')
+}
+
+export async function fetchSkillXp(): Promise<number[]> {
+	return await constants.fetchJSONConstant('manual/skill_xp.json')
+}
+
+export async function fetchSkillXpEasier(): Promise<number[]> {
+	return await constants.fetchJSONConstant('manual/skill_xp_easier.json')
 }
 
 /** Add skills to skyblock-constants. This has caching so it's fine to call many times */
