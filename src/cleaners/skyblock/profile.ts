@@ -46,10 +46,10 @@ export async function cleanSkyblockProfileResponseLighter(data): Promise<CleanPr
 /**
  * This function is somewhat costly and shouldn't be called often. Use cleanSkyblockProfileResponseLighter if you don't need all the data
  */
-export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptions): Promise<CleanFullProfile|CleanProfile> {
+export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptions): Promise<CleanFullProfile | CleanProfile | null> {
     // We use Promise.all so it can fetch all the users at once instead of waiting for the previous promise to complete
     const promises: Promise<CleanMember | null>[] = []
-    
+    if (!data) return null
     for (const memberUUID in data.members) {
         const memberRaw = data.members[memberUUID]
         memberRaw.uuid = memberUUID

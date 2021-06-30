@@ -48,6 +48,8 @@ exports.cleanSkyblockProfileResponseLighter = cleanSkyblockProfileResponseLighte
 async function cleanSkyblockProfileResponse(data, options) {
     // We use Promise.all so it can fetch all the users at once instead of waiting for the previous promise to complete
     const promises = [];
+    if (!data)
+        return null;
     for (const memberUUID in data.members) {
         const memberRaw = data.members[memberUUID];
         memberRaw.uuid = memberUUID;
