@@ -20,7 +20,7 @@ export interface AuctionsResponse {
 
 async function cleanSkyBlockAuction(rawAuction: any): Promise<Auction> {
 	const currentBid = rawAuction.highest_bid_amount || rawAuction.starting_bid
-	const nextBid = rawAuction.highest_bid_amount === 0 ? currentBid : currentBid * 1.15
+	const nextBid = Math.round(rawAuction.highest_bid_amount === 0 ? currentBid : currentBid * 1.15)
 	return {
 		uuid: rawAuction.uuid,
 		sellerUuid: rawAuction.auctioneer,
@@ -35,7 +35,7 @@ async function cleanSkyBlockAuction(rawAuction: any): Promise<Auction> {
 }
 
 export async function cleanSkyBlockAuctionsResponse(data: any): Promise<AuctionsResponse> {
-	const promises = []
+	const promises: Promise<Auction>[] = []
 	for (const rawAuction of data.auctions) {
 		promises.push(cleanSkyBlockAuction(rawAuction))
 	}

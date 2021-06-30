@@ -253,6 +253,6 @@ exports.fetchAllAuctionsUncached = fetchAllAuctionsUncached;
 async function getAuctionLowestBin(item) {
     console.log('ok getting auctions');
     const auctions = await cached.fetchAllAuctions();
-    console.log(auctions);
+    // TODO
 }
 setTimeout(() => { getAuctionLowestBin(null); }, 1000);

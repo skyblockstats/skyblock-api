@@ -5,6 +5,7 @@ import * as constants from './constants'
 import * as discord from './discord'
 import express from 'express'
 import { getKeyUsage } from './hypixelApi'
+import { fetchAllAuctions } from './hypixelCached'
 
 const app = express()
 
@@ -127,6 +128,10 @@ app.get('/constants', async(req, res) => {
 		console.error(err)
 		res.json({ ok: false })
 	}
+})
+
+app.get('/auctions', async(req, res) => {
+	res.json(await fetchAllAuctions())
 })
 
 app.post('/accounts/createsession', async(req, res) => {

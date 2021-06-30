@@ -68,7 +68,7 @@ async function sendApiRequest({ path, key, args }) {
         args.key = key;
     // Construct a url from the base api url, path, and arguments
     const fetchUrl = baseHypixelAPI + '/' + path + '?' + util_1.jsonToQuery(args);
-    let fetchResponse = null;
+    let fetchResponse;
     let fetchJsonParsed;
     // the number of times it's retried the attempt
     let retries = 0;

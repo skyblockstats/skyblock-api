@@ -29,6 +29,7 @@ const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const constants = __importStar(require("./constants"));
 const discord = __importStar(require("./discord"));
 const express_1 = __importDefault(require("express"));
+const hypixelCached_1 = require("./hypixelCached");
 const app = express_1.default();
 exports.debug = true;
 const mainSiteUrl = 'https://skyblock.matdoes.dev';
@@ -132,6 +133,9 @@ app.get('/constants', async (req, res) => {
         console.error(err);
         res.json({ ok: false });
     }
+});
+app.get('/auctions', async (req, res) => {
+    res.json(await hypixelCached_1.fetchAllAuctions());
 });
 app.post('/accounts/createsession', async (req, res) => {
     try {

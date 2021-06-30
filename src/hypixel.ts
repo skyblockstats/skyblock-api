@@ -295,10 +295,10 @@ export async function fetchAllAuctionsUncached(): Promise<AuctionsResponse> {
 }
 
 
-async function getAuctionLowestBin(item: Item) {
+async function getAuctionLowestBin(item: Item | null) {
 	console.log('ok getting auctions')
 	const auctions = await cached.fetchAllAuctions()
-	console.log(auctions)
+	// TODO
 }
 
 

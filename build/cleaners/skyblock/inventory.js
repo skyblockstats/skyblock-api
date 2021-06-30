@@ -60,6 +60,7 @@ function cleanItem(rawItem) {
         reforge: extraAttributes === null || extraAttributes === void 0 ? void 0 : extraAttributes.modifier,
         enchantments: extraAttributes === null || extraAttributes === void 0 ? void 0 : extraAttributes.enchantments,
         anvil_uses: extraAttributes === null || extraAttributes === void 0 ? void 0 : extraAttributes.anvil_uses,
+        // TODO: parse this to be a number, hypixel returns it in this format: 6/24/21 9:32 AM
         timestamp: extraAttributes === null || extraAttributes === void 0 ? void 0 : extraAttributes.timestamp,
         head_texture: headId,
     };
@@ -68,12 +69,11 @@ function cleanItems(rawItems) {
     return rawItems.map(cleanItem);
 }
 function cleanItemEncoded(encodedNbt) {
-    return new Promise(resolve => {
+    return new Promise(async (resolve) => {
         const base64Data = base64decode(encodedNbt);
-        nbt.parse(base64Data, false, (err, value) => {
-            const simplifiedNbt = nbt.simplify(value);
-            resolve(cleanItem(simplifiedNbt.i[0]));
-        });
+        const value = await nbt.parse(base64Data);
+        const simplifiedNbt = nbt.simplify(value.parsed);
+        resolve(cleanItem(simplifiedNbt.i[0]));
     });
 }
 exports.cleanItemEncoded = cleanItemEncoded;

@@ -153,7 +153,7 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 	// Construct a url from the base api url, path, and arguments
 	const fetchUrl = baseHypixelAPI + '/' + path + '?' + jsonToQuery(args)
 
-	let fetchResponse: Response = null
+	let fetchResponse: Response
 	let fetchJsonParsed: any
 
 	// the number of times it's retried the attempt
@@ -185,12 +185,12 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 		return await sendApiRequest({ path, key, args })
 	}
 
-	if (fetchResponse.headers.get('ratelimit-limit'))
+	if (fetchResponse!.headers.get('ratelimit-limit'))
 		// remember how many uses it has
 		apiKeyUsage[key] = {
-			remaining: parseInt(fetchResponse.headers.get('ratelimit-remaining') ?? '0'),
-			limit: parseInt(fetchResponse.headers.get('ratelimit-limit') ?? '0'),
-			reset: Date.now() + parseInt(fetchResponse.headers.get('ratelimit-reset') ?? '0') * 1000
+			remaining: parseInt(fetchResponse!.headers.get('ratelimit-remaining') ?? '0'),
+			limit: parseInt(fetchResponse!.headers.get('ratelimit-limit') ?? '0'),
+			reset: Date.now() + parseInt(fetchResponse!.headers.get('ratelimit-reset') ?? '0') * 1000
 		}
 	
 	if (fetchJsonParsed.throttle) {

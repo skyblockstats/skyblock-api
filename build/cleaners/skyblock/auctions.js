@@ -4,7 +4,7 @@ exports.cleanSkyBlockAuctionsResponse = void 0;
 const inventory_1 = require("./inventory");
 async function cleanSkyBlockAuction(rawAuction) {
     const currentBid = rawAuction.highest_bid_amount || rawAuction.starting_bid;
-    const nextBid = rawAuction.highest_bid_amount === 0 ? currentBid : currentBid * 1.15;
+    const nextBid = Math.round(rawAuction.highest_bid_amount === 0 ? currentBid : currentBid * 1.15);
     return {
         uuid: rawAuction.uuid,
         sellerUuid: rawAuction.auctioneer,

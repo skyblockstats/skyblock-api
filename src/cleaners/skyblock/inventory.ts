@@ -70,6 +70,7 @@ function cleanItem(rawItem): Item | null {
 		reforge: extraAttributes?.modifier,
 		enchantments: extraAttributes?.enchantments,
 		anvil_uses: extraAttributes?.anvil_uses,
+		// TODO: parse this to be a number, hypixel returns it in this format: 6/24/21 9:32 AM
 		timestamp: extraAttributes?.timestamp,
 
 		head_texture: headId,
@@ -81,12 +82,11 @@ function cleanItems(rawItems): Inventory {
 }
 
 export function cleanItemEncoded(encodedNbt: string): Promise<Item> {
-	return new Promise(resolve => {
+	return new Promise(async resolve => {
 		const base64Data = base64decode(encodedNbt)
-		nbt.parse(base64Data, false, (err, value) => {
-			const simplifiedNbt = nbt.simplify(value)
-			resolve(cleanItem(simplifiedNbt.i[0]))
-		})
+		const value = await nbt.parse(base64Data)
+		const simplifiedNbt = nbt.simplify(value.parsed)
+		resolve(cleanItem(simplifiedNbt.i[0])!)
 	})
 }
 
