@@ -726,12 +726,8 @@ async function removeBadMemberLeaderboardAttributes(): Promise<void> {
 		}
 	}
 
-	await memberLeaderboardsCollection.deleteMany(
-		{ stats: {} }
-	)
-	await profileLeaderboardsCollection.deleteMany(
-		{ stats: {} }
-	)
+	await memberLeaderboardsCollection.deleteMany({ stats: {} })
+	await profileLeaderboardsCollection.deleteMany({ stats: {} })
 
 }
 
