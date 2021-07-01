@@ -725,6 +725,14 @@ async function removeBadMemberLeaderboardAttributes(): Promise<void> {
 			)
 		}
 	}
+
+	await memberLeaderboardsCollection.deleteMany(
+		{ stats: {} }
+	)
+	await profileLeaderboardsCollection.deleteMany(
+		{ stats: {} }
+	)
+
 }
 
 export let finishedCachingRawLeaderboards = false
