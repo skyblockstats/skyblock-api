@@ -19,7 +19,7 @@ async function cleanSkyblockProfilesResponse(data) {
     for (const profile of data !== null && data !== void 0 ? data : []) {
         promises.push(profile_1.cleanSkyblockProfileResponse(profile));
     }
-    const cleanedProfiles = await Promise.all(promises);
+    const cleanedProfiles = (await Promise.all(promises)).filter(p => p);
     return cleanedProfiles;
 }
 exports.cleanSkyblockProfilesResponse = cleanSkyblockProfilesResponse;

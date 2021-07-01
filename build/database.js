@@ -568,6 +568,8 @@ async function removeBadMemberLeaderboardAttributes() {
             await memberLeaderboardsCollection.updateMany(filter, { '$unset': unsetValue });
         }
     }
+    await memberLeaderboardsCollection.deleteMany({ stats: {} });
+    await profileLeaderboardsCollection.deleteMany({ stats: {} });
 }
 exports.finishedCachingRawLeaderboards = false;
 /** Fetch all the leaderboards, used for caching. Don't call this often! */
