@@ -22,11 +22,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.cleanInventories = exports.INVENTORIES = exports.cleanInventory = exports.cleanItemEncoded = void 0;
 // maybe todo?: create a fast replacement for prismarine-nbt
 const nbt = __importStar(require("prismarine-nbt"));
+const util_1 = require("../../util");
 function base64decode(base64) {
     return Buffer.from(base64, 'base64');
 }
 function cleanItem(rawItem) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w;
     // if the item doesn't have an id, it isn't an item
     if (rawItem.id === undefined)
         return null;
@@ -71,6 +72,7 @@ function cleanItem(rawItem) {
         potion_effectiveness_level: (_t = extraAttributes.enhanced) !== null && _t !== void 0 ? _t : undefined,
         potion_duration_level: (_u = extraAttributes.extended) !== null && _u !== void 0 ? _u : undefined,
         head_texture: headId,
+        tier: util_1.extractItemTier((_w = (_v = itemTag === null || itemTag === void 0 ? void 0 : itemTag.display) === null || _v === void 0 ? void 0 : _v.Lore) !== null && _w !== void 0 ? _w : [])
     };
 }
 function cleanItems(rawItems) {

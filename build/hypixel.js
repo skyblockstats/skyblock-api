@@ -266,4 +266,4 @@ async function getAuctionLowestBin(item) {
     const auctions = await cached.fetchAllAuctions();
     // TODO
 }
-setTimeout(() => { getAuctionLowestBin(null); }, 1000);
+// setTimeout(() => { getAuctionLowestBin(null) }, 1000)

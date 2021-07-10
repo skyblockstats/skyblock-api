@@ -1,4 +1,5 @@
 import { diff as fastMyersDiff } from 'fast-myers-diff'
+import { Tier } from './cleaners/skyblock/inventory'
 
 
 /**
@@ -105,4 +106,13 @@ export function replaceDifferencesWithQuestionMark(string1: string, string2: str
 		resultOffset += (Math.min(replace.length, replaceWith.length) > 0 ? 1 : 0) - (removeEnd-removeStart)
 	}
 	return result.join(' ').replace(/ (§.|[^\w? ]) /gi, '$1')
+}
+
+/** Extract the tier of the item from the lore, or return null if it can't find it */
+export function extractItemTier(lore: string[]): Tier | null {
+	const lastLoreLine = lore[lore.length - 1]?.replace(/§./g, '')?.trim()
+	if (!lastLoreLine) return null
+	const tierFirstWord = lastLoreLine.split(' ')[0] ?? null
+	if (tierFirstWord === 'VERY') return 'VERY SPECIAL' // hopefully they don't add more two word tiers
+	else return tierFirstWord as Tier
 }

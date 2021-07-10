@@ -25,7 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addAuction = exports.getItemUniqueId = exports.updateAccount = exports.fetchAccountFromDiscord = exports.fetchAccount = exports.fetchSession = exports.createSession = exports.finishedCachingRawLeaderboards = exports.queueUpdateDatabaseProfile = exports.queueUpdateDatabaseMember = exports.leaderboardUpdateProfileQueue = exports.leaderboardUpdateMemberQueue = exports.updateDatabaseProfile = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchLeaderboard = exports.fetchProfileLeaderboard = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchSlayerLeaderboards = exports.fetchAllLeaderboardsCategorized = exports.cachedRawLeaderboards = void 0;
+exports.fetchItemPrice = exports.addAuction = exports.getItemUniqueId = exports.updateAccount = exports.fetchAccountFromDiscord = exports.fetchAccount = exports.fetchSession = exports.createSession = exports.finishedCachingRawLeaderboards = exports.queueUpdateDatabaseProfile = exports.queueUpdateDatabaseMember = exports.leaderboardUpdateProfileQueue = exports.leaderboardUpdateMemberQueue = exports.updateDatabaseProfile = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchLeaderboard = exports.fetchProfileLeaderboard = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchSlayerLeaderboards = exports.fetchAllLeaderboardsCategorized = exports.cachedRawLeaderboards = void 0;
 const util_1 = require("./util");
 const stats_1 = require("./cleaners/skyblock/stats");
 const mongodb_1 = require("mongodb");
@@ -622,6 +622,7 @@ async function getItemUniqueId(item, update) {
     const itemUniqueData = {
         i: item.id,
         pt: item.pet_type,
+        t: item.tier,
         pot: item.potion_type,
         potd: item.potion_duration_level,
         pote: item.potion_effectiveness_level,
@@ -654,7 +655,8 @@ async function getItemUniqueId(item, update) {
 }
 exports.getItemUniqueId = getItemUniqueId;
 async function addAuction(auction) {
-    var _a;
+    if (auction.bin)
+        return; // no bin auctions
     console.log('ok added auction', auction.uuid);
     const itemUniqueId = await getItemUniqueId(auction.item, true);
     try {
@@ -664,7 +666,6 @@ async function addAuction(auction) {
             p: auction.bidAmount / auction.item.count,
             r: auction.item.reforge,
             t: new Date(auction.end * 1000),
-            b: (_a = auction.bin) !== null && _a !== void 0 ? _a : false
         });
     }
     catch {
@@ -687,6 +688,9 @@ async function addEndedAuctions() {
         }
     }
 }
+async function fetchItemPrice(item) {
+}
+exports.fetchItemPrice = fetchItemPrice;
 // make sure it's not in a test
 if (!globalThis.isTest) {
     connect().then(() => {

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.replaceDifferencesWithQuestionMark = exports.isUuid = exports.sleep = exports.colorCodeFromName = exports.minecraftColorCodes = exports.shuffle = exports.jsonToQuery = exports.undashUuid = void 0;
+exports.extractItemTier = exports.replaceDifferencesWithQuestionMark = exports.isUuid = exports.sleep = exports.colorCodeFromName = exports.minecraftColorCodes = exports.shuffle = exports.jsonToQuery = exports.undashUuid = void 0;
 const fast_myers_diff_1 = require("fast-myers-diff");
 /**
  * Random utility functions that are not related to Hypixel
@@ -93,3 +93,16 @@ function replaceDifferencesWithQuestionMark(string1, string2) {
     return result.join(' ').replace(/ (§.|[^\w? ]) /gi, '$1');
 }
 exports.replaceDifferencesWithQuestionMark = replaceDifferencesWithQuestionMark;
+/** Extract the tier of the item from the lore, or return null if it can't find it */
+function extractItemTier(lore) {
+    var _a, _b, _c;
+    const lastLoreLine = (_b = (_a = lore[lore.length - 1]) === null || _a === void 0 ? void 0 : _a.replace(/§./g, '')) === null || _b === void 0 ? void 0 : _b.trim();
+    if (!lastLoreLine)
+        return null;
+    const tierFirstWord = (_c = lastLoreLine.split(' ')[0]) !== null && _c !== void 0 ? _c : null;
+    if (tierFirstWord === 'VERY')
+        return 'VERY SPECIAL'; // hopefully they don't add more two word tiers
+    else
+        return tierFirstWord;
+}
+exports.extractItemTier = extractItemTier;

@@ -1,11 +1,12 @@
 // maybe todo?: create a fast replacement for prismarine-nbt
 import * as nbt from 'prismarine-nbt'
+import { extractItemTier } from '../../util'
 
 function base64decode(base64: string): Buffer {
 	return Buffer.from(base64, 'base64')
 }
 
-type Tier = 'COMMON' | 'UNCOMMON' | 'RARE' | 'EPIC' | 'LEGENDARY' | 'MYTHIC' | 'SUPREME' | 'SPECIAL' | 'VERY SPECIAL'
+export type Tier = 'COMMON' | 'UNCOMMON' | 'RARE' | 'EPIC' | 'LEGENDARY' | 'MYTHIC' | 'SUPREME' | 'SPECIAL' | 'VERY SPECIAL'
 
 // TODO: add a "Slot" interface that extends Item but has the count
 export interface Item {
@@ -34,8 +35,8 @@ export interface Item {
 	potion_duration_level?: number
 	potion_effectiveness_level?: number
 
-	// TODO: this isn't extracted automatically atm
-	tier?: Tier
+	/** The item tier (common, legendary, etc). This will only be null if it's impossible to find a tier. */
+	tier: Tier | null
 }
 
 export type Inventory = Item[]
@@ -95,6 +96,7 @@ function cleanItem(rawItem): Item | null {
 		potion_duration_level: extraAttributes.extended ?? undefined,
 
 		head_texture: headId,
+		tier: extractItemTier(itemTag?.display?.Lore ?? [])
 	}
 }
 

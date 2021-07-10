@@ -110,6 +110,26 @@ describe('util', () => {
 			assert.ok(!util.isUuid('6536bfed869548fd83a1ecd24cf2a0f'))
 		})
 	})
+	describe('#extractItemTier()', () => {
+		it('Common accessory', () => {
+			assert.strictEqual(
+				util.extractItemTier(['§7Grants Night Vision I while this', '§7item is in your inventory.', '', '§f§lCOMMON ACCESSORY' ]),
+				'COMMON'
+			)
+		})
+		it('Legendary helmet', () => {
+			assert.strictEqual(
+				util.extractItemTier(['§7Crit Chance: §c+?%', '§7Crit Damage: §c+??%', '', '§7Health: §a+?? HP', '§7Defense: §a+???', '§7Intelligence: §a+??', '', '§6Full Set Bonus: Unstable Blood', '§7Sometimes strikes nearby mobs', '§7with lightning. It\'s unstable!', '', '§6§lLEGENDARY HELMET' ]),
+				'LEGENDARY'
+			)
+		})
+		it('No lore', () => {
+			assert.strictEqual( util.extractItemTier([]), null )
+		})
+		it('Empty lore', () => {
+			assert.strictEqual( util.extractItemTier([ '' ]), null )
+		})
+	})
 })
 
 describe('hypixel', () => {
@@ -150,29 +170,27 @@ describe('hypixel', () => {
 	})
 })
 
-describe('Individual utility things', () => {
-	describe('#levelForSkillXp()', () => {
-		it('0 xp is level 0', () => assert.strictEqual(levelForSkillXp(0, 60), 0))
-		it('49 xp is level 0', () => assert.strictEqual(levelForSkillXp(49, 60), 0))
-		it('50 xp is level 1', () => assert.strictEqual(levelForSkillXp(50, 60), 1))
-		it('174 xp is level 1', () => assert.strictEqual(levelForSkillXp(174, 60), 1))
-		it('175 xp is level 2', () => assert.strictEqual(levelForSkillXp(175, 60), 2))
-		it('176 xp is level 2', () => assert.strictEqual(levelForSkillXp(176, 60), 2))
-		it('55172424 xp is level 49', () => assert.strictEqual(levelForSkillXp(55172424, 60), 49))
-		it('55172425 xp is level 50', () => assert.strictEqual(levelForSkillXp(55172425, 60), 50))
-		it('111672424 xp is level 59', () => assert.strictEqual(levelForSkillXp(111672424, 60), 59))
-		it('111672425 xp is level 60', () => assert.strictEqual(levelForSkillXp(111672425, 60), 60))
-		it('999999999 xp is level 60', () => assert.strictEqual(levelForSkillXp(999999999, 60), 60))
+describe('Level from skill xp', () => {
+	it('0 xp is level 0', () => assert.strictEqual(levelForSkillXp(0, 60), 0))
+	it('49 xp is level 0', () => assert.strictEqual(levelForSkillXp(49, 60), 0))
+	it('50 xp is level 1', () => assert.strictEqual(levelForSkillXp(50, 60), 1))
+	it('174 xp is level 1', () => assert.strictEqual(levelForSkillXp(174, 60), 1))
+	it('175 xp is level 2', () => assert.strictEqual(levelForSkillXp(175, 60), 2))
+	it('176 xp is level 2', () => assert.strictEqual(levelForSkillXp(176, 60), 2))
+	it('55172424 xp is level 49', () => assert.strictEqual(levelForSkillXp(55172424, 60), 49))
+	it('55172425 xp is level 50', () => assert.strictEqual(levelForSkillXp(55172425, 60), 50))
+	it('111672424 xp is level 59', () => assert.strictEqual(levelForSkillXp(111672424, 60), 59))
+	it('111672425 xp is level 60', () => assert.strictEqual(levelForSkillXp(111672425, 60), 60))
+	it('999999999 xp is level 60', () => assert.strictEqual(levelForSkillXp(999999999, 60), 60))
 
-		it('0 xp is level 0 (max 25)', () => assert.strictEqual(levelForSkillXp(0, 25), 0))
-		it('49 xp is level 0 (max 25)', () => assert.strictEqual(levelForSkillXp(49, 25), 0))
-		it('50 xp is level 1 (max 25)', () => assert.strictEqual(levelForSkillXp(50, 25), 1))
-		it('149 xp is level 1 (max 25)', () => assert.strictEqual(levelForSkillXp(149, 25), 1))
-		it('150 xp is level 2 (max 25)', () => assert.strictEqual(levelForSkillXp(150, 25), 2))
-		it('151 xp is level 2 (max 25)', () => assert.strictEqual(levelForSkillXp(151, 25), 2))
-		it('94449 xp is level 24 (max 25)', () => assert.strictEqual(levelForSkillXp(94449, 25), 24))
-		it('94450 xp is level 25 (max 25)', () => assert.strictEqual(levelForSkillXp(94450, 25), 25))
-		it('99999 xp is level 25 (max 25)', () => assert.strictEqual(levelForSkillXp(99999, 25), 25))
-	})
+	it('0 xp is level 0 (max 25)', () => assert.strictEqual(levelForSkillXp(0, 25), 0))
+	it('49 xp is level 0 (max 25)', () => assert.strictEqual(levelForSkillXp(49, 25), 0))
+	it('50 xp is level 1 (max 25)', () => assert.strictEqual(levelForSkillXp(50, 25), 1))
+	it('149 xp is level 1 (max 25)', () => assert.strictEqual(levelForSkillXp(149, 25), 1))
+	it('150 xp is level 2 (max 25)', () => assert.strictEqual(levelForSkillXp(150, 25), 2))
+	it('151 xp is level 2 (max 25)', () => assert.strictEqual(levelForSkillXp(151, 25), 2))
+	it('94449 xp is level 24 (max 25)', () => assert.strictEqual(levelForSkillXp(94449, 25), 24))
+	it('94450 xp is level 25 (max 25)', () => assert.strictEqual(levelForSkillXp(94450, 25), 25))
+	it('99999 xp is level 25 (max 25)', () => assert.strictEqual(levelForSkillXp(99999, 25), 25))
 })
 

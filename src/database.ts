@@ -9,7 +9,7 @@ import { CleanFullProfile } from './cleaners/skyblock/profile'
 import { slayerLevels } from './cleaners/skyblock/slayers'
 import { CleanMember } from './cleaners/skyblock/member'
 import { Auction } from './cleaners/skyblock/auctions'
-import { Item } from './cleaners/skyblock/inventory'
+import { Item, Tier } from './cleaners/skyblock/inventory'
 import { CleanPlayer } from './cleaners/player'
 import * as cached from './hypixelCached'
 import * as constants from './constants'
@@ -114,6 +114,8 @@ interface ItemSchema {
 	i: string
 	/** Pet type */
 	pt: string | undefined
+	/** The tier of the item */
+	t: Tier | null
 	/** The display name for the item, variable parts of the name are replaced with ? */
 	dn: string
 	/** The head texture */
@@ -147,8 +149,6 @@ interface AuctionSchema {
 	p: number
 	/** the reforge of the item */
 	r?: string
-	/** Whether it's a bin auction */
-	b: boolean
 }
 
 let memberLeaderboardsCollection: Collection<DatabaseMemberLeaderboardItem>
@@ -837,6 +837,7 @@ export async function getItemUniqueId<U extends boolean>(item: Item, update: U):
 	const itemUniqueData: FilterQuery<ItemSchema> = {
 		i: item.id,
 		pt: item.pet_type,
+		t: item.tier,
 		pot: item.potion_type,
 		potd: item.potion_duration_level,
 		pote: item.potion_effectiveness_level,
@@ -877,6 +878,7 @@ export async function getItemUniqueId<U extends boolean>(item: Item, update: U):
 }
 
 export async function addAuction(auction: Auction) {
+	if (auction.bin) return // no bin auctions
 	console.log('ok added auction', auction.uuid)
 	const itemUniqueId = await getItemUniqueId(auction.item, true)
 	try {
@@ -886,7 +888,6 @@ export async function addAuction(auction: Auction) {
 			p: auction.bidAmount / auction.item.count,
 			r: auction.item.reforge,
 			t: new Date(auction.end * 1000),
-			b: auction.bin ?? false
 		})
 	} catch {
 		// failed inserting, probably duplicate key
@@ -907,6 +908,10 @@ async function addEndedAuctions() {
 			await addAuction(auction)
 		}
 	}
+}
+
+export async function fetchItemPrice(item: Partial<Item>) {
+	
 }
 
 // make sure it's not in a test

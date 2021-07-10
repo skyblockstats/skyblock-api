@@ -312,4 +312,4 @@ async function getAuctionLowestBin(item: Item | null) {
 }
 
 
-setTimeout(() => { getAuctionLowestBin(null) }, 1000)
+// setTimeout(() => { getAuctionLowestBin(null) }, 1000)
