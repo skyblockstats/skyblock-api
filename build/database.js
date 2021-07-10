@@ -682,7 +682,7 @@ async function addEndedAuctions() {
     console.log(endedAuctions.length, 'ended auctions');
     for (const auction of endedAuctions) {
         // if the auction isn't bin and it was actually bid on, add it to the database
-        if (!previouslyEndedAuctionIdsClone.includes(auction.uuid) && auction.bidAmount) {
+        if (!previouslyEndedAuctionIdsClone.includes(auction.uuid) && !auction.bin && auction.bidAmount) {
             await addAuction(auction);
         }
     }
