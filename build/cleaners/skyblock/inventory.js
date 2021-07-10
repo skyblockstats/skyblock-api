@@ -35,8 +35,6 @@ function cleanItem(rawItem) {
     const damageValue = rawItem.Damage;
     const itemTag = rawItem.tag;
     const extraAttributes = (_a = itemTag === null || itemTag === void 0 ? void 0 : itemTag.ExtraAttributes) !== null && _a !== void 0 ? _a : {};
-    if (extraAttributes.id === 'POTION')
-        console.log(rawItem);
     let headId;
     if (vanillaId === 397) {
         const headDataBase64 = (_e = (_d = (_c = (_b = itemTag === null || itemTag === void 0 ? void 0 : itemTag.SkullOwner) === null || _b === void 0 ? void 0 : _b.Properties) === null || _c === void 0 ? void 0 : _c.textures) === null || _d === void 0 ? void 0 : _d[0]) === null || _e === void 0 ? void 0 : _e.Value;

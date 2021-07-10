@@ -50,8 +50,7 @@ function cleanItem(rawItem): Item | null {
 	const damageValue = rawItem.Damage
 	const itemTag = rawItem.tag
 	const extraAttributes = itemTag?.ExtraAttributes ?? {}
-	if (extraAttributes.id === 'POTION')
-		console.log(rawItem)
+
 	let headId: string | undefined
 
 	if (vanillaId === 397) {

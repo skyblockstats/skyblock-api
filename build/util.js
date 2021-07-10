@@ -79,17 +79,17 @@ function isUuid(string) {
 }
 exports.isUuid = isUuid;
 function replaceDifferencesWithQuestionMark(string1, string2) {
-    const string1split = string1.replace(/([^a-z? ])/gi, ' $1 ').split(' ');
-    const string2split = string2.replace(/([^a-z? ])/gi, ' $1 ').split(' ');
+    const string1split = string1.replace(/(§.|[^\w? ])/gi, ' $1 ').split(' ');
+    const string2split = string2.replace(/(§.|[^\w? ])/gi, ' $1 ').split(' ');
     let result = string1split.slice(); // this will be modified, and we slice to clone it
     let resultOffset = 0;
     const patch = fast_myers_diff_1.diff(string1split, string2split);
     for (const [removeStart, removeEnd, insertStart, insertEnd] of patch) {
-        const replace = string1split.slice(removeStart, removeEnd).join(' ').replace(/ ([^a-z? ]) /gi, '$1');
-        const replaceWith = string2split.slice(insertStart, insertEnd).join(' ').replace(/ ([^a-z? ]) /gi, '$1');
+        const replace = string1split.slice(removeStart, removeEnd).join(' ').replace(/ (§.|[^\w? ]) /gi, '$1');
+        const replaceWith = string2split.slice(insertStart, insertEnd).join(' ').replace(/ (§.|[^\w? ]) /gi, '$1');
         result.splice(resultOffset + removeStart, removeEnd - removeStart, ...(Math.min(replace.length, replaceWith.length) > 0 ? ['?'.repeat(Math.min(replace.length, replaceWith.length))] : []));
         resultOffset += (Math.min(replace.length, replaceWith.length) > 0 ? 1 : 0) - (removeEnd - removeStart);
     }
-    return result.join(' ').replace(/ ([^a-z? ]) /gi, '$1');
+    return result.join(' ').replace(/ (§.|[^\w? ]) /gi, '$1');
 }
 exports.replaceDifferencesWithQuestionMark = replaceDifferencesWithQuestionMark;
