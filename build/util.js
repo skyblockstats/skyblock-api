@@ -1,9 +1,10 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.replaceDifferencesWithQuestionMark = exports.isUuid = exports.sleep = exports.colorCodeFromName = exports.minecraftColorCodes = exports.shuffle = exports.jsonToQuery = exports.undashUuid = void 0;
+const fast_myers_diff_1 = require("fast-myers-diff");
 /**
  * Random utility functions that are not related to Hypixel
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.isUuid = exports.sleep = exports.colorCodeFromName = exports.minecraftColorCodes = exports.shuffle = exports.jsonToQuery = exports.undashUuid = void 0;
 function undashUuid(uuid) {
     return uuid.replace(/-/g, '').toLowerCase();
 }
@@ -77,3 +78,18 @@ function isUuid(string) {
     return undashUuid(string).length === 32;
 }
 exports.isUuid = isUuid;
+function replaceDifferencesWithQuestionMark(string1, string2) {
+    const string1split = string1.replace(/([^a-z? ])/gi, ' $1 ').split(' ');
+    const string2split = string2.replace(/([^a-z? ])/gi, ' $1 ').split(' ');
+    let result = string1split.slice(); // this will be modified, and we slice to clone it
+    let resultOffset = 0;
+    const patch = fast_myers_diff_1.diff(string1split, string2split);
+    for (const [removeStart, removeEnd, insertStart, insertEnd] of patch) {
+        const replace = string1split.slice(removeStart, removeEnd).join(' ').replace(/ ([^a-z? ]) /gi, '$1');
+        const replaceWith = string2split.slice(insertStart, insertEnd).join(' ').replace(/ ([^a-z? ]) /gi, '$1');
+        result.splice(resultOffset + removeStart, removeEnd - removeStart, ...(Math.min(replace.length, replaceWith.length) > 0 ? ['?'.repeat(Math.min(replace.length, replaceWith.length))] : []));
+        resultOffset += (Math.min(replace.length, replaceWith.length) > 0 ? 1 : 0) - (removeEnd - removeStart);
+    }
+    return result.join(' ').replace(/ ([^a-z? ]) /gi, '$1');
+}
+exports.replaceDifferencesWithQuestionMark = replaceDifferencesWithQuestionMark;

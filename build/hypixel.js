@@ -22,7 +22,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchAllAuctionsUncached = exports.fetchMemberProfilesUncached = exports.fetchBasicProfileFromUuidUncached = exports.fetchMemberProfileUncached = exports.fetchMemberProfile = exports.fetchUser = exports.sendCleanApiRequest = exports.maxMinion = exports.saveInterval = void 0;
+exports.fetchAllEndedAuctionsUncached = exports.fetchAllAuctionsUncached = exports.fetchMemberProfilesUncached = exports.fetchBasicProfileFromUuidUncached = exports.fetchMemberProfileUncached = exports.fetchMemberProfile = exports.fetchUser = exports.sendCleanApiRequest = exports.maxMinion = exports.saveInterval = void 0;
 const profile_1 = require("./cleaners/skyblock/profile");
 const database_1 = require("./database");
 const auctions_1 = require("./cleaners/skyblock/auctions");
@@ -55,6 +55,7 @@ async function cleanResponse({ path, data }, options) {
         case 'skyblock/profile': return await profile_1.cleanSkyblockProfileResponse(data.profile, options);
         case 'skyblock/profiles': return await profiles_1.cleanSkyblockProfilesResponse(data.profiles);
         case 'skyblock/auctions': return await auctions_1.cleanSkyBlockAuctionsResponse(data);
+        case 'skyblock/auctions_ended': return await auctions_1.cleanSkyBlockAuctionsResponse(data);
     }
 }
 /**
@@ -250,6 +251,16 @@ async function fetchAllAuctionsUncached() {
     };
 }
 exports.fetchAllAuctionsUncached = fetchAllAuctionsUncached;
+/**
+ * this is expensive and takes about a few seconds, use cached.fetchAllAuctions instead
+ */
+async function fetchAllEndedAuctionsUncached() {
+    return await sendCleanApiRequest({
+        path: 'skyblock/auctions_ended',
+        args: {}
+    });
+}
+exports.fetchAllEndedAuctionsUncached = fetchAllEndedAuctionsUncached;
 async function getAuctionLowestBin(item) {
     console.log('ok getting auctions');
     const auctions = await cached.fetchAllAuctions();

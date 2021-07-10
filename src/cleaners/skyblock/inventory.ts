@@ -25,8 +25,16 @@ export interface Item {
 	enchantments?: { [ name: string ]: number }
 
 	head_texture?: string
+	origin_tag?: string
 
-	// this isn't extracted automatically atm
+	pet_type?: string
+
+	potion_type?: string
+	potion_level?: number
+	potion_duration_level?: number
+	potion_effectiveness_level?: number
+
+	// TODO: this isn't extracted automatically atm
 	tier?: Tier
 }
 
@@ -36,11 +44,14 @@ function cleanItem(rawItem): Item | null {
 	// if the item doesn't have an id, it isn't an item
 	if (rawItem.id === undefined) return null
 
+
 	const vanillaId: number = rawItem.id
 	const itemCount = rawItem.Count
 	const damageValue = rawItem.Damage
 	const itemTag = rawItem.tag
 	const extraAttributes = itemTag?.ExtraAttributes ?? {}
+	if (extraAttributes.id === 'POTION')
+		console.log(rawItem)
 	let headId: string | undefined
 
 	if (vanillaId === 397) {
@@ -55,8 +66,12 @@ function cleanItem(rawItem): Item | null {
 		}
 	}
 
+
+	// '{"type":"FLYING_FISH","active":false,"exp":1021029.881446,"tier":"LEGENDARY","hideInfo":false,"candyUsed":1}'
+	const petInfo = extraAttributes.petInfo ? JSON.parse(extraAttributes.petInfo) : {}
+
 	return {
-		id: extraAttributes?.id ?? null,
+		id: extraAttributes.id ?? null,
 		count: itemCount ?? 1,
 		vanillaId: damageValue ? `${vanillaId}:${damageValue}` : vanillaId.toString(),
 
@@ -67,11 +82,18 @@ function cleanItem(rawItem): Item | null {
 			glint: (itemTag?.ench ?? []).length > 0
 		},
 
-		reforge: extraAttributes?.modifier,
-		enchantments: extraAttributes?.enchantments,
-		anvil_uses: extraAttributes?.anvil_uses,
+		reforge: extraAttributes.modifier ?? undefined,
+		enchantments: extraAttributes.enchantments,
+		anvil_uses: extraAttributes.anvil_uses,
 		// TODO: parse this to be a number, hypixel returns it in this format: 6/24/21 9:32 AM
-		timestamp: extraAttributes?.timestamp,
+		timestamp: extraAttributes.timestamp,
+		origin_tag: extraAttributes.originTag,
+		pet_type: petInfo.type ?? undefined,
+
+		potion_type: extraAttributes.potion ?? undefined,
+		potion_level: extraAttributes.potion_level ?? undefined,
+		potion_effectiveness_level: extraAttributes.enhanced ?? undefined,
+		potion_duration_level: extraAttributes.extended ?? undefined,
 
 		head_texture: headId,
 	}

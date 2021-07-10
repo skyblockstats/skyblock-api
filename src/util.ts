@@ -1,3 +1,6 @@
+import { diff as fastMyersDiff } from 'fast-myers-diff'
+
+
 /**
  * Random utility functions that are not related to Hypixel
  */
@@ -21,7 +24,7 @@ export function shuffle<T>(a: T[]): T[] {
 
 
 export const minecraftColorCodes: { [ key: string ]: string } = {
-	'0': '#000000',
+	'0': '#000000', // black
 	'1': '#0000be',
 	'2': '#00be00',
 	'3': '#00bebe',
@@ -36,7 +39,7 @@ export const minecraftColorCodes: { [ key: string ]: string } = {
 	'c': '#fe3f3f', // light red
 	'd': '#fe3ffe',
 	'e': '#fefe3f',
-	'f': '#ffffff',
+	'f': '#ffffff', // white
 
 	'black': '#000000',
 	'dark_blue': '#0000be',
@@ -77,4 +80,29 @@ export async function sleep(ms: number): Promise<void> {
 /** Returns whether a string is a UUID4 (Minecraft uuid) */
 export function isUuid(string: string) {
 	return undashUuid(string).length === 32
+}
+
+export function replaceDifferencesWithQuestionMark(string1: string, string2: string): string {
+	const string1split = string1.replace(/([^a-z? ])/gi, ' $1 ').split(' ')
+	const string2split = string2.replace(/([^a-z? ])/gi, ' $1 ').split(' ')
+
+	let result = string1split.slice() // this will be modified, and we slice to clone it
+	let resultOffset = 0
+
+	const patch = fastMyersDiff(string1split, string2split)
+
+	for (const [removeStart, removeEnd, insertStart, insertEnd] of patch) {
+		const replace = string1split.slice(removeStart, removeEnd).join(' ').replace(/ ([^a-z? ]) /gi, '$1')
+		const replaceWith = string2split.slice(insertStart, insertEnd).join(' ').replace(/ ([^a-z? ]) /gi, '$1')
+
+
+		result.splice(
+			resultOffset + removeStart,
+			removeEnd - removeStart,
+			...(Math.min(replace.length, replaceWith.length) > 0 ? ['?'.repeat(Math.min(replace.length, replaceWith.length))] : [])
+		)
+
+		resultOffset += (Math.min(replace.length, replaceWith.length) > 0 ? 1 : 0) - (removeEnd-removeStart)
+	}
+	return result.join(' ').replace(/ ([^a-z? ]) /gi, '$1')
 }

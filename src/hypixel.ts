@@ -53,6 +53,7 @@ async function cleanResponse({ path, data }: { path: string, data: HypixelRespon
 		case 'skyblock/profile': return await cleanSkyblockProfileResponse(data.profile, options)
 		case 'skyblock/profiles': return await cleanSkyblockProfilesResponse(data.profiles)
 		case 'skyblock/auctions': return await cleanSkyBlockAuctionsResponse(data)
+		case 'skyblock/auctions_ended': return await cleanSkyBlockAuctionsResponse(data)
 	}
 }
 
@@ -270,7 +271,7 @@ async function fetchAuctionsPage(page: number): Promise<AuctionsResponse> {
 /**
  * this is expensive and takes about a few seconds, use cached.fetchAllAuctions instead
  */
-export async function fetchAllAuctionsUncached(): Promise<AuctionsResponse> {
+ export async function fetchAllAuctionsUncached(): Promise<AuctionsResponse> {
 	const firstPage = await fetchAuctionsPage(1)
 	console.log(`gotten first auctions page, there\'s a total of ${firstPage.pageCount} pages`)
 	const allAuctions: Auction[] = [ ...firstPage.auctions ]
@@ -292,6 +293,15 @@ export async function fetchAllAuctionsUncached(): Promise<AuctionsResponse> {
 		lastUpdated: firstPage.lastUpdated,
 		auctions: allAuctions
 	}
+}
+/**
+ * this is expensive and takes about a few seconds, use cached.fetchAllAuctions instead
+ */
+export async function fetchAllEndedAuctionsUncached(): Promise<AuctionsResponse> {
+	return await sendCleanApiRequest({
+		path: 'skyblock/auctions_ended',
+		args: {}
+	})
 }
 
 

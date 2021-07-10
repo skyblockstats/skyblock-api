@@ -25,7 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchAllAuctions = exports.fetchProfileName = exports.fetchBasicProfileFromUuid = exports.fetchProfile = exports.fetchProfileUuid = exports.fetchSkyblockProfiles = exports.fetchBasicPlayer = exports.fetchPlayer = exports.usernameFromUser = exports.uuidFromUser = exports.profileNameCache = exports.profilesCache = exports.profileCache = exports.basicPlayerCache = exports.playerCache = exports.basicProfilesCache = exports.usernameCache = void 0;
+exports.fetchAllEndedAuctions = exports.fetchAllAuctions = exports.fetchProfileName = exports.fetchBasicProfileFromUuid = exports.fetchProfile = exports.fetchProfileUuid = exports.fetchSkyblockProfiles = exports.fetchBasicPlayer = exports.fetchPlayer = exports.usernameFromUser = exports.uuidFromUser = exports.profileNameCache = exports.profilesCache = exports.profileCache = exports.basicPlayerCache = exports.playerCache = exports.basicProfilesCache = exports.usernameCache = void 0;
 const hypixel_1 = require("./hypixel");
 const util_1 = require("./util");
 const hypixel = __importStar(require("./hypixel"));
@@ -378,28 +378,59 @@ async function fetchProfileName(user, profile) {
 }
 exports.fetchProfileName = fetchProfileName;
 let allAuctionsCache = [];
+let allEndedAuctionsCache = [];
 let nextAuctionsUpdate = 0;
+let nextEndedAuctionsUpdate = 0;
 let nextAuctionsUpdateTimeout;
+let nextEndedAuctionsUpdateTimeout;
 // we use a queue so it doesnt fetch twice at the same time, and instead it waits so it can just use the cached version
-const fetchAllAuctionsQueue = new queue_promise_1.default({
-    concurrent: 1
-});
+const fetchAllAuctionsQueue = new queue_promise_1.default({ concurrent: 1 });
+const fetchAllEndedAuctionsQueue = new queue_promise_1.default({ concurrent: 1 });
 /**
  * Fetch an array of all active Auctions
  */
 async function fetchAllAuctions() {
     if (Date.now() / 1000 > nextAuctionsUpdate) {
-        fetchAllAuctionsQueue.enqueue(hypixel_1.fetchAllAuctionsUncached);
-        const auctionsResponse = await fetchAllAuctionsQueue.dequeue();
+        const auctionsResponse = await new Promise(resolve => fetchAllAuctionsQueue.enqueue(async () => {
+            if (Date.now() / 1000 > nextAuctionsUpdate)
+                resolve(await hypixel_1.fetchAllAuctionsUncached());
+            else
+                resolve(allAuctionsCache);
+        }));
+        // ok it just got the cached one
+        if (Array.isArray(auctionsResponse))
+            return auctionsResponse;
+        // const auctionsResponse: AuctionsResponse = await fetchAllAuctionsQueue.dequeue()
         allAuctionsCache = auctionsResponse.auctions;
         // the auctions endpoint updates every 60 seconds
         nextAuctionsUpdate = auctionsResponse.lastUpdated + 60;
-        // if there's already a timeout, clear it and make a new one
+        // if there's already a timeout, clear it and make a new one for the next auctions update
         if (nextAuctionsUpdateTimeout)
             clearTimeout(nextAuctionsUpdateTimeout);
-        // make a timeout for the next auctions update
         nextAuctionsUpdateTimeout = setTimeout(fetchAllAuctions, Date.now() - nextAuctionsUpdate * 1000);
     }
     return allAuctionsCache;
 }
 exports.fetchAllAuctions = fetchAllAuctions;
+async function fetchAllEndedAuctions() {
+    if (Date.now() / 1000 > nextEndedAuctionsUpdate) {
+        const auctionsResponse = await new Promise(resolve => fetchAllEndedAuctionsQueue.enqueue(async () => {
+            if (Date.now() / 1000 > nextEndedAuctionsUpdate)
+                resolve(await hypixel.fetchAllEndedAuctionsUncached());
+            else
+                resolve(allEndedAuctionsCache);
+        }));
+        // ok it just got the cached one
+        if (Array.isArray(auctionsResponse))
+            return auctionsResponse;
+        allEndedAuctionsCache = auctionsResponse.auctions;
+        // the auctions endpoint updates every 60 seconds
+        nextEndedAuctionsUpdate = auctionsResponse.lastUpdated + 60;
+        // if there's already a timeout, clear it and make a new one for the next auctions update
+        if (nextEndedAuctionsUpdateTimeout)
+            clearTimeout(nextEndedAuctionsUpdateTimeout);
+        nextEndedAuctionsUpdateTimeout = setTimeout(fetchAllEndedAuctions, Date.now() - nextEndedAuctionsUpdate * 1000);
+    }
+    return allEndedAuctionsCache;
+}
+exports.fetchAllEndedAuctions = fetchAllEndedAuctions;

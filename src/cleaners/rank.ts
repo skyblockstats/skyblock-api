@@ -87,7 +87,7 @@ export function cleanRank({
 			if (bracketColor)
 				colored = `§${bracketColor}[${rankColorPrefix}${name}§${bracketColor}]`
 			else
-			colored = `${rankColorPrefix}[${name}]`
+				colored = `${rankColorPrefix}[${name}]`
 		else
 			// nons don't have a prefix
 			colored = `${rankColorPrefix}`

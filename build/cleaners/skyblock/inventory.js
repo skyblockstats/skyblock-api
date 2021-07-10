@@ -26,7 +26,7 @@ function base64decode(base64) {
     return Buffer.from(base64, 'base64');
 }
 function cleanItem(rawItem) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u;
     // if the item doesn't have an id, it isn't an item
     if (rawItem.id === undefined)
         return null;
@@ -35,6 +35,8 @@ function cleanItem(rawItem) {
     const damageValue = rawItem.Damage;
     const itemTag = rawItem.tag;
     const extraAttributes = (_a = itemTag === null || itemTag === void 0 ? void 0 : itemTag.ExtraAttributes) !== null && _a !== void 0 ? _a : {};
+    if (extraAttributes.id === 'POTION')
+        console.log(rawItem);
     let headId;
     if (vanillaId === 397) {
         const headDataBase64 = (_e = (_d = (_c = (_b = itemTag === null || itemTag === void 0 ? void 0 : itemTag.SkullOwner) === null || _b === void 0 ? void 0 : _b.Properties) === null || _c === void 0 ? void 0 : _c.textures) === null || _d === void 0 ? void 0 : _d[0]) === null || _e === void 0 ? void 0 : _e.Value;
@@ -47,8 +49,10 @@ function cleanItem(rawItem) {
             }
         }
     }
+    // '{"type":"FLYING_FISH","active":false,"exp":1021029.881446,"tier":"LEGENDARY","hideInfo":false,"candyUsed":1}'
+    const petInfo = extraAttributes.petInfo ? JSON.parse(extraAttributes.petInfo) : {};
     return {
-        id: (_h = extraAttributes === null || extraAttributes === void 0 ? void 0 : extraAttributes.id) !== null && _h !== void 0 ? _h : null,
+        id: (_h = extraAttributes.id) !== null && _h !== void 0 ? _h : null,
         count: itemCount !== null && itemCount !== void 0 ? itemCount : 1,
         vanillaId: damageValue ? `${vanillaId}:${damageValue}` : vanillaId.toString(),
         display: {
@@ -57,11 +61,17 @@ function cleanItem(rawItem) {
             // if it has an ench value in the tag, then it should have an enchant glint effect
             glint: ((_o = itemTag === null || itemTag === void 0 ? void 0 : itemTag.ench) !== null && _o !== void 0 ? _o : []).length > 0
         },
-        reforge: extraAttributes === null || extraAttributes === void 0 ? void 0 : extraAttributes.modifier,
-        enchantments: extraAttributes === null || extraAttributes === void 0 ? void 0 : extraAttributes.enchantments,
-        anvil_uses: extraAttributes === null || extraAttributes === void 0 ? void 0 : extraAttributes.anvil_uses,
+        reforge: (_p = extraAttributes.modifier) !== null && _p !== void 0 ? _p : undefined,
+        enchantments: extraAttributes.enchantments,
+        anvil_uses: extraAttributes.anvil_uses,
         // TODO: parse this to be a number, hypixel returns it in this format: 6/24/21 9:32 AM
-        timestamp: extraAttributes === null || extraAttributes === void 0 ? void 0 : extraAttributes.timestamp,
+        timestamp: extraAttributes.timestamp,
+        origin_tag: extraAttributes.originTag,
+        pet_type: (_q = petInfo.type) !== null && _q !== void 0 ? _q : undefined,
+        potion_type: (_r = extraAttributes.potion) !== null && _r !== void 0 ? _r : undefined,
+        potion_level: (_s = extraAttributes.potion_level) !== null && _s !== void 0 ? _s : undefined,
+        potion_effectiveness_level: (_t = extraAttributes.enhanced) !== null && _t !== void 0 ? _t : undefined,
+        potion_duration_level: (_u = extraAttributes.extended) !== null && _u !== void 0 ? _u : undefined,
         head_texture: headId,
     };
 }

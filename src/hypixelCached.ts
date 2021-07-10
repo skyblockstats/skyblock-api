@@ -3,7 +3,7 @@
  */
 
 import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/skyblock/profile'
-import { Auction } from './cleaners/skyblock/auctions'
+import { Auction, AuctionsResponse } from './cleaners/skyblock/auctions'
 import { fetchAllAuctionsUncached } from './hypixel'
 import { CleanPlayer } from './cleaners/player'
 import { isUuid, undashUuid } from './util'
@@ -403,32 +403,66 @@ export async function fetchProfileName(user: string, profile: string): Promise<s
 }
 
 let allAuctionsCache: Auction[] = []
+let allEndedAuctionsCache: Auction[] = []
+
 let nextAuctionsUpdate = 0
+let nextEndedAuctionsUpdate = 0
+
 let nextAuctionsUpdateTimeout: NodeJS.Timeout
+let nextEndedAuctionsUpdateTimeout: NodeJS.Timeout
 
 // we use a queue so it doesnt fetch twice at the same time, and instead it waits so it can just use the cached version
-const fetchAllAuctionsQueue = new Queue({
-	concurrent: 1
-})
+const fetchAllAuctionsQueue = new Queue({ concurrent: 1 })
+const fetchAllEndedAuctionsQueue = new Queue({ concurrent: 1 })
 
 /**
  * Fetch an array of all active Auctions 
  */
 export async function fetchAllAuctions(): Promise<Auction[]> {
 	if (Date.now() / 1000 > nextAuctionsUpdate) {
-		fetchAllAuctionsQueue.enqueue(fetchAllAuctionsUncached)
-		const auctionsResponse = await fetchAllAuctionsQueue.dequeue()
+		const auctionsResponse: AuctionsResponse | Auction[] = await new Promise(resolve => fetchAllAuctionsQueue.enqueue(async() => {
+			if (Date.now() / 1000 > nextAuctionsUpdate)
+				resolve(await fetchAllAuctionsUncached())
+			else
+				resolve(allAuctionsCache)
+		}))
+		// ok it just got the cached one
+		if (Array.isArray(auctionsResponse)) return auctionsResponse
 
+		// const auctionsResponse: AuctionsResponse = await fetchAllAuctionsQueue.dequeue()
+		
 		allAuctionsCache = auctionsResponse.auctions
 
 		// the auctions endpoint updates every 60 seconds
 		nextAuctionsUpdate = auctionsResponse.lastUpdated + 60
-
-		// if there's already a timeout, clear it and make a new one
-		if (nextAuctionsUpdateTimeout)
-			clearTimeout(nextAuctionsUpdateTimeout)
-		// make a timeout for the next auctions update
+		
+		// if there's already a timeout, clear it and make a new one for the next auctions update
+		if (nextAuctionsUpdateTimeout) clearTimeout(nextAuctionsUpdateTimeout)
 		nextAuctionsUpdateTimeout = setTimeout(fetchAllAuctions, Date.now() - nextAuctionsUpdate * 1000)
 	}
 	return allAuctionsCache
+}
+
+
+export async function fetchAllEndedAuctions(): Promise<Auction[]> {
+	if (Date.now() / 1000 > nextEndedAuctionsUpdate) {
+		const auctionsResponse: AuctionsResponse | Auction[] = await new Promise(resolve => fetchAllEndedAuctionsQueue.enqueue(async() => {
+			if (Date.now() / 1000 > nextEndedAuctionsUpdate)
+				resolve(await hypixel.fetchAllEndedAuctionsUncached())
+			else
+				resolve(allEndedAuctionsCache)
+		}))
+		// ok it just got the cached one
+		if (Array.isArray(auctionsResponse)) return auctionsResponse
+
+		allEndedAuctionsCache = auctionsResponse.auctions
+
+		// the auctions endpoint updates every 60 seconds
+		nextEndedAuctionsUpdate = auctionsResponse.lastUpdated + 60
+
+		// if there's already a timeout, clear it and make a new one for the next auctions update
+		if (nextEndedAuctionsUpdateTimeout) clearTimeout(nextEndedAuctionsUpdateTimeout)
+		nextEndedAuctionsUpdateTimeout = setTimeout(fetchAllEndedAuctions, Date.now() - nextEndedAuctionsUpdate * 1000)
+	}
+	return allEndedAuctionsCache
 }
