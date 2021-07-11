@@ -124,10 +124,31 @@ describe('util', () => {
 			)
 		})
 		it('No lore', () => {
-			assert.strictEqual( util.extractItemTier([]), null )
+			assert.strictEqual(util.extractItemTier([]), null)
 		})
 		it('Empty lore', () => {
-			assert.strictEqual( util.extractItemTier([ '' ]), null )
+			assert.strictEqual(util.extractItemTier([ '' ]), null)
+		})
+	})
+	describe('#replaceDifferencesWithQuestionMark()', () => {
+		it('Don\'t include removed parts', () => {
+			assert.strictEqual(util.replaceDifferencesWithQuestionMark('Hello world', 'Hello'), 'Hello')
+		})
+		it('Replace difference with question marks', () => {
+			assert.strictEqual(util.replaceDifferencesWithQuestionMark('Hello world', 'Hello there'), 'Hello ?????')
+		})
+		it('Replace difference with least question marks', () => {
+			assert.strictEqual(util.replaceDifferencesWithQuestionMark('Hello world', 'Hello a'), 'Hello ?')
+			assert.strictEqual(util.replaceDifferencesWithQuestionMark('Hello a', 'Hello world'), 'Hello ?')
+		})
+		it('Handles removed parts after newlines properly', () => {
+			assert.strictEqual(util.replaceDifferencesWithQuestionMark('Hello world\ngaming asdf', 'Hello world\nasdf'), 'Hello world\nasdf')
+		})
+		it('Handles Minecraft formatting codes', () => {
+			assert.strictEqual(util.replaceDifferencesWithQuestionMark('§lHello', '§lWorld'), '§l?????')
+		})
+		it('SkyBlock differently leveled Rabbit pet name', () => {
+			assert.strictEqual(util.replaceDifferencesWithQuestionMark('§7[Lvl 1] §5Rabbit', '§7[Lvl 99] §5Rabbit'), '§7[Lvl ?] §5Rabbit')
 		})
 	})
 })
