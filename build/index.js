@@ -137,6 +137,14 @@ app.get('/constants', async (req, res) => {
 app.get('/auctions', async (req, res) => {
     res.json(await hypixelCached_1.fetchAllAuctions());
 });
+app.get('/auctions/price', async (req, res) => {
+    /** just assume the params are perfectly accurate */
+    const item = {
+        id: req.query.id,
+        tier: req.query.tier,
+    };
+    res.json(await database_1.fetchItemPriceData(item));
+});
 app.post('/accounts/createsession', async (req, res) => {
     try {
         const { code } = req.body;

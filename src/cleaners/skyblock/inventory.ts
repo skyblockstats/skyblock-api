@@ -10,7 +10,9 @@ export type Tier = 'COMMON' | 'UNCOMMON' | 'RARE' | 'EPIC' | 'LEGENDARY' | 'MYTH
 
 // TODO: add a "Slot" interface that extends Item but has the count
 export interface Item {
+	/** The item's SkyBlock id */
 	id: string
+	/** How much of the item is there */
 	count: number
 	vanillaId: string
 
@@ -20,14 +22,17 @@ export interface Item {
 		glint: boolean
 	}
 
+	/** The name of the reforge on the item */
 	reforge?: string
 	anvil_uses?: number
 	timestamp?: string
 	enchantments?: { [ name: string ]: number }
 
 	head_texture?: string
+	/** Where the item was obtained from */
 	origin_tag?: string
 
+	/** The SkyBlock id of the pet (if it exists) */
 	pet_type?: string
 
 	potion_type?: string

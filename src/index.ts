@@ -1,4 +1,4 @@
-import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount } from './database'
+import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchItemPriceData, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount } from './database'
 import { fetchMemberProfile, fetchUser } from './hypixel'
 import rateLimit from 'express-rate-limit'
 import * as constants from './constants'
@@ -6,6 +6,7 @@ import * as discord from './discord'
 import express from 'express'
 import { getKeyUsage } from './hypixelApi'
 import { fetchAllAuctions } from './hypixelCached'
+import { Item, Tier } from './cleaners/skyblock/inventory'
 
 const app = express()
 
@@ -132,6 +133,15 @@ app.get('/constants', async(req, res) => {
 
 app.get('/auctions', async(req, res) => {
 	res.json(await fetchAllAuctions())
+})
+
+app.get('/auctions/price', async(req, res) => {
+	/** just assume the params are perfectly accurate */
+	const item: Partial<Item> = {
+		id: req.query.id as string,
+		tier: req.query.tier as Tier,
+	}
+	res.json(await fetchItemPriceData(item))
 })
 
 app.post('/accounts/createsession', async(req, res) => {
