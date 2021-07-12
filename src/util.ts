@@ -110,8 +110,14 @@ export function replaceDifferencesWithQuestionMark(string1: string, string2: str
 
 /** Extract the tier of the item from the lore, or return null if it can't find it */
 export function extractItemTier(lore: string[]): Tier | null {
-	const lastLoreLine = lore[lore.length - 1]?.replace(/§./g, '')?.trim()
+	let lastLoreLine = lore[lore.length - 1]
+	// if the last line just doesn't exist, return nul
 	if (!lastLoreLine) return null
+
+	lastLoreLine = lastLoreLine.replace(/§k.+?§r/g, '').replace(/§./g, '').trim()
+	// if the last line is empty, return null
+	if (!lastLoreLine) return null
+
 	const tierFirstWord = lastLoreLine.split(' ')[0] ?? null
 	if (tierFirstWord === 'VERY') return 'VERY SPECIAL' // hopefully they don't add more two word tiers
 	else return tierFirstWord as Tier

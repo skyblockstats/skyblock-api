@@ -129,6 +129,9 @@ describe('util', () => {
 		it('Empty lore', () => {
 			assert.strictEqual(util.extractItemTier([ '' ]), null)
 		})
+		it('Recombobulated pants', () => {
+			assert.strictEqual(util.extractItemTier([ '§9§l§ka§r §9§l§9§lRARE LEGGINGS §9§l§ka' ]), 'RARE')
+		})
 	})
 	describe('#replaceDifferencesWithQuestionMark()', () => {
 		it('Don\'t include removed parts', () => {

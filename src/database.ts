@@ -121,7 +121,7 @@ interface ItemSchema {
 	/** The head texture */
 	h?: string
 	/** The lore of the item. Variable parts of this are replaced with ? */
-	l: string
+	l: string | null
 	/** The id of the vanilla item */
 	v: string
 	/** Potion type */
@@ -858,33 +858,38 @@ export async function getItemUniqueId<U extends boolean, E extends boolean=false
 	const itemUniqueId = existingItem ? existingItem._id : uuid4().replace(/-/g, '')
 
 	const itemName = existingItem ? replaceDifferencesWithQuestionMark(existingItem.dn, item.display.name) : item.display.name
-	const itemLore = existingItem ? replaceDifferencesWithQuestionMark(existingItem.l, item.display.lore.join('\n')) : item.display.lore.join('\n')
+	let itemLore: string | null
+	if (item.reforge)
+		itemLore = null
+	else
+		itemLore = existingItem?.l ? replaceDifferencesWithQuestionMark(existingItem.l, item.display.lore.join('\n')) : item.display.lore.join('\n')
 
 	// all the stuff is the same, don't bother updating it
 	if (
 		existingItem
 		&& itemName === existingItem.dn
-		&& itemLore === existingItem.l
+		&& (!itemLore || itemLore === existingItem.l)
 		&& item.head_texture === existingItem.h
 	)
 		return returnEntireItem ? existingItem : itemUniqueId
 
 
+	let updateSet: { dn: string, h?: string, l?: string } = {
+		dn: itemName,
+		h: item.head_texture
+	}
+	if (itemLore)
+		updateSet.l = itemLore
+
 	await itemsCollection.updateOne({
 		_id: itemUniqueId,
 		...itemUniqueData
 	}, {
-		$set: {
-			dn: itemName,
-			l: itemLore,
-			h: item.head_texture
-		}
+		$set: updateSet
 	}, { upsert: true })
 
 	return returnEntireItem ? {
-		dn: itemName,
-		l: itemLore,
-		h: item.head_texture,
+		...updateSet,
 		_id: itemUniqueId,
 		...itemUniqueData
 	} : itemUniqueId
@@ -927,7 +932,7 @@ function schemaToItem(itemSchema: ItemSchema, additionalData?: Item): Partial<It
 	return {
 		display: {
 			name: itemSchema.dn,
-			lore: itemSchema.l.split('\n'),
+			lore: itemSchema.l?.split('\n') ?? [],
 			glint: itemSchema.e ? Object.keys(itemSchema.e).length > 0 : false,
 		},
 		id: itemSchema.i,

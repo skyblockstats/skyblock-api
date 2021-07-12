@@ -640,27 +640,31 @@ async function getItemUniqueId(item, update, returnEntireItem) {
         return returnEntireItem ? existingItem : existingItem === null || existingItem === void 0 ? void 0 : existingItem._id;
     const itemUniqueId = existingItem ? existingItem._id : uuid_1.v4().replace(/-/g, '');
     const itemName = existingItem ? util_1.replaceDifferencesWithQuestionMark(existingItem.dn, item.display.name) : item.display.name;
-    const itemLore = existingItem ? util_1.replaceDifferencesWithQuestionMark(existingItem.l, item.display.lore.join('\n')) : item.display.lore.join('\n');
+    let itemLore;
+    if (item.reforge)
+        itemLore = null;
+    else
+        itemLore = (existingItem === null || existingItem === void 0 ? void 0 : existingItem.l) ? util_1.replaceDifferencesWithQuestionMark(existingItem.l, item.display.lore.join('\n')) : item.display.lore.join('\n');
     // all the stuff is the same, don't bother updating it
     if (existingItem
         && itemName === existingItem.dn
-        && itemLore === existingItem.l
+        && (!itemLore || itemLore === existingItem.l)
         && item.head_texture === existingItem.h)
         return returnEntireItem ? existingItem : itemUniqueId;
+    let updateSet = {
+        dn: itemName,
+        h: item.head_texture
+    };
+    if (itemLore)
+        updateSet.l = itemLore;
     await itemsCollection.updateOne({
         _id: itemUniqueId,
         ...itemUniqueData
     }, {
-        $set: {
-            dn: itemName,
-            l: itemLore,
-            h: item.head_texture
-        }
+        $set: updateSet
     }, { upsert: true });
     return returnEntireItem ? {
-        dn: itemName,
-        l: itemLore,
-        h: item.head_texture,
+        ...updateSet,
         _id: itemUniqueId,
         ...itemUniqueData
     } : itemUniqueId;
@@ -700,17 +704,17 @@ async function addEndedAuctions() {
     }
 }
 function schemaToItem(itemSchema, additionalData) {
-    var _a;
+    var _a, _b, _c;
     return {
         display: {
             name: itemSchema.dn,
-            lore: itemSchema.l.split('\n'),
+            lore: (_b = (_a = itemSchema.l) === null || _a === void 0 ? void 0 : _a.split('\n')) !== null && _b !== void 0 ? _b : [],
             glint: itemSchema.e ? Object.keys(itemSchema.e).length > 0 : false,
         },
         id: itemSchema.i,
         vanillaId: itemSchema.v,
         enchantments: itemSchema.e,
-        head_texture: (_a = itemSchema.h) !== null && _a !== void 0 ? _a : undefined,
+        head_texture: (_c = itemSchema.h) !== null && _c !== void 0 ? _c : undefined,
         reforge: additionalData === null || additionalData === void 0 ? void 0 : additionalData.reforge,
         tier: itemSchema.t,
     };

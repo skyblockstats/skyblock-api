@@ -95,11 +95,16 @@ function replaceDifferencesWithQuestionMark(string1, string2) {
 exports.replaceDifferencesWithQuestionMark = replaceDifferencesWithQuestionMark;
 /** Extract the tier of the item from the lore, or return null if it can't find it */
 function extractItemTier(lore) {
-    var _a, _b, _c;
-    const lastLoreLine = (_b = (_a = lore[lore.length - 1]) === null || _a === void 0 ? void 0 : _a.replace(/§./g, '')) === null || _b === void 0 ? void 0 : _b.trim();
+    var _a;
+    let lastLoreLine = lore[lore.length - 1];
+    // if the last line just doesn't exist, return nul
     if (!lastLoreLine)
         return null;
-    const tierFirstWord = (_c = lastLoreLine.split(' ')[0]) !== null && _c !== void 0 ? _c : null;
+    lastLoreLine = lastLoreLine.replace(/§k.+?§r/g, '').replace(/§./g, '').trim();
+    // if the last line is empty, return null
+    if (!lastLoreLine)
+        return null;
+    const tierFirstWord = (_a = lastLoreLine.split(' ')[0]) !== null && _a !== void 0 ? _a : null;
     if (tierFirstWord === 'VERY')
         return 'VERY SPECIAL'; // hopefully they don't add more two word tiers
     else
