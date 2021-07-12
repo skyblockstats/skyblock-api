@@ -922,12 +922,6 @@ async function addEndedAuctions() {
 	}
 }
 
-interface ItemPriceData {
-	item: Partial<Item>
-	count: number
-	median: number
-	average: number
-}
 
 function schemaToItem(itemSchema: ItemSchema, additionalData?: Item): Partial<Item> {
 	return {
@@ -943,6 +937,15 @@ function schemaToItem(itemSchema: ItemSchema, additionalData?: Item): Partial<It
 		reforge: additionalData?.reforge,
 		tier: itemSchema.t,
 	}
+}
+
+
+interface ItemPriceData {
+	internalId: string
+	count: number
+	median: number
+	average: number
+	item: Partial<Item>
 }
 
 /**
@@ -981,6 +984,7 @@ export async function fetchItemPriceData(item: Partial<Item>): Promise<ItemPrice
 	const averagePrice = auctionPrices.reduce((acc, p) => acc + p, 0) / auctions.length
 
 	return {
+		internalId: itemSchema._id,
 		item: schemaToItem(itemSchema, fullItem),
 		// auctionIds: auctions.map(a => a._id),
 		count: auctions.length,
@@ -989,7 +993,15 @@ export async function fetchItemPriceData(item: Partial<Item>): Promise<ItemPrice
 	}
 }
 
-export async function fetchMostSoldItems() {
+let lastUpdatedMostSoldItems = 0
+let cachedMostSoldItems: ItemPriceData[] = []
+
+
+export async function fetchMostSoldItems(): Promise<ItemPriceData[]> {
+	// TODO: lock it so it doesn't do the query multiple times
+	if (Date.now() - lastUpdatedMostSoldItems < 60 * 1000)
+		return cachedMostSoldItems
+
 	const mostSoldItems = await auctionsCollection.aggregate(
 		[
 			{ $sort: { p: 1 } },
@@ -1010,11 +1022,20 @@ export async function fetchMostSoldItems() {
 			{ $sort: { count: -1 } },
 			{ $limit: 100 },
 
+			{
+				$project: {
+					prices: 1,
+					count: 1,
+					average: { '$avg': '$prices' }
+				}
+			},
+
 			// get the median
 			{
 				$project: {
 					median: { '$arrayElemAt': [ '$prices', { $floor: { $divide: ['$count', 2] } } ] },
-					count: 1
+					count: 1,
+					average: 1
 				}
 			},
 
@@ -1031,18 +1052,22 @@ export async function fetchMostSoldItems() {
 					item: { $arrayElemAt: ['$item', 0] },
 					prices: 1,
 					median: 1,
-					count: 1
+					count: 1,
+					average: 1
 				}
 			}
 		]
 	)
 	.toArray()
-	return mostSoldItems.map((i: any) => ({
+	cachedMostSoldItems = mostSoldItems.map((i: any): ItemPriceData => ({
 		internalId: i._id,
 		count: i.count,
 		median: i.median,
+		average: i.average,
 		item: schemaToItem(i.item)
 	}))
+	lastUpdatedMostSoldItems = Date.now()
+	return cachedMostSoldItems
 }
 
 // make sure it's not in a test

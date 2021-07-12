@@ -749,6 +749,7 @@ async function fetchItemPriceData(item) {
     // find the average
     const averagePrice = auctionPrices.reduce((acc, p) => acc + p, 0) / auctions.length;
     return {
+        internalId: itemSchema._id,
         item: schemaToItem(itemSchema, fullItem),
         // auctionIds: auctions.map(a => a._id),
         count: auctions.length,
@@ -757,7 +758,12 @@ async function fetchItemPriceData(item) {
     };
 }
 exports.fetchItemPriceData = fetchItemPriceData;
+let lastUpdatedMostSoldItems = 0;
+let cachedMostSoldItems = [];
 async function fetchMostSoldItems() {
+    // TODO: lock it so it doesn't do the query multiple times
+    if (Date.now() - lastUpdatedMostSoldItems < 60 * 1000)
+        return cachedMostSoldItems;
     const mostSoldItems = await auctionsCollection.aggregate([
         { $sort: { p: 1 } },
         {
@@ -775,11 +781,19 @@ async function fetchMostSoldItems() {
         // sort and cut off the results at the top 100
         { $sort: { count: -1 } },
         { $limit: 100 },
+        {
+            $project: {
+                prices: 1,
+                count: 1,
+                average: { '$avg': '$prices' }
+            }
+        },
         // get the median
         {
             $project: {
                 median: { '$arrayElemAt': ['$prices', { $floor: { $divide: ['$count', 2] } }] },
-                count: 1
+                count: 1,
+                average: 1
             }
         },
         {
@@ -795,17 +809,21 @@ async function fetchMostSoldItems() {
                 item: { $arrayElemAt: ['$item', 0] },
                 prices: 1,
                 median: 1,
-                count: 1
+                count: 1,
+                average: 1
             }
         }
     ])
         .toArray();
-    return mostSoldItems.map((i) => ({
+    cachedMostSoldItems = mostSoldItems.map((i) => ({
         internalId: i._id,
         count: i.count,
         median: i.median,
+        average: i.average,
         item: schemaToItem(i.item)
     }));
+    lastUpdatedMostSoldItems = Date.now();
+    return cachedMostSoldItems;
 }
 exports.fetchMostSoldItems = fetchMostSoldItems;
 // make sure it's not in a test
