@@ -838,7 +838,7 @@ export async function updateAccount(discordId: string, schema: AccountSchema) {
 export async function getItemUniqueId<U extends boolean, E extends boolean=false>(item: Item, update: U, returnEntireItem?: E): Promise<E extends true ? (U extends true ? ItemSchema : ItemSchema | undefined) : (U extends true ? string : string | undefined)> {
 	const itemUniqueData: FilterQuery<ItemSchema> = {
 		i: item.id,
-		v: item.vanillaId,
+		v: item.vanillaId || undefined,
 		pt: item.pet_type,
 		t: item.tier ?? undefined,
 		pot: item.potion_type,
@@ -849,7 +849,10 @@ export async function getItemUniqueId<U extends boolean, E extends boolean=false
 	}
 	// Delete undefined stuff from itemUniqueData
 	Object.keys(itemUniqueData).forEach(key => itemUniqueData[key] === undefined && delete itemUniqueData[key])
-	const existingItem = await itemsCollection.findOne(itemUniqueData)
+	// if (itemUniqueData.display)
+	// 	Object.keys(itemUniqueData.display).forEach(key => itemUniqueData.display[key] === undefined && delete itemUniqueData.display[key])
+
+		const existingItem = await itemsCollection.findOne(itemUniqueData)
 	if (!update) return returnEntireItem ? existingItem : existingItem?._id as any
 
 	const itemUniqueId = existingItem ? existingItem._id : uuid4().replace(/-/g, '')
@@ -926,6 +929,22 @@ interface ItemPriceData {
 	average: number
 }
 
+function schemaToItem(itemSchema: ItemSchema, additionalData?: Item): Partial<Item> {
+	return {
+		display: {
+			name: itemSchema.dn,
+			lore: itemSchema.l.split('\n'),
+			glint: itemSchema.e ? Object.keys(itemSchema.e).length > 0 : false,
+		},
+		id: itemSchema.i,
+		vanillaId: itemSchema.v,
+		enchantments: itemSchema.e,
+		head_texture: itemSchema.h ?? undefined,
+		reforge: additionalData?.reforge,
+		tier: itemSchema.t,
+	}
+}
+
 /**
  * Fetch the price data for the item
 */
@@ -939,6 +958,7 @@ export async function fetchItemPriceData(item: Partial<Item>): Promise<ItemPrice
 	}
 	const fullItem: Item = { ...defaultData, ...item }
 	const itemSchema = await getItemUniqueId(fullItem, false, true)
+	console.log(fullItem, itemSchema)
 	// we couldn't generate a unique id, meaning the item doesn't exist
 	if (!itemSchema) return null
 
@@ -961,20 +981,68 @@ export async function fetchItemPriceData(item: Partial<Item>): Promise<ItemPrice
 	const averagePrice = auctionPrices.reduce((acc, p) => acc + p, 0) / auctions.length
 
 	return {
-		item: {
-			display: {
-				glint: itemSchema.e ? Object.keys(itemSchema.e).length > 0 : false,
-				lore: itemSchema.l.split('\n'),
-				name: itemSchema.dn
-			},
-			id: itemSchema.i,
-			vanillaId: itemSchema.v,
-		},
+		item: schemaToItem(itemSchema, fullItem),
 		// auctionIds: auctions.map(a => a._id),
 		count: auctions.length,
 		median: medianPrice,
 		average: averagePrice
 	}
+}
+
+export async function fetchMostSoldItems() {
+	const mostSoldItems = await auctionsCollection.aggregate(
+		[
+			{ $sort: { p: 1 } },
+			{
+				$group: {
+					_id: '$i',
+					prices: { $push: '$p' }
+				}
+			},
+			{
+				$project: {
+					prices: 1,
+					count: { '$size': ['$prices'] }
+				}
+			},
+
+			// sort and cut off the results at the top 100
+			{ $sort: { count: -1 } },
+			{ $limit: 100 },
+
+			// get the median
+			{
+				$project: {
+					median: { '$arrayElemAt': [ '$prices', { $floor: { $divide: ['$count', 2] } } ] },
+					count: 1
+				}
+			},
+
+			{
+				$lookup: {
+					from: 'items',
+					localField: '_id',
+					foreignField: '_id',
+					as: 'item'
+				}
+			},
+			{
+				$project: {
+					item: { $arrayElemAt: ['$item', 0] },
+					prices: 1,
+					median: 1,
+					count: 1
+				}
+			}
+		]
+	)
+	.toArray()
+	return mostSoldItems.map((i: any) => ({
+		internalId: i._id,
+		count: i.count,
+		median: i.median,
+		item: schemaToItem(i.item)
+	}))
 }
 
 // make sure it's not in a test

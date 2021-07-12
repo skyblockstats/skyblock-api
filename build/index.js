@@ -145,6 +145,9 @@ app.get('/auctions/price', async (req, res) => {
     };
     res.json(await database_1.fetchItemPriceData(item));
 });
+app.get('/auctions/top', async (req, res) => {
+    res.json(await database_1.fetchMostSoldItems());
+});
 app.post('/accounts/createsession', async (req, res) => {
     try {
         const { code } = req.body;

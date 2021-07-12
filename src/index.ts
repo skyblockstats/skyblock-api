@@ -1,4 +1,4 @@
-import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchItemPriceData, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount } from './database'
+import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchItemPriceData, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchMostSoldItems, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount } from './database'
 import { fetchMemberProfile, fetchUser } from './hypixel'
 import rateLimit from 'express-rate-limit'
 import * as constants from './constants'
@@ -142,6 +142,10 @@ app.get('/auctions/price', async(req, res) => {
 		tier: req.query.tier as Tier,
 	}
 	res.json(await fetchItemPriceData(item))
+})
+
+app.get('/auctions/top', async(req, res) => {
+	res.json(await fetchMostSoldItems())
 })
 
 app.post('/accounts/createsession', async(req, res) => {

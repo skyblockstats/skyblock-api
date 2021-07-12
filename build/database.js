@@ -25,7 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchItemPriceData = exports.addAuction = exports.getItemUniqueId = exports.updateAccount = exports.fetchAccountFromDiscord = exports.fetchAccount = exports.fetchSession = exports.createSession = exports.finishedCachingRawLeaderboards = exports.queueUpdateDatabaseProfile = exports.queueUpdateDatabaseMember = exports.leaderboardUpdateProfileQueue = exports.leaderboardUpdateMemberQueue = exports.updateDatabaseProfile = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchLeaderboard = exports.fetchProfileLeaderboard = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchSlayerLeaderboards = exports.fetchAllLeaderboardsCategorized = exports.cachedRawLeaderboards = void 0;
+exports.fetchMostSoldItems = exports.fetchItemPriceData = exports.addAuction = exports.getItemUniqueId = exports.updateAccount = exports.fetchAccountFromDiscord = exports.fetchAccount = exports.fetchSession = exports.createSession = exports.finishedCachingRawLeaderboards = exports.queueUpdateDatabaseProfile = exports.queueUpdateDatabaseMember = exports.leaderboardUpdateProfileQueue = exports.leaderboardUpdateMemberQueue = exports.updateDatabaseProfile = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchLeaderboard = exports.fetchProfileLeaderboard = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchSlayerLeaderboards = exports.fetchAllLeaderboardsCategorized = exports.cachedRawLeaderboards = void 0;
 const util_1 = require("./util");
 const stats_1 = require("./cleaners/skyblock/stats");
 const mongodb_1 = require("mongodb");
@@ -622,7 +622,7 @@ async function getItemUniqueId(item, update, returnEntireItem) {
     var _a;
     const itemUniqueData = {
         i: item.id,
-        v: item.vanillaId,
+        v: item.vanillaId || undefined,
         pt: item.pet_type,
         t: (_a = item.tier) !== null && _a !== void 0 ? _a : undefined,
         pot: item.potion_type,
@@ -633,6 +633,8 @@ async function getItemUniqueId(item, update, returnEntireItem) {
     };
     // Delete undefined stuff from itemUniqueData
     Object.keys(itemUniqueData).forEach(key => itemUniqueData[key] === undefined && delete itemUniqueData[key]);
+    // if (itemUniqueData.display)
+    // 	Object.keys(itemUniqueData.display).forEach(key => itemUniqueData.display[key] === undefined && delete itemUniqueData.display[key])
     const existingItem = await itemsCollection.findOne(itemUniqueData);
     if (!update)
         return returnEntireItem ? existingItem : existingItem === null || existingItem === void 0 ? void 0 : existingItem._id;
@@ -697,6 +699,22 @@ async function addEndedAuctions() {
         }
     }
 }
+function schemaToItem(itemSchema, additionalData) {
+    var _a;
+    return {
+        display: {
+            name: itemSchema.dn,
+            lore: itemSchema.l.split('\n'),
+            glint: itemSchema.e ? Object.keys(itemSchema.e).length > 0 : false,
+        },
+        id: itemSchema.i,
+        vanillaId: itemSchema.v,
+        enchantments: itemSchema.e,
+        head_texture: (_a = itemSchema.h) !== null && _a !== void 0 ? _a : undefined,
+        reforge: additionalData === null || additionalData === void 0 ? void 0 : additionalData.reforge,
+        tier: itemSchema.t,
+    };
+}
 /**
  * Fetch the price data for the item
 */
@@ -710,6 +728,7 @@ async function fetchItemPriceData(item) {
     };
     const fullItem = { ...defaultData, ...item };
     const itemSchema = await getItemUniqueId(fullItem, false, true);
+    console.log(fullItem, itemSchema);
     // we couldn't generate a unique id, meaning the item doesn't exist
     if (!itemSchema)
         return null;
@@ -730,15 +749,7 @@ async function fetchItemPriceData(item) {
     // find the average
     const averagePrice = auctionPrices.reduce((acc, p) => acc + p, 0) / auctions.length;
     return {
-        item: {
-            display: {
-                glint: itemSchema.e ? Object.keys(itemSchema.e).length > 0 : false,
-                lore: itemSchema.l.split('\n'),
-                name: itemSchema.dn
-            },
-            id: itemSchema.i,
-            vanillaId: itemSchema.v,
-        },
+        item: schemaToItem(itemSchema, fullItem),
         // auctionIds: auctions.map(a => a._id),
         count: auctions.length,
         median: medianPrice,
@@ -746,6 +757,57 @@ async function fetchItemPriceData(item) {
     };
 }
 exports.fetchItemPriceData = fetchItemPriceData;
+async function fetchMostSoldItems() {
+    const mostSoldItems = await auctionsCollection.aggregate([
+        { $sort: { p: 1 } },
+        {
+            $group: {
+                _id: '$i',
+                prices: { $push: '$p' }
+            }
+        },
+        {
+            $project: {
+                prices: 1,
+                count: { '$size': ['$prices'] }
+            }
+        },
+        // sort and cut off the results at the top 100
+        { $sort: { count: -1 } },
+        { $limit: 100 },
+        // get the median
+        {
+            $project: {
+                median: { '$arrayElemAt': ['$prices', { $floor: { $divide: ['$count', 2] } }] },
+                count: 1
+            }
+        },
+        {
+            $lookup: {
+                from: 'items',
+                localField: '_id',
+                foreignField: '_id',
+                as: 'item'
+            }
+        },
+        {
+            $project: {
+                item: { $arrayElemAt: ['$item', 0] },
+                prices: 1,
+                median: 1,
+                count: 1
+            }
+        }
+    ])
+        .toArray();
+    return mostSoldItems.map((i) => ({
+        internalId: i._id,
+        count: i.count,
+        median: i.median,
+        item: schemaToItem(i.item)
+    }));
+}
+exports.fetchMostSoldItems = fetchMostSoldItems;
 // make sure it's not in a test
 if (!globalThis.isTest) {
     connect().then(() => {

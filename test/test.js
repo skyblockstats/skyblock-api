@@ -134,6 +134,9 @@ describe('util', () => {
 		it('Don\'t include removed parts', () => {
 			assert.strictEqual(util.replaceDifferencesWithQuestionMark('Hello world', 'Hello'), 'Hello')
 		})
+		it('Don\'t include removed parts', () => {
+			assert.strictEqual(util.replaceDifferencesWithQuestionMark('§9???? Soulstealer Bow', '§9Soulstealer Bow'), '§9Soulstealer Bow')
+		})
 		it('Replace difference with question marks', () => {
 			assert.strictEqual(util.replaceDifferencesWithQuestionMark('Hello world', 'Hello there'), 'Hello ?????')
 		})
