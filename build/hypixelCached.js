@@ -40,7 +40,7 @@ exports.usernameCache = new node_cache_1.default({
     checkperiod: 60,
     useClones: false,
 });
-exports.usernameCache.setMaxListeners(20);
+exports.usernameCache.setMaxListeners(50);
 exports.basicProfilesCache = new node_cache_1.default({
     stdTTL: 60 * 10,
     checkperiod: 60,
@@ -244,7 +244,7 @@ async function fetchBasicProfiles(user) {
         console.debug('Cache miss: fetchBasicProfiles', user);
     const player = await fetchPlayer(playerUuid);
     if (!player) {
-        console.log('bruh playerUuid', user);
+        console.log('bruh playerUuid', user, playerUuid);
         return [];
     }
     const profiles = player.profiles;

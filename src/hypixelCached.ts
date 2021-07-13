@@ -21,7 +21,7 @@ export const usernameCache = new NodeCache({
 	useClones: false,
 })
 
-usernameCache.setMaxListeners(20)
+usernameCache.setMaxListeners(50)
 
 export const basicProfilesCache = new NodeCache({
 	stdTTL: 60 * 10,
@@ -260,7 +260,7 @@ async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[] | n
 
 	const player = await fetchPlayer(playerUuid)
 	if (!player) {
-		console.log('bruh playerUuid', user)
+		console.log('bruh playerUuid', user, playerUuid)
 		return []
 	}
 	const profiles = player.profiles
