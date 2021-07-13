@@ -8,6 +8,9 @@
     "compile": "tsc",
     "start": "npm i --only=prod; node build/index.js"
   },
+  "engines": {
+    "node" : ">=16.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mat-1/skyblock-api.git"
