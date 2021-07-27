@@ -43,7 +43,7 @@
     "@types/express-rate-limit": "^5.1.3",
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.4.3",
-    "@types/mongodb": "^3.6.20",
+    "@types/mongodb": "^4.0.7",
     "@types/lru-cache": "^5.1.1",
     "@types/node-fetch": "^2.5.12",
     "dotenv": "^10.0.0",
