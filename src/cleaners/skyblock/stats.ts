@@ -64,7 +64,7 @@ export const statUnits = {
 	time: ['_best_time', '_best_time_2'],
 	date: ['first_join'],
 	coins: ['purse'],
-	leaderboards: ['leaderboards_count']
+	leaderboards: ['leaderboards_count', 'top_1_leaderboards_count']
 }
 
 export interface StatItem {
