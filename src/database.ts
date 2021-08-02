@@ -497,21 +497,10 @@ async function getLeaderboardRequirement(name: string, leaderboardType: 'member'
 		leaderboard = await fetchProfileLeaderboardRaw(name)
 
 	// if there's more than 100 items, return the 100th. if there's less, return null
-	if (leaderboard!.length >= leaderboardMax)
-		return {
-			top_100: leaderboard![leaderboardMax - 1].value,
-			top_1: leaderboard![1].value
-		}
-	else if (leaderboard!.length >= 1)
-		return {
-			top_100: null,
-			top_1: leaderboard![1]?.value ?? null
-		}
-	else
-		return {
-			top_100: null,
-			top_1: null
-		}
+	return {
+		top_100: leaderboard![leaderboardMax - 1]?.value ?? null,
+		top_1: leaderboard![1]?.value ?? null
+	}
 }
 
 /** Get the attributes for the member, but only ones that would put them on the top 100 for leaderboards */
@@ -557,7 +546,6 @@ async function getApplicableMemberLeaderboardAttributes(member: CleanMember): Pr
 		|| (top1LeaderboardsCount > top1LeaderboardsCountRequirement.top_100)
 	)
 	applicableAttributes['top_1_leaderboards_count'] = top1LeaderboardsCount
-	console.log('top_1_leaderboards_count', applicableTop1Attributes, top1LeaderboardsCount, 'requirement', top1LeaderboardsCountRequirement)
 	return applicableAttributes
 }
 

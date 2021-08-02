@@ -371,28 +371,17 @@ async function fetchMemberLeaderboardSpots(player, profile) {
 }
 exports.fetchMemberLeaderboardSpots = fetchMemberLeaderboardSpots;
 async function getLeaderboardRequirement(name, leaderboardType) {
-    var _a, _b;
+    var _a, _b, _c, _d;
     let leaderboard;
     if (leaderboardType === 'member')
         leaderboard = await fetchMemberLeaderboardRaw(name);
     else if (leaderboardType === 'profile')
         leaderboard = await fetchProfileLeaderboardRaw(name);
     // if there's more than 100 items, return the 100th. if there's less, return null
-    if (leaderboard.length >= leaderboardMax)
-        return {
-            top_100: leaderboard[leaderboardMax - 1].value,
-            top_1: leaderboard[1].value
-        };
-    else if (leaderboard.length >= 1)
-        return {
-            top_100: null,
-            top_1: (_b = (_a = leaderboard[1]) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : null
-        };
-    else
-        return {
-            top_100: null,
-            top_1: null
-        };
+    return {
+        top_100: (_b = (_a = leaderboard[leaderboardMax - 1]) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : null,
+        top_1: (_d = (_c = leaderboard[1]) === null || _c === void 0 ? void 0 : _c.value) !== null && _d !== void 0 ? _d : null
+    };
 }
 /** Get the attributes for the member, but only ones that would put them on the top 100 for leaderboards */
 async function getApplicableMemberLeaderboardAttributes(member) {
@@ -423,7 +412,6 @@ async function getApplicableMemberLeaderboardAttributes(member) {
     if ((top1LeaderboardsCountRequirement.top_100 === null)
         || (top1LeaderboardsCount > top1LeaderboardsCountRequirement.top_100))
         applicableAttributes['top_1_leaderboards_count'] = top1LeaderboardsCount;
-    console.log('top_1_leaderboards_count', applicableTop1Attributes, top1LeaderboardsCount, 'requirement', top1LeaderboardsCountRequirement);
     return applicableAttributes;
 }
 /** Get the attributes for the profile, but only ones that would put them on the top 100 for leaderboards */
