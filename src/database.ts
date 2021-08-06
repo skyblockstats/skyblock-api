@@ -165,7 +165,8 @@ let auctionsCollection: Collection<AuctionSchema>
 const leaderboardInfos: { [ leaderboardName: string ]: string } = {
 	highest_crit_damage: 'This leaderboard is capped at the integer limit because Hypixel, look at the <a href="/leaderboard/highest_critical_damage">highest critical damage leaderboard</a> instead.',
 	highest_critical_damage: 'uhhhhh yeah idk either',
-	leaderboards_count: 'This leaderboard counts how many leaderboards people are in the top 100 for.',
+	leaderboards_count: 'This leaderboard counts how many leaderboards players are in the top 100 for.',
+	top_1_leaderboards_count: 'This leaderboard counts how many leaderboards players are #1 for.',
 }
 
 
@@ -317,7 +318,8 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 		'first_join',
 		'purse',
 		'visited_zones',
-		'leaderboards_count'
+		'leaderboards_count',
+		'top_1_leaderboards_count'
 	]
 }
 
@@ -545,7 +547,7 @@ export async function fetchMemberLeaderboardSpots(player: string, profile: strin
 	return memberLeaderboardSpots
 }
 
-async function getLeaderboardRequirement(name: string, leaderboardType: 'member' | 'profile'): Promise<number | null> {
+async function getLeaderboardRequirement(name: string, leaderboardType: 'member' | 'profile'): Promise<{ top_100: number | null, top_1: number | null }> {
 	let leaderboard: memberRawLeaderboardItem[] | profileRawLeaderboardItem[]
 	if (leaderboardType === 'member')
 		leaderboard = await fetchMemberLeaderboardRaw(name)
@@ -553,39 +555,61 @@ async function getLeaderboardRequirement(name: string, leaderboardType: 'member'
 		leaderboard = await fetchProfileLeaderboardRaw(name)
 
 	// if there's more than 100 items, return the 100th. if there's less, return null
-	if (leaderboard!.length >= leaderboardMax)
-		return leaderboard![leaderboardMax - 1].value
-	else
-		return null
+	return {
+		top_100: leaderboard![leaderboardMax - 1]?.value ?? null,
+		top_1: leaderboard![1]?.value ?? null
+	}
 }
 
 /** Get the attributes for the member, but only ones that would put them on the top 100 for leaderboards */
 async function getApplicableMemberLeaderboardAttributes(member: CleanMember): Promise<StringNumber> {
 	const leaderboardAttributes = getMemberLeaderboardAttributes(member)
 	const applicableAttributes = {}
+	const applicableTop1Attributes = {}
 
 	for (const [ leaderboard, attributeValue ] of Object.entries(leaderboardAttributes)) {
 		const requirement = await getLeaderboardRequirement(leaderboard, 'member')
 		const leaderboardReversed = isLeaderboardReversed(leaderboard)
 		if (
-			(requirement === null)
-			|| (leaderboardReversed ? attributeValue < requirement : attributeValue > requirement)
+			(requirement.top_100 === null)
+			|| (
+				leaderboardReversed ? attributeValue < requirement.top_100 : attributeValue > requirement.top_100)
 		) {
 			applicableAttributes[leaderboard] = attributeValue
 		}
+		if (
+			(requirement.top_1 === null)
+			|| (leaderboardReversed ? attributeValue < requirement.top_1 : attributeValue > requirement.top_1)
+		) {
+			applicableTop1Attributes[leaderboard] = attributeValue
+		}
 	}
 
-
-	let leaderboardsCount: number = Object.keys(applicableAttributes).length
-	const leaderboardsCountRequirement: number | null = await getLeaderboardRequirement('leaderboards_count', 'member')
+	// add the "leaderboards count" attribute
+	const leaderboardsCount: number = Object.keys(applicableAttributes).length
+	const leaderboardsCountRequirement = await getLeaderboardRequirement('leaderboards_count', 'member')
 
 	if (
-		(leaderboardsCountRequirement === null)
-		|| (leaderboardsCount > leaderboardsCountRequirement)
-	) {
+		leaderboardsCount > 0
+		&& (
+			(leaderboardsCountRequirement.top_100 === null)
+			|| (leaderboardsCount > leaderboardsCountRequirement.top_100)
+		)
+	)
 		applicableAttributes['leaderboards_count'] = leaderboardsCount
-	}
+	
+	// add the "first leaderboards count" attribute
+	const top1LeaderboardsCount: number = Object.keys(applicableTop1Attributes).length
+	const top1LeaderboardsCountRequirement = await getLeaderboardRequirement('top_1_leaderboards_count', 'member')
 
+	if (
+		top1LeaderboardsCount > 0
+		&& (
+			(top1LeaderboardsCountRequirement.top_100 === null)
+			|| (top1LeaderboardsCount > top1LeaderboardsCountRequirement.top_100)
+		)
+	)
+		applicableAttributes['top_1_leaderboards_count'] = top1LeaderboardsCount
 	return applicableAttributes
 }
 
@@ -593,27 +617,29 @@ async function getApplicableMemberLeaderboardAttributes(member: CleanMember): Pr
 async function getApplicableProfileLeaderboardAttributes(profile: CleanFullProfile): Promise<StringNumber> {
 	const leaderboardAttributes = getProfileLeaderboardAttributes(profile)
 	const applicableAttributes = {}
+	const applicableTop1Attributes = {}
 
 	for (const [ leaderboard, attributeValue ] of Object.entries(leaderboardAttributes)) {
 		const requirement = await getLeaderboardRequirement(leaderboard, 'profile')
 		const leaderboardReversed = isLeaderboardReversed(leaderboard)
 		if (
-			(requirement === null)
-			|| (leaderboardReversed ? attributeValue < requirement : attributeValue > requirement)
+			(requirement.top_100 === null)
+			|| (
+				leaderboardReversed ? attributeValue < requirement.top_100 : attributeValue > requirement.top_100
+				&& attributeValue !== 0
+			)
 		) {
 			applicableAttributes[leaderboard] = attributeValue
 		}
-	}
-
-
-	let leaderboardsCount: number = Object.keys(applicableAttributes).length
-	const leaderboardsCountRequirement: number | null = await getLeaderboardRequirement('leaderboards_count', 'member')
-
-	if (
-		leaderboardsCountRequirement === null
-		|| leaderboardsCount > leaderboardsCountRequirement
-	) {
-		applicableAttributes['leaderboards_count'] = leaderboardsCount
+		if (
+			(requirement.top_1 === null)
+			|| (
+				leaderboardReversed ? attributeValue < requirement.top_1 : attributeValue > requirement.top_1
+				&& attributeValue !== 0
+			)
+		) {
+			applicableTop1Attributes[leaderboard] = attributeValue
+		}
 	}
 
 	return applicableAttributes

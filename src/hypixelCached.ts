@@ -24,7 +24,7 @@ export const usernameCache = new NodeCache({
 	useClones: false,
 })
 
-usernameCache.setMaxListeners(20)
+usernameCache.setMaxListeners(50)
 
 export const basicProfilesCache = new NodeCache({
 	stdTTL: 60 * 10,
@@ -204,7 +204,7 @@ export async function fetchBasicPlayer(user: string): Promise<CleanPlayer | null
 	
 	const player = await fetchPlayer(playerUuid)
 	if (!player) {
-		console.debug('no player? this should never happen', user, playerUuid)
+		console.debug('no player? this should never happen, perhaps the uuid is invalid or the player hasn\'t played hypixel', playerUuid)
 		return null
 	}
 
@@ -263,7 +263,7 @@ async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[] | n
 
 	const player = await fetchPlayer(playerUuid)
 	if (!player) {
-		console.log('bruh playerUuid', user)
+		console.log('bruh playerUuid', user, playerUuid)
 		return []
 	}
 	const profiles = player.profiles

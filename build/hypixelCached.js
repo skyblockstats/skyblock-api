@@ -42,7 +42,7 @@ exports.usernameCache = new node_cache_1.default({
     checkperiod: 60,
     useClones: false,
 });
-exports.usernameCache.setMaxListeners(20);
+exports.usernameCache.setMaxListeners(50);
 exports.basicProfilesCache = new node_cache_1.default({
     stdTTL: 60 * 10,
     checkperiod: 60,
@@ -192,7 +192,7 @@ async function fetchBasicPlayer(user) {
         return exports.basicPlayerCache.get(playerUuid);
     const player = await fetchPlayer(playerUuid);
     if (!player) {
-        console.debug('no player? this should never happen', user, playerUuid);
+        console.debug('no player? this should never happen, perhaps the uuid is invalid or the player hasn\'t played hypixel', playerUuid);
         return null;
     }
     delete player.profiles;
@@ -246,7 +246,7 @@ async function fetchBasicProfiles(user) {
         console.debug('Cache miss: fetchBasicProfiles', user);
     const player = await fetchPlayer(playerUuid);
     if (!player) {
-        console.log('bruh playerUuid', user);
+        console.log('bruh playerUuid', user, playerUuid);
         return [];
     }
     const profiles = player.profiles;

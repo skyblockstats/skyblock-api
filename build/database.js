@@ -65,7 +65,8 @@ let auctionsCollection;
 const leaderboardInfos = {
     highest_crit_damage: 'This leaderboard is capped at the integer limit because Hypixel, look at the <a href="/leaderboard/highest_critical_damage">highest critical damage leaderboard</a> instead.',
     highest_critical_damage: 'uhhhhh yeah idk either',
-    leaderboards_count: 'This leaderboard counts how many leaderboards people are in the top 100 for.',
+    leaderboards_count: 'This leaderboard counts how many leaderboards players are in the top 100 for.',
+    top_1_leaderboards_count: 'This leaderboard counts how many leaderboards players are #1 for.',
 };
 async function connect() {
     if (!process.env.db_uri)
@@ -187,7 +188,8 @@ async function fetchAllMemberLeaderboardAttributes() {
         'first_join',
         'purse',
         'visited_zones',
-        'leaderboards_count'
+        'leaderboards_count',
+        'top_1_leaderboards_count'
     ];
 }
 exports.fetchAllMemberLeaderboardAttributes = fetchAllMemberLeaderboardAttributes;
@@ -373,54 +375,69 @@ async function fetchMemberLeaderboardSpots(player, profile) {
 }
 exports.fetchMemberLeaderboardSpots = fetchMemberLeaderboardSpots;
 async function getLeaderboardRequirement(name, leaderboardType) {
+    var _a, _b, _c, _d;
     let leaderboard;
     if (leaderboardType === 'member')
         leaderboard = await fetchMemberLeaderboardRaw(name);
     else if (leaderboardType === 'profile')
         leaderboard = await fetchProfileLeaderboardRaw(name);
     // if there's more than 100 items, return the 100th. if there's less, return null
-    if (leaderboard.length >= leaderboardMax)
-        return leaderboard[leaderboardMax - 1].value;
-    else
-        return null;
+    return {
+        top_100: (_b = (_a = leaderboard[leaderboardMax - 1]) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : null,
+        top_1: (_d = (_c = leaderboard[1]) === null || _c === void 0 ? void 0 : _c.value) !== null && _d !== void 0 ? _d : null
+    };
 }
 /** Get the attributes for the member, but only ones that would put them on the top 100 for leaderboards */
 async function getApplicableMemberLeaderboardAttributes(member) {
     const leaderboardAttributes = getMemberLeaderboardAttributes(member);
     const applicableAttributes = {};
+    const applicableTop1Attributes = {};
     for (const [leaderboard, attributeValue] of Object.entries(leaderboardAttributes)) {
         const requirement = await getLeaderboardRequirement(leaderboard, 'member');
         const leaderboardReversed = isLeaderboardReversed(leaderboard);
-        if ((requirement === null)
-            || (leaderboardReversed ? attributeValue < requirement : attributeValue > requirement)) {
+        if ((requirement.top_100 === null)
+            || (leaderboardReversed ? attributeValue < requirement.top_100 : attributeValue > requirement.top_100)) {
             applicableAttributes[leaderboard] = attributeValue;
         }
+        if ((requirement.top_1 === null)
+            || (leaderboardReversed ? attributeValue < requirement.top_1 : attributeValue > requirement.top_1)) {
+            applicableTop1Attributes[leaderboard] = attributeValue;
+        }
     }
-    let leaderboardsCount = Object.keys(applicableAttributes).length;
+    // add the "leaderboards count" attribute
+    const leaderboardsCount = Object.keys(applicableAttributes).length;
     const leaderboardsCountRequirement = await getLeaderboardRequirement('leaderboards_count', 'member');
-    if ((leaderboardsCountRequirement === null)
-        || (leaderboardsCount > leaderboardsCountRequirement)) {
+    if (leaderboardsCount > 0
+        && ((leaderboardsCountRequirement.top_100 === null)
+            || (leaderboardsCount > leaderboardsCountRequirement.top_100)))
         applicableAttributes['leaderboards_count'] = leaderboardsCount;
-    }
+    // add the "first leaderboards count" attribute
+    const top1LeaderboardsCount = Object.keys(applicableTop1Attributes).length;
+    const top1LeaderboardsCountRequirement = await getLeaderboardRequirement('top_1_leaderboards_count', 'member');
+    if (top1LeaderboardsCount > 0
+        && ((top1LeaderboardsCountRequirement.top_100 === null)
+            || (top1LeaderboardsCount > top1LeaderboardsCountRequirement.top_100)))
+        applicableAttributes['top_1_leaderboards_count'] = top1LeaderboardsCount;
     return applicableAttributes;
 }
 /** Get the attributes for the profile, but only ones that would put them on the top 100 for leaderboards */
 async function getApplicableProfileLeaderboardAttributes(profile) {
     const leaderboardAttributes = getProfileLeaderboardAttributes(profile);
     const applicableAttributes = {};
+    const applicableTop1Attributes = {};
     for (const [leaderboard, attributeValue] of Object.entries(leaderboardAttributes)) {
         const requirement = await getLeaderboardRequirement(leaderboard, 'profile');
         const leaderboardReversed = isLeaderboardReversed(leaderboard);
-        if ((requirement === null)
-            || (leaderboardReversed ? attributeValue < requirement : attributeValue > requirement)) {
+        if ((requirement.top_100 === null)
+            || (leaderboardReversed ? attributeValue < requirement.top_100 : attributeValue > requirement.top_100
+                && attributeValue !== 0)) {
             applicableAttributes[leaderboard] = attributeValue;
         }
-    }
-    let leaderboardsCount = Object.keys(applicableAttributes).length;
-    const leaderboardsCountRequirement = await getLeaderboardRequirement('leaderboards_count', 'member');
-    if (leaderboardsCountRequirement === null
-        || leaderboardsCount > leaderboardsCountRequirement) {
-        applicableAttributes['leaderboards_count'] = leaderboardsCount;
+        if ((requirement.top_1 === null)
+            || (leaderboardReversed ? attributeValue < requirement.top_1 : attributeValue > requirement.top_1
+                && attributeValue !== 0)) {
+            applicableTop1Attributes[leaderboard] = attributeValue;
+        }
     }
     return applicableAttributes;
 }

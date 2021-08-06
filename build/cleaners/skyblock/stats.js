@@ -61,7 +61,7 @@ exports.statUnits = {
     time: ['_best_time', '_best_time_2'],
     date: ['first_join'],
     coins: ['purse'],
-    leaderboards: ['leaderboards_count']
+    leaderboards: ['leaderboards_count', 'top_1_leaderboards_count']
 };
 function getStatUnit(name) {
     for (const [unitName, statMatchers] of Object.entries(exports.statUnits)) {
