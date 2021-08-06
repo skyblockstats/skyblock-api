@@ -532,8 +532,11 @@ async function getApplicableMemberLeaderboardAttributes(member: CleanMember): Pr
 	const leaderboardsCountRequirement = await getLeaderboardRequirement('leaderboards_count', 'member')
 
 	if (
-		(leaderboardsCountRequirement.top_100 === null)
-		|| (leaderboardsCount > leaderboardsCountRequirement.top_100)
+		leaderboardsCount > 0
+		&& (
+			(leaderboardsCountRequirement.top_100 === null)
+			|| (leaderboardsCount > leaderboardsCountRequirement.top_100)
+		)
 	)
 		applicableAttributes['leaderboards_count'] = leaderboardsCount
 	
@@ -542,10 +545,13 @@ async function getApplicableMemberLeaderboardAttributes(member: CleanMember): Pr
 	const top1LeaderboardsCountRequirement = await getLeaderboardRequirement('top_1_leaderboards_count', 'member')
 
 	if (
-		(top1LeaderboardsCountRequirement.top_100 === null)
-		|| (top1LeaderboardsCount > top1LeaderboardsCountRequirement.top_100)
+		top1LeaderboardsCount > 0
+		&& (
+			(top1LeaderboardsCountRequirement.top_100 === null)
+			|| (top1LeaderboardsCount > top1LeaderboardsCountRequirement.top_100)
+		)
 	)
-	applicableAttributes['top_1_leaderboards_count'] = top1LeaderboardsCount
+		applicableAttributes['top_1_leaderboards_count'] = top1LeaderboardsCount
 	return applicableAttributes
 }
 

@@ -403,14 +403,16 @@ async function getApplicableMemberLeaderboardAttributes(member) {
     // add the "leaderboards count" attribute
     const leaderboardsCount = Object.keys(applicableAttributes).length;
     const leaderboardsCountRequirement = await getLeaderboardRequirement('leaderboards_count', 'member');
-    if ((leaderboardsCountRequirement.top_100 === null)
-        || (leaderboardsCount > leaderboardsCountRequirement.top_100))
+    if (leaderboardsCount > 0
+        && ((leaderboardsCountRequirement.top_100 === null)
+            || (leaderboardsCount > leaderboardsCountRequirement.top_100)))
         applicableAttributes['leaderboards_count'] = leaderboardsCount;
     // add the "first leaderboards count" attribute
     const top1LeaderboardsCount = Object.keys(applicableTop1Attributes).length;
     const top1LeaderboardsCountRequirement = await getLeaderboardRequirement('top_1_leaderboards_count', 'member');
-    if ((top1LeaderboardsCountRequirement.top_100 === null)
-        || (top1LeaderboardsCount > top1LeaderboardsCountRequirement.top_100))
+    if (top1LeaderboardsCount > 0
+        && ((top1LeaderboardsCountRequirement.top_100 === null)
+            || (top1LeaderboardsCount > top1LeaderboardsCountRequirement.top_100)))
         applicableAttributes['top_1_leaderboards_count'] = top1LeaderboardsCount;
     return applicableAttributes;
 }
