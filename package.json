@@ -48,7 +48,7 @@
     "@types/node-fetch": "^2.5.12",
     "dotenv": "^10.0.0",
     "mocha": "^9.0.3",
-    "ts-node": "^10.1.0",
+    "ts-node": "^10.2.0",
     "typescript": "^4.3.5"
   }
 }
