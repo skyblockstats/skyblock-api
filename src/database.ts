@@ -4,12 +4,12 @@
 
 import { replaceDifferencesWithQuestionMark, shuffle, sleep } from './util'
 import { categorizeStat, getStatUnit } from './cleaners/skyblock/stats'
-import { Collection, Db, FilterQuery, MongoClient } from 'mongodb'
 import { CleanFullProfile } from './cleaners/skyblock/profile'
 import { slayerLevels } from './cleaners/skyblock/slayers'
+import { Item, Tier } from './cleaners/skyblock/inventory'
 import { CleanMember } from './cleaners/skyblock/member'
 import { Auction } from './cleaners/skyblock/auctions'
-import { Item, Tier } from './cleaners/skyblock/inventory'
+import { Collection, Db, MongoClient } from 'mongodb'
 import { CleanPlayer } from './cleaners/player'
 import * as cached from './hypixelCached'
 import * as constants from './constants'
@@ -79,9 +79,6 @@ const reversedLeaderboards = [
 	'_best_time', '_best_time_2'
 ]
 
-let client: MongoClient
-let database: Db
-
 interface SessionSchema {
 	_id?: string
 	refresh_token: string
@@ -134,6 +131,8 @@ interface ItemSchema {
 	pote?: number
 	/** Enchantments, this only applies when the SkyBlock id is ENCHANTED_BOOK */
 	e?: Record<string, number>
+	/** Whether the item is reforged */
+	r: boolean
 }
 
 interface AuctionSchema {
@@ -153,6 +152,9 @@ interface AuctionSchema {
 	r?: string
 }
 
+let client: MongoClient | undefined = undefined
+let database: Db
+
 let memberLeaderboardsCollection: Collection<DatabaseMemberLeaderboardItem>
 let profileLeaderboardsCollection: Collection<DatabaseProfileLeaderboardItem>
 let sessionsCollection: Collection<SessionSchema>
@@ -162,6 +164,24 @@ let itemsCollection: Collection<ItemSchema>
 let auctionsCollection: Collection<AuctionSchema>
 
 
+
+if (!process.env.db_uri)
+	console.warn('Warning: db_uri was not found in .env. Features that utilize the database such as leaderboards won\'t work')
+else if (!process.env.db_name)
+	console.warn('Warning: db_name was not found in .env. Features that utilize the database such as leaderboards won\'t work.')
+else {
+	client = new MongoClient(process.env.db_uri)
+	database = client.db(process.env.db_name)
+
+	memberLeaderboardsCollection = database.collection<DatabaseMemberLeaderboardItem>('member-leaderboards')
+	profileLeaderboardsCollection = database.collection<DatabaseProfileLeaderboardItem>('profile-leaderboards')
+	sessionsCollection = database.collection<SessionSchema>('sessions')
+	accountsCollection = database.collection<AccountSchema>('accounts')
+
+	itemsCollection = database.collection<ItemSchema>('items')
+	auctionsCollection = database.collection<AuctionSchema>('auctions')
+}
+
 const leaderboardInfos: { [ leaderboardName: string ]: string } = {
 	highest_crit_damage: 'This leaderboard is capped at the integer limit because Hypixel, look at the <a href="/leaderboard/highest_critical_damage">highest critical damage leaderboard</a> instead.',
 	highest_critical_damage: 'uhhhhh yeah idk either',
@@ -169,24 +189,6 @@ const leaderboardInfos: { [ leaderboardName: string ]: string } = {
 	top_1_leaderboards_count: 'This leaderboard counts how many leaderboards players are #1 for.',
 }
 
-
-async function connect(): Promise<void> {
-	if (!process.env.db_uri)
-		return console.warn('Warning: db_uri was not found in .env. Features that utilize the database such as leaderboards won\'t work.')
-	if (!process.env.db_name)
-		return console.warn('Warning: db_name was not found in .env. Features that utilize the database such as leaderboards won\'t work.')
-	client = await MongoClient.connect(process.env.db_uri, { useNewUrlParser: true, useUnifiedTopology: true })
-	database = client.db(process.env.db_name)
-
-	memberLeaderboardsCollection = database.collection('member-leaderboards')
-	profileLeaderboardsCollection = database.collection('profile-leaderboards')
-	sessionsCollection = database.collection('sessions')
-	accountsCollection = database.collection('accounts')
-	itemsCollection = database.collection('items')
-	auctionsCollection = database.collection('auctions')
-
-	console.log('Connected to database :)')
-}
 
 interface StringNumber {
 	[ name: string]: number
@@ -842,15 +844,15 @@ export async function createSession(refreshToken: string, userData: discord.Disc
 	return sessionId
 }
 
-export async function fetchSession(sessionId: string): Promise<SessionSchema | null> {
+export async function fetchSession(sessionId: string): Promise<SessionSchema | undefined> {
 	return await sessionsCollection?.findOne({ _id: sessionId })
 }
 
-export async function fetchAccount(minecraftUuid: string): Promise<AccountSchema | null> {
+export async function fetchAccount(minecraftUuid: string): Promise<AccountSchema | undefined> {
 	return await accountsCollection?.findOne({ minecraftUuid })
 }
 
-export async function fetchAccountFromDiscord(discordId: string): Promise<AccountSchema | null> {
+export async function fetchAccountFromDiscord(discordId: string): Promise<AccountSchema | undefined> {
 	return await accountsCollection?.findOne({ discordId })
 }
 
@@ -862,7 +864,7 @@ export async function updateAccount(discordId: string, schema: AccountSchema) {
 
 /** Get the unique uuid (generated by us) for the item, based on the SkyBlock id and pet type */
 export async function getItemUniqueId<U extends boolean, E extends boolean=false>(item: Item, update: U, returnEntireItem?: E): Promise<E extends true ? (U extends true ? ItemSchema : ItemSchema | undefined) : (U extends true ? string : string | undefined)> {
-	const itemUniqueData: FilterQuery<ItemSchema> = {
+	const itemUniqueData: Partial<ItemSchema> = {
 		i: item.id,
 		v: item.vanillaId || undefined,
 		pt: item.pet_type,
@@ -875,20 +877,32 @@ export async function getItemUniqueId<U extends boolean, E extends boolean=false
 	}
 	// Delete undefined stuff from itemUniqueData
 	Object.keys(itemUniqueData).forEach(key => itemUniqueData[key] === undefined && delete itemUniqueData[key])
-	// if (itemUniqueData.display)
-	// 	Object.keys(itemUniqueData.display).forEach(key => itemUniqueData.display[key] === undefined && delete itemUniqueData.display[key])
 
-		const existingItem = await itemsCollection.findOne(itemUniqueData)
-	if (!update) return returnEntireItem ? existingItem : existingItem?._id as any
+	// existing item is the data that we have on the item in the database, it's null if it doesn't exist
+	const existingItem = await itemsCollection.findOne(itemUniqueData)
+
+	// we're not updating anything, so just return the id now
+	if (!update)
+		return returnEntireItem ? existingItem : existingItem?._id as any
 
 	const itemUniqueId = existingItem ? existingItem._id : uuid4().replace(/-/g, '')
 
-	const itemName = existingItem ? replaceDifferencesWithQuestionMark(existingItem.dn, item.display.name) : item.display.name
+	// if the item in the database doesn't have a reforge but this one does, don't bother updating anything and just return the id
+	if (existingItem?.r === false && item.reforge !== undefined)
+		return returnEntireItem ? existingItem : itemUniqueId
+
+	let itemName: string
 	let itemLore: string | null
-	if (item.reforge)
-		itemLore = null
-	else
+
+	// the item in the database has a reforge but this one doesn't, that means we can override all of the data (since reforges will mess with the lore)
+	// i used "!== false" instead of "=== true" because sometimes old items in my database don't have r set
+	if (existingItem && existingItem.r !== false && item.reforge === undefined) {
+		itemName = item.display.name
+		itemLore = item.display.lore.join('\n')
+	} else {
+		itemName = existingItem ? replaceDifferencesWithQuestionMark(existingItem.dn, item.display.name) : item.display.name
 		itemLore = existingItem?.l ? replaceDifferencesWithQuestionMark(existingItem.l, item.display.lore.join('\n')) : item.display.lore.join('\n')
+	}
 
 	// all the stuff is the same, don't bother updating it
 	if (
@@ -896,13 +910,15 @@ export async function getItemUniqueId<U extends boolean, E extends boolean=false
 		&& itemName === existingItem.dn
 		&& (!itemLore || itemLore === existingItem.l)
 		&& item.head_texture === existingItem.h
+		&& (item.reforge !== undefined) === existingItem.r
 	)
 		return returnEntireItem ? existingItem : itemUniqueId
 
 
-	let updateSet: { dn: string, h?: string, l?: string } = {
+	let updateSet: { dn: string, h?: string, l?: string, r: boolean } = {
 		dn: itemName,
-		h: item.head_texture
+		h: item.head_texture,
+		r: item.reforge !== undefined
 	}
 	if (itemLore)
 		updateSet.l = itemLore
@@ -996,7 +1012,7 @@ export async function fetchItemPriceData(item: Partial<Item>): Promise<ItemPrice
 	// we couldn't generate a unique id, meaning the item doesn't exist
 	if (!itemSchema) return null
 
-	const auctionsQuery: FilterQuery<AuctionSchema> = {
+	const auctionsQuery: Partial<AuctionSchema> = {
 		i: itemSchema._id,
 		e: fullItem.enchantments,
 		r: fullItem.reforge,
@@ -1101,19 +1117,20 @@ export async function fetchMostSoldItems(): Promise<ItemPriceData[]> {
 	return cachedMostSoldItems
 }
 
-// make sure it's not in a test
-if (!globalThis.isTest) {
-	connect().then(() => {
-		// when it connects, cache the leaderboards and remove bad members
-		removeBadMemberLeaderboardAttributes()
+if (client)
+	client.connect().then(() => {
+		// make sure it's not in a test
+		if (!globalThis.isTest) {
+			// when it connects, cache the leaderboards and remove bad members
+			removeBadMemberLeaderboardAttributes()
 
-		// cache leaderboards on startup so its faster later on
-		fetchAllLeaderboards(true)
-		// cache leaderboard players again every 4 hours
-		setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000)
+			// cache leaderboards on startup so its faster later on
+			fetchAllLeaderboards(true)
+			// cache leaderboard players again every 4 hours
+			setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000)
 
-		// add auctions that ended to the database
-		addEndedAuctions()
-		setInterval(addEndedAuctions, 60 * 1000)
+			// add auctions that ended to the database
+			addEndedAuctions()
+			setInterval(addEndedAuctions, 60 * 1000)
+		}
 	})
-}

@@ -123,7 +123,7 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 			}
 		}
 	}
-	let websiteAccount: AccountSchema | null = null
+	let websiteAccount: AccountSchema | undefined = undefined
 
 	if (websiteAccountPromise)
 		websiteAccount = await websiteAccountPromise
@@ -177,7 +177,7 @@ export async function fetchMemberProfile(user: string, profile: string, customiz
 
 	cleanProfile.members = simpleMembers
 
-	let websiteAccount: AccountSchema | null = null
+	let websiteAccount: AccountSchema | undefined = undefined
 
 	if (websiteAccountPromise)
 		websiteAccount = await websiteAccountPromise

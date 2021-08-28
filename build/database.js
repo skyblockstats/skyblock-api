@@ -28,8 +28,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.fetchMostSoldItems = exports.fetchItemPriceData = exports.addAuction = exports.getItemUniqueId = exports.updateAccount = exports.fetchAccountFromDiscord = exports.fetchAccount = exports.fetchSession = exports.createSession = exports.finishedCachingRawLeaderboards = exports.queueUpdateDatabaseProfile = exports.queueUpdateDatabaseMember = exports.leaderboardUpdateProfileQueue = exports.leaderboardUpdateMemberQueue = exports.updateDatabaseProfile = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchLeaderboard = exports.fetchProfileLeaderboard = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchSlayerLeaderboards = exports.fetchAllLeaderboardsCategorized = exports.cachedRawLeaderboards = void 0;
 const util_1 = require("./util");
 const stats_1 = require("./cleaners/skyblock/stats");
-const mongodb_1 = require("mongodb");
 const slayers_1 = require("./cleaners/skyblock/slayers");
+const mongodb_1 = require("mongodb");
 const cached = __importStar(require("./hypixelCached"));
 const constants = __importStar(require("./constants"));
 const node_cache_1 = __importDefault(require("node-cache"));
@@ -54,7 +54,7 @@ const reversedLeaderboards = [
     'first_join',
     '_best_time', '_best_time_2'
 ];
-let client;
+let client = undefined;
 let database;
 let memberLeaderboardsCollection;
 let profileLeaderboardsCollection;
@@ -62,18 +62,12 @@ let sessionsCollection;
 let accountsCollection;
 let itemsCollection;
 let auctionsCollection;
-const leaderboardInfos = {
-    highest_crit_damage: 'This leaderboard is capped at the integer limit because Hypixel, look at the <a href="/leaderboard/highest_critical_damage">highest critical damage leaderboard</a> instead.',
-    highest_critical_damage: 'uhhhhh yeah idk either',
-    leaderboards_count: 'This leaderboard counts how many leaderboards players are in the top 100 for.',
-    top_1_leaderboards_count: 'This leaderboard counts how many leaderboards players are #1 for.',
-};
-async function connect() {
-    if (!process.env.db_uri)
-        return console.warn('Warning: db_uri was not found in .env. Features that utilize the database such as leaderboards won\'t work.');
-    if (!process.env.db_name)
-        return console.warn('Warning: db_name was not found in .env. Features that utilize the database such as leaderboards won\'t work.');
-    client = await mongodb_1.MongoClient.connect(process.env.db_uri, { useNewUrlParser: true, useUnifiedTopology: true });
+if (!process.env.db_uri)
+    console.warn('Warning: db_uri was not found in .env. Features that utilize the database such as leaderboards won\'t work');
+else if (!process.env.db_name)
+    console.warn('Warning: db_name was not found in .env. Features that utilize the database such as leaderboards won\'t work.');
+else {
+    client = new mongodb_1.MongoClient(process.env.db_uri);
     database = client.db(process.env.db_name);
     memberLeaderboardsCollection = database.collection('member-leaderboards');
     profileLeaderboardsCollection = database.collection('profile-leaderboards');
@@ -81,8 +75,13 @@ async function connect() {
     accountsCollection = database.collection('accounts');
     itemsCollection = database.collection('items');
     auctionsCollection = database.collection('auctions');
-    console.log('Connected to database :)');
 }
+const leaderboardInfos = {
+    highest_crit_damage: 'This leaderboard is capped at the integer limit because Hypixel, look at the <a href="/leaderboard/highest_critical_damage">highest critical damage leaderboard</a> instead.',
+    highest_critical_damage: 'uhhhhh yeah idk either',
+    leaderboards_count: 'This leaderboard counts how many leaderboards players are in the top 100 for.',
+    top_1_leaderboards_count: 'This leaderboard counts how many leaderboards players are #1 for.',
+};
 function getMemberCollectionAttributes(member) {
     const collectionAttributes = {};
     for (const collection of member.collections) {
@@ -650,27 +649,38 @@ async function getItemUniqueId(item, update, returnEntireItem) {
     };
     // Delete undefined stuff from itemUniqueData
     Object.keys(itemUniqueData).forEach(key => itemUniqueData[key] === undefined && delete itemUniqueData[key]);
-    // if (itemUniqueData.display)
-    // 	Object.keys(itemUniqueData.display).forEach(key => itemUniqueData.display[key] === undefined && delete itemUniqueData.display[key])
+    // existing item is the data that we have on the item in the database, it's null if it doesn't exist
     const existingItem = await itemsCollection.findOne(itemUniqueData);
+    // we're not updating anything, so just return the id now
     if (!update)
         return returnEntireItem ? existingItem : existingItem === null || existingItem === void 0 ? void 0 : existingItem._id;
     const itemUniqueId = existingItem ? existingItem._id : uuid_1.v4().replace(/-/g, '');
-    const itemName = existingItem ? util_1.replaceDifferencesWithQuestionMark(existingItem.dn, item.display.name) : item.display.name;
+    // if the item in the database doesn't have a reforge but this one does, don't bother updating anything and just return the id
+    if ((existingItem === null || existingItem === void 0 ? void 0 : existingItem.r) === false && item.reforge !== undefined)
+        return returnEntireItem ? existingItem : itemUniqueId;
+    let itemName;
     let itemLore;
-    if (item.reforge)
-        itemLore = null;
-    else
+    // the item in the database has a reforge but this one doesn't, that means we can override all of the data (since reforges will mess with the lore)
+    // i used "!== false" instead of "=== true" because sometimes old items in my database don't have r set
+    if (existingItem && existingItem.r !== false && item.reforge === undefined) {
+        itemName = item.display.name;
+        itemLore = item.display.lore.join('\n');
+    }
+    else {
+        itemName = existingItem ? util_1.replaceDifferencesWithQuestionMark(existingItem.dn, item.display.name) : item.display.name;
         itemLore = (existingItem === null || existingItem === void 0 ? void 0 : existingItem.l) ? util_1.replaceDifferencesWithQuestionMark(existingItem.l, item.display.lore.join('\n')) : item.display.lore.join('\n');
+    }
     // all the stuff is the same, don't bother updating it
     if (existingItem
         && itemName === existingItem.dn
         && (!itemLore || itemLore === existingItem.l)
-        && item.head_texture === existingItem.h)
+        && item.head_texture === existingItem.h
+        && (item.reforge !== undefined) === existingItem.r)
         return returnEntireItem ? existingItem : itemUniqueId;
     let updateSet = {
         dn: itemName,
-        h: item.head_texture
+        h: item.head_texture,
+        r: item.reforge !== undefined
     };
     if (itemLore)
         updateSet.l = itemLore;
@@ -847,17 +857,18 @@ async function fetchMostSoldItems() {
     return cachedMostSoldItems;
 }
 exports.fetchMostSoldItems = fetchMostSoldItems;
-// make sure it's not in a test
-if (!globalThis.isTest) {
-    connect().then(() => {
-        // when it connects, cache the leaderboards and remove bad members
-        removeBadMemberLeaderboardAttributes();
-        // cache leaderboards on startup so its faster later on
-        fetchAllLeaderboards(true);
-        // cache leaderboard players again every 4 hours
-        setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000);
-        // add auctions that ended to the database
-        addEndedAuctions();
-        setInterval(addEndedAuctions, 60 * 1000);
+if (client)
+    client.connect().then(() => {
+        // make sure it's not in a test
+        if (!globalThis.isTest) {
+            // when it connects, cache the leaderboards and remove bad members
+            removeBadMemberLeaderboardAttributes();
+            // cache leaderboards on startup so its faster later on
+            fetchAllLeaderboards(true);
+            // cache leaderboard players again every 4 hours
+            setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000);
+            // add auctions that ended to the database
+            addEndedAuctions();
+            setInterval(addEndedAuctions, 60 * 1000);
+        }
     });
-}
