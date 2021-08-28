@@ -61,11 +61,12 @@ exports.getKeyUsage = getKeyUsage;
 async function sendApiRequest({ path, key, args }) {
     var _a, _b, _c;
     // Send a raw http request to api.hypixel.net, and return the parsed json
+    let headers = {};
     if (key
         // keys arent required for skyblock/auctions
         && path !== 'skyblock/auctions')
         // If there's an api key, add it to the arguments
-        args.key = key;
+        headers['API-Key'] = key;
     // Construct a url from the base api url, path, and arguments
     const fetchUrl = baseHypixelAPI + '/' + path + '?' + util_1.jsonToQuery(args);
     let fetchResponse;
@@ -75,7 +76,10 @@ async function sendApiRequest({ path, key, args }) {
     const maxRetries = 2;
     while (retries <= maxRetries) {
         try {
-            fetchResponse = await node_fetch_1.default(fetchUrl, { agent: () => httpsAgent });
+            fetchResponse = await node_fetch_1.default(fetchUrl, {
+                agent: () => httpsAgent,
+                headers
+            });
             fetchJsonParsed = await fetchResponse.json();
             break;
         }

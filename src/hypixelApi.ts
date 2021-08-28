@@ -142,13 +142,14 @@ export interface HypixelPlayer {
 /** Send an HTTP request to the Hypixel API */
 export async function sendApiRequest({ path, key, args }): Promise<HypixelResponse> {
 	// Send a raw http request to api.hypixel.net, and return the parsed json
+	let headers: HeadersInit = {}
 	if (
 		key
 		// keys arent required for skyblock/auctions
 		&& path !== 'skyblock/auctions'
 	)
 		// If there's an api key, add it to the arguments
-		args.key = key
+		headers['API-Key'] = key
 
 	// Construct a url from the base api url, path, and arguments
 	const fetchUrl = baseHypixelAPI + '/' + path + '?' + jsonToQuery(args)
@@ -165,7 +166,10 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 		try {
 			fetchResponse = await fetch(
 				fetchUrl,
-				{ agent: () => httpsAgent }
+				{
+					agent: () => httpsAgent,
+					headers
+				}
 			)
 			fetchJsonParsed = await fetchResponse.json()
 			break
