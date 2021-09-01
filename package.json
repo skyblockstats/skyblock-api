@@ -33,7 +33,7 @@
     "lru-cache": "^6.0.0",
     "mongodb": "^4.1.1",
     "node-cache": "^5.1.2",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.0.0",
     "prismarine-nbt": "^1.6.0",
     "uuid": "^8.3.2",
     "queue-promise": "^2.2.1"
