@@ -164,7 +164,9 @@ app.get('/auctions/search', async(req, res) => {
 
 	itemName = itemName.trim().replace(/\s\s+/g, ' ')
 
-	const matchingItems = await fetchItemsByName(itemName)
+	console.log(filters)
+
+	const matchingItems = await fetchItemsByName(itemName, {})
 
 	res.json(matchingItems)
 })

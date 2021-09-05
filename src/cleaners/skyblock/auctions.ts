@@ -1,3 +1,4 @@
+import { addEnchantments } from '../../constants'
 import { cleanItemEncoded, Item } from './inventory'
 
 export interface Auction {
@@ -21,6 +22,12 @@ export interface AuctionsResponse {
 }
 
 async function cleanSkyBlockAuction(rawAuction: any): Promise<Auction> {
+	const item = await cleanItemEncoded(rawAuction.item_bytes)
+
+	// add item enchantments to enchantments.json
+	if (item.enchantments && Object.keys(item.enchantments).length > 0)
+		addEnchantments(Object.keys(item.enchantments))
+
 	if (!rawAuction.seller) {
 		const currentBid = rawAuction.bin ? rawAuction.starting_bid : rawAuction.highest_bid_amount || 0
 		const nextBid = Math.round(rawAuction.highest_bid_amount === 0 ? rawAuction.starting_bid : currentBid * 1.15)
@@ -30,7 +37,7 @@ async function cleanSkyBlockAuction(rawAuction: any): Promise<Auction> {
 			sellerProfileUuid: rawAuction.profile_id,
 			start: rawAuction.start / 1000,
 			end: rawAuction.end / 1000,
-			item: await cleanItemEncoded(rawAuction.item_bytes),
+			item,
 			bidAmount: currentBid,
 			nextBidAmount: nextBid,
 			bin: rawAuction.bin ?? false,
@@ -42,8 +49,8 @@ async function cleanSkyBlockAuction(rawAuction: any): Promise<Auction> {
 			sellerUuid: rawAuction.seller,
 			sellerProfileUuid: rawAuction.seller_profile,
 			start: undefined,
-			end: rawAuction.timestamp,
-			item: await cleanItemEncoded(rawAuction.item_bytes),
+			end: rawAuction.timestamp / 1000,
+			item,
 			bidAmount: rawAuction.price,
 			nextBidAmount: rawAuction.price,
 			bin: rawAuction.bin

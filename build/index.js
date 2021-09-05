@@ -160,7 +160,8 @@ app.get('/auctions/search', async (req, res) => {
         itemName = itemName.replace(match[0], '');
     }
     itemName = itemName.trim().replace(/\s\s+/g, ' ');
-    const matchingItems = await (0, database_1.fetchItemsByName)(itemName);
+    console.log(filters);
+    const matchingItems = await (0, database_1.fetchItemsByName)(itemName, {});
     res.json(matchingItems);
 });
 app.get('/auctions/top', async (req, res) => {

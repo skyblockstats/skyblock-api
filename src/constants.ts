@@ -107,22 +107,33 @@ function fetchFile(path: string): Promise<GithubFile> {
  * @param newContent The new content in the file
  */
 async function editFile(file: GithubFile, message: string, newContent: string): Promise<void> {
-	const r = await fetchGithubApi(
-		'PUT',
-		`/repos/${owner}/${repo}/contents/${file.path}`,
-		{ 'Content-Type': 'application/json' },
-		{
-			message: message,
-			content: Buffer.from(newContent).toString('base64'),
-			sha: file.sha,
-			branch: 'main'
-		}
-	)
-	const data = await r.json()
-	fileCache.set(file.path, {
-		path: data.content.path,
-		content: newContent,
-		sha: data.content.sha
+	return new Promise(resolve => {
+		queue.enqueue(async() => {
+			if (fileCache.has(file.path)) {
+				const cachedFile: GithubFile = fileCache.get(file.path)!
+				if (cachedFile.sha === file.sha)
+					// if the file hasn't changed, don't bother
+					return resolve()
+			}
+			const r = await fetchGithubApi(
+				'PUT',
+				`/repos/${owner}/${repo}/contents/${file.path}`,
+				{ 'Content-Type': 'application/json' },
+				{
+					message: message,
+					content: Buffer.from(newContent).toString('base64'),
+					sha: file.sha,
+					branch: 'main'
+				}
+			)
+			const data = await r.json()
+			fileCache.set(file.path, {
+				path: data.content.path,
+				content: newContent,
+				sha: data.content.sha
+			})
+			resolve()
+		})
 	})
 }
 
@@ -238,6 +249,16 @@ export async function fetchSkillXpEasier(): Promise<number[]> {
 /** Add skills to skyblock-constants. This has caching so it's fine to call many times */
 export async function addMinions(addingMinions: string[]): Promise<void> {
 	await constants.addJSONConstants('minions.json', addingMinions, 'minion')
+}
+
+/** Fetch all the known enchantments as an array of strings */
+export async function fetchEnchantments(): Promise<string[]> {
+	return await constants.fetchJSONConstant('enchantments.json')
+}
+
+/** Add enchantments to skyblock-constants. This has caching so it's fine to call many times */
+export async function addEnchantments(addingEnchantments: string[]): Promise<void> {
+	await constants.addJSONConstants('enchantments.json', addingEnchantments, 'enchantment')
 }
 
 interface constantValues {

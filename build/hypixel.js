@@ -22,7 +22,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchAllEndedAuctionsUncached = exports.fetchAllAuctionsUncached = exports.fetchMemberProfilesUncached = exports.fetchBasicProfileFromUuidUncached = exports.fetchMemberProfileUncached = exports.fetchMemberProfile = exports.fetchUser = exports.sendCleanApiRequest = exports.maxMinion = exports.saveInterval = void 0;
+exports.getItemLowestBin = exports.fetchAllEndedAuctionsUncached = exports.fetchAllAuctionsUncached = exports.fetchMemberProfilesUncached = exports.fetchBasicProfileFromUuidUncached = exports.fetchMemberProfileUncached = exports.fetchMemberProfile = exports.fetchUser = exports.sendCleanApiRequest = exports.maxMinion = exports.saveInterval = void 0;
 const profile_1 = require("./cleaners/skyblock/profile");
 const database_1 = require("./database");
 const auctions_1 = require("./cleaners/skyblock/auctions");
@@ -261,9 +261,66 @@ async function fetchAllEndedAuctionsUncached() {
     });
 }
 exports.fetchAllEndedAuctionsUncached = fetchAllEndedAuctionsUncached;
-async function getAuctionLowestBin(item) {
+async function getItemLowestBin(item) {
+    var _a;
     console.log('ok getting auctions');
     const auctions = await cached.fetchAllAuctions();
-    // TODO
+    const binAuctions = auctions.filter(a => a.bin);
+    // find all bin auctions that are identical, but ignoring enchants (we're calculating those in a moment)
+    const matchingBins = binAuctions
+        .filter(a => (!item.id || a.item.id === item.id) &&
+        (!item.vanillaId || a.item.vanillaId === item.vanillaId) &&
+        (!item.pet_type || a.item.pet_type === item.pet_type) &&
+        (!item.tier || a.item.tier === item.tier) &&
+        (!item.potion_type || a.item.potion_type === item.potion_type) &&
+        (!item.potion_duration_level || a.item.potion_duration_level === item.potion_duration_level) &&
+        (!item.potion_effectiveness_level || a.item.potion_effectiveness_level === item.potion_effectiveness_level) &&
+        (!item.potion_level || a.item.potion_level === item.potion_level));
+    const enchantments = (_a = item.enchantments) !== null && _a !== void 0 ? _a : {};
+    // if it's an enchanted book with one enchant, we don't have to take enchants into account
+    if (item.id === 'ENCHANTED_BOOK' && Object.keys(enchantments).length === 1) {
+        // it's an enchanted book with one enchantment, so we can just filter by that enchantment
+        const matchingEnchantedBooks = matchingBins.filter(a => {
+            if (!a.item.enchantments || Object.keys(a.item.enchantments).length !== 1)
+                // filter out all auctions that don't have exactly one enchantment
+                return false;
+            if (Object.keys(a.item.enchantments)[0] !== Object.keys(enchantments)[0])
+                // filter out all auctions that don't have the same enchantment
+                return false;
+            if (Object.values(a.item.enchantments)[0] !== Object.values(enchantments)[0])
+                // filter out all auctions that don't have the same enchantment level
+                return false;
+            return true;
+        });
+        // return the price of the cheapest book
+        return matchingEnchantedBooks.sort((a, b) => a.bidAmount - b.bidAmount)[0].bidAmount;
+    }
+    let lowestBin = Number.MAX_SAFE_INTEGER;
+    for (const auction of matchingBins) {
+        const auctionBasePrice = auction.bidAmount;
+        const auctionMissingEnchantments = Object.keys(enchantments).filter(enchantment => !(auction.item.enchantments
+            && auction.item.enchantments[enchantment]
+            && enchantments[enchantment] === auction.item.enchantments[enchantment]));
+        // add the value of all the enchantments (-10k) to the base price of the auction
+        let auctionEnchantmentsPrice = 0;
+        for (const enchantment of auctionMissingEnchantments) {
+            const enchantmentValue = await getEnchantmentBinPrice(enchantment, enchantments[enchantment]);
+            // the reason we subtract 10k is because books are usually more expensive
+            auctionEnchantmentsPrice += Math.max(enchantmentValue - 10000, 0);
+        }
+        const auctionPrice = auctionBasePrice + auctionEnchantmentsPrice;
+        if (auctionPrice < lowestBin)
+            lowestBin = auctionPrice;
+    }
+    return lowestBin;
+}
+exports.getItemLowestBin = getItemLowestBin;
+async function getEnchantmentBinPrice(enchantmentName, enchantmentLevel) {
+    const enchantments = {};
+    enchantments[enchantmentName] = enchantmentLevel;
+    return await getItemLowestBin({
+        id: 'ENCHANTED_BOOK',
+        enchantments
+    });
 }
 // setTimeout(() => { getAuctionLowestBin(null) }, 1000)

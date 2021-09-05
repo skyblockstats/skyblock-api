@@ -25,7 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setConstantValues = exports.fetchConstantValues = exports.addMinions = exports.fetchSkillXpEasier = exports.fetchSkillXp = exports.fetchMinions = exports.addSlayers = exports.fetchSlayers = exports.addZones = exports.fetchZones = exports.addSkills = exports.fetchSkills = exports.addCollections = exports.fetchCollections = exports.addStats = exports.fetchStats = exports.addJSONConstants = exports.fetchJSONConstant = void 0;
+exports.setConstantValues = exports.fetchConstantValues = exports.addEnchantments = exports.fetchEnchantments = exports.addMinions = exports.fetchSkillXpEasier = exports.fetchSkillXp = exports.fetchMinions = exports.addSlayers = exports.fetchSlayers = exports.addZones = exports.fetchZones = exports.addSkills = exports.fetchSkills = exports.addCollections = exports.fetchCollections = exports.addStats = exports.fetchStats = exports.addJSONConstants = exports.fetchJSONConstant = void 0;
 // we have to do this so we can mock the function from the tests properly
 const constants = __importStar(require("./constants"));
 const node_cache_1 = __importDefault(require("node-cache"));
@@ -109,17 +109,28 @@ function fetchFile(path) {
  * @param newContent The new content in the file
  */
 async function editFile(file, message, newContent) {
-    const r = await fetchGithubApi('PUT', `/repos/${owner}/${repo}/contents/${file.path}`, { 'Content-Type': 'application/json' }, {
-        message: message,
-        content: Buffer.from(newContent).toString('base64'),
-        sha: file.sha,
-        branch: 'main'
-    });
-    const data = await r.json();
-    fileCache.set(file.path, {
-        path: data.content.path,
-        content: newContent,
-        sha: data.content.sha
+    return new Promise(resolve => {
+        queue.enqueue(async () => {
+            if (fileCache.has(file.path)) {
+                const cachedFile = fileCache.get(file.path);
+                if (cachedFile.sha === file.sha)
+                    // if the file hasn't changed, don't bother
+                    return resolve();
+            }
+            const r = await fetchGithubApi('PUT', `/repos/${owner}/${repo}/contents/${file.path}`, { 'Content-Type': 'application/json' }, {
+                message: message,
+                content: Buffer.from(newContent).toString('base64'),
+                sha: file.sha,
+                branch: 'main'
+            });
+            const data = await r.json();
+            fileCache.set(file.path, {
+                path: data.content.path,
+                content: newContent,
+                sha: data.content.sha
+            });
+            resolve();
+        });
     });
 }
 async function fetchJSONConstant(filename) {
@@ -236,6 +247,16 @@ async function addMinions(addingMinions) {
     await constants.addJSONConstants('minions.json', addingMinions, 'minion');
 }
 exports.addMinions = addMinions;
+/** Fetch all the known enchantments as an array of strings */
+async function fetchEnchantments() {
+    return await constants.fetchJSONConstant('enchantments.json');
+}
+exports.fetchEnchantments = fetchEnchantments;
+/** Add enchantments to skyblock-constants. This has caching so it's fine to call many times */
+async function addEnchantments(addingEnchantments) {
+    await constants.addJSONConstants('enchantments.json', addingEnchantments, 'enchantment');
+}
+exports.addEnchantments = addEnchantments;
 async function fetchConstantValues() {
     return await constants.fetchJSONConstant('values.json');
 }
