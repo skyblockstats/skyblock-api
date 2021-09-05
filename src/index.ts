@@ -1,4 +1,4 @@
-import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchItemPriceData, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchMostSoldItems, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount } from './database'
+import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchItemPriceData, fetchItemsByName, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchMostSoldItems, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount } from './database'
 import { fetchMemberProfile, fetchUser } from './hypixel'
 import rateLimit from 'express-rate-limit'
 import * as constants from './constants'
@@ -142,6 +142,31 @@ app.get('/auctions/price', async(req, res) => {
 		tier: req.query.tier as Tier,
 	}
 	res.json(await fetchItemPriceData(item))
+})
+
+app.get('/auctions/search', async(req, res) => {
+	/** just assume the params are perfectly accurate */
+	if (!req.query.q)
+		return res.json({ ok: false, error: 'no query' })
+	
+	const query = req.query.q as string
+
+	let itemName = query
+	let filters = {} as any
+
+	for (let match of query.matchAll(/(\w+):([^ ]+)/g)) {
+		const filterName = match[1]
+		const filterValue = match[2]
+		filters[filterName] = filterValue
+		// remove the filter part from itemName
+		itemName = itemName.replace(match[0], '')
+	}
+
+	itemName = itemName.trim().replace(/\s\s+/g, ' ')
+
+	const matchingItems = await fetchItemsByName(itemName)
+
+	res.json(matchingItems)
 })
 
 app.get('/auctions/top', async(req, res) => {

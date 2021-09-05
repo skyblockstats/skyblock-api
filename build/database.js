@@ -25,7 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchMostSoldItems = exports.fetchItemPriceData = exports.addAuction = exports.getItemUniqueId = exports.updateAccount = exports.fetchAccountFromDiscord = exports.fetchAccount = exports.fetchSession = exports.createSession = exports.finishedCachingRawLeaderboards = exports.queueUpdateDatabaseProfile = exports.queueUpdateDatabaseMember = exports.leaderboardUpdateProfileQueue = exports.leaderboardUpdateMemberQueue = exports.updateDatabaseProfile = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchLeaderboard = exports.fetchProfileLeaderboard = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchSlayerLeaderboards = exports.fetchAllLeaderboardsCategorized = exports.cachedRawLeaderboards = void 0;
+exports.fetchMostSoldItems = exports.fetchItemsByName = exports.fetchItemPriceData = exports.addAuction = exports.getItemUniqueId = exports.updateAccount = exports.fetchAccountFromDiscord = exports.fetchAccount = exports.fetchSession = exports.createSession = exports.finishedCachingRawLeaderboards = exports.queueUpdateDatabaseProfile = exports.queueUpdateDatabaseMember = exports.leaderboardUpdateProfileQueue = exports.leaderboardUpdateMemberQueue = exports.updateDatabaseProfile = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchLeaderboard = exports.fetchProfileLeaderboard = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchSlayerLeaderboards = exports.fetchAllLeaderboardsCategorized = exports.cachedRawLeaderboards = void 0;
 const util_1 = require("./util");
 const stats_1 = require("./cleaners/skyblock/stats");
 const slayers_1 = require("./cleaners/skyblock/slayers");
@@ -789,6 +789,68 @@ async function fetchItemPriceData(item) {
     };
 }
 exports.fetchItemPriceData = fetchItemPriceData;
+/**
+ * Fetch an array of `Item`s that partially match a name.
+ */
+async function fetchItemsByName(name) {
+    // the string regex query we're going to be using, with all regex special characters escaped
+    const regexQuery = name.replace(/[.*+?^${}()|[\]\\#:!=]/g, '\\$&');
+    const mostSoldMatchingItems = await auctionsCollection.aggregate([
+        { $sort: { p: 1 } },
+        {
+            $group: {
+                _id: '$i',
+                prices: { $push: '$p' }
+            }
+        },
+        {
+            $lookup: {
+                from: 'items',
+                localField: '_id',
+                foreignField: '_id',
+                as: 'item'
+            }
+        },
+        // filter the items that match the query
+        {
+            $match: {
+                'item.dn': {
+                    $regex: regexQuery,
+                    $options: 'i'
+                }
+            }
+        },
+        {
+            $project: {
+                prices: 1,
+                count: { '$size': ['$prices'] },
+                item: { $arrayElemAt: ['$item', 0] }
+            }
+        },
+        // sort and cut off the results at the top 100
+        { $sort: { count: -1 } },
+        { $limit: 100 },
+        // get the average and median
+        {
+            $project: {
+                prices: 1,
+                count: 1,
+                average: { '$avg': '$prices' },
+                median: { '$arrayElemAt': ['$prices', { $floor: { $divide: ['$count', 2] } }] },
+                item: 1
+            }
+        },
+    ])
+        .toArray();
+    return mostSoldMatchingItems.map((i) => ({
+        internalId: i._id,
+        count: i.count,
+        median: i.median,
+        average: i.average,
+        item: schemaToItem(i.item)
+    }));
+}
+exports.fetchItemsByName = fetchItemsByName;
 let lastUpdatedMostSoldItems = 0;
 let cachedMostSoldItems = [];
 async function fetchMostSoldItems() {

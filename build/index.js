@@ -145,6 +145,24 @@ app.get('/auctions/price', async (req, res) => {
     };
     res.json(await database_1.fetchItemPriceData(item));
 });
+app.get('/auctions/search', async (req, res) => {
+    /** just assume the params are perfectly accurate */
+    if (!req.query.q)
+        return res.json({ ok: false, error: 'no query' });
+    const query = req.query.q;
+    let itemName = query;
+    let filters = {};
+    for (let match of query.matchAll(/(\w+):([^ ]+)/g)) {
+        const filterName = match[1];
+        const filterValue = match[2];
+        filters[filterName] = filterValue;
+        // remove the filter part from itemName
+        itemName = itemName.replace(match[0], '');
+    }
+    itemName = itemName.trim().replace(/\s\s+/g, ' ');
+    const matchingItems = await database_1.fetchItemsByName(itemName);
+    res.json(matchingItems);
+});
 app.get('/auctions/top', async (req, res) => {
     res.json(await database_1.fetchMostSoldItems());
 });
