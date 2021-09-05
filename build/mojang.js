@@ -20,9 +20,9 @@ const httpsAgent = new https_1.Agent({
 async function profileFromUuid(uuid) {
     let fetchResponse;
     try {
-        fetchResponse = await node_fetch_1.default(
+        fetchResponse = await (0, node_fetch_1.default)(
         // using mojang directly is faster than ashcon lol, also mojang removed the ratelimits from here
-        `https://sessionserver.mojang.com/session/minecraft/profile/${util_1.undashUuid(uuid)}`, { agent: () => httpsAgent });
+        `https://sessionserver.mojang.com/session/minecraft/profile/${(0, util_1.undashUuid)(uuid)}`, { agent: () => httpsAgent });
     }
     catch {
         // if there's an error, wait a second and try again
@@ -54,7 +54,7 @@ async function profileFromUsername(username) {
     // since we don't care about anything other than the uuid, we can use /uuid/ instead of /user/
     let fetchResponse;
     try {
-        fetchResponse = await node_fetch_1.default(`https://api.mojang.com/users/profiles/minecraft/${username}`, { agent: () => httpsAgent });
+        fetchResponse = await (0, node_fetch_1.default)(`https://api.mojang.com/users/profiles/minecraft/${username}`, { agent: () => httpsAgent });
     }
     catch {
         // if there's an error, wait a second and try again
@@ -80,7 +80,7 @@ exports.profileFromUsername = profileFromUsername;
 async function profileFromUsernameAlternative(username) {
     let fetchResponse;
     try {
-        fetchResponse = await node_fetch_1.default(`https://api.ashcon.app/mojang/v2/user/${username}`, { agent: () => httpsAgent });
+        fetchResponse = await (0, node_fetch_1.default)(`https://api.ashcon.app/mojang/v2/user/${username}`, { agent: () => httpsAgent });
     }
     catch {
         // if there's an error, wait a second and try again
@@ -97,13 +97,13 @@ async function profileFromUsernameAlternative(username) {
     if (!data.uuid)
         return { uuid: null, username: null };
     return {
-        uuid: util_1.undashUuid(data.uuid),
+        uuid: (0, util_1.undashUuid)(data.uuid),
         username: data.username
     };
 }
 exports.profileFromUsernameAlternative = profileFromUsernameAlternative;
 async function profileFromUser(user) {
-    if (util_1.isUuid(user)) {
+    if ((0, util_1.isUuid)(user)) {
         return await profileFromUuid(user);
     }
     else

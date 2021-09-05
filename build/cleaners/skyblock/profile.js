@@ -32,7 +32,7 @@ async function cleanSkyblockProfileResponseLighter(data) {
         const memberRaw = data.members[memberUUID];
         memberRaw.uuid = memberUUID;
         // we pass an empty array to make it not check stats
-        promises.push(member_1.cleanSkyBlockProfileMemberResponseBasic(memberRaw));
+        promises.push((0, member_1.cleanSkyBlockProfileMemberResponseBasic)(memberRaw));
     }
     const cleanedMembers = (await Promise.all(promises)).filter(m => m);
     return {
@@ -53,7 +53,7 @@ async function cleanSkyblockProfileResponse(data, options) {
     for (const memberUUID in data.members) {
         const memberRaw = data.members[memberUUID];
         memberRaw.uuid = memberUUID;
-        promises.push(member_1.cleanSkyBlockProfileMemberResponse(memberRaw, [
+        promises.push((0, member_1.cleanSkyBlockProfileMemberResponse)(memberRaw, [
             !(options === null || options === void 0 ? void 0 : options.basic) ? 'stats' : undefined,
             (options === null || options === void 0 ? void 0 : options.mainMemberUuid) === memberUUID ? 'inventories' : undefined
         ]));
@@ -70,9 +70,9 @@ async function cleanSkyblockProfileResponse(data, options) {
     for (const member of cleanedMembers) {
         memberMinions.push(member.minions);
     }
-    const minions = minions_1.combineMinionArrays(memberMinions);
+    const minions = (0, minions_1.combineMinionArrays)(memberMinions);
     const { max_minions: maxUniqueMinions } = await constants.fetchConstantValues();
-    const uniqueMinions = minions_1.countUniqueMinions(minions);
+    const uniqueMinions = (0, minions_1.countUniqueMinions)(minions);
     if (uniqueMinions > (maxUniqueMinions !== null && maxUniqueMinions !== void 0 ? maxUniqueMinions : 0))
         await constants.setConstantValues({ max_minions: uniqueMinions });
     // return more detailed info
@@ -80,7 +80,7 @@ async function cleanSkyblockProfileResponse(data, options) {
         uuid: data.profile_id,
         name: data.cute_name,
         members: cleanedMembers,
-        bank: bank_1.cleanBank(data),
+        bank: (0, bank_1.cleanBank)(data),
         minions: minions,
         minion_count: uniqueMinions
     };

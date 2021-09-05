@@ -50,7 +50,7 @@ export async function exchangeCode(redirectUri: string, code: string): Promise<T
 			body: new URLSearchParams(data).toString()
 		}
 	)
-	return await fetchResponse.json()
+	return await fetchResponse.json() as TokenResponse | null
 }
 
 
@@ -63,5 +63,5 @@ export async function getUser(accessToken: string): Promise<DiscordUser> {
 			agent: () => httpsAgent,
 		}
 	)
-	return response.json()
+	return await response.json() as DiscordUser
 }

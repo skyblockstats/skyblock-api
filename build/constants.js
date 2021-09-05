@@ -55,7 +55,7 @@ async function fetchGithubApi(method, route, headers, json) {
     try {
         if (_1.debug)
             console.debug('fetching github api', method, route);
-        const data = await node_fetch_1.default(githubApiBase + route, {
+        const data = await (0, node_fetch_1.default)(githubApiBase + route, {
             agent: () => httpsAgent,
             body: json ? JSON.stringify(json) : undefined,
             method,

@@ -87,7 +87,7 @@ function fetchFile(path: string): Promise<GithubFile> {
 					'Accept': 'application/vnd.github.v3+json',
 				},
 			)
-			const data = await r.json()
+			const data = await r.json() as any
 
 			const file = {
 				path: data.path,
@@ -118,7 +118,7 @@ async function editFile(file: GithubFile, message: string, newContent: string): 
 			branch: 'main'
 		}
 	)
-	const data = await r.json()
+	const data = await r.json() as any
 	fileCache.set(file.path, {
 		path: data.content.path,
 		content: newContent,

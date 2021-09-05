@@ -36,8 +36,8 @@ exports.saveInterval = 60 * 3 * 1000;
 exports.maxMinion = 11;
 /** Sends an API request to Hypixel and cleans it up. */
 async function sendCleanApiRequest({ path, args }, included, options) {
-    const key = await hypixelApi_1.chooseApiKey();
-    const rawResponse = await hypixelApi_1.sendApiRequest({ path, key, args });
+    const key = await (0, hypixelApi_1.chooseApiKey)();
+    const rawResponse = await (0, hypixelApi_1.sendApiRequest)({ path, key, args });
     if (rawResponse.throttled) {
         // if it's throttled, wait a second and try again
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -50,9 +50,9 @@ exports.sendCleanApiRequest = sendCleanApiRequest;
 async function cleanResponse({ path, data }, options) {
     // Cleans up an api response
     switch (path) {
-        case 'player': return await player_1.cleanPlayerResponse(data.player);
-        case 'skyblock/profile': return await profile_1.cleanSkyblockProfileResponse(data.profile, options);
-        case 'skyblock/profiles': return await profiles_1.cleanSkyblockProfilesResponse(data.profiles);
+        case 'player': return await (0, player_1.cleanPlayerResponse)(data.player);
+        case 'skyblock/profile': return await (0, profile_1.cleanSkyblockProfileResponse)(data.profile, options);
+        case 'skyblock/profiles': return await (0, profiles_1.cleanSkyblockProfilesResponse)(data.profiles);
     }
 }
 /**
@@ -75,7 +75,7 @@ async function fetchUser({ user, uuid, username }, included = ['player'], custom
             console.debug('error:', user, 'doesnt exist');
         return null;
     }
-    const websiteAccountPromise = customization ? database_1.fetchAccount(uuid) : null;
+    const websiteAccountPromise = customization ? (0, database_1.fetchAccount)(uuid) : null;
     const includePlayers = included.includes('player');
     const includeProfiles = included.includes('profiles');
     let profilesData;
@@ -126,7 +126,7 @@ async function fetchMemberProfile(user, profile, customization) {
     if (!playerUuid)
         return null;
     // we don't await the promise immediately so it can load while we do other stuff
-    const websiteAccountPromise = customization ? database_1.fetchAccount(playerUuid) : null;
+    const websiteAccountPromise = customization ? (0, database_1.fetchAccount)(playerUuid) : null;
     const profileUuid = await cached.fetchProfileUuid(user, profile);
     // if the profile or player doesn't have an id, just return
     if (!profileUuid)
@@ -180,8 +180,8 @@ async function fetchMemberProfileUncached(playerUuid, profileUuid) {
     }, undefined, { mainMemberUuid: playerUuid });
     // queue updating the leaderboard positions for the member, eventually
     for (const member of profile.members)
-        database_1.queueUpdateDatabaseMember(member, profile);
-    database_1.queueUpdateDatabaseProfile(profile);
+        (0, database_1.queueUpdateDatabaseMember)(member, profile);
+    (0, database_1.queueUpdateDatabaseProfile)(profile);
     return profile;
 }
 exports.fetchMemberProfileUncached = fetchMemberProfileUncached;
@@ -210,9 +210,9 @@ async function fetchMemberProfilesUncached(playerUuid) {
     });
     for (const profile of profiles) {
         for (const member of profile.members) {
-            database_1.queueUpdateDatabaseMember(member, profile);
+            (0, database_1.queueUpdateDatabaseMember)(member, profile);
         }
-        database_1.queueUpdateDatabaseProfile(profile);
+        (0, database_1.queueUpdateDatabaseProfile)(profile);
     }
     return profiles;
 }
