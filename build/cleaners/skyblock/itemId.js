@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.cleanItemId = void 0;
 // change weird item names to be more consistent with vanilla
 const ITEMS = {
     'log': 'oak_log',
@@ -55,8 +52,6 @@ const ITEMS = {
     'enchanted_glistering_melon': 'enchanted_glistering_melon_slice'
 };
 /** Clean an item with a weird name (log_2:1) and make it have a better name (dark_oak_log) */
-function cleanItemId(itemId) {
-    var _a;
-    return (_a = ITEMS[itemId.toLowerCase()]) !== null && _a !== void 0 ? _a : itemId.toLowerCase();
+export function cleanItemId(itemId) {
+    return ITEMS[itemId.toLowerCase()] ?? itemId.toLowerCase();
 }
-exports.cleanItemId = cleanItemId;

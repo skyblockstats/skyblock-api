@@ -1,11 +1,12 @@
 {
 	"compilerOptions": {
-	  "module": "commonjs",
+	  "module": "ESNext",
 	  "lib": ["esnext", "dom", "DOM.Iterable"],
-	  "target": "es2019",
+	  "target": "ESNext",
 	  "esModuleInterop": true,
 	  "outDir": "build",
-	  "strictNullChecks": true
+	  "strictNullChecks": true,
+	  "moduleResolution": "node"
 	},
 	"include": ["src"],
 	"exclude": ["**/node_modules"],

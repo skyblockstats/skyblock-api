@@ -1,54 +1,29 @@
-"use strict";
 /**
  * Store data about members for leaderboards
 */
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateAccount = exports.fetchAccountFromDiscord = exports.fetchAccount = exports.fetchSession = exports.createSession = exports.finishedCachingRawLeaderboards = exports.queueUpdateDatabaseProfile = exports.queueUpdateDatabaseMember = exports.leaderboardUpdateProfileQueue = exports.leaderboardUpdateMemberQueue = exports.updateDatabaseProfile = exports.updateDatabaseMember = exports.fetchMemberLeaderboardSpots = exports.fetchLeaderboard = exports.fetchProfileLeaderboard = exports.fetchMemberLeaderboard = exports.fetchAllMemberLeaderboardAttributes = exports.fetchSlayerLeaderboards = exports.fetchAllLeaderboardsCategorized = exports.cachedRawLeaderboards = void 0;
-const stats_1 = require("./cleaners/skyblock/stats");
-const slayers_1 = require("./cleaners/skyblock/slayers");
-const mongodb_1 = require("mongodb");
-const cached = __importStar(require("./hypixelCached"));
-const constants = __importStar(require("./constants"));
-const util_1 = require("./util");
-const node_cache_1 = __importDefault(require("node-cache"));
-const uuid_1 = require("uuid");
-const queue_promise_1 = __importDefault(require("queue-promise"));
-const _1 = require(".");
+import { categorizeStat, getStatUnit } from './cleaners/skyblock/stats';
+import { slayerLevels } from './cleaners/skyblock/slayers';
+import { MongoClient } from 'mongodb';
+import * as cached from './hypixelCached';
+import * as constants from './constants';
+import { shuffle, sleep } from './util';
+import NodeCache from 'node-cache';
+import { v4 as uuid4 } from 'uuid';
+import Queue from 'queue-promise';
+import { debug } from '.';
 // don't update the user for 3 minutes
-const recentlyUpdated = new node_cache_1.default({
+const recentlyUpdated = new NodeCache({
     stdTTL: 60 * 3,
     checkperiod: 60,
     useClones: false,
 });
 // don't add stuff to the queue within the same 5 minutes
-const recentlyQueued = new node_cache_1.default({
+const recentlyQueued = new NodeCache({
     stdTTL: 60 * 5,
     checkperiod: 60,
     useClones: false,
 });
-exports.cachedRawLeaderboards = new Map();
+export const cachedRawLeaderboards = new Map();
 const leaderboardMax = 100;
 const reversedLeaderboards = [
     'first_join',
@@ -71,7 +46,7 @@ async function connect() {
         return console.warn('Warning: db_uri was not found in .env. Features that utilize the database such as leaderboards won\'t work.');
     if (!process.env.db_name)
         return console.warn('Warning: db_name was not found in .env. Features that utilize the database such as leaderboards won\'t work.');
-    client = await mongodb_1.MongoClient.connect(process.env.db_uri);
+    client = await MongoClient.connect(process.env.db_uri);
     database = client.db(process.env.db_name);
     memberLeaderboardsCollection = database.collection('member-leaderboards');
     profileLeaderboardsCollection = database.collection('profile-leaderboards');
@@ -132,12 +107,12 @@ function getProfileLeaderboardAttributes(profile) {
         unique_minions: profile.minion_count
     };
 }
-async function fetchAllLeaderboardsCategorized() {
+export async function fetchAllLeaderboardsCategorized() {
     const memberLeaderboardAttributes = await fetchAllMemberLeaderboardAttributes();
     const profileLeaderboardAttributes = await fetchAllProfileLeaderboardAttributes();
     const categorizedLeaderboards = {};
     for (const leaderboard of [...memberLeaderboardAttributes, ...profileLeaderboardAttributes]) {
-        const { category } = (0, stats_1.categorizeStat)(leaderboard);
+        const { category } = categorizeStat(leaderboard);
         if (category) {
             if (!categorizedLeaderboards[category])
                 categorizedLeaderboards[category] = [];
@@ -150,9 +125,8 @@ async function fetchAllLeaderboardsCategorized() {
     categorizedLeaderboards.misc = misc;
     return categorizedLeaderboards;
 }
-exports.fetchAllLeaderboardsCategorized = fetchAllLeaderboardsCategorized;
 /** Fetch the raw names for the slayer leaderboards */
-async function fetchSlayerLeaderboards() {
+export async function fetchSlayerLeaderboards() {
     const rawSlayerNames = await constants.fetchSlayers();
     let leaderboardNames = [
         'slayer_total_xp',
@@ -162,15 +136,14 @@ async function fetchSlayerLeaderboards() {
     for (const slayerNameRaw of rawSlayerNames) {
         leaderboardNames.push(`slayer_${slayerNameRaw}_total_xp`);
         leaderboardNames.push(`slayer_${slayerNameRaw}_total_kills`);
-        for (let slayerTier = 1; slayerTier <= slayers_1.slayerLevels; slayerTier++) {
+        for (let slayerTier = 1; slayerTier <= slayerLevels; slayerTier++) {
             leaderboardNames.push(`slayer_${slayerNameRaw}_${slayerTier}_kills`);
         }
     }
     return leaderboardNames;
 }
-exports.fetchSlayerLeaderboards = fetchSlayerLeaderboards;
 /** Fetch the names of all the leaderboards that rank members */
-async function fetchAllMemberLeaderboardAttributes() {
+export async function fetchAllMemberLeaderboardAttributes() {
     return [
         // we use the raw stat names rather than the clean stats in case hypixel adds a new stat and it takes a while for us to clean it
         ...await constants.fetchStats(),
@@ -188,7 +161,6 @@ async function fetchAllMemberLeaderboardAttributes() {
         'top_1_leaderboards_count'
     ];
 }
-exports.fetchAllMemberLeaderboardAttributes = fetchAllMemberLeaderboardAttributes;
 /** Fetch the names of all the leaderboards that rank profiles */
 async function fetchAllProfileLeaderboardAttributes() {
     return [
@@ -211,14 +183,14 @@ const fetchingRawLeaderboardNames = new Set();
 async function fetchMemberLeaderboardRaw(name) {
     if (!client)
         throw Error('Client isn\'t initialized yet');
-    if (exports.cachedRawLeaderboards.has(name))
-        return exports.cachedRawLeaderboards.get(name);
+    if (cachedRawLeaderboards.has(name))
+        return cachedRawLeaderboards.get(name);
     // if it's currently being fetched, check every 100ms until it's in cachedRawLeaderboards
     if (fetchingRawLeaderboardNames.has(name)) {
         while (true) {
-            await (0, util_1.sleep)(100);
-            if (exports.cachedRawLeaderboards.has(name))
-                return exports.cachedRawLeaderboards.get(name);
+            await sleep(100);
+            if (cachedRawLeaderboards.has(name))
+                return cachedRawLeaderboards.get(name);
         }
     }
     // typescript forces us to make a new variable and set it this way because it gives an error otherwise
@@ -240,18 +212,18 @@ async function fetchMemberLeaderboardRaw(name) {
         };
     });
     fetchingRawLeaderboardNames.delete(name);
-    exports.cachedRawLeaderboards.set(name, leaderboardRaw);
+    cachedRawLeaderboards.set(name, leaderboardRaw);
     return leaderboardRaw;
 }
 async function fetchProfileLeaderboardRaw(name) {
-    if (exports.cachedRawLeaderboards.has(name))
-        return exports.cachedRawLeaderboards.get(name);
+    if (cachedRawLeaderboards.has(name))
+        return cachedRawLeaderboards.get(name);
     // if it's currently being fetched, check every 100ms until it's in cachedRawLeaderboards
     if (fetchingRawLeaderboardNames.has(name)) {
         while (true) {
-            await (0, util_1.sleep)(100);
-            if (exports.cachedRawLeaderboards.has(name))
-                return exports.cachedRawLeaderboards.get(name);
+            await sleep(100);
+            if (cachedRawLeaderboards.has(name))
+                return cachedRawLeaderboards.get(name);
         }
     }
     // typescript forces us to make a new variable and set it this way because it gives an error otherwise
@@ -273,12 +245,11 @@ async function fetchProfileLeaderboardRaw(name) {
         };
     });
     fetchingRawLeaderboardNames.delete(name);
-    exports.cachedRawLeaderboards.set(name, leaderboardRaw);
+    cachedRawLeaderboards.set(name, leaderboardRaw);
     return leaderboardRaw;
 }
 /** Fetch a leaderboard that ranks members, as opposed to profiles */
-async function fetchMemberLeaderboard(name) {
-    var _a;
+export async function fetchMemberLeaderboard(name) {
     const leaderboardRaw = await fetchMemberLeaderboardRaw(name);
     const fetchLeaderboardPlayer = async (i) => {
         const player = await cached.fetchBasicPlayer(i.uuid);
@@ -295,14 +266,12 @@ async function fetchMemberLeaderboard(name) {
     const leaderboard = await Promise.all(promises);
     return {
         name: name,
-        unit: (_a = (0, stats_1.getStatUnit)(name)) !== null && _a !== void 0 ? _a : null,
+        unit: getStatUnit(name) ?? null,
         list: leaderboard
     };
 }
-exports.fetchMemberLeaderboard = fetchMemberLeaderboard;
 /** Fetch a leaderboard that ranks profiles, as opposed to members */
-async function fetchProfileLeaderboard(name) {
-    var _a;
+export async function fetchProfileLeaderboard(name) {
     const leaderboardRaw = await fetchProfileLeaderboardRaw(name);
     const fetchLeaderboardProfile = async (i) => {
         const players = [];
@@ -324,13 +293,12 @@ async function fetchProfileLeaderboard(name) {
     const leaderboard = await Promise.all(promises);
     return {
         name: name,
-        unit: (_a = (0, stats_1.getStatUnit)(name)) !== null && _a !== void 0 ? _a : null,
+        unit: getStatUnit(name) ?? null,
         list: leaderboard
     };
 }
-exports.fetchProfileLeaderboard = fetchProfileLeaderboard;
 /** Fetch a leaderboard */
-async function fetchLeaderboard(name) {
+export async function fetchLeaderboard(name) {
     const profileLeaderboards = await fetchAllProfileLeaderboardAttributes();
     let leaderboard;
     if (profileLeaderboards.includes(name)) {
@@ -343,10 +311,8 @@ async function fetchLeaderboard(name) {
         leaderboard.info = leaderboardInfos[name];
     return leaderboard;
 }
-exports.fetchLeaderboard = fetchLeaderboard;
 /** Get the leaderboard positions a member is on. This may take a while depending on whether stuff is cached */
-async function fetchMemberLeaderboardSpots(player, profile) {
-    var _a;
+export async function fetchMemberLeaderboardSpots(player, profile) {
     const fullProfile = await cached.fetchProfile(player, profile);
     if (!fullProfile)
         return null;
@@ -364,14 +330,12 @@ async function fetchMemberLeaderboardSpots(player, profile) {
             name: leaderboardName,
             positionIndex: leaderboardPositionIndex,
             value: applicableAttributes[leaderboardName],
-            unit: (_a = (0, stats_1.getStatUnit)(leaderboardName)) !== null && _a !== void 0 ? _a : null
+            unit: getStatUnit(leaderboardName) ?? null
         });
     }
     return memberLeaderboardSpots;
 }
-exports.fetchMemberLeaderboardSpots = fetchMemberLeaderboardSpots;
 async function getLeaderboardRequirement(name, leaderboardType) {
-    var _a, _b, _c, _d;
     let leaderboard;
     if (leaderboardType === 'member')
         leaderboard = await fetchMemberLeaderboardRaw(name);
@@ -379,8 +343,8 @@ async function getLeaderboardRequirement(name, leaderboardType) {
         leaderboard = await fetchProfileLeaderboardRaw(name);
     // if there's more than 100 items, return the 100th. if there's less, return null
     return {
-        top_100: (_b = (_a = leaderboard[leaderboardMax - 1]) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : null,
-        top_1: (_d = (_c = leaderboard[1]) === null || _c === void 0 ? void 0 : _c.value) !== null && _d !== void 0 ? _d : null
+        top_100: leaderboard[leaderboardMax - 1]?.value ?? null,
+        top_1: leaderboard[1]?.value ?? null
     };
 }
 /** Get the attributes for the member, but only ones that would put them on the top 100 for leaderboards */
@@ -438,17 +402,17 @@ async function getApplicableProfileLeaderboardAttributes(profile) {
     return applicableAttributes;
 }
 /** Update the member's leaderboard data on the server if applicable */
-async function updateDatabaseMember(member, profile) {
+export async function updateDatabaseMember(member, profile) {
     if (!client)
         return; // the db client hasn't been initialized
-    if (_1.debug)
+    if (debug)
         console.debug('updateDatabaseMember', member.username);
     // the member's been updated too recently, just return
     if (recentlyUpdated.get(profile.uuid + member.uuid))
         return;
     // store the member in recentlyUpdated so it cant update for 3 more minutes
     recentlyUpdated.set(profile.uuid + member.uuid, true);
-    if (_1.debug)
+    if (debug)
         console.debug('adding member to leaderboards', member.username);
     if (member.rawHypixelStats)
         await constants.addStats(Object.keys(member.rawHypixelStats));
@@ -456,10 +420,10 @@ async function updateDatabaseMember(member, profile) {
     await constants.addSkills(member.skills.map(skill => skill.name));
     await constants.addZones(member.visited_zones.map(zone => zone.name));
     await constants.addSlayers(member.slayers.bosses.map(s => s.raw_name));
-    if (_1.debug)
+    if (debug)
         console.debug('done constants..');
     const leaderboardAttributes = await getApplicableMemberLeaderboardAttributes(member);
-    if (_1.debug)
+    if (debug)
         console.debug('done getApplicableMemberLeaderboardAttributes..', leaderboardAttributes, member.username, profile.name);
     await memberLeaderboardsCollection.updateOne({
         uuid: member.uuid,
@@ -483,30 +447,29 @@ async function updateDatabaseMember(member, profile) {
             }])
             .sort((a, b) => leaderboardReverse ? a.value - b.value : b.value - a.value)
             .slice(0, 100);
-        exports.cachedRawLeaderboards.set(attributeName, newRawLeaderboard);
+        cachedRawLeaderboards.set(attributeName, newRawLeaderboard);
     }
-    if (_1.debug)
+    if (debug)
         console.debug('added member to leaderboards', member.username, leaderboardAttributes);
 }
-exports.updateDatabaseMember = updateDatabaseMember;
 /**
  * Update the profiles's leaderboard data on the server if applicable.
  * This will not also update the members, you have to call updateDatabaseMember separately for that
  */
-async function updateDatabaseProfile(profile) {
+export async function updateDatabaseProfile(profile) {
     if (!client)
         return; // the db client hasn't been initialized
-    if (_1.debug)
+    if (debug)
         console.debug('updateDatabaseProfile', profile.name);
     // the profile's been updated too recently, just return
     if (recentlyUpdated.get(profile.uuid + 'profile'))
         return;
     // store the profile in recentlyUpdated so it cant update for 3 more minutes
     recentlyUpdated.set(profile.uuid + 'profile', true);
-    if (_1.debug)
+    if (debug)
         console.debug('adding profile to leaderboards', profile.name);
     const leaderboardAttributes = await getApplicableProfileLeaderboardAttributes(profile);
-    if (_1.debug)
+    if (debug)
         console.debug('done getApplicableProfileLeaderboardAttributes..', leaderboardAttributes, profile.name);
     await profileLeaderboardsCollection.updateOne({
         uuid: profile.uuid
@@ -531,47 +494,44 @@ async function updateDatabaseProfile(profile) {
             }])
             .sort((a, b) => leaderboardReverse ? a.value - b.value : b.value - a.value)
             .slice(0, 100);
-        exports.cachedRawLeaderboards.set(attributeName, newRawLeaderboard);
+        cachedRawLeaderboards.set(attributeName, newRawLeaderboard);
     }
-    if (_1.debug)
+    if (debug)
         console.debug('added profile to leaderboards', profile.name, leaderboardAttributes);
 }
-exports.updateDatabaseProfile = updateDatabaseProfile;
-exports.leaderboardUpdateMemberQueue = new queue_promise_1.default({
+export const leaderboardUpdateMemberQueue = new Queue({
     concurrent: 1,
     interval: 50
 });
-exports.leaderboardUpdateProfileQueue = new queue_promise_1.default({
+export const leaderboardUpdateProfileQueue = new Queue({
     concurrent: 1,
     interval: 500
 });
 /** Queue an update for the member's leaderboard data on the server if applicable */
-function queueUpdateDatabaseMember(member, profile) {
+export function queueUpdateDatabaseMember(member, profile) {
     if (recentlyQueued.get(profile.uuid + member.uuid))
         return;
     else
         recentlyQueued.set(profile.uuid + member.uuid, true);
-    exports.leaderboardUpdateMemberQueue.enqueue(async () => await updateDatabaseMember(member, profile));
+    leaderboardUpdateMemberQueue.enqueue(async () => await updateDatabaseMember(member, profile));
 }
-exports.queueUpdateDatabaseMember = queueUpdateDatabaseMember;
 /** Queue an update for the profile's leaderboard data on the server if applicable */
-function queueUpdateDatabaseProfile(profile) {
+export function queueUpdateDatabaseProfile(profile) {
     if (recentlyQueued.get(profile.uuid + 'profile'))
         return;
     else
         recentlyQueued.set(profile.uuid + 'profile', true);
-    exports.leaderboardUpdateProfileQueue.enqueue(async () => await updateDatabaseProfile(profile));
+    leaderboardUpdateProfileQueue.enqueue(async () => await updateDatabaseProfile(profile));
 }
-exports.queueUpdateDatabaseProfile = queueUpdateDatabaseProfile;
 /**
  * Remove leaderboard attributes for members that wouldn't actually be on the leaderboard. This saves a lot of storage space
  */
 async function removeBadMemberLeaderboardAttributes() {
     const leaderboards = await fetchAllMemberLeaderboardAttributes();
     // shuffle so if the application is restarting many times itll still be useful
-    for (const leaderboard of (0, util_1.shuffle)(leaderboards)) {
+    for (const leaderboard of shuffle(leaderboards)) {
         // wait 10 seconds so it doesnt use as much ram
-        await (0, util_1.sleep)(10 * 1000);
+        await sleep(10 * 1000);
         const unsetValue = {};
         unsetValue[leaderboard] = '';
         const filter = {};
@@ -588,19 +548,19 @@ async function removeBadMemberLeaderboardAttributes() {
     await memberLeaderboardsCollection.deleteMany({ stats: {} });
     await profileLeaderboardsCollection.deleteMany({ stats: {} });
 }
-exports.finishedCachingRawLeaderboards = false;
+export let finishedCachingRawLeaderboards = false;
 /** Fetch all the leaderboards, used for caching. Don't call this often! */
 async function fetchAllLeaderboards(fast) {
     const leaderboards = await fetchAllMemberLeaderboardAttributes();
-    if (_1.debug)
+    if (debug)
         console.debug('Caching raw leaderboards!');
-    for (const leaderboard of (0, util_1.shuffle)(leaderboards))
+    for (const leaderboard of shuffle(leaderboards))
         await fetchMemberLeaderboardRaw(leaderboard);
-    exports.finishedCachingRawLeaderboards = true;
+    finishedCachingRawLeaderboards = true;
 }
-async function createSession(refreshToken, userData) {
-    const sessionId = (0, uuid_1.v4)();
-    await (sessionsCollection === null || sessionsCollection === void 0 ? void 0 : sessionsCollection.insertOne({
+export async function createSession(refreshToken, userData) {
+    const sessionId = uuid4();
+    await sessionsCollection?.insertOne({
         _id: sessionId,
         refresh_token: refreshToken,
         discord_user: {
@@ -608,28 +568,23 @@ async function createSession(refreshToken, userData) {
             name: userData.username + '#' + userData.discriminator
         },
         lastUpdated: new Date()
-    }));
+    });
     return sessionId;
 }
-exports.createSession = createSession;
-async function fetchSession(sessionId) {
-    return await (sessionsCollection === null || sessionsCollection === void 0 ? void 0 : sessionsCollection.findOne({ _id: sessionId }));
+export async function fetchSession(sessionId) {
+    return await sessionsCollection?.findOne({ _id: sessionId });
 }
-exports.fetchSession = fetchSession;
-async function fetchAccount(minecraftUuid) {
-    return await (accountsCollection === null || accountsCollection === void 0 ? void 0 : accountsCollection.findOne({ minecraftUuid }));
+export async function fetchAccount(minecraftUuid) {
+    return await accountsCollection?.findOne({ minecraftUuid });
 }
-exports.fetchAccount = fetchAccount;
-async function fetchAccountFromDiscord(discordId) {
-    return await (accountsCollection === null || accountsCollection === void 0 ? void 0 : accountsCollection.findOne({ discordId }));
+export async function fetchAccountFromDiscord(discordId) {
+    return await accountsCollection?.findOne({ discordId });
 }
-exports.fetchAccountFromDiscord = fetchAccountFromDiscord;
-async function updateAccount(discordId, schema) {
-    await (accountsCollection === null || accountsCollection === void 0 ? void 0 : accountsCollection.updateOne({
+export async function updateAccount(discordId, schema) {
+    await accountsCollection?.updateOne({
         discordId
-    }, { $set: schema }, { upsert: true }));
+    }, { $set: schema }, { upsert: true });
 }
-exports.updateAccount = updateAccount;
 // make sure it's not in a test
 if (!globalThis.isTest) {
     connect().then(() => {

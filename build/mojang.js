@@ -1,28 +1,22 @@
-"use strict";
 /**
  * Fetch the Mojang username API through api.ashcon.app
  */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.profileFromUser = exports.profileFromUsernameAlternative = exports.profileFromUsername = exports.profileFromUuid = void 0;
-const node_fetch_1 = __importDefault(require("node-fetch"));
-const https_1 = require("https");
-const util_1 = require("./util");
+import fetch from 'node-fetch';
+import { Agent } from 'https';
+import { isUuid, undashUuid } from './util';
 // We need to create an agent to prevent memory leaks
-const httpsAgent = new https_1.Agent({
+const httpsAgent = new Agent({
     keepAlive: true
 });
 /**
  * Get mojang api data from the session server
  */
-async function profileFromUuid(uuid) {
+export async function profileFromUuid(uuid) {
     let fetchResponse;
     try {
-        fetchResponse = await (0, node_fetch_1.default)(
+        fetchResponse = await fetch(
         // using mojang directly is faster than ashcon lol, also mojang removed the ratelimits from here
-        `https://sessionserver.mojang.com/session/minecraft/profile/${(0, util_1.undashUuid)(uuid)}`, { agent: () => httpsAgent });
+        `https://sessionserver.mojang.com/session/minecraft/profile/${undashUuid(uuid)}`, { agent: () => httpsAgent });
     }
     catch {
         // if there's an error, wait a second and try again
@@ -49,12 +43,11 @@ async function profileFromUuid(uuid) {
         username: data.name
     };
 }
-exports.profileFromUuid = profileFromUuid;
-async function profileFromUsername(username) {
+export async function profileFromUsername(username) {
     // since we don't care about anything other than the uuid, we can use /uuid/ instead of /user/
     let fetchResponse;
     try {
-        fetchResponse = await (0, node_fetch_1.default)(`https://api.mojang.com/users/profiles/minecraft/${username}`, { agent: () => httpsAgent });
+        fetchResponse = await fetch(`https://api.mojang.com/users/profiles/minecraft/${username}`, { agent: () => httpsAgent });
     }
     catch {
         // if there's an error, wait a second and try again
@@ -67,7 +60,7 @@ async function profileFromUsername(username) {
         data = JSON.parse(rawData);
     }
     catch { }
-    if (!(data === null || data === void 0 ? void 0 : data.id)) {
+    if (!data?.id) {
         // return { uuid: null, username: null }
         return await profileFromUsernameAlternative(username);
     }
@@ -76,11 +69,10 @@ async function profileFromUsername(username) {
         username: data.name
     };
 }
-exports.profileFromUsername = profileFromUsername;
-async function profileFromUsernameAlternative(username) {
+export async function profileFromUsernameAlternative(username) {
     let fetchResponse;
     try {
-        fetchResponse = await (0, node_fetch_1.default)(`https://api.ashcon.app/mojang/v2/user/${username}`, { agent: () => httpsAgent });
+        fetchResponse = await fetch(`https://api.ashcon.app/mojang/v2/user/${username}`, { agent: () => httpsAgent });
     }
     catch {
         // if there's an error, wait a second and try again
@@ -97,16 +89,14 @@ async function profileFromUsernameAlternative(username) {
     if (!data.uuid)
         return { uuid: null, username: null };
     return {
-        uuid: (0, util_1.undashUuid)(data.uuid),
+        uuid: undashUuid(data.uuid),
         username: data.username
     };
 }
-exports.profileFromUsernameAlternative = profileFromUsernameAlternative;
-async function profileFromUser(user) {
-    if ((0, util_1.isUuid)(user)) {
+export async function profileFromUser(user) {
+    if (isUuid(user)) {
         return await profileFromUuid(user);
     }
     else
         return await profileFromUsername(user);
 }
-exports.profileFromUser = profileFromUser;
