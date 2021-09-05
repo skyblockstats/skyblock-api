@@ -105,7 +105,7 @@ async function fetchUser({ user, uuid, username }, included = ['player'], custom
             }
         }
     }
-    let websiteAccount = undefined;
+    let websiteAccount = null;
     if (websiteAccountPromise)
         websiteAccount = await websiteAccountPromise;
     return {
@@ -154,7 +154,7 @@ async function fetchMemberProfile(user, profile, customization) {
         };
     });
     cleanProfile.members = simpleMembers;
-    let websiteAccount = undefined;
+    let websiteAccount = null;
     if (websiteAccountPromise)
         websiteAccount = await websiteAccountPromise;
     return {

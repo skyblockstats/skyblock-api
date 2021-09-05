@@ -844,15 +844,15 @@ export async function createSession(refreshToken: string, userData: discord.Disc
 	return sessionId
 }
 
-export async function fetchSession(sessionId: string): Promise<SessionSchema | undefined> {
+export async function fetchSession(sessionId: string): Promise<SessionSchema | null> {
 	return await sessionsCollection?.findOne({ _id: sessionId })
 }
 
-export async function fetchAccount(minecraftUuid: string): Promise<AccountSchema | undefined> {
+export async function fetchAccount(minecraftUuid: string): Promise<AccountSchema | null> {
 	return await accountsCollection?.findOne({ minecraftUuid })
 }
 
-export async function fetchAccountFromDiscord(discordId: string): Promise<AccountSchema | undefined> {
+export async function fetchAccountFromDiscord(discordId: string): Promise<AccountSchema | null> {
 	return await accountsCollection?.findOne({ discordId })
 }
 
