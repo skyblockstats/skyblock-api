@@ -11,12 +11,12 @@ async function cleanPlayerResponse(data) {
     if (!data)
         return null; // bruh
     return {
-        uuid: util_1.undashUuid(data.uuid),
+        uuid: (0, util_1.undashUuid)(data.uuid),
         username: data.displayname,
-        rank: rank_1.cleanRank(data),
-        socials: socialmedia_1.cleanSocialMedia(data),
+        rank: (0, rank_1.cleanRank)(data),
+        socials: (0, socialmedia_1.cleanSocialMedia)(data),
         // first_join: data.firstLogin / 1000,
-        profiles: profiles_1.cleanPlayerSkyblockProfiles((_b = (_a = data.stats) === null || _a === void 0 ? void 0 : _a.SkyBlock) === null || _b === void 0 ? void 0 : _b.profiles)
+        profiles: (0, profiles_1.cleanPlayerSkyblockProfiles)((_b = (_a = data.stats) === null || _a === void 0 ? void 0 : _a.SkyBlock) === null || _b === void 0 ? void 0 : _b.profiles)
     };
 }
 exports.cleanPlayerResponse = cleanPlayerResponse;

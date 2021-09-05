@@ -27,7 +27,7 @@ function chooseApiKey() {
     // find the api key with the lowest amount of uses
     let bestKeyUsage = null;
     let bestKey = null;
-    for (let key of util_1.shuffle(apiKeys.slice())) {
+    for (let key of (0, util_1.shuffle)(apiKeys.slice())) {
         const keyUsage = apiKeyUsage[key];
         // if the key has never been used before, use it
         if (!keyUsage)
@@ -68,7 +68,7 @@ async function sendApiRequest({ path, key, args }) {
         // If there's an api key, add it to the arguments
         headers['API-Key'] = key;
     // Construct a url from the base api url, path, and arguments
-    const fetchUrl = baseHypixelAPI + '/' + path + '?' + util_1.jsonToQuery(args);
+    const fetchUrl = baseHypixelAPI + '/' + path + '?' + (0, util_1.jsonToQuery)(args);
     let fetchResponse;
     let fetchJsonParsed;
     // the number of times it's retried the attempt
@@ -76,7 +76,7 @@ async function sendApiRequest({ path, key, args }) {
     const maxRetries = 2;
     while (retries <= maxRetries) {
         try {
-            fetchResponse = await node_fetch_1.default(fetchUrl, {
+            fetchResponse = await (0, node_fetch_1.default)(fetchUrl, {
                 agent: () => httpsAgent,
                 headers
             });

@@ -91,7 +91,7 @@ function cleanCollections(data) {
     const playerCollectionTiers = {};
     for (const collectionTierNameValueRaw of playerCollectionTiersRaw) {
         const [collectionTierNameRaw, collectionTierValueRaw] = collectionTierNameValueRaw.split(/_(?=-?\d+$)/);
-        const collectionName = itemId_1.cleanItemId(collectionTierNameRaw);
+        const collectionName = (0, itemId_1.cleanItemId)(collectionTierNameRaw);
         // ensure it's at least 0
         const collectionValue = Math.max(parseInt(collectionTierValueRaw), 0);
         // if the collection hasn't been checked yet, or the new value is higher than the old, replace it
@@ -104,7 +104,7 @@ function cleanCollections(data) {
     const playerCollections = [];
     for (const collectionNameRaw in playerCollectionXpsRaw) {
         const collectionXp = playerCollectionXpsRaw[collectionNameRaw];
-        const collectionName = itemId_1.cleanItemId(collectionNameRaw);
+        const collectionName = (0, itemId_1.cleanItemId)(collectionNameRaw);
         const collectionLevel = playerCollectionTiers[collectionName];
         const collectionCategory = (_c = getCategory(collectionName)) !== null && _c !== void 0 ? _c : 'unknown';
         // in some very weird cases the collection level will be undefined, we should ignore these collections

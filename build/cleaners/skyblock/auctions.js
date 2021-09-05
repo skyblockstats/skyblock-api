@@ -13,7 +13,7 @@ async function cleanSkyBlockAuction(rawAuction) {
             sellerProfileUuid: rawAuction.profile_id,
             start: rawAuction.start / 1000,
             end: rawAuction.end / 1000,
-            item: await inventory_1.cleanItemEncoded(rawAuction.item_bytes),
+            item: await (0, inventory_1.cleanItemEncoded)(rawAuction.item_bytes),
             bidAmount: currentBid,
             nextBidAmount: nextBid,
             bin: (_a = rawAuction.bin) !== null && _a !== void 0 ? _a : false,
@@ -27,7 +27,7 @@ async function cleanSkyBlockAuction(rawAuction) {
             sellerProfileUuid: rawAuction.seller_profile,
             start: undefined,
             end: rawAuction.timestamp,
-            item: await inventory_1.cleanItemEncoded(rawAuction.item_bytes),
+            item: await (0, inventory_1.cleanItemEncoded)(rawAuction.item_bytes),
             bidAmount: rawAuction.price,
             nextBidAmount: rawAuction.price,
             bin: rawAuction.bin

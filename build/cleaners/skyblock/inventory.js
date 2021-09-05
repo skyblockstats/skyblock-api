@@ -72,7 +72,7 @@ function cleanItem(rawItem) {
         potion_effectiveness_level: (_t = extraAttributes.enhanced) !== null && _t !== void 0 ? _t : undefined,
         potion_duration_level: (_u = extraAttributes.extended) !== null && _u !== void 0 ? _u : undefined,
         head_texture: headId,
-        tier: util_1.extractItemTier((_w = (_v = itemTag === null || itemTag === void 0 ? void 0 : itemTag.display) === null || _v === void 0 ? void 0 : _v.Lore) !== null && _w !== void 0 ? _w : [])
+        tier: (0, util_1.extractItemTier)((_w = (_v = itemTag === null || itemTag === void 0 ? void 0 : itemTag.display) === null || _v === void 0 ? void 0 : _v.Lore) !== null && _w !== void 0 ? _w : [])
     };
 }
 function cleanItems(rawItems) {

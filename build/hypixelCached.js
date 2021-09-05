@@ -90,11 +90,11 @@ function waitForCacheSet(cache, key, value) {
  */
 async function uuidFromUser(user) {
     // if the user is 32 characters long, it has to be a uuid
-    if (util_1.isUuid(user))
-        return util_1.undashUuid(user);
-    if (exports.usernameCache.has(util_1.undashUuid(user))) {
+    if ((0, util_1.isUuid)(user))
+        return (0, util_1.undashUuid)(user);
+    if (exports.usernameCache.has((0, util_1.undashUuid)(user))) {
         // check if the uuid is a key
-        const username = exports.usernameCache.get(util_1.undashUuid(user));
+        const username = exports.usernameCache.get((0, util_1.undashUuid)(user));
         // sometimes the username will be null, return that
         if (username === null)
             return undefined;
@@ -105,7 +105,7 @@ async function uuidFromUser(user) {
             return uuid;
         }
         else
-            return util_1.undashUuid(user);
+            return (0, util_1.undashUuid)(user);
     }
     // check if the username is a value
     const uuidToUsername = exports.usernameCache.mget(exports.usernameCache.keys());
@@ -115,7 +115,7 @@ async function uuidFromUser(user) {
     }
     if (_1.debug)
         console.debug('Cache miss: uuidFromUser', user);
-    const undashedUser = util_1.undashUuid(user);
+    const undashedUser = (0, util_1.undashUuid)(user);
     // set it as waitForCacheSet (a promise) in case uuidFromUser gets called while its fetching mojang
     exports.usernameCache.set(undashedUser, waitForCacheSet(exports.usernameCache, user, user));
     // not cached, actually fetch mojang api now
@@ -125,7 +125,7 @@ async function uuidFromUser(user) {
         return;
     }
     // remove dashes from the uuid so its more normal
-    uuid = util_1.undashUuid(uuid);
+    uuid = (0, util_1.undashUuid)(uuid);
     exports.usernameCache.del(undashedUser);
     exports.usernameCache.set(uuid, username);
     return uuid;
@@ -137,17 +137,17 @@ exports.uuidFromUser = uuidFromUser;
  */
 async function usernameFromUser(user) {
     var _a;
-    if (exports.usernameCache.has(util_1.undashUuid(user))) {
+    if (exports.usernameCache.has((0, util_1.undashUuid)(user))) {
         if (_1.debug)
             console.debug('Cache hit! usernameFromUser', user);
-        return (_a = exports.usernameCache.get(util_1.undashUuid(user))) !== null && _a !== void 0 ? _a : null;
+        return (_a = exports.usernameCache.get((0, util_1.undashUuid)(user))) !== null && _a !== void 0 ? _a : null;
     }
     if (_1.debug)
         console.debug('Cache miss: usernameFromUser', user);
     let { uuid, username } = await mojang.profileFromUser(user);
     if (!uuid)
         return null;
-    uuid = util_1.undashUuid(uuid);
+    uuid = (0, util_1.undashUuid)(uuid);
     exports.usernameCache.set(uuid, username);
     return username;
 }
@@ -276,12 +276,12 @@ async function fetchProfileUuid(user, profile) {
     const profiles = await fetchBasicProfiles(user);
     if (!profiles)
         return null; // user probably doesnt exist
-    const profileUuid = util_1.undashUuid(profile);
+    const profileUuid = (0, util_1.undashUuid)(profile);
     for (const p of profiles) {
         if (((_a = p.name) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === profileUuid.toLowerCase())
-            return util_1.undashUuid(p.uuid);
-        else if (util_1.undashUuid(p.uuid) === util_1.undashUuid(profileUuid))
-            return util_1.undashUuid(p.uuid);
+            return (0, util_1.undashUuid)(p.uuid);
+        else if ((0, util_1.undashUuid)(p.uuid) === (0, util_1.undashUuid)(profileUuid))
+            return (0, util_1.undashUuid)(p.uuid);
     }
     return null;
 }
@@ -393,7 +393,7 @@ async function fetchAllAuctions() {
     if (Date.now() / 1000 > nextAuctionsUpdate) {
         const auctionsResponse = await new Promise(resolve => fetchAllAuctionsQueue.enqueue(async () => {
             if (Date.now() / 1000 > nextAuctionsUpdate)
-                resolve(await hypixel_1.fetchAllAuctionsUncached());
+                resolve(await (0, hypixel_1.fetchAllAuctionsUncached)());
             else
                 resolve(allAuctionsCache);
         }));

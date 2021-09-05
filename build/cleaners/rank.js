@@ -54,7 +54,7 @@ function cleanRank({ packageRank, newPackageRank, monthlyPackageRank, rankPlusCo
                 name = 'NONE';
                 break;
         }
-        const plusColor = rankPlusColor ? util_1.colorCodeFromName(rankPlusColor) : null;
+        const plusColor = rankPlusColor ? (0, util_1.colorCodeFromName)(rankPlusColor) : null;
         color = util_1.minecraftColorCodes[rankColors[name]];
         let rankColorPrefix = rankColors[name] ? '§' + rankColors[name] : '';
         // the text is white, but only in the prefix

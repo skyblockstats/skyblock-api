@@ -140,7 +140,7 @@ async function fetchAllLeaderboardsCategorized() {
     const profileLeaderboardAttributes = await fetchAllProfileLeaderboardAttributes();
     const categorizedLeaderboards = {};
     for (const leaderboard of [...memberLeaderboardAttributes, ...profileLeaderboardAttributes]) {
-        const { category } = stats_1.categorizeStat(leaderboard);
+        const { category } = (0, stats_1.categorizeStat)(leaderboard);
         if (category) {
             if (!categorizedLeaderboards[category])
                 categorizedLeaderboards[category] = [];
@@ -219,7 +219,7 @@ async function fetchMemberLeaderboardRaw(name) {
     // if it's currently being fetched, check every 100ms until it's in cachedRawLeaderboards
     if (fetchingRawLeaderboardNames.has(name)) {
         while (true) {
-            await util_1.sleep(100);
+            await (0, util_1.sleep)(100);
             if (exports.cachedRawLeaderboards.has(name))
                 return exports.cachedRawLeaderboards.get(name);
         }
@@ -252,7 +252,7 @@ async function fetchProfileLeaderboardRaw(name) {
     // if it's currently being fetched, check every 100ms until it's in cachedRawLeaderboards
     if (fetchingRawLeaderboardNames.has(name)) {
         while (true) {
-            await util_1.sleep(100);
+            await (0, util_1.sleep)(100);
             if (exports.cachedRawLeaderboards.has(name))
                 return exports.cachedRawLeaderboards.get(name);
         }
@@ -298,7 +298,7 @@ async function fetchMemberLeaderboard(name) {
     const leaderboard = await Promise.all(promises);
     return {
         name: name,
-        unit: (_a = stats_1.getStatUnit(name)) !== null && _a !== void 0 ? _a : null,
+        unit: (_a = (0, stats_1.getStatUnit)(name)) !== null && _a !== void 0 ? _a : null,
         list: leaderboard
     };
 }
@@ -327,7 +327,7 @@ async function fetchProfileLeaderboard(name) {
     const leaderboard = await Promise.all(promises);
     return {
         name: name,
-        unit: (_a = stats_1.getStatUnit(name)) !== null && _a !== void 0 ? _a : null,
+        unit: (_a = (0, stats_1.getStatUnit)(name)) !== null && _a !== void 0 ? _a : null,
         list: leaderboard
     };
 }
@@ -367,7 +367,7 @@ async function fetchMemberLeaderboardSpots(player, profile) {
             name: leaderboardName,
             positionIndex: leaderboardPositionIndex,
             value: applicableAttributes[leaderboardName],
-            unit: (_a = stats_1.getStatUnit(leaderboardName)) !== null && _a !== void 0 ? _a : null
+            unit: (_a = (0, stats_1.getStatUnit)(leaderboardName)) !== null && _a !== void 0 ? _a : null
         });
     }
     return memberLeaderboardSpots;
@@ -572,9 +572,9 @@ exports.queueUpdateDatabaseProfile = queueUpdateDatabaseProfile;
 async function removeBadMemberLeaderboardAttributes() {
     const leaderboards = await fetchAllMemberLeaderboardAttributes();
     // shuffle so if the application is restarting many times itll still be useful
-    for (const leaderboard of util_1.shuffle(leaderboards)) {
+    for (const leaderboard of (0, util_1.shuffle)(leaderboards)) {
         // wait 10 seconds so it doesnt use as much ram
-        await util_1.sleep(10 * 1000);
+        await (0, util_1.sleep)(10 * 1000);
         const unsetValue = {};
         unsetValue[leaderboard] = '';
         const filter = {};
@@ -597,12 +597,12 @@ async function fetchAllLeaderboards(fast) {
     const leaderboards = await fetchAllMemberLeaderboardAttributes();
     if (_1.debug)
         console.debug('Caching raw leaderboards!');
-    for (const leaderboard of util_1.shuffle(leaderboards))
+    for (const leaderboard of (0, util_1.shuffle)(leaderboards))
         await fetchMemberLeaderboardRaw(leaderboard);
     exports.finishedCachingRawLeaderboards = true;
 }
 async function createSession(refreshToken, userData) {
-    const sessionId = uuid_1.v4();
+    const sessionId = (0, uuid_1.v4)();
     await (sessionsCollection === null || sessionsCollection === void 0 ? void 0 : sessionsCollection.insertOne({
         _id: sessionId,
         refresh_token: refreshToken,
@@ -654,7 +654,7 @@ async function getItemUniqueId(item, update, returnEntireItem) {
     // we're not updating anything, so just return the id now
     if (!update)
         return returnEntireItem ? existingItem : existingItem === null || existingItem === void 0 ? void 0 : existingItem._id;
-    const itemUniqueId = existingItem ? existingItem._id : uuid_1.v4().replace(/-/g, '');
+    const itemUniqueId = existingItem ? existingItem._id : (0, uuid_1.v4)().replace(/-/g, '');
     // if the item in the database doesn't have a reforge but this one does, don't bother updating anything and just return the id
     if ((existingItem === null || existingItem === void 0 ? void 0 : existingItem.r) === false && item.reforge !== undefined)
         return returnEntireItem ? existingItem : itemUniqueId;
@@ -667,8 +667,8 @@ async function getItemUniqueId(item, update, returnEntireItem) {
         itemLore = item.display.lore.join('\n');
     }
     else {
-        itemName = existingItem ? util_1.replaceDifferencesWithQuestionMark(existingItem.dn, item.display.name) : item.display.name;
-        itemLore = (existingItem === null || existingItem === void 0 ? void 0 : existingItem.l) ? util_1.replaceDifferencesWithQuestionMark(existingItem.l, item.display.lore.join('\n')) : item.display.lore.join('\n');
+        itemName = existingItem ? (0, util_1.replaceDifferencesWithQuestionMark)(existingItem.dn, item.display.name) : item.display.name;
+        itemLore = (existingItem === null || existingItem === void 0 ? void 0 : existingItem.l) ? (0, util_1.replaceDifferencesWithQuestionMark)(existingItem.l, item.display.lore.join('\n')) : item.display.lore.join('\n');
     }
     // all the stuff is the same, don't bother updating it
     if (existingItem

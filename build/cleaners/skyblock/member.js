@@ -52,7 +52,7 @@ async function cleanSkyBlockProfileMemberResponse(member, included = undefined) 
     const player = await cached.fetchPlayer(member.uuid);
     if (!player)
         return null;
-    const fairySouls = fairysouls_1.cleanFairySouls(member);
+    const fairySouls = (0, fairysouls_1.cleanFairySouls)(member);
     const { max_fairy_souls: maxFairySouls } = await constants.fetchConstantValues();
     if (fairySouls.total > (maxFairySouls !== null && maxFairySouls !== void 0 ? maxFairySouls : 0))
         await constants.setConstantValues({ max_fairy_souls: fairySouls.total });
@@ -63,17 +63,17 @@ async function cleanSkyBlockProfileMemberResponse(member, included = undefined) 
         first_join: member.first_join / 1000,
         rank: player.rank,
         purse: member.coin_purse,
-        stats: stats_1.cleanProfileStats(member),
+        stats: (0, stats_1.cleanProfileStats)(member),
         // this is used for leaderboards
         rawHypixelStats: (_a = member.stats) !== null && _a !== void 0 ? _a : {},
-        minions: await minions_1.cleanMinions(member),
+        minions: await (0, minions_1.cleanMinions)(member),
         fairy_souls: fairySouls,
-        inventories: inventoriesIncluded ? await inventory_1.cleanInventories(member) : undefined,
-        objectives: objectives_1.cleanObjectives(member),
-        skills: await skills_1.cleanSkills(member),
-        visited_zones: zones_1.cleanVisitedZones(member),
-        collections: collections_1.cleanCollections(member),
-        slayers: slayers_1.cleanSlayers(member)
+        inventories: inventoriesIncluded ? await (0, inventory_1.cleanInventories)(member) : undefined,
+        objectives: (0, objectives_1.cleanObjectives)(member),
+        skills: await (0, skills_1.cleanSkills)(member),
+        visited_zones: (0, zones_1.cleanVisitedZones)(member),
+        collections: (0, collections_1.cleanCollections)(member),
+        slayers: (0, slayers_1.cleanSlayers)(member)
     };
 }
 exports.cleanSkyBlockProfileMemberResponse = cleanSkyBlockProfileMemberResponse;

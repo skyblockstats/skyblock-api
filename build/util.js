@@ -83,7 +83,7 @@ function replaceDifferencesWithQuestionMark(string1, string2) {
     const string2split = string2.replace(/(§.|[^\w? ])/gi, ' $1 ').split(' ');
     let result = string1split.slice(); // this will be modified, and we slice to clone it
     let resultOffset = 0;
-    const patch = fast_myers_diff_1.diff(string1split, string2split);
+    const patch = (0, fast_myers_diff_1.diff)(string1split, string2split);
     for (const [removeStart, removeEnd, insertStart, insertEnd] of patch) {
         const replace = string1split.slice(removeStart, removeEnd).join(' ').replace(/ (§.|[^\w? ]) /gi, '$1');
         const replaceWith = string2split.slice(insertStart, insertEnd).join(' ').replace(/ (§.|[^\w? ]) /gi, '$1');

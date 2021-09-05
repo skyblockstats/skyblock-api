@@ -25,7 +25,7 @@ async function exchangeCode(redirectUri, code) {
         'redirect_uri': redirectUri,
         'scope': 'identify'
     };
-    const fetchResponse = await node_fetch_1.default(API_ENDPOINT + '/oauth2/token', {
+    const fetchResponse = await (0, node_fetch_1.default)(API_ENDPOINT + '/oauth2/token', {
         method: 'POST',
         agent: () => httpsAgent,
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -36,7 +36,7 @@ async function exchangeCode(redirectUri, code) {
 exports.exchangeCode = exchangeCode;
 async function getUser(accessToken) {
     const API_ENDPOINT = 'https://discord.com/api/v6';
-    const response = await node_fetch_1.default(API_ENDPOINT + '/users/@me', {
+    const response = await (0, node_fetch_1.default)(API_ENDPOINT + '/users/@me', {
         headers: { 'Authorization': 'Bearer ' + accessToken },
         agent: () => httpsAgent,
     });
