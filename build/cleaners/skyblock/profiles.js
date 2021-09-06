@@ -1,4 +1,4 @@
-import { cleanSkyblockProfileResponse } from './profile';
+import { cleanSkyblockProfileResponse } from './profile.js';
 export function cleanPlayerSkyblockProfiles(rawProfiles) {
     let profiles = [];
     for (const profile of Object.values(rawProfiles ?? {})) {

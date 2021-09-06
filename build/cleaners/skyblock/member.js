@@ -1,14 +1,14 @@
-import { cleanCollections } from './collections';
-import { cleanInventories } from './inventory';
-import { cleanFairySouls } from './fairysouls';
-import { cleanObjectives } from './objectives';
-import { cleanProfileStats } from './stats';
-import { cleanMinions } from './minions';
-import { cleanSlayers } from './slayers';
-import { cleanVisitedZones } from './zones';
-import { cleanSkills } from './skills';
-import * as cached from '../../hypixelCached';
-import * as constants from '../../constants';
+import { cleanCollections } from './collections.js';
+import { cleanInventories } from './inventory.js';
+import { cleanFairySouls } from './fairysouls.js';
+import { cleanObjectives } from './objectives.js';
+import { cleanProfileStats } from './stats.js';
+import { cleanMinions } from './minions.js';
+import { cleanSlayers } from './slayers.js';
+import { cleanVisitedZones } from './zones.js';
+import { cleanSkills } from './skills.js';
+import * as cached from '../../hypixelCached.js';
+import * as constants from '../../constants.js';
 export async function cleanSkyBlockProfileMemberResponseBasic(member) {
     const player = await cached.fetchPlayer(member.uuid);
     if (!player)

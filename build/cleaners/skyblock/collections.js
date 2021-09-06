@@ -1,4 +1,4 @@
-import { cleanItemId } from "./itemId";
+import { cleanItemId } from './itemId.js';
 const COLLECTIONS = {
     'farming': [
         'wheat',

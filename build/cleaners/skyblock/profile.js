@@ -1,7 +1,7 @@
-import { cleanSkyBlockProfileMemberResponse, cleanSkyBlockProfileMemberResponseBasic } from './member';
-import { combineMinionArrays, countUniqueMinions } from './minions';
-import { cleanBank } from './bank';
-import * as constants from '../../constants';
+import { cleanSkyBlockProfileMemberResponse, cleanSkyBlockProfileMemberResponseBasic } from './member.js';
+import { combineMinionArrays, countUniqueMinions } from './minions.js';
+import * as constants from '../../constants.js';
+import { cleanBank } from './bank.js';
 /** Return a `CleanProfile` instead of a `CleanFullProfile`, useful when we need to get members but don't want to waste much ram */
 export async function cleanSkyblockProfileResponseLighter(data) {
     // We use Promise.all so it can fetch all the usernames at once instead of waiting for the previous promise to complete

@@ -2,12 +2,12 @@
  * Fetch and edit constants from the skyblock-constants repo
  */
 // we have to do this so we can mock the function from the tests properly
-import * as constants from './constants';
+import * as constants from './constants.js';
 import NodeCache from 'node-cache';
+import { debug } from './index.js';
 import Queue from 'queue-promise';
 import fetch from 'node-fetch';
 import { Agent } from 'https';
-import { debug } from '.';
 const httpsAgent = new Agent({
     keepAlive: true
 });
@@ -97,7 +97,7 @@ async function editFile(file, message, newContent) {
         sha: data.content.sha
     });
 }
-export async function fetchJSONConstant(filename) {
+export let fetchJSONConstant = async function fetchJSONConstant(filename) {
     const file = await fetchFile(filename);
     try {
         return JSON.parse(file.content);
@@ -106,9 +106,9 @@ export async function fetchJSONConstant(filename) {
         // probably invalid json, return an empty array
         return [];
     }
-}
+};
 /** Add stats to skyblock-constants. This has caching so it's fine to call many times */
-export async function addJSONConstants(filename, addingValues, unit = 'stat') {
+export let addJSONConstants = async function addJSONConstants(filename, addingValues, unit = 'stat') {
     if (addingValues.length === 0)
         return; // no stats provided, just return
     let file = await fetchFile(filename);
@@ -140,7 +140,7 @@ export async function addJSONConstants(filename, addingValues, unit = 'stat') {
         file = await fetchFile(filename);
         await editFile(file, commitMessage, JSON.stringify(updatedStats, null, 2));
     }
-}
+};
 /** Fetch all the known SkyBlock stats as an array of strings */
 export async function fetchStats() {
     return await constants.fetchJSONConstant('stats.json');
@@ -221,3 +221,6 @@ export async function setConstantValues(newValues) {
     }
     catch { }
 }
+// this is necessary for mocking in the tests because es6
+export function mockAddJSONConstants($value) { addJSONConstants = $value; }
+export function mockFetchJSONConstant($value) { fetchJSONConstant = $value; }

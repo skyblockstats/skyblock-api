@@ -1,4 +1,4 @@
-import { colorCodeFromName, minecraftColorCodes } from '../util';
+import { colorCodeFromName, minecraftColorCodes } from '../util.js';
 const rankColors = {
     'NONE': '7',
     'VIP': 'a',

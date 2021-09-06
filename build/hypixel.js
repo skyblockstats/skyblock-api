@@ -1,13 +1,13 @@
 /**
  * Fetch the clean Hypixel API
  */
-import { cleanSkyblockProfileResponse } from './cleaners/skyblock/profile';
-import { fetchAccount, queueUpdateDatabaseMember, queueUpdateDatabaseProfile } from './database';
-import { chooseApiKey, sendApiRequest } from './hypixelApi';
-import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles';
-import { cleanPlayerResponse } from './cleaners/player';
-import * as cached from './hypixelCached';
-import { debug } from '.';
+import { cleanSkyblockProfileResponse } from './cleaners/skyblock/profile.js';
+import { fetchAccount, queueUpdateDatabaseMember, queueUpdateDatabaseProfile } from './database.js';
+import { chooseApiKey, sendApiRequest } from './hypixelApi.js';
+import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles.js';
+import { cleanPlayerResponse } from './cleaners/player.js';
+import * as cached from './hypixelCached.js';
+import { debug } from './index.js';
 // the interval at which the "last_save" parameter updates in the hypixel api, this is 3 minutes
 export const saveInterval = 60 * 3 * 1000;
 // the highest level a minion can be

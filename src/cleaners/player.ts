@@ -1,9 +1,9 @@
-import { cleanPlayerSkyblockProfiles } from './skyblock/profiles'
-import { cleanSocialMedia, CleanSocialMedia } from './socialmedia'
-import { CleanBasicProfile } from './skyblock/profile'
-import { cleanRank, CleanRank } from './rank'
-import { HypixelPlayer } from '../hypixelApi'
-import { undashUuid } from '../util'
+import { cleanPlayerSkyblockProfiles } from './skyblock/profiles.js'
+import { cleanSocialMedia, CleanSocialMedia } from './socialmedia.js'
+import { CleanBasicProfile } from './skyblock/profile.js'
+import { cleanRank, CleanRank } from './rank.js'
+import { HypixelPlayer } from '../hypixelApi.js'
+import { undashUuid } from '../util.js'
 
 export interface CleanBasicPlayer {
     uuid: string

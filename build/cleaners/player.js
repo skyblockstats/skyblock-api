@@ -1,7 +1,7 @@
-import { cleanPlayerSkyblockProfiles } from './skyblock/profiles';
-import { cleanSocialMedia } from './socialmedia';
-import { cleanRank } from './rank';
-import { undashUuid } from '../util';
+import { cleanPlayerSkyblockProfiles } from './skyblock/profiles.js';
+import { cleanSocialMedia } from './socialmedia.js';
+import { cleanRank } from './rank.js';
+import { undashUuid } from '../util.js';
 export async function cleanPlayerResponse(data) {
     // Cleans up a 'player' api response
     if (!data)

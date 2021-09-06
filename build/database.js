@@ -1,16 +1,16 @@
 /**
  * Store data about members for leaderboards
 */
-import { categorizeStat, getStatUnit } from './cleaners/skyblock/stats';
-import { slayerLevels } from './cleaners/skyblock/slayers';
+import { categorizeStat, getStatUnit } from './cleaners/skyblock/stats.js';
+import { slayerLevels } from './cleaners/skyblock/slayers.js';
 import { MongoClient } from 'mongodb';
-import * as cached from './hypixelCached';
-import * as constants from './constants';
-import { shuffle, sleep } from './util';
+import * as cached from './hypixelCached.js';
+import * as constants from './constants.js';
+import { shuffle, sleep } from './util.js';
 import NodeCache from 'node-cache';
 import { v4 as uuid4 } from 'uuid';
 import Queue from 'queue-promise';
-import { debug } from '.';
+import { debug } from './index.js';
 // don't update the user for 3 minutes
 const recentlyUpdated = new NodeCache({
     stdTTL: 60 * 3,
@@ -586,6 +586,7 @@ export async function updateAccount(discordId, schema) {
     }, { $set: schema }, { upsert: true });
 }
 // make sure it's not in a test
+console.log('global.isTest', globalThis.isTest);
 if (!globalThis.isTest) {
     connect().then(() => {
         // when it connects, cache the leaderboards and remove bad members

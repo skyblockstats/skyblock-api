@@ -1,10 +1,10 @@
-import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount } from './database'
-import { fetchMemberProfile, fetchUser } from './hypixel'
+import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount } from './database.js'
+import { fetchMemberProfile, fetchUser } from './hypixel.js'
 import rateLimit from 'express-rate-limit'
-import * as constants from './constants'
-import * as discord from './discord'
+import * as constants from './constants.js'
+import * as discord from './discord.js'
 import express from 'express'
-import { getKeyUsage } from './hypixelApi'
+import { getKeyUsage } from './hypixelApi.js'
 
 const app = express()
 

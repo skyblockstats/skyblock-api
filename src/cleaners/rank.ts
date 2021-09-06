@@ -1,5 +1,5 @@
-import { colorCodeFromName, minecraftColorCodes } from '../util'
-import { HypixelPlayer } from '../hypixelApi'
+import { colorCodeFromName, minecraftColorCodes } from '../util.js'
+import { HypixelPlayer } from '../hypixelApi.js'
 
 const rankColors: { [ name: string ]: string } = {
 	'NONE': '7',

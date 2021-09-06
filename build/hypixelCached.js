@@ -1,12 +1,12 @@
 /**
  * Fetch the clean and cached Hypixel API
  */
+import { isUuid, undashUuid } from './util.js';
+import * as hypixel from './hypixel.js';
+import * as mojang from './mojang.js';
 import NodeCache from 'node-cache';
+import { debug } from './index.js';
 import LRUCache from 'lru-cache';
-import * as mojang from './mojang';
-import * as hypixel from './hypixel';
-import { isUuid, undashUuid } from './util';
-import { debug } from '.';
 // cache usernames for 30 minutes
 /** uuid: username */
 export const usernameCache = new NodeCache({
