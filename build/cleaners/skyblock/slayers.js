@@ -1,30 +1,26 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.cleanSlayers = exports.slayerLevels = void 0;
-exports.slayerLevels = 5;
+export const slayerLevels = 5;
 const SLAYER_NAMES = {
     spider: 'tarantula',
     zombie: 'revenant',
     wolf: 'sven'
 };
-function cleanSlayers(data) {
-    var _a, _b;
+export function cleanSlayers(data) {
     const slayers = [];
-    const slayersDataRaw = data === null || data === void 0 ? void 0 : data.slayer_bosses;
+    const slayersDataRaw = data?.slayer_bosses;
     let totalXp = 0;
     let totalKills = 0;
     for (const slayerNameRaw in slayersDataRaw) {
         const slayerDataRaw = slayersDataRaw[slayerNameRaw];
         // convert name provided by api (spider) to the real name (tarantula)
         const slayerName = SLAYER_NAMES[slayerNameRaw];
-        const slayerXp = (_a = slayerDataRaw.xp) !== null && _a !== void 0 ? _a : 0;
+        const slayerXp = slayerDataRaw.xp ?? 0;
         let slayerKills = 0;
         const slayerTiers = [];
         for (const slayerDataKey in slayerDataRaw) {
             // if a key starts with boss_kills_tier_ (boss_kills_tier_1), get the last number
             if (slayerDataKey.startsWith('boss_kills_tier_')) {
                 const slayerTierRaw = parseInt(slayerDataKey.substr('boss_kills_tier_'.length));
-                const slayerTierKills = (_b = slayerDataRaw[slayerDataKey]) !== null && _b !== void 0 ? _b : 0;
+                const slayerTierKills = slayerDataRaw[slayerDataKey] ?? 0;
                 // add 1 since hypixel is using 0 indexed tiers
                 const slayerTier = slayerTierRaw + 1;
                 slayerTiers.push({
@@ -37,7 +33,7 @@ function cleanSlayers(data) {
             }
         }
         // if the slayer tier length is less than the max, add more empty ones
-        while (slayerTiers.length < exports.slayerLevels)
+        while (slayerTiers.length < slayerLevels)
             slayerTiers.push({
                 tier: slayerTiers.length + 1,
                 kills: 0
@@ -46,7 +42,7 @@ function cleanSlayers(data) {
             name: slayerName,
             raw_name: slayerNameRaw,
             tiers: slayerTiers,
-            xp: slayerXp !== null && slayerXp !== void 0 ? slayerXp : 0,
+            xp: slayerXp ?? 0,
             kills: slayerKills
         };
         slayers.push(slayer);
@@ -62,4 +58,3 @@ function cleanSlayers(data) {
         bosses: slayers
     };
 }
-exports.cleanSlayers = cleanSlayers;

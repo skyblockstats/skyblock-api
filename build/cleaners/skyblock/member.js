@@ -1,37 +1,15 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.cleanSkyBlockProfileMemberResponse = exports.cleanSkyBlockProfileMemberResponseBasic = void 0;
-const collections_1 = require("./collections");
-const inventory_1 = require("./inventory");
-const fairysouls_1 = require("./fairysouls");
-const objectives_1 = require("./objectives");
-const stats_1 = require("./stats");
-const minions_1 = require("./minions");
-const slayers_1 = require("./slayers");
-const zones_1 = require("./zones");
-const skills_1 = require("./skills");
-const cached = __importStar(require("../../hypixelCached"));
-const constants = __importStar(require("../../constants"));
-async function cleanSkyBlockProfileMemberResponseBasic(member) {
+import { cleanCollections } from './collections.js';
+import { cleanInventories } from './inventory.js';
+import { cleanFairySouls } from './fairysouls.js';
+import { cleanObjectives } from './objectives.js';
+import { cleanProfileStats } from './stats.js';
+import { cleanMinions } from './minions.js';
+import { cleanSlayers } from './slayers.js';
+import { cleanVisitedZones } from './zones.js';
+import { cleanSkills } from './skills.js';
+import * as cached from '../../hypixelCached.js';
+import * as constants from '../../constants.js';
+export async function cleanSkyBlockProfileMemberResponseBasic(member) {
     const player = await cached.fetchPlayer(member.uuid);
     if (!player)
         return null;
@@ -43,18 +21,16 @@ async function cleanSkyBlockProfileMemberResponseBasic(member) {
         rank: player.rank
     };
 }
-exports.cleanSkyBlockProfileMemberResponseBasic = cleanSkyBlockProfileMemberResponseBasic;
 /** Cleans up a member (from skyblock/profile) */
-async function cleanSkyBlockProfileMemberResponse(member, included = undefined) {
-    var _a;
+export async function cleanSkyBlockProfileMemberResponse(member, included = undefined) {
     // profiles.members[]
     const inventoriesIncluded = included === undefined || included.includes('inventories');
     const player = await cached.fetchPlayer(member.uuid);
     if (!player)
         return null;
-    const fairySouls = (0, fairysouls_1.cleanFairySouls)(member);
+    const fairySouls = cleanFairySouls(member);
     const { max_fairy_souls: maxFairySouls } = await constants.fetchConstantValues();
-    if (fairySouls.total > (maxFairySouls !== null && maxFairySouls !== void 0 ? maxFairySouls : 0))
+    if (fairySouls.total > (maxFairySouls ?? 0))
         await constants.setConstantValues({ max_fairy_souls: fairySouls.total });
     return {
         uuid: member.uuid,
@@ -63,17 +39,16 @@ async function cleanSkyBlockProfileMemberResponse(member, included = undefined) 
         first_join: member.first_join / 1000,
         rank: player.rank,
         purse: member.coin_purse,
-        stats: (0, stats_1.cleanProfileStats)(member),
+        stats: cleanProfileStats(member),
         // this is used for leaderboards
-        rawHypixelStats: (_a = member.stats) !== null && _a !== void 0 ? _a : {},
-        minions: await (0, minions_1.cleanMinions)(member),
+        rawHypixelStats: member.stats ?? {},
+        minions: await cleanMinions(member),
         fairy_souls: fairySouls,
-        inventories: inventoriesIncluded ? await (0, inventory_1.cleanInventories)(member) : undefined,
-        objectives: (0, objectives_1.cleanObjectives)(member),
-        skills: await (0, skills_1.cleanSkills)(member),
-        visited_zones: (0, zones_1.cleanVisitedZones)(member),
-        collections: (0, collections_1.cleanCollections)(member),
-        slayers: (0, slayers_1.cleanSlayers)(member)
+        inventories: inventoriesIncluded ? await cleanInventories(member) : undefined,
+        objectives: cleanObjectives(member),
+        skills: await cleanSkills(member),
+        visited_zones: cleanVisitedZones(member),
+        collections: cleanCollections(member),
+        slayers: cleanSlayers(member)
     };
 }
-exports.cleanSkyBlockProfileMemberResponse = cleanSkyBlockProfileMemberResponse;

@@ -1,8 +1,8 @@
-import { CleanBasicMember, CleanMember, cleanSkyBlockProfileMemberResponse, cleanSkyBlockProfileMemberResponseBasic } from './member'
-import { CleanMinion, combineMinionArrays, countUniqueMinions } from './minions'
-import { ApiOptions } from '../../hypixel'
-import { Bank, cleanBank } from './bank'
-import * as constants from '../../constants'
+import { CleanBasicMember, CleanMember, cleanSkyBlockProfileMemberResponse, cleanSkyBlockProfileMemberResponseBasic } from './member.js'
+import { CleanMinion, combineMinionArrays, countUniqueMinions } from './minions.js'
+import * as constants from '../../constants.js'
+import { ApiOptions } from '../../hypixel.js'
+import { Bank, cleanBank } from './bank.js'
 
 export interface CleanProfile extends CleanBasicProfile {
     members?: CleanBasicMember[]

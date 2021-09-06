@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.cleanProfileStats = exports.getStatUnit = exports.statUnits = exports.categorizeStat = void 0;
 const statCategories = {
     'deaths': ['deaths_', 'deaths'],
     'kills': ['kills_', 'kills'],
@@ -13,7 +10,7 @@ const statCategories = {
     'slayer': ['slayer_'],
     'misc': null // everything else goes here
 };
-function categorizeStat(statNameRaw) {
+export function categorizeStat(statNameRaw) {
     // 'deaths_void'
     for (const statCategory in statCategories) {
         // 'deaths'
@@ -56,15 +53,14 @@ function categorizeStat(statNameRaw) {
         name: statNameRaw
     };
 }
-exports.categorizeStat = categorizeStat;
-exports.statUnits = {
+export const statUnits = {
     time: ['_best_time', '_best_time_2'],
     date: ['first_join'],
     coins: ['purse'],
     leaderboards: ['leaderboards_count', 'top_1_leaderboards_count']
 };
-function getStatUnit(name) {
-    for (const [unitName, statMatchers] of Object.entries(exports.statUnits)) {
+export function getStatUnit(name) {
+    for (const [unitName, statMatchers] of Object.entries(statUnits)) {
         for (const statMatch of statMatchers) {
             let trailingEnd = statMatch[0] === '_';
             let trailingStart = statMatch.substr(-1) === '_';
@@ -76,23 +72,20 @@ function getStatUnit(name) {
     }
     return null;
 }
-exports.getStatUnit = getStatUnit;
-function cleanProfileStats(data) {
-    var _a, _b;
+export function cleanProfileStats(data) {
     // TODO: add type for statsRaw (probably in hypixelApi.ts since its coming from there)
     const stats = [];
-    const rawStats = (_a = data === null || data === void 0 ? void 0 : data.stats) !== null && _a !== void 0 ? _a : {};
+    const rawStats = data?.stats ?? {};
     for (const statNameRaw in rawStats) {
         const statValue = rawStats[statNameRaw];
         let { category: statCategory, name: statName } = categorizeStat(statNameRaw);
         stats.push({
-            categorizedName: statName !== null && statName !== void 0 ? statName : 'total',
+            categorizedName: statName ?? 'total',
             value: statValue,
             rawName: statNameRaw,
             category: statCategory,
-            unit: (_b = getStatUnit(statNameRaw)) !== null && _b !== void 0 ? _b : null
+            unit: getStatUnit(statNameRaw) ?? null
         });
     }
     return stats;
 }
-exports.cleanProfileStats = cleanProfileStats;

@@ -2,23 +2,23 @@
  * Store data about members for leaderboards
 */
 
-import { replaceDifferencesWithQuestionMark, shuffle, sleep } from './util'
-import { categorizeStat, getStatUnit } from './cleaners/skyblock/stats'
-import { CleanFullProfile } from './cleaners/skyblock/profile'
-import { slayerLevels } from './cleaners/skyblock/slayers'
-import { Item, Tier } from './cleaners/skyblock/inventory'
-import { CleanMember } from './cleaners/skyblock/member'
-import { Auction } from './cleaners/skyblock/auctions'
+import { replaceDifferencesWithQuestionMark, shuffle, sleep } from './util.js'
+import { categorizeStat, getStatUnit } from './cleaners/skyblock/stats.js'
+import { CleanFullProfile } from './cleaners/skyblock/profile.js'
+import { slayerLevels } from './cleaners/skyblock/slayers.js'
+import { Item, Tier } from './cleaners/skyblock/inventory.js'
+import { CleanMember } from './cleaners/skyblock/member.js'
+import { Auction } from './cleaners/skyblock/auctions.js'
 import { Collection, Db, MongoClient } from 'mongodb'
-import { CleanPlayer } from './cleaners/player'
-import * as cached from './hypixelCached'
-import * as constants from './constants'
-import * as discord from './discord'
+import { CleanPlayer } from './cleaners/player.js'
+import { getItemLowestBin } from './hypixel.js'
+import * as cached from './hypixelCached.js'
+import * as constants from './constants.js'
+import * as discord from './discord.js'
 import NodeCache from 'node-cache'
 import { v4 as uuid4 } from 'uuid'
+import { debug } from './index.js'
 import Queue from 'queue-promise'
-import { debug } from '.'
-import { getItemLowestBin } from './hypixel'
 
 // don't update the user for 3 minutes
 const recentlyUpdated = new NodeCache({

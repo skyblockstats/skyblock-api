@@ -1,52 +1,26 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.debug = void 0;
-const database_1 = require("./database");
-const hypixel_1 = require("./hypixel");
-const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
-const constants = __importStar(require("./constants"));
-const discord = __importStar(require("./discord"));
-const express_1 = __importDefault(require("express"));
-const hypixelCached_1 = require("./hypixelCached");
-const app = (0, express_1.default)();
-exports.debug = true;
+import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchItemPriceData, fetchItemsByName, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchMostSoldItems, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount } from './database.js';
+import { fetchMemberProfile, fetchUser } from './hypixel.js';
+import { fetchAllAuctions } from './hypixelCached.js';
+import * as constants from './constants.js';
+import rateLimit from 'express-rate-limit';
+import * as discord from './discord.js';
+import express from 'express';
+const app = express();
+export const debug = true;
 const mainSiteUrl = 'https://skyblock.matdoes.dev';
 // 200 requests over 5 minutes
-const limiter = (0, express_rate_limit_1.default)({
+const limiter = rateLimit({
     windowMs: 60 * 1000 * 5,
     max: 200,
     skip: (req) => {
         return req.headers.key === process.env.key;
     },
     keyGenerator: (req) => {
-        var _a;
-        return ((_a = req.headers['cf-connecting-ip']) !== null && _a !== void 0 ? _a : req.ip).toString();
+        return (req.headers['cf-connecting-ip'] ?? req.ip).toString();
     }
 });
 app.use(limiter);
-app.use(express_1.default.json());
+app.use(express.json());
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     next();
@@ -57,15 +31,15 @@ app.get('/', async (req, res) => {
     res.json({
         ok: true,
         uptimeHours: (currentTime - startTime) / 1000 / 60 / 60,
-        finishedCachingRawLeaderboards: database_1.finishedCachingRawLeaderboards,
-        leaderboardUpdateMemberQueueSize: database_1.leaderboardUpdateMemberQueue.size,
-        leaderboardUpdateProfileQueueSize: database_1.leaderboardUpdateProfileQueue.size,
+        finishedCachingRawLeaderboards,
+        leaderboardUpdateMemberQueueSize: leaderboardUpdateMemberQueue.size,
+        leaderboardUpdateProfileQueueSize: leaderboardUpdateProfileQueue.size,
         // key: getKeyUsage()
     });
 });
 app.get('/player/:user', async (req, res) => {
     try {
-        const user = await (0, hypixel_1.fetchUser)({ user: req.params.user }, [req.query.basic === 'true' ? undefined : 'profiles', 'player'], req.query.customization === 'true');
+        const user = await fetchUser({ user: req.params.user }, [req.query.basic === 'true' ? undefined : 'profiles', 'player'], req.query.customization === 'true');
         if (user)
             res.json(user);
         else
@@ -78,7 +52,7 @@ app.get('/player/:user', async (req, res) => {
 });
 app.get('/discord/:id', async (req, res) => {
     try {
-        res.json(await (0, database_1.fetchAccountFromDiscord)(req.params.id));
+        res.json(await fetchAccountFromDiscord(req.params.id));
     }
     catch (err) {
         console.error(err);
@@ -87,7 +61,7 @@ app.get('/discord/:id', async (req, res) => {
 });
 app.get('/player/:user/:profile', async (req, res) => {
     try {
-        const profile = await (0, hypixel_1.fetchMemberProfile)(req.params.user, req.params.profile, req.query.customization === 'true');
+        const profile = await fetchMemberProfile(req.params.user, req.params.profile, req.query.customization === 'true');
         if (profile)
             res.json(profile);
         else
@@ -100,7 +74,7 @@ app.get('/player/:user/:profile', async (req, res) => {
 });
 app.get('/player/:user/:profile/leaderboards', async (req, res) => {
     try {
-        res.json(await (0, database_1.fetchMemberLeaderboardSpots)(req.params.user, req.params.profile));
+        res.json(await fetchMemberLeaderboardSpots(req.params.user, req.params.profile));
     }
     catch (err) {
         console.error(err);
@@ -109,7 +83,7 @@ app.get('/player/:user/:profile/leaderboards', async (req, res) => {
 });
 app.get('/leaderboard/:name', async (req, res) => {
     try {
-        res.json(await (0, database_1.fetchLeaderboard)(req.params.name));
+        res.json(await fetchLeaderboard(req.params.name));
     }
     catch (err) {
         console.error(err);
@@ -118,7 +92,7 @@ app.get('/leaderboard/:name', async (req, res) => {
 });
 app.get('/leaderboards', async (req, res) => {
     try {
-        res.json(await (0, database_1.fetchAllLeaderboardsCategorized)());
+        res.json(await fetchAllLeaderboardsCategorized());
     }
     catch (err) {
         console.error(err);
@@ -135,7 +109,7 @@ app.get('/constants', async (req, res) => {
     }
 });
 app.get('/auctions', async (req, res) => {
-    res.json(await (0, hypixelCached_1.fetchAllAuctions)());
+    res.json(await fetchAllAuctions());
 });
 app.get('/auctions/price', async (req, res) => {
     /** just assume the params are perfectly accurate */
@@ -143,7 +117,7 @@ app.get('/auctions/price', async (req, res) => {
         id: req.query.id,
         tier: req.query.tier,
     };
-    res.json(await (0, database_1.fetchItemPriceData)(item));
+    res.json(await fetchItemPriceData(item));
 });
 app.get('/auctions/search', async (req, res) => {
     /** just assume the params are perfectly accurate */
@@ -161,11 +135,11 @@ app.get('/auctions/search', async (req, res) => {
     }
     itemName = itemName.trim().replace(/\s\s+/g, ' ');
     console.log(filters);
-    const matchingItems = await (0, database_1.fetchItemsByName)(itemName, {});
+    const matchingItems = await fetchItemsByName(itemName, {});
     res.json(matchingItems);
 });
 app.get('/auctions/top', async (req, res) => {
-    res.json(await (0, database_1.fetchMostSoldItems)());
+    res.json(await fetchMostSoldItems());
 });
 app.post('/accounts/createsession', async (req, res) => {
     try {
@@ -180,7 +154,7 @@ app.post('/accounts/createsession', async (req, res) => {
             // access token is invalid :(
             return res.json({ ok: false });
         const userData = await discord.getUser(accessToken);
-        const sessionId = await (0, database_1.createSession)(refreshToken, userData);
+        const sessionId = await createSession(refreshToken, userData);
         res.json({ ok: true, session_id: sessionId });
     }
     catch (err) {
@@ -190,10 +164,10 @@ app.post('/accounts/createsession', async (req, res) => {
 app.post('/accounts/session', async (req, res) => {
     try {
         const { uuid } = req.body;
-        const session = await (0, database_1.fetchSession)(uuid);
+        const session = await fetchSession(uuid);
         if (!session)
             return res.json({ ok: false });
-        const account = await (0, database_1.fetchAccountFromDiscord)(session.discord_user.id);
+        const account = await fetchAccountFromDiscord(session.discord_user.id);
         res.json({ session, account });
     }
     catch (err) {
@@ -206,7 +180,7 @@ app.post('/accounts/update', async (req, res) => {
     if (req.headers.key !== process.env.key)
         return console.log('bad key!');
     try {
-        await (0, database_1.updateAccount)(req.body.discordId, req.body);
+        await updateAccount(req.body.discordId, req.body);
         res.json({ ok: true });
     }
     catch (err) {

@@ -1,7 +1,7 @@
 on: [ push, pull_request ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     name: Run tests
     steps:
@@ -9,14 +9,34 @@ jobs:
         uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '14.15.0'
+          node-version: '16.0.0'
       - run: npm install
 
       - name: Run tests
         run: npm test
 
+  build:
+    runs-on: ubuntu-latest
+    name: Compile Typescript
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16.0.0'
+      - run: npm install
+      - name: Compile Typescript
+        uses: FuLagann/tsc-build-push@v1
+        with:
+          user-name: "mat-1"
+          user-email: "github@matdoes.dev"
+          message: "Compiled TS into JS"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   automerge:
-    needs: build
+    needs: [ build, test ]
     runs-on: ubuntu-latest
     steps:
       - uses: fastify/github-action-merge-dependabot@v2.1.1

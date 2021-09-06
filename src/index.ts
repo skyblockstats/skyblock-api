@@ -1,12 +1,25 @@
-import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchItemPriceData, fetchItemsByName, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchMostSoldItems, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount } from './database'
-import { fetchMemberProfile, fetchUser } from './hypixel'
+import {
+	createSession,
+	fetchAccountFromDiscord,
+	fetchAllLeaderboardsCategorized,
+	fetchItemPriceData,
+	fetchItemsByName,
+	fetchLeaderboard,
+	fetchMemberLeaderboardSpots,
+	fetchMostSoldItems,
+	fetchSession,
+	finishedCachingRawLeaderboards,
+	leaderboardUpdateMemberQueue,
+	leaderboardUpdateProfileQueue,
+	updateAccount
+} from './database.js'
+import { Item, Tier } from './cleaners/skyblock/inventory.js'
+import { fetchMemberProfile, fetchUser } from './hypixel.js'
+import { fetchAllAuctions } from './hypixelCached.js'
+import * as constants from './constants.js'
 import rateLimit from 'express-rate-limit'
-import * as constants from './constants'
-import * as discord from './discord'
+import * as discord from './discord.js'
 import express from 'express'
-import { getKeyUsage } from './hypixelApi'
-import { fetchAllAuctions } from './hypixelCached'
-import { Item, Tier } from './cleaners/skyblock/inventory'
 
 const app = express()
 

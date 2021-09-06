@@ -1,16 +1,10 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUser = exports.exchangeCode = void 0;
-const node_fetch_1 = __importDefault(require("node-fetch"));
-const https_1 = require("https");
+import fetch from 'node-fetch';
+import { Agent } from 'https';
 const DISCORD_CLIENT_ID = '656634948148527107';
-const httpsAgent = new https_1.Agent({
+const httpsAgent = new Agent({
     keepAlive: true
 });
-async function exchangeCode(redirectUri, code) {
+export async function exchangeCode(redirectUri, code) {
     const API_ENDPOINT = 'https://discord.com/api/v6';
     const CLIENT_SECRET = process.env.discord_client_secret;
     if (!CLIENT_SECRET) {
@@ -25,7 +19,7 @@ async function exchangeCode(redirectUri, code) {
         'redirect_uri': redirectUri,
         'scope': 'identify'
     };
-    const fetchResponse = await (0, node_fetch_1.default)(API_ENDPOINT + '/oauth2/token', {
+    const fetchResponse = await fetch(API_ENDPOINT + '/oauth2/token', {
         method: 'POST',
         agent: () => httpsAgent,
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -33,13 +27,11 @@ async function exchangeCode(redirectUri, code) {
     });
     return await fetchResponse.json();
 }
-exports.exchangeCode = exchangeCode;
-async function getUser(accessToken) {
+export async function getUser(accessToken) {
     const API_ENDPOINT = 'https://discord.com/api/v6';
-    const response = await (0, node_fetch_1.default)(API_ENDPOINT + '/users/@me', {
+    const response = await fetch(API_ENDPOINT + '/users/@me', {
         headers: { 'Authorization': 'Bearer ' + accessToken },
         agent: () => httpsAgent,
     });
-    return response.json();
+    return await response.json();
 }
-exports.getUser = getUser;

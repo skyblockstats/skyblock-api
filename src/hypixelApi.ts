@@ -1,15 +1,15 @@
 /**
  * Fetch the raw Hypixel API
  */
-import { jsonToQuery, shuffle } from './util'
-import type { Response } from 'node-fetch'
+import { jsonToQuery, shuffle } from './util.js'
+import * as nodeFetch from 'node-fetch'
 import fetch from 'node-fetch'
 import { Agent } from 'https'
 import { debug } from '.'
 
 if (!process.env.hypixel_keys)
 	// if there's no hypixel keys in env, run dotenv
-	require('dotenv').config()
+	(await import('dotenv')).config()
 
 // We need to create an agent to prevent memory leaks and to only do dns lookups once
 const httpsAgent = new Agent({
@@ -140,7 +140,7 @@ export interface HypixelPlayer {
 }
 
 /** Send an HTTP request to the Hypixel API */
-export async function sendApiRequest({ path, key, args }): Promise<HypixelResponse> {
+export let sendApiRequest = async function sendApiRequest({ path, key, args }): Promise<HypixelResponse> {
 	// Send a raw http request to api.hypixel.net, and return the parsed json
 	let headers: HeadersInit = {}
 	if (
@@ -154,7 +154,7 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 	// Construct a url from the base api url, path, and arguments
 	const fetchUrl = baseHypixelAPI + '/' + path + '?' + jsonToQuery(args)
 
-	let fetchResponse: Response
+	let fetchResponse: nodeFetch.Response
 	let fetchJsonParsed: any
 
 	// the number of times it's retried the attempt
@@ -207,3 +207,5 @@ export async function sendApiRequest({ path, key, args }): Promise<HypixelRespon
 	return fetchJsonParsed
 }
 
+// this is necessary for mocking in the tests because es6
+export function mockSendApiRequest($value) { sendApiRequest = $value }
