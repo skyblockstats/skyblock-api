@@ -1,5 +1,5 @@
-import { addEnchantments } from '../../constants'
-import { cleanItemEncoded, Item } from './inventory'
+import { cleanItemEncoded, Item } from './inventory.js'
+import { addEnchantments } from '../../constants.js'
 
 export interface Auction {
 	uuid: string
