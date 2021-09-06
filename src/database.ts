@@ -2,20 +2,20 @@
  * Store data about members for leaderboards
 */
 
-import { categorizeStat, getStatUnit } from './cleaners/skyblock/stats'
-import { CleanFullProfile } from './cleaners/skyblock/profile'
-import { slayerLevels } from './cleaners/skyblock/slayers'
-import { CleanMember } from './cleaners/skyblock/member'
+import { categorizeStat, getStatUnit } from './cleaners/skyblock/stats.js'
+import { CleanFullProfile } from './cleaners/skyblock/profile.js'
+import { slayerLevels } from './cleaners/skyblock/slayers.js'
+import { CleanMember } from './cleaners/skyblock/member.js'
 import { Collection, Db, MongoClient } from 'mongodb'
-import { CleanPlayer } from './cleaners/player'
-import * as cached from './hypixelCached'
-import * as constants from './constants'
-import { shuffle, sleep } from './util'
-import * as discord from './discord'
+import { CleanPlayer } from './cleaners/player.js'
+import * as cached from './hypixelCached.js'
+import * as constants from './constants.js'
+import { shuffle, sleep } from './util.js'
+import * as discord from './discord.js'
 import NodeCache from 'node-cache'
 import { v4 as uuid4 } from 'uuid'
 import Queue from 'queue-promise'
-import { debug } from '.'
+import { debug } from './index.js'
 
 // don't update the user for 3 minutes
 const recentlyUpdated = new NodeCache({
@@ -121,7 +121,7 @@ async function connect(): Promise<void> {
 		return console.warn('Warning: db_uri was not found in .env. Features that utilize the database such as leaderboards won\'t work.')
 	if (!process.env.db_name)
 		return console.warn('Warning: db_name was not found in .env. Features that utilize the database such as leaderboards won\'t work.')
-	client = await MongoClient.connect(process.env.db_uri, { useNewUrlParser: true, useUnifiedTopology: true })
+	client = await MongoClient.connect(process.env.db_uri)
 	database = client.db(process.env.db_name)
 	memberLeaderboardsCollection = database.collection('member-leaderboards')
 	profileLeaderboardsCollection = database.collection('profile-leaderboards')
@@ -803,6 +803,7 @@ export async function updateAccount(discordId: string, schema: AccountSchema) {
 }
 
 // make sure it's not in a test
+console.log('global.isTest', globalThis.isTest)
 if (!globalThis.isTest) {
 	connect().then(() => {
 		// when it connects, cache the leaderboards and remove bad members

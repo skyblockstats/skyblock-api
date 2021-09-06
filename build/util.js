@@ -1,26 +1,20 @@
-"use strict";
 /**
  * Random utility functions that are not related to Hypixel
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.isUuid = exports.sleep = exports.colorCodeFromName = exports.minecraftColorCodes = exports.shuffle = exports.jsonToQuery = exports.undashUuid = void 0;
-function undashUuid(uuid) {
+export function undashUuid(uuid) {
     return uuid.replace(/-/g, '').toLowerCase();
 }
-exports.undashUuid = undashUuid;
-function jsonToQuery(data) {
+export function jsonToQuery(data) {
     return Object.entries(data || {}).map(e => e.join('=')).join('&');
 }
-exports.jsonToQuery = jsonToQuery;
-function shuffle(a) {
+export function shuffle(a) {
     for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
 }
-exports.shuffle = shuffle;
-exports.minecraftColorCodes = {
+export const minecraftColorCodes = {
     '0': '#000000',
     '1': '#0000be',
     '2': '#00be00',
@@ -59,21 +53,18 @@ exports.minecraftColorCodes = {
  * For example: blue -> 9
  * @param colorName The name of the color (blue, red, aqua, etc)
  */
-function colorCodeFromName(colorName) {
-    const hexColor = exports.minecraftColorCodes[colorName.toLowerCase()];
-    for (const key in exports.minecraftColorCodes) {
-        const value = exports.minecraftColorCodes[key];
+export function colorCodeFromName(colorName) {
+    const hexColor = minecraftColorCodes[colorName.toLowerCase()];
+    for (const key in minecraftColorCodes) {
+        const value = minecraftColorCodes[key];
         if (key.length === 1 && value === hexColor)
             return key;
     }
 }
-exports.colorCodeFromName = colorCodeFromName;
-async function sleep(ms) {
+export async function sleep(ms) {
     await new Promise(resolve => setTimeout(resolve, ms));
 }
-exports.sleep = sleep;
 /** Returns whether a string is a UUID4 (Minecraft uuid) */
-function isUuid(string) {
+export function isUuid(string) {
     return undashUuid(string).length === 32;
 }
-exports.isUuid = isUuid;

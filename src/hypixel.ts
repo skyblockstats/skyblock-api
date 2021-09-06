@@ -2,14 +2,26 @@
  * Fetch the clean Hypixel API
  */
 
-import { cleanSkyblockProfileResponse, CleanProfile, CleanBasicProfile, CleanFullProfile, CleanFullProfileBasicMembers } from './cleaners/skyblock/profile'
-import { AccountCustomization, AccountSchema, fetchAccount, queueUpdateDatabaseMember, queueUpdateDatabaseProfile } from './database'
-import { CleanBasicMember, CleanMemberProfile } from './cleaners/skyblock/member'
-import { chooseApiKey, HypixelResponse, sendApiRequest } from './hypixelApi'
-import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles'
-import { CleanPlayer, cleanPlayerResponse } from './cleaners/player'
-import * as cached from './hypixelCached'
-import { debug } from '.'
+import {
+	cleanSkyblockProfileResponse,
+	CleanProfile,
+	CleanBasicProfile,
+	CleanFullProfile,
+	CleanFullProfileBasicMembers
+} from './cleaners/skyblock/profile.js'
+import {
+	AccountCustomization,
+	AccountSchema,
+	fetchAccount,
+	queueUpdateDatabaseMember,
+	queueUpdateDatabaseProfile
+} from './database.js'
+import { CleanBasicMember, CleanMemberProfile } from './cleaners/skyblock/member.js'
+import { chooseApiKey, HypixelResponse, sendApiRequest } from './hypixelApi.js'
+import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles.js'
+import { CleanPlayer, cleanPlayerResponse } from './cleaners/player.js'
+import * as cached from './hypixelCached.js'
+import { debug } from './index.js'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories' | undefined
 

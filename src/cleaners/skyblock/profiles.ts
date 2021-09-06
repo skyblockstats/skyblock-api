@@ -1,10 +1,10 @@
-import { HypixelPlayerStatsSkyBlockProfiles } from '../../hypixelApi'
+import { HypixelPlayerStatsSkyBlockProfiles } from '../../hypixelApi.js'
 import {
     CleanBasicProfile,
     CleanFullProfile,
     CleanProfile,
     cleanSkyblockProfileResponse
-} from './profile'
+} from './profile.js'
 
 export function cleanPlayerSkyblockProfiles(rawProfiles: HypixelPlayerStatsSkyBlockProfiles): CleanBasicProfile[] {
     let profiles: CleanBasicProfile[] = []

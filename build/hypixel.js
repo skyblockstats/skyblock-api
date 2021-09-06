@@ -1,58 +1,35 @@
-"use strict";
 /**
  * Fetch the clean Hypixel API
  */
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchMemberProfilesUncached = exports.fetchBasicProfileFromUuidUncached = exports.fetchMemberProfileUncached = exports.fetchMemberProfile = exports.fetchUser = exports.sendCleanApiRequest = exports.maxMinion = exports.saveInterval = void 0;
-const profile_1 = require("./cleaners/skyblock/profile");
-const database_1 = require("./database");
-const hypixelApi_1 = require("./hypixelApi");
-const profiles_1 = require("./cleaners/skyblock/profiles");
-const player_1 = require("./cleaners/player");
-const cached = __importStar(require("./hypixelCached"));
-const _1 = require(".");
+import { cleanSkyblockProfileResponse } from './cleaners/skyblock/profile.js';
+import { fetchAccount, queueUpdateDatabaseMember, queueUpdateDatabaseProfile } from './database.js';
+import { chooseApiKey, sendApiRequest } from './hypixelApi.js';
+import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles.js';
+import { cleanPlayerResponse } from './cleaners/player.js';
+import * as cached from './hypixelCached.js';
+import { debug } from './index.js';
 // the interval at which the "last_save" parameter updates in the hypixel api, this is 3 minutes
-exports.saveInterval = 60 * 3 * 1000;
+export const saveInterval = 60 * 3 * 1000;
 // the highest level a minion can be
-exports.maxMinion = 11;
+export const maxMinion = 11;
 /** Sends an API request to Hypixel and cleans it up. */
-async function sendCleanApiRequest({ path, args }, included, options) {
-    const key = await hypixelApi_1.chooseApiKey();
-    const rawResponse = await hypixelApi_1.sendApiRequest({ path, key, args });
+export async function sendCleanApiRequest({ path, args }, included, options) {
+    const key = await chooseApiKey();
+    const rawResponse = await sendApiRequest({ path, key, args });
     if (rawResponse.throttled) {
         // if it's throttled, wait a second and try again
         await new Promise(resolve => setTimeout(resolve, 1000));
         return await sendCleanApiRequest({ path, args }, included, options);
     }
     // clean the response
-    return await cleanResponse({ path, data: rawResponse }, options !== null && options !== void 0 ? options : {});
+    return await cleanResponse({ path, data: rawResponse }, options ?? {});
 }
-exports.sendCleanApiRequest = sendCleanApiRequest;
 async function cleanResponse({ path, data }, options) {
     // Cleans up an api response
     switch (path) {
-        case 'player': return await player_1.cleanPlayerResponse(data.player);
-        case 'skyblock/profile': return await profile_1.cleanSkyblockProfileResponse(data.profile, options);
-        case 'skyblock/profiles': return await profiles_1.cleanSkyblockProfilesResponse(data.profiles);
+        case 'player': return await cleanPlayerResponse(data.player);
+        case 'skyblock/profile': return await cleanSkyblockProfileResponse(data.profile, options);
+        case 'skyblock/profiles': return await cleanSkyblockProfilesResponse(data.profiles);
     }
 }
 /**
@@ -61,21 +38,20 @@ async function cleanResponse({ path, data }, options) {
  * @param included lets you choose what is returned, so there's less processing required on the backend
  * used inclusions: player, profiles
  */
-async function fetchUser({ user, uuid, username }, included = ['player'], customization) {
-    var _a, _b;
+export async function fetchUser({ user, uuid, username }, included = ['player'], customization) {
     if (!uuid) {
         // If the uuid isn't provided, get it
         if (!username && !user)
             return null;
-        uuid = await cached.uuidFromUser((user !== null && user !== void 0 ? user : username));
+        uuid = await cached.uuidFromUser((user ?? username));
     }
     if (!uuid) {
         // the user doesn't exist.
-        if (_1.debug)
+        if (debug)
             console.debug('error:', user, 'doesnt exist');
         return null;
     }
-    const websiteAccountPromise = customization ? database_1.fetchAccount(uuid) : null;
+    const websiteAccountPromise = customization ? fetchAccount(uuid) : null;
     const includePlayers = included.includes('player');
     const includeProfiles = included.includes('profiles');
     let profilesData;
@@ -85,7 +61,7 @@ async function fetchUser({ user, uuid, username }, included = ['player'], custom
         playerData = await cached.fetchPlayer(uuid);
         // if not including profiles, include lightweight profiles just in case
         if (!includeProfiles)
-            basicProfilesData = playerData === null || playerData === void 0 ? void 0 : playerData.profiles;
+            basicProfilesData = playerData?.profiles;
         if (playerData)
             delete playerData.profiles;
     }
@@ -95,7 +71,7 @@ async function fetchUser({ user, uuid, username }, included = ['player'], custom
     let lastOnline = 0;
     if (includeProfiles) {
         for (const profile of profilesData) {
-            const member = (_a = profile.members) === null || _a === void 0 ? void 0 : _a.find(member => member.uuid === uuid);
+            const member = profile.members?.find(member => member.uuid === uuid);
             if (member && member.last_save > lastOnline) {
                 lastOnline = member.last_save;
                 activeProfile = profile;
@@ -107,13 +83,12 @@ async function fetchUser({ user, uuid, username }, included = ['player'], custom
         websiteAccount = await websiteAccountPromise;
     return {
         player: playerData,
-        profiles: profilesData !== null && profilesData !== void 0 ? profilesData : basicProfilesData,
-        activeProfile: includeProfiles ? (_b = activeProfile) === null || _b === void 0 ? void 0 : _b.uuid : undefined,
-        online: includeProfiles ? lastOnline > (Date.now() - exports.saveInterval) : undefined,
-        customization: websiteAccount === null || websiteAccount === void 0 ? void 0 : websiteAccount.customization
+        profiles: profilesData ?? basicProfilesData,
+        activeProfile: includeProfiles ? activeProfile?.uuid : undefined,
+        online: includeProfiles ? lastOnline > (Date.now() - saveInterval) : undefined,
+        customization: websiteAccount?.customization
     };
 }
-exports.fetchUser = fetchUser;
 /**
  * Fetch a CleanMemberProfile from a user and string
  * This is safe to use many times as the results are cached!
@@ -121,12 +96,12 @@ exports.fetchUser = fetchUser;
  * @param profile A profile name or profile uuid
  * @param customization Whether stuff like the user's custom background will be returned
  */
-async function fetchMemberProfile(user, profile, customization) {
+export async function fetchMemberProfile(user, profile, customization) {
     const playerUuid = await cached.uuidFromUser(user);
     if (!playerUuid)
         return null;
     // we don't await the promise immediately so it can load while we do other stuff
-    const websiteAccountPromise = customization ? database_1.fetchAccount(playerUuid) : null;
+    const websiteAccountPromise = customization ? fetchAccount(playerUuid) : null;
     const profileUuid = await cached.fetchProfileUuid(user, profile);
     // if the profile or player doesn't have an id, just return
     if (!profileUuid)
@@ -164,41 +139,38 @@ async function fetchMemberProfile(user, profile, customization) {
             ...player
         },
         profile: cleanProfile,
-        customization: websiteAccount === null || websiteAccount === void 0 ? void 0 : websiteAccount.customization
+        customization: websiteAccount?.customization
     };
 }
-exports.fetchMemberProfile = fetchMemberProfile;
 /**
  * Fetches the Hypixel API to get a CleanFullProfile. This doesn't do any caching and you should use hypixelCached.fetchProfile instead
  * @param playerUuid The UUID of the Minecraft player
  * @param profileUuid The UUID of the Hypixel SkyBlock profile
  */
-async function fetchMemberProfileUncached(playerUuid, profileUuid) {
+export async function fetchMemberProfileUncached(playerUuid, profileUuid) {
     const profile = await sendCleanApiRequest({
         path: 'skyblock/profile',
         args: { profile: profileUuid }
     }, undefined, { mainMemberUuid: playerUuid });
     // queue updating the leaderboard positions for the member, eventually
     for (const member of profile.members)
-        database_1.queueUpdateDatabaseMember(member, profile);
-    database_1.queueUpdateDatabaseProfile(profile);
+        queueUpdateDatabaseMember(member, profile);
+    queueUpdateDatabaseProfile(profile);
     return profile;
 }
-exports.fetchMemberProfileUncached = fetchMemberProfileUncached;
 /**
  * Fetches the Hypixel API to get a CleanProfile from its id. This doesn't do any caching and you should use hypixelCached.fetchBasicProfileFromUuid instead
  * @param playerUuid The UUID of the Minecraft player
  * @param profileUuid The UUID of the Hypixel SkyBlock profile
  */
-async function fetchBasicProfileFromUuidUncached(profileUuid) {
+export async function fetchBasicProfileFromUuidUncached(profileUuid) {
     const profile = await sendCleanApiRequest({
         path: 'skyblock/profile',
         args: { profile: profileUuid }
     }, undefined, { basic: true });
     return profile;
 }
-exports.fetchBasicProfileFromUuidUncached = fetchBasicProfileFromUuidUncached;
-async function fetchMemberProfilesUncached(playerUuid) {
+export async function fetchMemberProfilesUncached(playerUuid) {
     const profiles = await sendCleanApiRequest({
         path: 'skyblock/profiles',
         args: {
@@ -210,10 +182,9 @@ async function fetchMemberProfilesUncached(playerUuid) {
     });
     for (const profile of profiles) {
         for (const member of profile.members) {
-            database_1.queueUpdateDatabaseMember(member, profile);
+            queueUpdateDatabaseMember(member, profile);
         }
-        database_1.queueUpdateDatabaseProfile(profile);
+        queueUpdateDatabaseProfile(profile);
     }
     return profiles;
 }
-exports.fetchMemberProfilesUncached = fetchMemberProfilesUncached;

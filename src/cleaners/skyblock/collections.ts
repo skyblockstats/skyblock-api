@@ -1,4 +1,4 @@
-import { cleanItemId, hypixelItemNames } from "./itemId"
+import { cleanItemId, hypixelItemNames } from './itemId.js'
 
 const COLLECTIONS = {
 	'farming': [

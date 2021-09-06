@@ -2,10 +2,10 @@
  * Fetch the Mojang username API through api.ashcon.app
  */
 
-import fetch from 'node-fetch'
+import { isUuid, undashUuid } from './util.js'
 import * as nodeFetch from 'node-fetch'
+import fetch from 'node-fetch'
 import { Agent } from 'https'
-import { isUuid, undashUuid } from './util'
 
 // We need to create an agent to prevent memory leaks
 const httpsAgent = new Agent({
@@ -21,7 +21,7 @@ interface MojangApiResponse {
 /**
  * Get mojang api data from the session server
  */
-export async function profileFromUuid(uuid: string): Promise<MojangApiResponse> {
+export let profileFromUuid = async function profileFromUuid(uuid: string): Promise<MojangApiResponse> {
 	let fetchResponse: nodeFetch.Response
 
 	try {
@@ -56,7 +56,7 @@ export async function profileFromUuid(uuid: string): Promise<MojangApiResponse> 
 }
 
 
-export async function profileFromUsername(username: string): Promise<MojangApiResponse> {
+export let profileFromUsername = async function profileFromUsername(username: string): Promise<MojangApiResponse> {
 	// since we don't care about anything other than the uuid, we can use /uuid/ instead of /user/
 
 	let fetchResponse: nodeFetch.Response
@@ -118,9 +118,15 @@ export async function profileFromUsernameAlternative(username: string): Promise<
 	}
 }
 
-export async function profileFromUser(user: string): Promise<MojangApiResponse> {
+export let profileFromUser = async function profileFromUser(user: string): Promise<MojangApiResponse> {
 	if (isUuid(user)) {
 		return await profileFromUuid(user)
 	} else
 		return await profileFromUsername(user)
 }
+
+
+// this is necessary for mocking in the tests because es6
+export function mockProfileFromUuid($value) { profileFromUuid = $value }
+export function mockProfileFromUsername($value) { profileFromUsername = $value }
+export function mockProfileFromUser($value) { profileFromUser = $value }

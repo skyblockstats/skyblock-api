@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.cleanCollections = void 0;
-const itemId_1 = require("./itemId");
+import { cleanItemId } from './itemId.js';
 const COLLECTIONS = {
     'farming': [
         'wheat',
@@ -83,15 +80,14 @@ function getCategory(collectionName) {
             return categoryName;
     }
 }
-function cleanCollections(data) {
-    var _a, _b, _c;
+export function cleanCollections(data) {
     // collection tiers show up like this: [ GRAVEL_3, GOLD_INGOT_2, MELON_-1, LOG_2:1_7, RAW_FISH:3_-1]
     // these tiers are the same for all players in a coop
-    const playerCollectionTiersRaw = (_a = data === null || data === void 0 ? void 0 : data.unlocked_coll_tiers) !== null && _a !== void 0 ? _a : [];
+    const playerCollectionTiersRaw = data?.unlocked_coll_tiers ?? [];
     const playerCollectionTiers = {};
     for (const collectionTierNameValueRaw of playerCollectionTiersRaw) {
         const [collectionTierNameRaw, collectionTierValueRaw] = collectionTierNameValueRaw.split(/_(?=-?\d+$)/);
-        const collectionName = itemId_1.cleanItemId(collectionTierNameRaw);
+        const collectionName = cleanItemId(collectionTierNameRaw);
         // ensure it's at least 0
         const collectionValue = Math.max(parseInt(collectionTierValueRaw), 0);
         // if the collection hasn't been checked yet, or the new value is higher than the old, replace it
@@ -100,13 +96,13 @@ function cleanCollections(data) {
     }
     // collection names show up like this: { LOG: 49789, LOG:2: 26219, MUSHROOM_COLLECTION: 2923}
     // these values are different for each player in a coop
-    const playerCollectionXpsRaw = (_b = data === null || data === void 0 ? void 0 : data.collection) !== null && _b !== void 0 ? _b : {};
+    const playerCollectionXpsRaw = data?.collection ?? {};
     const playerCollections = [];
     for (const collectionNameRaw in playerCollectionXpsRaw) {
         const collectionXp = playerCollectionXpsRaw[collectionNameRaw];
-        const collectionName = itemId_1.cleanItemId(collectionNameRaw);
+        const collectionName = cleanItemId(collectionNameRaw);
         const collectionLevel = playerCollectionTiers[collectionName];
-        const collectionCategory = (_c = getCategory(collectionName)) !== null && _c !== void 0 ? _c : 'unknown';
+        const collectionCategory = getCategory(collectionName) ?? 'unknown';
         // in some very weird cases the collection level will be undefined, we should ignore these collections
         if (collectionLevel !== undefined)
             playerCollections.push({
@@ -118,4 +114,3 @@ function cleanCollections(data) {
     }
     return playerCollections;
 }
-exports.cleanCollections = cleanCollections;

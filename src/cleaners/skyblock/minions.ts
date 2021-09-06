@@ -1,5 +1,5 @@
-import { maxMinion } from '../../hypixel'
-import * as constants from '../../constants'
+import { maxMinion } from '../../hypixel.js'
+import * as constants from '../../constants.js'
 
 export interface CleanMinion {
     name: string,

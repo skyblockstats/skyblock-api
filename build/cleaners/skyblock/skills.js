@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.cleanSkills = exports.levelForSkillXp = void 0;
 // the highest level you can have in each skill
 // numbers taken from https://hypixel-skyblock.fandom.com/wiki/Skills
 const skillsMaxLevel = {
@@ -113,21 +110,19 @@ const skillsDefaultMaxLevel = 50;
  * @param xp The xp we're finding the level for
  * @param easierLevel Whether it should use the alternate leveling xp table (used for cosmetic skills and dungeoneering)
  */
-function levelForSkillXp(xp, maxLevel) {
+export function levelForSkillXp(xp, maxLevel) {
     const xpTable = (maxLevel <= 25 ? skillXpTableEasier : skillXpTable).slice(0, maxLevel);
     const skillLevel = [...xpTable].reverse().findIndex(levelXp => xp >= levelXp);
     return skillLevel === -1 ? 0 : xpTable.length - skillLevel;
 }
-exports.levelForSkillXp = levelForSkillXp;
-async function cleanSkills(data) {
-    var _a;
+export async function cleanSkills(data) {
     const skills = [];
     for (const item in data) {
         if (item.startsWith('experience_skill_')) {
             const skillName = item.substr('experience_skill_'.length);
             // the amount of total xp you have in this skill
             const skillXp = data[item];
-            const skillMaxLevel = (_a = skillsMaxLevel[skillName]) !== null && _a !== void 0 ? _a : skillsDefaultMaxLevel;
+            const skillMaxLevel = skillsMaxLevel[skillName] ?? skillsDefaultMaxLevel;
             const xpTable = (skillMaxLevel <= 25 ? skillXpTableEasier : skillXpTable).slice(0, skillMaxLevel);
             // the level you're at for this skill
             const skillLevel = levelForSkillXp(skillXp, skillMaxLevel);
@@ -149,4 +144,3 @@ async function cleanSkills(data) {
     }
     return skills;
 }
-exports.cleanSkills = cleanSkills;

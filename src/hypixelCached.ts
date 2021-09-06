@@ -2,14 +2,14 @@
  * Fetch the clean and cached Hypixel API
  */
 
+import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/skyblock/profile.js'
+import { CleanPlayer } from './cleaners/player.js'
+import { isUuid, undashUuid } from './util.js'
+import * as hypixel from './hypixel.js'
+import * as mojang from './mojang.js'
 import NodeCache from 'node-cache'
+import { debug } from './index.js'
 import LRUCache from 'lru-cache'
-import * as mojang from './mojang'
-import * as hypixel from './hypixel'
-import { CleanPlayer } from './cleaners/player'
-import { isUuid, undashUuid } from './util'
-import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/skyblock/profile'
-import { debug } from '.'
 
 // cache usernames for 30 minutes
 /** uuid: username */

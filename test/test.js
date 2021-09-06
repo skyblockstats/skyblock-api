@@ -1,15 +1,17 @@
 globalThis.isTest = true
+console.log('set globalThis.isTest to true', globalThis.isTest)
 
-const { levelForSkillXp } = require('../build/cleaners/skyblock/skills')
-const hypixelCached = require('../build/hypixelCached')
-const hypixelApi = require('../build/hypixelApi')
-const constants = require('../build/constants')
-const hypixel = require('../build/hypixel')
-const mojang = require('../build/mojang')
-const util = require('../build/util')
-const assert = require('assert')
-const path = require('path')
-const fs = require('fs')
+// we use `await import` instead of `import from` so globalThis.isTest is set before importing the modules
+const { levelForSkillXp } = await import('../build/cleaners/skyblock/skills.js')
+const hypixelCached = await import('../build/hypixelCached.js')
+const hypixelApi = await import('../build/hypixelApi.js')
+const constants = await import('../build/constants.js')
+const hypixel = await import('../build/hypixel.js')
+const mojang = await import('../build/mojang.js')
+const util = await import('../build/util.js')
+const assert = await import('assert')
+const path = await import('path')
+const fs = await import('fs')
 
 
 const cachedJsonData = {}
@@ -26,7 +28,7 @@ async function readJsonData(dir) {
 	return parsedData
 }
 
-hypixelApi.sendApiRequest = async ({ path, key, args }) => {
+hypixelApi.mockSendApiRequest(async ({ path, key, args }) => {
 	requestsSent ++
 	switch (path) {
 		case 'player': {
@@ -37,32 +39,32 @@ hypixelApi.sendApiRequest = async ({ path, key, args }) => {
 		}
 	}
 	console.log(path, args)
-}
+})
 
-mojang.profileFromUuid = async (uuid) => {
+mojang.mockProfileFromUuid(async (uuid) => {
 	requestsSent ++
 	const uuidToUsername = await readJsonData('mojang')
 	const undashedUuid = undashUuid(uuid)
 	const username = uuidToUsername[undashUuid(undashedUuid)]
 	return { username, uuid: undashedUuid }
-}
-mojang.profileFromUsername = async (username) => {
+})
+mojang.mockProfileFromUsername(async (username) => {
 	requestsSent ++
 	const uuidToUsername = await readJsonData('mojang')
 	const uuid = Object.keys(uuidToUsername).find(uuid => uuidToUsername[uuid] === username)
 	return { username, uuid }
-}
-mojang.profileFromUser = async (user) => {
+})
+mojang.mockProfileFromUser(async (user) => {
 	if (util.isUuid(user))
 		return await mojang.profileFromUuid(user)
 	else
 		return await mojang.profileFromUsername(user)
-}
+})
 
-constants.addJSONConstants = async(filename, addingValues, unit) => {}
-constants.fetchJSONConstant = async(filename) => {
+constants.mockAddJSONConstants(async(filename, addingValues, unit) => {})
+constants.mockFetchJSONConstant(async(filename) => {
 	return await readJsonData('constants/' + filename.slice(0, filename.length - '.json'.length))
-}
+})
 
 
 /** Clear all the current caches and stuff */

@@ -3,14 +3,14 @@
  */
 
 // we have to do this so we can mock the function from the tests properly
-import * as constants from './constants'
+import * as constants from './constants.js'
 
 import * as nodeFetch from 'node-fetch'
 import NodeCache from 'node-cache'
+import { debug } from './index.js'
 import Queue from 'queue-promise'
 import fetch from 'node-fetch'
 import { Agent } from 'https'
-import { debug } from '.'
 
 const httpsAgent = new Agent({
 	keepAlive: true
@@ -87,7 +87,7 @@ function fetchFile(path: string): Promise<GithubFile> {
 					'Accept': 'application/vnd.github.v3+json',
 				},
 			)
-			const data = await r.json()
+			const data = await r.json() as any
 
 			const file = {
 				path: data.path,
@@ -118,7 +118,7 @@ async function editFile(file: GithubFile, message: string, newContent: string): 
 			branch: 'main'
 		}
 	)
-	const data = await r.json()
+	const data = await r.json() as any
 	fileCache.set(file.path, {
 		path: data.content.path,
 		content: newContent,
@@ -126,7 +126,7 @@ async function editFile(file: GithubFile, message: string, newContent: string): 
 	})
 }
 
-export async function fetchJSONConstant(filename: string): Promise<any> {
+export let fetchJSONConstant = async function fetchJSONConstant(filename: string): Promise<any> {
 	const file = await fetchFile(filename)
 	try {
 		return JSON.parse(file.content)
@@ -137,7 +137,7 @@ export async function fetchJSONConstant(filename: string): Promise<any> {
 }
 
 /** Add stats to skyblock-constants. This has caching so it's fine to call many times */
-export async function addJSONConstants(filename: string, addingValues: string[], unit: string='stat'): Promise<void> {
+export let addJSONConstants = async function addJSONConstants(filename: string, addingValues: string[], unit: string='stat'): Promise<void> {
 	if (addingValues.length === 0) return // no stats provided, just return
 
 	let file: GithubFile = await fetchFile(filename)
@@ -270,3 +270,8 @@ export async function setConstantValues(newValues: constantValues) {
 		await editFile(file, commitMessage, JSON.stringify(updatedStats, null, 2))
 	} catch {}
 }
+
+
+// this is necessary for mocking in the tests because es6
+export function mockAddJSONConstants($value) { addJSONConstants = $value }
+export function mockFetchJSONConstant($value) { fetchJSONConstant = $value }

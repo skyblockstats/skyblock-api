@@ -1,4 +1,4 @@
-import { fetchSkillXp, fetchSkillXpEasier } from '../../constants'
+import { fetchSkillXp, fetchSkillXpEasier } from '../../constants.js'
 
 export interface Skill {
 	name: string
