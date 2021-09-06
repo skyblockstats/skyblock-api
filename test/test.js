@@ -1,5 +1,4 @@
 globalThis.isTest = true
-console.log('set globalThis.isTest to true', globalThis.isTest)
 
 // we use `await import` instead of `import from` so globalThis.isTest is set before importing the modules
 const { levelForSkillXp } = await import('../build/cleaners/skyblock/skills.js')
