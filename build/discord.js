@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import { Agent } from 'https';
-const DISCORD_CLIENT_ID = '656634948148527107';
+const DISCORD_CLIENT_ID = '885347559382605916';
 const httpsAgent = new Agent({
     keepAlive: true
 });
