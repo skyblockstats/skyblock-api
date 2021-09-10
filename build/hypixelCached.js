@@ -354,6 +354,7 @@ const fetchAllEndedAuctionsQueue = new Queue({ concurrent: 1 });
 export async function fetchAllAuctions() {
     if (Date.now() / 1000 > nextAuctionsUpdate) {
         const auctionsResponse = await new Promise(resolve => fetchAllAuctionsQueue.enqueue(async () => {
+            console.log('ok, maybe fetching auctions uncached?', nextAuctionsUpdate, Date.now() / 1000);
             if (Date.now() / 1000 > nextAuctionsUpdate)
                 resolve(await fetchAllAuctionsUncached());
             else

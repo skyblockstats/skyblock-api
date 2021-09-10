@@ -317,7 +317,7 @@ export async function fetchAllEndedAuctionsUncached(): Promise<AuctionsResponse>
 }
 
 
-export async function getItemLowestBin(item: Partial<Item>): Promise<number> {
+export async function getItemLowestBin(item: Partial<Item>): Promise<number | null> {
 	console.log('ok getting auctions')
 	const auctions = await cached.fetchAllAuctions()
 	const binAuctions = auctions.filter(a => a.bin)
@@ -325,14 +325,14 @@ export async function getItemLowestBin(item: Partial<Item>): Promise<number> {
 	const matchingBins = binAuctions
 		.filter(
 			a =>
-			(!item.id || a.item.id === item.id) &&
-			(!item.vanillaId || a.item.vanillaId === item.vanillaId) &&
-			(!item.pet_type || a.item.pet_type === item.pet_type) &&
-			(!item.tier || a.item.tier === item.tier) &&
-			(!item.potion_type || a.item.potion_type === item.potion_type) &&
-			(!item.potion_duration_level || a.item.potion_duration_level === item.potion_duration_level) &&
-			(!item.potion_effectiveness_level || a.item.potion_effectiveness_level === item.potion_effectiveness_level) &&
-			(!item.potion_level || a.item.potion_level === item.potion_level)
+			((!item.id) || a.item.id === item.id) &&
+			((!item.vanillaId) || a.item.vanillaId === item.vanillaId) &&
+			((!item.pet_type) || a.item.pet_type === item.pet_type) &&
+			((!item.tier) || a.item.tier === item.tier) &&
+			((!item.potion_type) || a.item.potion_type === item.potion_type) &&
+			((!item.potion_duration_level) || a.item.potion_duration_level === item.potion_duration_level) &&
+			((!item.potion_effectiveness_level) || a.item.potion_effectiveness_level === item.potion_effectiveness_level) &&
+			((!item.potion_level) || a.item.potion_level === item.potion_level)
 		)
 	
 	const enchantments = item.enchantments ?? {}
@@ -358,10 +358,10 @@ export async function getItemLowestBin(item: Partial<Item>): Promise<number> {
 			}
 		)
 		// return the price of the cheapest book
-		return matchingEnchantedBooks.sort((a, b) => a.bidAmount - b.bidAmount)[0].bidAmount
+		return matchingEnchantedBooks.sort((a, b) => a.bidAmount - b.bidAmount)[0]?.bidAmount ?? null
 	}
 
-	let lowestBin = Number.MAX_SAFE_INTEGER
+	let lowestBin: number | null = null
 
 	for (const auction of matchingBins) {
 		const auctionBasePrice = auction.bidAmount
@@ -377,20 +377,21 @@ export async function getItemLowestBin(item: Partial<Item>): Promise<number> {
 		let auctionEnchantmentsPrice = 0
 		for (const enchantment of auctionMissingEnchantments) {
 			const enchantmentValue = await getEnchantmentBinPrice(enchantment, enchantments[enchantment])
-			// the reason we subtract 10k is because books are usually more expensive
-			auctionEnchantmentsPrice += Math.max(enchantmentValue - 10_000, 0)
+			if (enchantmentValue)
+				// the reason we subtract 10k is because books are usually more expensive
+				auctionEnchantmentsPrice += Math.max(enchantmentValue - 10_000, 0)
 		}
 
 		const auctionPrice = auctionBasePrice + auctionEnchantmentsPrice
 
-		if (auctionPrice < lowestBin)
+		if (lowestBin === null || auctionPrice < lowestBin)
 			lowestBin = auctionPrice
 	}
 
 	return lowestBin
 }
 
-async function getEnchantmentBinPrice(enchantmentName: string, enchantmentLevel: number): Promise<number> {
+async function getEnchantmentBinPrice(enchantmentName: string, enchantmentLevel: number): Promise<number | null> {
 	const enchantments: Record<string, number> = {}
 	enchantments[enchantmentName] = enchantmentLevel
 	return await getItemLowestBin({

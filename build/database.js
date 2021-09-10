@@ -723,6 +723,7 @@ export async function fetchItemPriceData(item) {
     // remove undefined stuff
     Object.keys(auctionsQuery).forEach(key => auctionsQuery[key] === undefined && delete auctionsQuery[key]);
     const auctions = await auctionsCollection.find(auctionsQuery).toArray();
+    console.log('auctions:', auctionsQuery, auctions);
     // there's not actually any auctions for the item
     if (auctions.length === 0)
         return null;
@@ -746,6 +747,19 @@ export async function fetchItemPriceData(item) {
 export async function fetchItemsByName(name, enchantments) {
     // the string regex query we're going to be using, with all regex special characters escaped
     const regexQuery = name.replace(/[.*+?^${}()|[\]\\#:!=]/g, '\\$&');
+    // the enchantment things here maybe should be removed?
+    const nonNullEnchantments = Object.fromEntries(Object.entries(enchantments)
+        .filter(([k, v]) => v !== null));
+    // only match enchantments if they're specified
+    const enchantmentsMatch = Object.keys(nonNullEnchantments).length > 0 ? {
+        $eq: nonNullEnchantments
+    } : undefined;
+    console.log(enchantmentsMatch);
+    const extraMatches = {};
+    for (const enchantment of Object.keys(enchantments).filter(e => enchantments[e] === null)) {
+        extraMatches[`item.e.${enchantment}`] = { $exists: true };
+    }
+    console.log('extraMatches', extraMatches);
     const mostSoldMatchingItems = await auctionsCollection.aggregate([
         { $sort: { p: 1 } },
         {
@@ -769,10 +783,8 @@ export async function fetchItemsByName(name, enchantments) {
                     $regex: regexQuery,
                     $options: 'i'
                 },
-                // only match enchantments if they're specified
-                'item.e': Object.keys(enchantments).length > 0 ? {
-                    $eq: enchantments
-                } : undefined
+                'item.e': enchantmentsMatch,
+                ...extraMatches
             }
         },
         {
@@ -797,14 +809,17 @@ export async function fetchItemsByName(name, enchantments) {
         },
     ])
         .toArray();
-    return await Promise.all(mostSoldMatchingItems.map(async (i) => ({
-        internalId: i._id,
-        count: i.count,
-        median: i.median,
-        average: i.average,
-        lowestBin: await getItemLowestBin(i.item),
-        item: schemaToItem(i.item)
-    })));
+    return await Promise.all(mostSoldMatchingItems.map(async (i) => {
+        const itemSchema = schemaToItem(i.item);
+        return {
+            internalId: i._id,
+            count: i.count,
+            median: i.median,
+            average: i.average,
+            lowestBin: await getItemLowestBin(itemSchema),
+            item: itemSchema
+        };
+    }));
 }
 let lastUpdatedMostSoldItems = 0;
 let cachedMostSoldItems = [];
@@ -863,12 +878,16 @@ export async function fetchMostSoldItems() {
         }
     ])
         .toArray();
-    cachedMostSoldItems = mostSoldItems.map((i) => ({
-        internalId: i._id,
-        count: i.count,
-        median: i.median,
-        average: i.average,
-        item: schemaToItem(i.item)
+    cachedMostSoldItems = await Promise.all(mostSoldItems.map(async (i) => {
+        const itemSchema = schemaToItem(i.item);
+        return {
+            internalId: i._id,
+            count: i.count,
+            median: i.median,
+            average: i.average,
+            lowestBin: await getItemLowestBin(itemSchema),
+            item: schemaToItem(i.item)
+        };
     }));
     lastUpdatedMostSoldItems = Date.now();
     return cachedMostSoldItems;

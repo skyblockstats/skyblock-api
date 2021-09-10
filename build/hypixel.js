@@ -236,14 +236,14 @@ export async function getItemLowestBin(item) {
     const binAuctions = auctions.filter(a => a.bin);
     // find all bin auctions that are identical, but ignoring enchants (we're calculating those in a moment)
     const matchingBins = binAuctions
-        .filter(a => (!item.id || a.item.id === item.id) &&
-        (!item.vanillaId || a.item.vanillaId === item.vanillaId) &&
-        (!item.pet_type || a.item.pet_type === item.pet_type) &&
-        (!item.tier || a.item.tier === item.tier) &&
-        (!item.potion_type || a.item.potion_type === item.potion_type) &&
-        (!item.potion_duration_level || a.item.potion_duration_level === item.potion_duration_level) &&
-        (!item.potion_effectiveness_level || a.item.potion_effectiveness_level === item.potion_effectiveness_level) &&
-        (!item.potion_level || a.item.potion_level === item.potion_level));
+        .filter(a => ((!item.id) || a.item.id === item.id) &&
+        ((!item.vanillaId) || a.item.vanillaId === item.vanillaId) &&
+        ((!item.pet_type) || a.item.pet_type === item.pet_type) &&
+        ((!item.tier) || a.item.tier === item.tier) &&
+        ((!item.potion_type) || a.item.potion_type === item.potion_type) &&
+        ((!item.potion_duration_level) || a.item.potion_duration_level === item.potion_duration_level) &&
+        ((!item.potion_effectiveness_level) || a.item.potion_effectiveness_level === item.potion_effectiveness_level) &&
+        ((!item.potion_level) || a.item.potion_level === item.potion_level));
     const enchantments = item.enchantments ?? {};
     // if it's an enchanted book with one enchant, we don't have to take enchants into account
     if (item.id === 'ENCHANTED_BOOK' && Object.keys(enchantments).length === 1) {
@@ -261,9 +261,9 @@ export async function getItemLowestBin(item) {
             return true;
         });
         // return the price of the cheapest book
-        return matchingEnchantedBooks.sort((a, b) => a.bidAmount - b.bidAmount)[0].bidAmount;
+        return matchingEnchantedBooks.sort((a, b) => a.bidAmount - b.bidAmount)[0]?.bidAmount ?? null;
     }
-    let lowestBin = Number.MAX_SAFE_INTEGER;
+    let lowestBin = null;
     for (const auction of matchingBins) {
         const auctionBasePrice = auction.bidAmount;
         const auctionMissingEnchantments = Object.keys(enchantments).filter(enchantment => !(auction.item.enchantments
@@ -273,11 +273,12 @@ export async function getItemLowestBin(item) {
         let auctionEnchantmentsPrice = 0;
         for (const enchantment of auctionMissingEnchantments) {
             const enchantmentValue = await getEnchantmentBinPrice(enchantment, enchantments[enchantment]);
-            // the reason we subtract 10k is because books are usually more expensive
-            auctionEnchantmentsPrice += Math.max(enchantmentValue - 10_000, 0);
+            if (enchantmentValue)
+                // the reason we subtract 10k is because books are usually more expensive
+                auctionEnchantmentsPrice += Math.max(enchantmentValue - 10_000, 0);
         }
         const auctionPrice = auctionBasePrice + auctionEnchantmentsPrice;
-        if (auctionPrice < lowestBin)
+        if (lowestBin === null || auctionPrice < lowestBin)
             lowestBin = auctionPrice;
     }
     return lowestBin;

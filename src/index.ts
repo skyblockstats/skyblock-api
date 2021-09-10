@@ -165,12 +165,17 @@ app.get('/auctions/search', async(req, res) => {
 	const query = req.query.q as string
 
 	let itemName = query
-	let filters = {} as any
+	let filters = {} as Record<string, string>
 
 	for (let match of query.matchAll(/(\w+):([^ ]+)/g)) {
 		const filterName = match[1]
 		const filterValue = match[2]
-		filters[filterName] = filterValue
+		// if the filter is there more than once, add it with a comma
+		if (filters[filterName])
+			filters[filterName] += `,${filterValue}`
+		else
+			filters[filterName] = filterValue
+
 		// remove the filter part from itemName
 		itemName = itemName.replace(match[0], '')
 	}
@@ -178,6 +183,22 @@ app.get('/auctions/search', async(req, res) => {
 	itemName = itemName.trim().replace(/\s\s+/g, ' ')
 
 	console.log(filters)
+
+	let enchantments: Record<string, number | null> = {}
+
+	// enchantments are in the format "enchantments:ultimate_bank1,cubism2"
+	// also if the number at the end is omitted, match any level
+	if (filters.enchantments) {
+		const splitEnchantments: string[] = filters.enchantments.split(',')
+		for (let enchantmentString of splitEnchantments) {
+			console.log('enchantmentString', enchantmentString)
+			const [ _, enchantmentName, enchantmentLevelString ] = enchantmentString.trim().match(/^([a-zA-Z_]+)(\d*)$/) ?? []
+			const enchantmentLevel: number | null = enchantmentLevelString ? parseInt(enchantmentLevelString) : null
+			enchantments[enchantmentName] = enchantmentLevel
+		}
+	}
+
+	console.log('enchantments', enchantments)
 
 	const matchingItems = await fetchItemsByName(itemName, {})
 

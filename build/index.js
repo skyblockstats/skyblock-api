@@ -129,12 +129,29 @@ app.get('/auctions/search', async (req, res) => {
     for (let match of query.matchAll(/(\w+):([^ ]+)/g)) {
         const filterName = match[1];
         const filterValue = match[2];
-        filters[filterName] = filterValue;
+        // if the filter is there more than once, add it with a comma
+        if (filters[filterName])
+            filters[filterName] += `,${filterValue}`;
+        else
+            filters[filterName] = filterValue;
         // remove the filter part from itemName
         itemName = itemName.replace(match[0], '');
     }
     itemName = itemName.trim().replace(/\s\s+/g, ' ');
     console.log(filters);
+    let enchantments = {};
+    // enchantments are in the format "enchantments:ultimate_bank1,cubism2"
+    // also if the number at the end is omitted, match any level
+    if (filters.enchantments) {
+        const splitEnchantments = filters.enchantments.split(',');
+        for (let enchantmentString of splitEnchantments) {
+            console.log('enchantmentString', enchantmentString);
+            const [_, enchantmentName, enchantmentLevelString] = enchantmentString.trim().match(/^([a-zA-Z_]+)(\d*)$/) ?? [];
+            const enchantmentLevel = enchantmentLevelString ? parseInt(enchantmentLevelString) : null;
+            enchantments[enchantmentName] = enchantmentLevel;
+        }
+    }
+    console.log('enchantments', enchantments);
     const matchingItems = await fetchItemsByName(itemName, {});
     res.json(matchingItems);
 });

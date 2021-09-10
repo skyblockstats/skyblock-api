@@ -53,7 +53,7 @@ async function cleanSkyBlockAuction(rawAuction: any): Promise<Auction> {
 			item,
 			bidAmount: rawAuction.price,
 			nextBidAmount: rawAuction.price,
-			bin: rawAuction.bin
+			bin: rawAuction.bin ?? false
 		}
 	}
 }

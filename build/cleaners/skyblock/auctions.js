@@ -31,7 +31,7 @@ async function cleanSkyBlockAuction(rawAuction) {
             item,
             bidAmount: rawAuction.price,
             nextBidAmount: rawAuction.price,
-            bin: rawAuction.bin
+            bin: rawAuction.bin ?? false
         };
     }
 }
