@@ -7,7 +7,7 @@
     "test": "mocha",
     "compile": "tsc",
     "watch": "tsc -w",
-    "start": "npm i --only=prod; node build/index.js --trace-warnings"
+    "start": "npm i --only=prod; node --trace-warnings build/index.js"
   },
   "engines": {
     "node": ">=16.0.0"
