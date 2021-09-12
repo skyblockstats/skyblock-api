@@ -7,7 +7,7 @@
     "test": "mocha",
     "compile": "tsc",
     "watch": "tsc -w",
-    "start": "npm i --only=prod; node build/index.js"
+    "start": "npm i --only=prod; node --trace-warnings build/index.js"
   },
   "engines": {
     "node": ">=16.0.0"
@@ -45,7 +45,7 @@
     "@types/express-rate-limit": "^5.1.3",
     "@types/lru-cache": "^5.1.1",
     "@types/mocha": "^9.0.0",
-    "@types/node": "^16.7.10",
+    "@types/node": "^16.9.1",
     "dotenv": "^10.0.0",
     "mocha": "^9.1.1",
     "nodemon": "^2.0.12",
