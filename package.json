@@ -46,7 +46,6 @@
     "@types/lru-cache": "^5.1.1",
     "@types/mocha": "^9.0.0",
     "nodemon": "^2.0.12",
-    "@types/mongodb": "^4.0.7",
     "@types/node": "^16.10.2",
     "dotenv": "^10.0.0",
     "mocha": "^9.1.2",
