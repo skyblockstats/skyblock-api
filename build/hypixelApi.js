@@ -4,6 +4,7 @@
 import { jsonToQuery, shuffle } from './util.js';
 import fetch from 'node-fetch';
 import { Agent } from 'https';
+import Queue from 'queue-promise';
 if (!process.env.hypixel_keys)
     // if there's no hypixel keys in env, run dotenv
     (await import('dotenv')).config();
@@ -48,8 +49,11 @@ export function getKeyUsage() {
         usage: keyUsage
     };
 }
+// we only do 30 concurrent requests so hypixel doesn't just drop our requests
+const apiRequestQueue = new Queue({ concurrent: 30, interval: 10 });
 /** Send an HTTP request to the Hypixel API */
 export let sendApiRequest = async function sendApiRequest({ path, key, args }) {
+    await new Promise(resolve => apiRequestQueue.enqueue(async () => resolve(null)));
     // Send a raw http request to api.hypixel.net, and return the parsed json
     let headers = {};
     if (key

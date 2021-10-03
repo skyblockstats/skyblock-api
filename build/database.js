@@ -653,7 +653,6 @@ export async function getItemUniqueId(item, update, returnEntireItem) {
 export async function addAuction(auction) {
     if (auction.bin)
         return; // no bin auctions
-    console.log('ok added auction', auction.uuid);
     const itemUniqueId = await getItemUniqueId(auction.item, true);
     try {
         await auctionsCollection.insertOne({

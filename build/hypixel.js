@@ -194,9 +194,7 @@ export async function fetchMemberProfilesUncached(playerUuid) {
 async function fetchAuctionsPage(page) {
     return await sendCleanApiRequest({
         path: 'skyblock/auctions',
-        args: {
-            page: page
-        }
+        args: { page: page }
     });
 }
 /**
@@ -207,14 +205,12 @@ export async function fetchAllAuctionsUncached() {
     console.log(`gotten first auctions page, there\'s a total of ${firstPage.pageCount} pages`);
     const allAuctions = [...firstPage.auctions];
     const promises = [];
-    // for (let pageNumber = 2; pageNumber <= firstPage.pageCount; pageNumber ++)
-    // 	promises.push(fetchAuctionsPage(pageNumber))
-    promises.push(fetchAuctionsPage(2));
+    for (let pageNumber = 2; pageNumber <= (firstPage.pageCount ?? 2); pageNumber++)
+        promises.push(fetchAuctionsPage(pageNumber));
     const otherResponses = await Promise.all(promises);
     console.log('promises resolved');
-    for (const auctionsResponse of otherResponses) {
+    for (const auctionsResponse of otherResponses)
         allAuctions.push(...auctionsResponse.auctions);
-    }
     return {
         pageCount: firstPage.pageCount,
         lastUpdated: firstPage.lastUpdated,

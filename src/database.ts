@@ -939,7 +939,6 @@ export async function getItemUniqueId<U extends boolean, E extends boolean=false
 
 export async function addAuction(auction: Auction) {
 	if (auction.bin) return // no bin auctions
-	console.log('ok added auction', auction.uuid)
 	const itemUniqueId = await getItemUniqueId(auction.item, true)
 	try {
 		await auctionsCollection.insertOne({

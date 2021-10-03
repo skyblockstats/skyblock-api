@@ -274,9 +274,7 @@ export async function fetchMemberProfilesUncached(playerUuid: string): Promise<C
 async function fetchAuctionsPage(page: number): Promise<AuctionsResponse> {
 	return await sendCleanApiRequest({
 		path: 'skyblock/auctions',
-		args: {
-			page: page
-		}}
+		args: { page: page }}
 	)
 }
 
@@ -290,15 +288,13 @@ async function fetchAuctionsPage(page: number): Promise<AuctionsResponse> {
 
 	const promises: Promise<AuctionsResponse>[] = []
 
-	// for (let pageNumber = 2; pageNumber <= firstPage.pageCount; pageNumber ++)
-	// 	promises.push(fetchAuctionsPage(pageNumber))
-	promises.push(fetchAuctionsPage(2))
+	for (let pageNumber = 2; pageNumber <= (firstPage.pageCount ?? 2); pageNumber ++)
+		promises.push(fetchAuctionsPage(pageNumber))
 
 	const otherResponses = await Promise.all(promises)
 	console.log('promises resolved')
-	for (const auctionsResponse of otherResponses) {
+	for (const auctionsResponse of otherResponses)
 		allAuctions.push(...auctionsResponse.auctions)
-	}
 
 	return {
 		pageCount: firstPage.pageCount,
