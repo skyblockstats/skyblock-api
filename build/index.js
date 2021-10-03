@@ -5,6 +5,7 @@ import * as constants from './constants.js';
 import rateLimit from 'express-rate-limit';
 import * as discord from './discord.js';
 import express from 'express';
+import { basicPlayerCache, basicProfilesCache, playerCache, profileCache, profileNameCache, profilesCache, usernameCache } from './hypixelCached.js';
 const app = express();
 export const debug = true;
 const mainSiteUrl = 'https://skyblock.matdoes.dev';
@@ -34,6 +35,13 @@ app.get('/', async (req, res) => {
         finishedCachingRawLeaderboards,
         leaderboardUpdateMemberQueueSize: leaderboardUpdateMemberQueue.size,
         leaderboardUpdateProfileQueueSize: leaderboardUpdateProfileQueue.size,
+        usernameCacheSize: usernameCache.keys().length,
+        basicProfilesCacheSize: basicProfilesCache.keys().length,
+        playerCacheSize: playerCache.keys().length,
+        basicPlayerCacheSize: basicPlayerCache.keys().length,
+        profileCacheSize: profileCache.keys().length,
+        profilesCacheSize: profilesCache.keys().length,
+        profileNameCacheSize: profileNameCache.keys().length,
         // key: getKeyUsage()
     });
 });
