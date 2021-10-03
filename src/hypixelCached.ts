@@ -10,11 +10,10 @@ import * as mojang from './mojang.js'
 import NodeCache from 'node-cache'
 import { debug } from './index.js'
 import LRUCache from 'lru-cache'
-// import { TLSSocket } from 'tls'
 
 // cache usernames for 30 minutes
-/** uuid: username */
 
+/** uuid: username */
 export const usernameCache = new NodeCache({
 	// stdTTL: 60 * 60 * 4,
 	stdTTL: 60 * 30,
@@ -22,9 +21,7 @@ export const usernameCache = new NodeCache({
 	useClones: false,
 })
 
-// usernameCache.setMaxListeners(50)
-// // @ts-ignore for some reason the typings don't have setMaxListeners but it does
-// TLSSocket.setMaxListeners(50)
+usernameCache.setMaxListeners(50)
 
 
 export const basicProfilesCache = new NodeCache({
