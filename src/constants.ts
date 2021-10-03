@@ -76,7 +76,7 @@ const fileCache = new NodeCache({
  */
 function fetchFile(path: string): Promise<GithubFile> {
 	return new Promise(resolve => {
-		queue.enqueue(async() => {
+		queue.enqueue(async () => {
 			if (fileCache.has(path))
 				return resolve(fileCache.get(path)!)
 
@@ -137,7 +137,7 @@ export let fetchJSONConstant = async function fetchJSONConstant(filename: string
 }
 
 /** Add stats to skyblock-constants. This has caching so it's fine to call many times */
-export let addJSONConstants = async function addJSONConstants(filename: string, addingValues: string[], unit: string='stat'): Promise<void> {
+export let addJSONConstants = async function addJSONConstants(filename: string, addingValues: string[], unit: string = 'stat'): Promise<void> {
 	if (addingValues.length === 0) return // no stats provided, just return
 
 	let file: GithubFile = await fetchFile(filename)
@@ -268,7 +268,7 @@ export async function setConstantValues(newValues: constantValues) {
 	const commitMessage = 'Update values'
 	try {
 		await editFile(file, commitMessage, JSON.stringify(updatedStats, null, 2))
-	} catch {}
+	} catch { }
 }
 
 

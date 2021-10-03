@@ -10,7 +10,7 @@ import * as mojang from './mojang.js'
 import NodeCache from 'node-cache'
 import { debug } from './index.js'
 import LRUCache from 'lru-cache'
-import { TLSSocket } from 'tls'
+// import { TLSSocket } from 'tls'
 
 // cache usernames for 30 minutes
 /** uuid: username */
@@ -22,9 +22,9 @@ export const usernameCache = new NodeCache({
 	useClones: false,
 })
 
-usernameCache.setMaxListeners(50)
-// @ts-ignore for some reason the typings don't have setMaxListeners but it does
-TLSSocket.setMaxListeners(50)
+// usernameCache.setMaxListeners(50)
+// // @ts-ignore for some reason the typings don't have setMaxListeners but it does
+// TLSSocket.setMaxListeners(50)
 
 
 export const basicProfilesCache = new NodeCache({
@@ -107,8 +107,8 @@ export async function uuidFromUser(user: string): Promise<string | undefined> {
 	}
 
 	// check if the username is a value
-	const uuidToUsername: { [ key: string ]: string | Promise<KeyValue> } = usernameCache.mget(usernameCache.keys())
-	for (const [ uuid, username ] of Object.entries(uuidToUsername)) {
+	const uuidToUsername: { [key: string]: string | Promise<KeyValue> } = usernameCache.mget(usernameCache.keys())
+	for (const [uuid, username] of Object.entries(uuidToUsername)) {
 		if (username && (<string>username).toLowerCase && user.toLowerCase() === (<string>username).toLowerCase())
 			return uuid
 	}
@@ -119,7 +119,7 @@ export async function uuidFromUser(user: string): Promise<string | undefined> {
 
 	// set it as waitForCacheSet (a promise) in case uuidFromUser gets called while its fetching mojang
 	usernameCache.set(undashedUser, waitForCacheSet(usernameCache, user, user))
-	
+
 	// not cached, actually fetch mojang api now
 	let { uuid, username } = await mojang.profileFromUser(user)
 	if (!uuid) {
@@ -186,7 +186,7 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer | null> {
 	// clone in case it gets modified somehow later
 	playerCache.set(playerUuid, cleanPlayer)
 	usernameCache.set(playerUuid, cleanPlayer.username)
-	
+
 	const cleanBasicPlayer = Object.assign({}, cleanPlayer)
 	delete cleanBasicPlayer.profiles
 	basicPlayerCache.set(playerUuid, cleanBasicPlayer)
@@ -202,7 +202,7 @@ export async function fetchBasicPlayer(user: string): Promise<CleanPlayer | null
 
 	if (basicPlayerCache.has(playerUuid))
 		return basicPlayerCache.get(playerUuid)!
-	
+
 	const player = await fetchPlayer(playerUuid)
 	if (!player) {
 		console.debug('no player? this should never happen, perhaps the uuid is invalid or the player hasn\'t played hypixel', playerUuid)
@@ -390,7 +390,7 @@ export async function fetchProfileName(user: string, profile: string): Promise<s
 	if (debug) console.debug('Cache miss: fetchProfileName', user, profile)
 
 	const basicProfiles = await fetchBasicProfiles(playerUuid)
-	
+
 	if (!basicProfiles) return null
 
 	let profileName: string | null = null

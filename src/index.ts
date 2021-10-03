@@ -5,6 +5,7 @@ import * as constants from './constants.js'
 import * as discord from './discord.js'
 import express from 'express'
 import { getKeyUsage } from './hypixelApi.js'
+import { basicPlayerCache, basicProfilesCache, playerCache, profileCache, profileNameCache, profilesCache, usernameCache } from './hypixelCached.js'
 
 const app = express()
 
@@ -32,7 +33,7 @@ app.use((req, res, next) => {
 })
 
 const startTime = Date.now()
-app.get('/', async(req, res) => {
+app.get('/', async (req, res) => {
 	const currentTime = Date.now()
 	res.json({
 		ok: true,
@@ -40,11 +41,19 @@ app.get('/', async(req, res) => {
 		finishedCachingRawLeaderboards,
 		leaderboardUpdateMemberQueueSize: leaderboardUpdateMemberQueue.size,
 		leaderboardUpdateProfileQueueSize: leaderboardUpdateProfileQueue.size,
+
+		usernameCacheSize: usernameCache.keys().length,
+		basicProfilesCacheSize: basicProfilesCache.keys().length,
+		playerCacheSize: playerCache.keys().length,
+		basicPlayerCacheSize: basicPlayerCache.keys().length,
+		profileCacheSize: profileCache.keys().length,
+		profilesCacheSize: profilesCache.keys().length,
+		profileNameCacheSize: profileNameCache.keys().length,
 		// key: getKeyUsage()
 	})
 })
 
-app.get('/player/:user', async(req, res) => {
+app.get('/player/:user', async (req, res) => {
 	try {
 		const user = await fetchUser(
 			{ user: req.params.user },
@@ -61,7 +70,7 @@ app.get('/player/:user', async(req, res) => {
 	}
 })
 
-app.get('/discord/:id', async(req, res) => {
+app.get('/discord/:id', async (req, res) => {
 	try {
 		res.json(
 			await fetchAccountFromDiscord(req.params.id)
@@ -72,7 +81,7 @@ app.get('/discord/:id', async(req, res) => {
 	}
 })
 
-app.get('/player/:user/:profile', async(req, res) => {
+app.get('/player/:user/:profile', async (req, res) => {
 	try {
 		const profile = await fetchMemberProfile(req.params.user, req.params.profile, req.query.customization as string === 'true')
 		if (profile)
@@ -85,7 +94,7 @@ app.get('/player/:user/:profile', async(req, res) => {
 	}
 })
 
-app.get('/player/:user/:profile/leaderboards', async(req, res) => {
+app.get('/player/:user/:profile/leaderboards', async (req, res) => {
 	try {
 		res.json(
 			await fetchMemberLeaderboardSpots(req.params.user, req.params.profile)
@@ -96,7 +105,7 @@ app.get('/player/:user/:profile/leaderboards', async(req, res) => {
 	}
 })
 
-app.get('/leaderboard/:name', async(req, res) => {
+app.get('/leaderboard/:name', async (req, res) => {
 	try {
 		res.json(
 			await fetchLeaderboard(req.params.name)
@@ -107,7 +116,7 @@ app.get('/leaderboard/:name', async(req, res) => {
 	}
 })
 
-app.get('/leaderboards', async(req, res) => {
+app.get('/leaderboards', async (req, res) => {
 	try {
 		res.json(
 			await fetchAllLeaderboardsCategorized()
@@ -118,7 +127,7 @@ app.get('/leaderboards', async(req, res) => {
 	}
 })
 
-app.get('/constants', async(req, res) => {
+app.get('/constants', async (req, res) => {
 	try {
 		res.json(
 			await constants.fetchConstantValues()
@@ -129,7 +138,7 @@ app.get('/constants', async(req, res) => {
 	}
 })
 
-app.post('/accounts/createsession', async(req, res) => {
+app.post('/accounts/createsession', async (req, res) => {
 	try {
 		const { code } = req.body
 		const codeExchange = await discord.exchangeCode(`${mainSiteUrl}/loggedin`, code)
@@ -149,7 +158,7 @@ app.post('/accounts/createsession', async(req, res) => {
 	}
 })
 
-app.post('/accounts/session', async(req, res) => {
+app.post('/accounts/session', async (req, res) => {
 	try {
 		const { uuid } = req.body
 		const session = await fetchSession(uuid)
@@ -164,7 +173,7 @@ app.post('/accounts/session', async(req, res) => {
 })
 
 
-app.post('/accounts/update', async(req, res) => {
+app.post('/accounts/update', async (req, res) => {
 	// it checks against the key, so it's kind of secure
 	if (req.headers.key !== process.env.key) return console.log('bad key!')
 	try {
