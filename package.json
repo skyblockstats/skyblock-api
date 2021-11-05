@@ -35,7 +35,7 @@
     "mongodb": "^4.1.4",
     "node-cache": "^5.1.2",
     "node-fetch": "github:tekwiz/node-fetch#fix/chunked-encoding-keepalive",
-    "prismarine-nbt": "^1.6.0",
+    "prismarine-nbt": "^2.0.0",
     "queue-promise": "^2.2.1",
     "uuid": "^8.3.2"
   },
