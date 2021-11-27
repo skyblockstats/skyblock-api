@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Compile Typescript
     if: github.ref == 'refs/heads/main'
+    needs: [ test ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -36,7 +37,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   automerge:
-    needs: [ test ]
+    needs: [ build ]
     runs-on: ubuntu-latest
     steps:
       - uses: fastify/github-action-merge-dependabot@v2.1.1
