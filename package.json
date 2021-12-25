@@ -32,7 +32,7 @@
     "express": "^4.17.1",
     "express-rate-limit": "^5.5.1",
     "lru-cache": "^6.0.0",
-    "mongodb": "^4.2.1",
+    "mongodb": "^4.2.2",
     "node-cache": "^5.1.2",
     "node-fetch": "github:tekwiz/node-fetch#fix/chunked-encoding-keepalive",
     "prismarine-nbt": "^2.0.0",
