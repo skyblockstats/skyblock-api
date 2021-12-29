@@ -72,6 +72,12 @@ export let sendApiRequest = async function sendApiRequest({ path, key, args }) {
         await new Promise((resolve) => setTimeout(resolve, 30000));
         return await sendApiRequest({ path, key, args });
     }
+    // if the cause is "Invalid API key", remove the key from the list of keys and try again
+    if (fetchJsonParsed.cause === 'Invalid API key') {
+        apiKeys.splice(apiKeys.indexOf(key), 1);
+        console.log(`${key} is invalid, removing it from the list of keys`);
+        return await sendApiRequest({ path, key: null, args });
+    }
     if (fetchResponse.headers.get('ratelimit-limit'))
         // remember how many uses it has
         apiKeyUsage[key] = {
