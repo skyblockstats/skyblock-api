@@ -20,7 +20,8 @@ export function chooseApiKey() {
     // find the api key with the lowest amount of uses
     let bestKeyUsage = null;
     let bestKey = null;
-    for (let key of shuffle(apiKeys.slice())) {
+    // we limit to 5 api keys because otherwise they get automatically banned
+    for (let key of shuffle(apiKeys.slice(0, 5))) {
         const keyUsage = apiKeyUsage[key];
         // if the key has never been used before, use it
         if (!keyUsage)
