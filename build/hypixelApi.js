@@ -76,7 +76,7 @@ export let sendApiRequest = async function sendApiRequest({ path, key, args }) {
     if (fetchJsonParsed.cause === 'Invalid API key') {
         apiKeys.splice(apiKeys.indexOf(key), 1);
         console.log(`${key} is invalid, removing it from the list of keys`);
-        return await sendApiRequest({ path, key: null, args });
+        return await sendApiRequest({ path, key: chooseApiKey(), args });
     }
     if (fetchResponse.headers.get('ratelimit-limit'))
         // remember how many uses it has
