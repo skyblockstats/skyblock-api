@@ -36,7 +36,7 @@ app.use((req, res, next) => {
 const startTime = Date.now()
 app.get('/', async (req, res) => {
 	const currentTime = Date.now()
-	res.json({
+	let data: any = {
 		ok: true,
 		uptimeHours: (currentTime - startTime) / 1000 / 60 / 60,
 		finishedCachingRawLeaderboards,
@@ -50,8 +50,10 @@ app.get('/', async (req, res) => {
 		profileCacheSize: profileCache.keys().length,
 		profilesCacheSize: profilesCache.keys().length,
 		profileNameCacheSize: profileNameCache.keys().length,
-		// key: getKeyUsage()
-	})
+	}
+	if (req.headers.key === process.env.key)
+		data.key = getKeyUsage()
+	res.json()
 })
 
 app.get('/player/:user', async (req, res) => {
