@@ -53,7 +53,7 @@ app.get('/', async (req, res) => {
 	}
 	if (req.headers.key === process.env.key)
 		data.key = getKeyUsage()
-	res.json()
+	res.json(data)
 })
 
 app.get('/player/:user', async (req, res) => {
