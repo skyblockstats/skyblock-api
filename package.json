@@ -10,7 +10,7 @@
     "start": "npm i --only=prod; node --trace-warnings build/index.js"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=17.0.0"
   },
   "repository": {
     "type": "git",
