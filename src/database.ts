@@ -6,7 +6,7 @@ import { categorizeStat, getStatUnit } from './cleaners/skyblock/stats.js'
 import { CleanFullProfile } from './cleaners/skyblock/profile.js'
 import { slayerLevels } from './cleaners/skyblock/slayers.js'
 import { CleanMember } from './cleaners/skyblock/member.js'
-import { Collection, Db, MongoClient } from 'mongodb'
+import { Collection, Db, Filter, MongoClient, WithId } from 'mongodb'
 import { CleanPlayer } from './cleaners/player.js'
 import * as cached from './hypixelCached.js'
 import * as constants from './constants.js'
@@ -785,15 +785,15 @@ export async function createSession(refreshToken: string, userData: discord.Disc
 	return sessionId
 }
 
-export async function fetchSession(sessionId: string): Promise<SessionSchema | null> {
-	return await sessionsCollection?.findOne({ _id: sessionId })
+export async function fetchSession(sessionId: string): Promise<WithId<SessionSchema> | null> {
+	return await sessionsCollection?.findOne({ _id: sessionId as any } )
 }
 
-export async function fetchAccount(minecraftUuid: string): Promise<AccountSchema | null> {
+export async function fetchAccount(minecraftUuid: string): Promise<WithId<AccountSchema> | null> {
 	return await accountsCollection?.findOne({ minecraftUuid })
 }
 
-export async function fetchAccountFromDiscord(discordId: string): Promise<AccountSchema | null> {
+export async function fetchAccountFromDiscord(discordId: string): Promise<WithId<AccountSchema> | null> {
 	return await accountsCollection?.findOne({ discordId })
 }
 

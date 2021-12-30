@@ -22,6 +22,7 @@ import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles.js'
 import { CleanPlayer, cleanPlayerResponse } from './cleaners/player.js'
 import * as cached from './hypixelCached.js'
 import { debug } from './index.js'
+import { WithId } from 'mongodb'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories' | undefined
 
@@ -131,7 +132,7 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 			}
 		}
 	}
-	let websiteAccount: AccountSchema | null = null
+	let websiteAccount: WithId<AccountSchema> | null = null
 
 	if (websiteAccountPromise)
 		websiteAccount = await websiteAccountPromise
@@ -185,7 +186,7 @@ export async function fetchMemberProfile(user: string, profile: string, customiz
 
 	cleanProfile.members = simpleMembers
 
-	let websiteAccount: AccountSchema | null = null
+	let websiteAccount: WithId<AccountSchema> | null = null
 
 	if (websiteAccountPromise)
 		websiteAccount = await websiteAccountPromise
