@@ -26,7 +26,8 @@ interface KeyUsage {
 }
 
 const apiKeyUsage: { [ key: string ]: KeyUsage } = {}
-
+// the usage amount the api key was on right before it reset
+const apiKeyMaxUsage: { [ key: string ]: number } = {}
 
 const baseHypixelAPI = 'https://api.hypixel.net'
 
@@ -44,8 +45,10 @@ export function chooseApiKey(): string | null {
 		if (!keyUsage) return key
 
 		// if the key has reset since the last use, set the remaining count to the default
-		if (Date.now() > keyUsage.reset)
+		if (Date.now() > keyUsage.reset) {
+			apiKeyMaxUsage[key] = keyUsage.limit - keyUsage.remaining
 			keyUsage.remaining = keyUsage.limit
+		}
 
 		// if this key has more uses remaining than the current known best one, save it
 		if (bestKeyUsage === null || keyUsage.remaining > bestKeyUsage.remaining) {
@@ -59,9 +62,12 @@ export function chooseApiKey(): string | null {
 export function getKeyUsage() {
 	let keyLimit = 0
 	let keyUsage = 0
-	for (let key of Object.values(apiKeyUsage)) {
-		keyLimit += key.limit
-		keyUsage += key.limit - key.remaining
+	for (let key of Object.values(apiKeyMaxUsage)) {
+		// if the key isn't in apiKeyUsage, continue
+		if (!apiKeyUsage[key]) continue
+
+		keyLimit += apiKeyUsage[key].limit
+		keyUsage += apiKeyMaxUsage[key]
 	}
 	return {
 		limit: keyLimit,
@@ -185,7 +191,7 @@ export let sendApiRequest = async function sendApiRequest({ path, key, args }): 
 		apiKeyUsage[key] = {
 			remaining: parseInt(fetchResponse.headers.get('ratelimit-remaining') ?? '0'),
 			limit: parseInt(fetchResponse.headers.get('ratelimit-limit') ?? '0'),
-			reset: Date.now() + parseInt(fetchResponse.headers.get('ratelimit-reset') ?? '0') * 1000
+			reset: Date.now() + parseInt(fetchResponse.headers.get('ratelimit-reset') ?? '0') * 1000,
 		}
 	
 	if (fetchJsonParsed.throttle) {
