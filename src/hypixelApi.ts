@@ -62,12 +62,12 @@ export function chooseApiKey(): string | null {
 export function getKeyUsage() {
 	let keyLimit = 0
 	let keyUsage = 0
-	for (let key of Object.values(apiKeyMaxUsage)) {
+	for (let key of Object.keys(apiKeyMaxUsage)) {
 		// if the key isn't in apiKeyUsage, continue
 		if (!apiKeyUsage[key]) continue
 
-		keyLimit += apiKeyUsage[key].limit
 		keyUsage += apiKeyMaxUsage[key]
+		keyLimit += apiKeyUsage[key].limit
 	}
 	return {
 		limit: keyLimit,
@@ -186,13 +186,19 @@ export let sendApiRequest = async function sendApiRequest({ path, key, args }): 
 		return await sendApiRequest({ path, key: chooseApiKey(), args })
 	}
 
-	if (fetchResponse.headers.get('ratelimit-limit'))
+	if (fetchResponse.headers.get('ratelimit-limit')) {
 		// remember how many uses it has
 		apiKeyUsage[key] = {
 			remaining: parseInt(fetchResponse.headers.get('ratelimit-remaining') ?? '0'),
 			limit: parseInt(fetchResponse.headers.get('ratelimit-limit') ?? '0'),
-			reset: Date.now() + parseInt(fetchResponse.headers.get('ratelimit-reset') ?? '0') * 1000,
+			reset: Date.now() + parseInt(fetchResponse.headers.get('ratelimit-reset') ?? '0') * 1000 + 1000,
 		}
+
+		let usage = apiKeyUsage[key].limit - apiKeyUsage[key].remaining
+		// if it's not in apiKeyMaxUsage or this usage is higher, update it
+		if (!apiKeyMaxUsage[key] || (usage > apiKeyMaxUsage[key]))
+			apiKeyMaxUsage[key] = usage
+	}
 	
 	if (fetchJsonParsed.throttle) {
 		if (apiKeyUsage[key])
