@@ -1,24 +1,9 @@
 on: [ push, pull_request ]
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
-    name: Run tests
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '16.0.0'
-      - run: npm install
-
-      - name: Run tests
-        run: npm test
-
-  build:
-    runs-on: ubuntu-latest
-    name: Compile Typescript
-    needs: [ test ]
+    name: Build & run tests
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -28,9 +13,12 @@ jobs:
       - run: npm install
       - name: Typescript compiler
         uses: iCrawl/action-tsc@v1
+      - name: Run tests
+        run: npm test
+
 
   automerge:
-    needs: [ build ]
+    needs: [ build-and-test ]
     runs-on: ubuntu-latest
     steps:
       - uses: fastify/github-action-merge-dependabot@v2.1.1
