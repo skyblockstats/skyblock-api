@@ -18,7 +18,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: Compile Typescript
-    if: github.ref == 'refs/heads/main'
     needs: [ test ]
     steps:
       - name: Checkout
@@ -27,14 +26,8 @@ jobs:
         with:
           node-version: '16.0.0'
       - run: npm install
-      - name: Compile Typescript
-        uses: FuLagann/tsc-build-push@v1
-        with:
-          user-name: "mat-1"
-          user-email: "github@matdoes.dev"
-          message: "Compiled TS into JS"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Typescript compiler
+        uses: iCrawl/action-tsc@v1
 
   automerge:
     needs: [ build ]
