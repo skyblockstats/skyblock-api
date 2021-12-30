@@ -1,8 +1,8 @@
 # SkyBlock API
 
-Backend for [skyblock.matdoes.dev](https://github.com/skyblockstats/skyblock-stats)
+Backend for [skyblock.matdoes.dev](https://github.com/skyblockstats/skyblock-stats).
 
-Basically this is [Slothpixel](https://github.com/slothpixel/core) but more specialized
+Basically this is [Slothpixel](https://github.com/slothpixel/core) but more specialized.
 
 ## What it does
 
