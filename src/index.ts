@@ -6,6 +6,7 @@ import * as discord from './discord.js'
 import express from 'express'
 import { getKeyUsage } from './hypixelApi.js'
 import { basicPlayerCache, basicProfilesCache, playerCache, profileCache, profileNameCache, profilesCache, usernameCache } from './hypixelCached.js'
+import { collectDefaultMetrics, register } from 'prom-client'
 
 const app = express()
 
@@ -182,6 +183,18 @@ app.post('/accounts/update', async (req, res) => {
 	} catch (err) {
 		console.error(err)
 		res.json({ ok: false })
+	}
+})
+
+
+// grafana integration
+collectDefaultMetrics()
+app.get('/metrics', async (_req, res) => {
+	try {
+		res.set('Content-Type', register.contentType)
+		res.end(await register.metrics())
+	} catch (err) {
+		res.status(500).end(err)
 	}
 })
 
