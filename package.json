@@ -36,7 +36,6 @@
     "node-cache": "^5.1.2",
     "node-fetch": "github:tekwiz/node-fetch#fix/chunked-encoding-keepalive",
     "prismarine-nbt": "^2.0.0",
-    "prom-client": "^14.0.1",
     "queue-promise": "^2.2.1",
     "uuid": "^8.3.2"
   },
