@@ -32,6 +32,7 @@ const ITEMS = {
 	'water_lily': 'lily_pad',
 	'melon': 'melon_slice',
 	'ender_stone': 'end_stone',
+	'gemstone_collection': 'gemstone',
 
 	'huge_mushroom_1': 'red_mushroom_block',
 	'huge_mushroom_2': 'brown_mushroom_block',

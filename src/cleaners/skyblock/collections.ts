@@ -38,7 +38,7 @@ const COLLECTIONS = {
 		'sand',
 		'end_stone',
 		'mithril_ore',
-		'gemstone_collection', // this is a hypixel issue, not my problem
+		'gemstone',
 		'hard_stone'
 	],
 	'combat': [
