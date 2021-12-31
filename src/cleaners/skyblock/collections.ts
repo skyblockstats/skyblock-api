@@ -36,7 +36,10 @@ const COLLECTIONS = {
 		'ice',
 		'netherrack',
 		'sand',
-		'end_stone'
+		'end_stone',
+		'mithril_ore',
+		'gemstone_collection', // this is a hypixel issue, not my problem
+		'hard_stone'
 	],
 	'combat': [
 		'rotten_flesh',
