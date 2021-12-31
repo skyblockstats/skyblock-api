@@ -203,7 +203,8 @@ const apiKeyCounter = new Gauge({
 })
 
 app.get('/metrics', async (req, res) => {
-	console.log(req.params, req.headers)
+	if (!req.headers.host?.startsWith('0.0.0.0:'))
+		return res.status(403).send('Forbidden')
 	try {
 		res.set('Content-Type', register.contentType)
 		res.end(await register.metrics())
