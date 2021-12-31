@@ -21,7 +21,7 @@ export const usernameCache = new NodeCache({
 	useClones: false,
 })
 
-usernameCache.setMaxListeners(50)
+usernameCache.setMaxListeners(200)
 
 
 export const basicProfilesCache = new NodeCache({
