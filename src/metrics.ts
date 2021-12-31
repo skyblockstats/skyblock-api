@@ -1,5 +1,5 @@
 import { collectDefaultMetrics, Gauge, register } from 'prom-client'
-import { fetchServerStatus } from './database.js'
+import { fetchServerStats, fetchServerStatus } from './database.js'
 import { getKeyUsage } from './hypixelApi.js'
 export { register } from 'prom-client'
 
@@ -26,8 +26,8 @@ const connectionsCounter = new Gauge({
 		connectionsCounter.set(status.connections.current)
 		networkBytesInCounter.set(status.network.bytesIn)
 		networkBytesOutCounter.set(status.network.bytesOut)
-		queryOpCounter.set(status.opcounters.query)
-		updateOpCounter.set(status.opcounters.update)
+		readCounter.set(status.opLatencies.reads.ops)
+		writeCounter.set(status.opLatencies.writes.ops)
 	}
 })
 const networkBytesInCounter = new Gauge({
@@ -40,15 +40,24 @@ const networkBytesOutCounter = new Gauge({
 	help: 'Number of bytes sent by the database.',
 	registers: [ register ],
 })
-const queryOpCounter = new Gauge({
-	name: 'mongodb_query_op_count',
-	help: 'Number of queries executed by the database.',
+const readCounter = new Gauge({
+	name: 'mongodb_read_ops',
+	help: 'Number of read operations by the database.',
 	registers: [ register ],
 })
-const updateOpCounter = new Gauge({
+const writeCounter = new Gauge({
 	name: 'mongodb_update_op_count',
-	help: 'Number of updates executed by the database.',
+	help: 'Number of write operations by the database.',
 	registers: [ register ],
 })
+const dbSizeCounter = new Gauge({
+	name: 'mongodb_db_size',
+	help: 'Size of the database in bytes.',
+	registers: [ register ],
+	async collect() {
+		let stats = await fetchServerStats()
 
+		dbSizeCounter.set(stats.dataSize + stats.indexSize)
+	}
+})
 

@@ -807,6 +807,10 @@ export async function fetchServerStatus() {
 	return await database.admin().serverStatus()
 }
 
+export async function fetchServerStats() {
+	return await database.stats()
+}
+
 // make sure it's not in a test
 console.log('global.isTest', globalThis.isTest)
 if (!globalThis.isTest) {
