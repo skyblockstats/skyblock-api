@@ -46,7 +46,7 @@ const readCounter = new Gauge({
 	registers: [ register ],
 })
 const writeCounter = new Gauge({
-	name: 'mongodb_update_op_count',
+	name: 'mongodb_write_ops',
 	help: 'Number of write operations by the database.',
 	registers: [ register ],
 })
