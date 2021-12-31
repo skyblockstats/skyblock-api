@@ -69,7 +69,9 @@ interface KeyValue {
 function waitForCacheSet(cache: NodeCache, key?: string, value?: string): Promise<KeyValue> {
 	return new Promise((resolve, reject) => {
 		const listener = (setKey, setValue) => {
-			if (((setKey === key) || (value && setValue === value)) && typeof setValue === 'string') {
+			// we check that the setValue isn't a promise because it's often
+			// set as a promise for this exact function
+			if (((setKey === key) || (value && setValue === value)) && (!setValue.then)) {
 				cache.removeListener('set', listener)
 				return resolve({ key: setKey, value: setValue })
 			}
