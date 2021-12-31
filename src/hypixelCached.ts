@@ -71,7 +71,7 @@ function waitForCacheSet(cache: NodeCache, key?: string, value?: string): Promis
 		const listener = (setKey, setValue) => {
 			// we check that the setValue isn't a promise because it's often
 			// set as a promise for this exact function
-			if (((setKey === key) || (value && setValue === value)) && (!setValue.then)) {
+			if (((setKey === key) || (value && setValue === value)) && (!setValue?.then)) {
 				cache.removeListener('set', listener)
 				return resolve({ key: setKey, value: setValue })
 			}
