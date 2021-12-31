@@ -1,5 +1,3 @@
-import { fetchSkillXp, fetchSkillXpEasier } from '../../constants.js'
-
 export interface Skill {
 	name: string
 	xp: number

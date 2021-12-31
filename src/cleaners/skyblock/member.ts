@@ -82,7 +82,7 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
 		objectives: cleanObjectives(member),
 		skills: await cleanSkills(member),
 		visited_zones: await cleanVisitedZones(member),
-		collections: cleanCollections(member),
+		collections: await cleanCollections(member),
 		slayers: cleanSlayers(member)
 	}
 }

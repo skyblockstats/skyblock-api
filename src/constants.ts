@@ -11,6 +11,7 @@ import { debug } from './index.js'
 import Queue from 'queue-promise'
 import fetch from 'node-fetch'
 import { Agent } from 'https'
+import { CollectionNames } from './cleaners/skyblock/collections.js'
 
 const httpsAgent = new Agent({
 	keepAlive: true
@@ -227,13 +228,6 @@ export async function fetchMinions(): Promise<string[]> {
 	return await constants.fetchJSONConstant('minions.json')
 }
 
-export async function fetchSkillXp(): Promise<number[]> {
-	return await constants.fetchJSONConstant('manual/skill_xp.json')
-}
-
-export async function fetchSkillXpEasier(): Promise<number[]> {
-	return await constants.fetchJSONConstant('manual/skill_xp_easier.json')
-}
 
 /** Add skills to skyblock-constants. This has caching so it's fine to call many times */
 export async function addMinions(addingMinions: string[]): Promise<void> {
@@ -247,6 +241,17 @@ interface constantValues {
 
 export async function fetchConstantValues(): Promise<constantValues> {
 	return await constants.fetchJSONConstant('values.json')
+}
+
+/** The xp required to level up for each collection. If it's unknown, it's left as null */
+export async function fetchCollectionXpTable(): Promise<{ [ key in CollectionNames ]: (number | null)[] | undefined }> {
+	const file = await fetchFile('collection_xp.json')
+	const data = JSON.parse(file.content)
+	return data
+}
+
+export async function updateCollectionXpTable(updates: JsonXpTableUpdate[]): Promise<void> {
+	await updateJSONXpTable('collection_xp.json', updates)
 }
 
 export async function setConstantValues(newValues: constantValues) {
@@ -275,3 +280,69 @@ export async function setConstantValues(newValues: constantValues) {
 // this is necessary for mocking in the tests because es6
 export function mockAddJSONConstants($value) { addJSONConstants = $value }
 export function mockFetchJSONConstant($value) { fetchJSONConstant = $value }
+
+export interface JsonXpTableUpdate {
+	name: string
+	level: number
+	xp: number
+}
+
+export async function updateJSONXpTable(filename: string, updates: JsonXpTableUpdate[]): Promise<void> {
+	if (updates.length === 0) return // no stats provided, just return
+
+	let file: GithubFile = await fetchFile(filename)
+	if (!file.path)
+		// the file doesn't exist, just return
+		return
+
+	let oldTable: Record<string, number[]>
+	// the updatedTable starts the same as the oldTable
+	let updatedTable: Record<string, number[]>
+	try {
+		oldTable = JSON.parse(file.content)
+		updatedTable = JSON.parse(file.content)
+	} catch {
+		// invalid json, set it as an empty object
+		oldTable = {}
+		updatedTable = {}
+	}
+
+	let updatedCount = 0
+
+	// now, we iterate over `updates` and see what we can apply
+	for (const update of updates) {
+		// if the update is for a level that's already in the table, check if it's lower and update it
+		let xpList = updatedTable[update.name]
+		if (xpList) {
+			if (xpList[update.level - 1] !== null) {
+				// the xp is already set, check if it's lower
+				if (update.xp < xpList[update.level - 1]) {
+					xpList[update.level - 1] = update.xp
+					updatedCount ++
+				}
+			} else {
+				// the xp is not set, just set it
+				xpList[update.level - 1] = update.xp
+				updatedCount ++
+			}
+		} else {
+			// the xp list doesn't exist, create it
+			xpList = []
+			xpList[update.level - 1] = update.xp
+			updatedTable[update.name] = xpList
+			updatedCount ++
+		}
+	}
+	
+	// there's not actually any difference, just return
+	if (updatedCount === 0) return
+
+	const commitMessage = updatedCount >= 2 ? `Updated ${updatedCount} level xps` : `Updated 1 level xp`
+	try {
+		await editFile(file, commitMessage, JSON.stringify(updatedTable, null, 2))
+	} catch {
+		// the file probably changed or something, try again
+		file = await fetchFile(filename)
+		await editFile(file, commitMessage, JSON.stringify(updatedTable, null, 2))
+	}
+}

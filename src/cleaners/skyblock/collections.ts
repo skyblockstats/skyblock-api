@@ -1,4 +1,5 @@
 import { cleanItemId, hypixelItemNames } from './itemId.js'
+import * as constants from '../../constants.js'
 
 const COLLECTION_CATEGORIES = {
 	'farming': [
@@ -88,98 +89,61 @@ const COLLECTION_CATEGORIES = {
 
 
 type CollectionCategory = keyof typeof COLLECTION_CATEGORIES
-type CollectionNames = (typeof COLLECTION_CATEGORIES)[CollectionCategory][number]
+export type CollectionNames = (typeof COLLECTION_CATEGORIES)[CollectionCategory][number]
 
-// numbers taken from https://hypixel-skyblock.fandom.com/wiki/Collections
-const COLLECTION_XP_TABLES: { [ key in CollectionNames ]: number[] } = {
-	// farming
-	wheat: [ 100, 250, 500, 1000, 2500, 10000, 15000, 25000, 50000, 100000, 70000 ],
-	carrot: [ 250, 500, 1700, 5000, 10000, 25000, 50000, 100000 ],
-	potato: [ 250, 500, 1700, 5000, 10000, 25000, 50000, 100000 ],
-	pumpkin: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000 ],
-	melon_slice: [ 500, 1200, 5000, 15500, 25000, 50000, 100000, 250000 ],
-	wheat_seeds: [ 100, 250, 1000, 2500, 5000 ],
-	red_mushroom: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	cocoa_beans: [ 200, 500, 2000, 5000, 10000, 20000, 50000, 100000 ],
-	cactus: [ 250, 500, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	sugar_cane: [ 250, 500, 1000, 2000, 5000, 10000, 20000, 50000 ],
-	feather: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	leather: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000 ],
-	porkchop: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	chicken: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	mutton: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	rabbit: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	nether_wart: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 75000, 100000, 250000 ],
 
-	// mining
-	cobblestone: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 40000 ],
-	coal: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	iron_ingot: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 200000, 400000 ],
-	gold_ingot: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	diamond: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	lapis_lazuli: [ 500, 1000, 2000, 10000, 25000, 50000, 100000, 150000, 250000 ],
-	emerald: [ 100, 250, 1000, 5000, 15000, 30000, 50000, 100000 ],
-	redstone: [ 250, 750, 1500, 3000, 5000, 10000, 25000, 50000, 200000, 400000, 600000, 800000, 1000000, 1200000, 1400000 ],
-	quartz: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	obsidian: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 100000 ],
-	glowstone_dust: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	gravel: [ 100, 250, 1000, 2500, 5000, 10000, 15000, 50000 ],
-	ice: [ 100, 250, 500, 1000, 5000, 10000, 50000, 100000, 250000 ],
-	netherrack: [ 250, 500, 1000, 5000 ],
-	sand: [ 100, 250, 500, 1000, 2500, 5000 ],
-	end_stone: [ 100, 250, 1000, 2500, 5000, 10000, 15000, 25000, 50000 ],
-	mithril: [ 250, 1000, 2500, 5000, 10000, 250000, 500000, 1000000 ],
-	hard_stone: [ 50, 1000, 5000, 50000, 150000, 300000, 1000000 ],
-	gemstone: [ 100, 250, 1000, 2500, 5000, 25000, 100000, 250000, 500000 ],
+/** The xp amounts that levels should be rounded down to. This is used for the automatic generation of the xp requirements. */
+const collectionXpSteps = [
+	0,			25,			40,			50,			100,
+	150,		200,		250,		400,		500,
+	750,		800,		1_000,		1_200,		1_500,
+	1_700,		2_000,		2_400,		2_500,		3_000,
+	4_000,		4_800,		5_000,		6_000,		9_000,
+	10_000,		15_000,		15_500,		20_000,		25_000,
+	30_000,		40_000,		45_000,		50_000,		60_000,
+	70_000,		75_000,		100_000,	150_000,	200_000,
+	250_000,	300_000,	400_000,	500_000,	600_000,
+	800_000,	1_000_000,	1_200_000,	1_400_000,
+]
 
-	// combat
-	rotten_flesh: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	bone: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000, 150000 ],
-	string: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	spider_eye: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	gunpowder: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	ender_pearl: [ 250, 1000, 2500, 5000, 10000, 15000, 25000, 50000 ],
-	ghast_tear: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	slime_ball: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	blaze_rod: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	magma_cream: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-
-	// foraging
-	oak_log: [ 100, 250, 500, 1000, 2000, 5000, 10000, 30000 ],
-	spruce_log: [ 100, 250, 1000, 2000, 5000, 10000, 25000, 50000 ],
-	birch_log: [ 100, 250, 500, 1000, 2000, 5000, 10000, 25000 ],
-	dark_oak_log: [ 100, 250, 1000, 2500, 5000, 10000, 25000, 50000 ],
-	acacia_log: [ 100, 250, 500, 1000, 2000, 5000, 10000, 25000 ],
-	jungle_log: [ 100, 250, 500, 1000, 2000, 5000, 10000, 25000 ],
-
-	// fishing
-	cod: [ 50, 100, 250, 500, 1000, 2500, 15000, 30000, 45000, 60000 ],
-	salmon: [ 50, 100, 250, 500, 1000, 2500, 5000, 10000 ],
-	tropical_fish: [ 25, 50, 100, 200, 400, 800 ],
-	pufferfish: [ 50, 100, 150, 400, 800, 2400, 4800, 9000 ],
-	prismarine_shard: [ 25, 50, 100, 200 ],
-	prismarine_crystals: [ 25, 50, 100, 200, 400, 800 ],
-	clay_ball: [ 100, 250, 1000, 2500 ],
-	lily_pad: [ 50, 100, 200, 500, 1500, 3000, 6000, 10000 ],
-	ink_sac: [ 40, 100, 200, 400, 800, 1500, 2500, 4000 ],
-	sponge: [ 40, 100, 200, 400, 800, 1500, 2500, 4000 ],
-
-	// boss
-	bonzo: [ 50, 100, 150, 250, 1000 ],
-	scarf: [ 50, 100, 150, 250, 1000 ],
-	the_professor: [ 50, 100, 150, 250, 1000 ],
-	thorn: [ 100, 150, 250, 400, 1000 ],
-	livid: [ 100, 150, 250, 500, 750, 1000 ],
-	sadan: [ 100, 150, 250, 500, 750, 1000 ],
-	necron: [ 100, 150, 250, 500, 750, 1000 ],
+/** Round down an xp number to the lowest step */
+function roundDownXp(xp: number): number {
+	let roundedDown = 0
+	for (const step of collectionXpSteps) {
+		if (xp >= step && xp > roundedDown) {
+			roundedDown = step
+		}
+	}
+	return roundedDown
 }
 
+
+/**
+ * Get the collection level from the collection name and xp
+ * @param collectionId The collection name, like "red_mushroom"
+ * @param xp The xp that we're finding the level for
+ */
+export function getCollectionLevel(
+	collectionName: CollectionNames,
+	xp: number,
+	table: { [ key in CollectionNames ]: (number | null)[] | undefined }
+): number | null {
+	const xpTable = table[collectionName]
+
+	if (!xpTable)
+		return null
+
+	const collLevel = [...xpTable].reverse().findIndex(levelXp => levelXp && (xp >= levelXp))
+	return (collLevel === -1 ? 0 : xpTable.length - collLevel) + 1
+}
 
 export interface Collection {
 	name: string
 	xp: number
 	level: number
 	category: CollectionCategory
+	levelXp: number | null
+	levelXpRequired: number | null
 }
 
 // get a category name (farming) from a collection name (wheat)
@@ -192,7 +156,7 @@ function getCategory(collectionName): CollectionCategory {
 	return 'unknown'
 }
 
-export function cleanCollections(data: any): Collection[] {
+export async function cleanCollections(data: any): Promise<Collection[]> {
 	// collection tiers show up like this: [ GRAVEL_3, GOLD_INGOT_2, MELON_-1, LOG_2:1_7, RAW_FISH:3_-1]
 	// these tiers are the same for all players in a coop
 	const playerCollectionTiersRaw: string[] = data?.unlocked_coll_tiers ?? []
@@ -213,11 +177,35 @@ export function cleanCollections(data: any): Collection[] {
 	// these values are different for each player in a coop
 	const playerCollectionXpsRaw: { [ key in hypixelItemNames ]: number } = data?.collection ?? {}
 	const playerCollections: Collection[] = []
+
+	const collectionXpTable = await constants.fetchCollectionXpTable()
+
+	// the updates that we're gonna have to make to the constants after this loop
+	let collectionUpdates: constants.JsonXpTableUpdate[] = []
 	
 	for (const collectionNameRaw in playerCollectionXpsRaw) {
 		const collectionXp: number = playerCollectionXpsRaw[collectionNameRaw]
 		const collectionName = cleanItemId(collectionNameRaw)
-		const collectionLevel = playerCollectionTiers[collectionName]
+
+		const collectionLevel = playerCollectionTiers[collectionName] ?? null
+		const calculatedCollectionLevel = getCollectionLevel(collectionName as CollectionNames, collectionXp, collectionXpTable)
+
+		// calculate the xp required to go to the next level
+		const collectionXpList = collectionXpTable[collectionName as CollectionNames]
+		const collectionXpRequired = collectionXpList ? collectionXpList[collectionLevel] : null
+		// calculate the xp that we have in this level
+		const collectionXpInLevel = collectionXpList ? collectionXpList[collectionLevel - 1] : null
+
+		// if the calculated collection is wrong, that means we need to update the constant.
+		if (calculatedCollectionLevel !== collectionLevel) {
+			console.warn(`The xp table for ${collectionName} is wrong. Calculated: ${calculatedCollectionLevel}, actual: ${collectionLevel}`)
+			collectionUpdates.push({
+				level: collectionLevel,
+				name: collectionName,
+				xp: roundDownXp(collectionXp)
+			})
+		}
+
 		const collectionCategory = getCategory(collectionName) ?? 'unknown'
 
 		// in some very weird cases the collection level will be undefined, we should ignore these collections
@@ -226,8 +214,11 @@ export function cleanCollections(data: any): Collection[] {
 				name: collectionName,
 				xp: collectionXp,
 				level: collectionLevel,
-				category: collectionCategory
+				category: collectionCategory,
+				levelXp: collectionXpInLevel,
+				levelXpRequired: collectionXpRequired
 			})
 	}
+	await constants.updateCollectionXpTable(collectionUpdates)
 	return playerCollections
 }
