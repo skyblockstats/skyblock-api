@@ -12,7 +12,7 @@ jobs:
           node-version: '16.0.0'
       - run: npm install
       - name: Typescript compiler
-        uses: iCrawl/action-tsc@v1
+        uses: stepek/tsc-action@master
       - name: Run tests
         run: npm test
 
