@@ -6,7 +6,7 @@ import * as discord from './discord.js'
 import express from 'express'
 import { getKeyUsage } from './hypixelApi.js'
 import { basicPlayerCache, basicProfilesCache, playerCache, profileCache, profileNameCache, profilesCache, usernameCache } from './hypixelCached.js'
-import { collectDefaultMetrics, register } from 'prom-client'
+import { collectDefaultMetrics, Counter, Gauge, register } from 'prom-client'
 
 const app = express()
 
@@ -191,7 +191,19 @@ app.post('/accounts/update', async (req, res) => {
 
 // grafana integration
 collectDefaultMetrics()
-app.get('/metrics', async (_req, res) => {
+
+const apiKeyCounter = new Gauge({
+	name: 'hypixel_api_key_usage',
+	help: 'API requests in the past minute.',
+	registers: [ register ],
+	collect() {
+		let keyUsage = getKeyUsage()
+		apiKeyCounter.set(keyUsage.usage)
+	}
+})
+
+app.get('/metrics', async (req, res) => {
+	console.log(req.params, req.headers)
 	try {
 		res.set('Content-Type', register.contentType)
 		res.end(await register.metrics())
