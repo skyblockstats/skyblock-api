@@ -803,6 +803,10 @@ export async function updateAccount(discordId: string, schema: AccountSchema) {
 	}, { $set: schema }, { upsert: true })
 }
 
+export async function fetchServerStatus() {
+	return await database.admin().serverStatus()
+}
+
 // make sure it's not in a test
 console.log('global.isTest', globalThis.isTest)
 if (!globalThis.isTest) {

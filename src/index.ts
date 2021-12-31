@@ -1,4 +1,4 @@
-import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount } from './database.js'
+import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount, fetchServerStatus } from './database.js'
 import { fetchMemberProfile, fetchUser } from './hypixel.js'
 import rateLimit from 'express-rate-limit'
 import * as constants from './constants.js'
@@ -6,7 +6,7 @@ import * as discord from './discord.js'
 import express from 'express'
 import { getKeyUsage } from './hypixelApi.js'
 import { basicPlayerCache, basicProfilesCache, playerCache, profileCache, profileNameCache, profilesCache, usernameCache } from './hypixelCached.js'
-import { collectDefaultMetrics, Counter, Gauge, register } from 'prom-client'
+import { register } from './metrics.js'
 
 const app = express()
 
@@ -188,19 +188,6 @@ app.post('/accounts/update', async (req, res) => {
 	}
 })
 
-
-// grafana integration
-collectDefaultMetrics()
-
-const apiKeyCounter = new Gauge({
-	name: 'hypixel_api_key_usage',
-	help: 'API requests in the past minute.',
-	registers: [ register ],
-	collect() {
-		let keyUsage = getKeyUsage()
-		apiKeyCounter.set(keyUsage.usage)
-	}
-})
 
 app.get('/metrics', async (req, res) => {
 	if (!req.headers.host?.startsWith('0.0.0.0:'))
