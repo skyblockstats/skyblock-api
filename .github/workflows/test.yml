@@ -15,13 +15,3 @@ jobs:
         run: npm run compile
       - name: Run tests
         run: npm test
-
-
-  automerge:
-    needs: [ build-and-test ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: fastify/github-action-merge-dependabot@v2.1.1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          target: minor
