@@ -30,7 +30,7 @@
   "homepage": "https://github.com/mat-1/skyblock-api#readme",
   "dependencies": {
     "express": "^4.17.2",
-    "express-rate-limit": "^6.2.0",
+    "express-rate-limit": "^6.2.1",
     "lru-cache": "^7.3.1",
     "mongodb": "^4.3.1",
     "node-cache": "^5.1.2",
