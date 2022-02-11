@@ -313,21 +313,28 @@ async function fetchMemberLeaderboardRaw(name: string): Promise<memberRawLeaderb
 	sortQuery[`stats.${name}`] = isLeaderboardReversed(name) ? 1 : -1
 
 	fetchingRawLeaderboardNames.add(name)
-	const leaderboardRaw: memberRawLeaderboardItem[] = (await memberLeaderboardsCollection
-		.find(query)
-		.sort(sortQuery)
-		.limit(leaderboardMax)
-		.toArray())
-		.map((i: DatabaseMemberLeaderboardItem): memberRawLeaderboardItem => {
-			return {
-				profile: i.profile,
-				uuid: i.uuid,
-				value: i.stats[name]
-			}
-		})
-	fetchingRawLeaderboardNames.delete(name)
-	cachedRawLeaderboards.set(name, leaderboardRaw)
-	return leaderboardRaw
+
+	try {
+		const leaderboardRaw: memberRawLeaderboardItem[] = (await memberLeaderboardsCollection
+			.find(query)
+			.sort(sortQuery)
+			.limit(leaderboardMax)
+			.toArray())
+			.map((i: DatabaseMemberLeaderboardItem): memberRawLeaderboardItem => {
+				return {
+					profile: i.profile,
+					uuid: i.uuid,
+					value: i.stats[name]
+				}
+			})
+		fetchingRawLeaderboardNames.delete(name)
+		cachedRawLeaderboards.set(name, leaderboardRaw)
+		return leaderboardRaw
+	} catch (e) {
+		// if it fails while fetching, remove it from fetchingRawLeaderboardNames
+		fetchingRawLeaderboardNames.delete(name)
+		throw e
+	}
 }
 
 async function fetchProfileLeaderboardRaw(name: string): Promise<profileRawLeaderboardItem[]> {
@@ -351,22 +358,28 @@ async function fetchProfileLeaderboardRaw(name: string): Promise<profileRawLeade
 	sortQuery[`stats.${name}`] = isLeaderboardReversed(name) ? 1 : -1
 
 	fetchingRawLeaderboardNames.add(name)
-	const leaderboardRaw: profileRawLeaderboardItem[] = (await profileLeaderboardsCollection
-		.find(query)
-		.sort(sortQuery)
-		.limit(leaderboardMax)
-		.toArray())
-		.map((i: DatabaseProfileLeaderboardItem): profileRawLeaderboardItem => {
-			return {
-				players: i.players,
-				uuid: i.uuid,
-				value: i.stats[name]
-			}
-		})
-	fetchingRawLeaderboardNames.delete(name)
+	try {
+		const leaderboardRaw: profileRawLeaderboardItem[] = (await profileLeaderboardsCollection
+			.find(query)
+			.sort(sortQuery)
+			.limit(leaderboardMax)
+			.toArray())
+			.map((i: DatabaseProfileLeaderboardItem): profileRawLeaderboardItem => {
+				return {
+					players: i.players,
+					uuid: i.uuid,
+					value: i.stats[name]
+				}
+			})
+		fetchingRawLeaderboardNames.delete(name)
 
-	cachedRawLeaderboards.set(name, leaderboardRaw)
-	return leaderboardRaw
+		cachedRawLeaderboards.set(name, leaderboardRaw)
+		return leaderboardRaw
+	} catch (e) {
+		// if it fails while fetching, remove it from fetchingRawLeaderboardNames
+		fetchingRawLeaderboardNames.delete(name)
+		throw e
+	}
 }
 
 interface MemberLeaderboard {

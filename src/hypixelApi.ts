@@ -1,9 +1,9 @@
 /**
  * Fetch the raw Hypixel API
  */
-import fetch from 'node-fetch'
+import { jsonToQuery, shuffle, sleep } from './util.js'
 import * as nodeFetch from 'node-fetch'
-import { jsonToQuery, shuffle } from './util.js'
+import fetch from 'node-fetch'
 import { Agent } from 'https'
 
 if (!process.env.hypixel_keys)
@@ -167,13 +167,13 @@ export let sendApiRequest = async function sendApiRequest({ path, key, args }): 
 		fetchJsonParsed = await fetchResponse.json()
 	} catch {
 		// if there's an error, wait a second and try again
-		await new Promise((resolve) => setTimeout(resolve, 1000))
+		await sleep(1000)
 		return await sendApiRequest({ path, key, args })
 	}
 
 	// bruh
 	if (fetchJsonParsed.cause === 'This endpoint is currently disabled') {
-		await new Promise((resolve) => setTimeout(resolve, 30000))
+		await sleep(30000)
 		return await sendApiRequest({ path, key, args })
 	}
 
@@ -204,7 +204,7 @@ export let sendApiRequest = async function sendApiRequest({ path, key, args }): 
 		if (apiKeyUsage[key])
 			apiKeyUsage[key].remaining = 0
 		// if it's throttled, wait 10 seconds and try again
-		await new Promise((resolve) => setTimeout(resolve, 10000))
+		await sleep(10000)
 		return await sendApiRequest({ path, key, args })
 	}
 	return fetchJsonParsed

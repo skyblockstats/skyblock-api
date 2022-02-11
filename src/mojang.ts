@@ -2,7 +2,7 @@
  * Fetch the Mojang username API through api.ashcon.app
  */
 
-import { isUuid, undashUuid } from './util.js'
+import { isUuid, sleep, undashUuid } from './util.js'
 import * as nodeFetch from 'node-fetch'
 import fetch from 'node-fetch'
 import { Agent } from 'https'
@@ -32,7 +32,7 @@ export let profileFromUuid = async function profileFromUuid(uuid: string): Promi
 		)
 	} catch {
 		// if there's an error, wait a second and try again
-		await new Promise((resolve) => setTimeout(resolve, 1000))
+		await sleep(1000)
 		return await profileFromUuid(uuid)
 	}
 
@@ -68,7 +68,7 @@ export let profileFromUsername = async function profileFromUsername(username: st
 		)
 	} catch {
 		// if there's an error, wait a second and try again
-		await new Promise((resolve) => setTimeout(resolve, 1000))
+		await sleep(1000)
 		return await profileFromUsername(username)
 	}
 
@@ -100,7 +100,7 @@ export async function profileFromUsernameAlternative(username: string): Promise<
 		)
 	} catch {
 		// if there's an error, wait a second and try again
-		await new Promise((resolve) => setTimeout(resolve, 1000))
+		await sleep(1000)
 		return await profileFromUsernameAlternative(username)
 	}
 

@@ -22,6 +22,7 @@ import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles.js'
 import { CleanPlayer, cleanPlayerResponse } from './cleaners/player.js'
 import * as cached from './hypixelCached.js'
 import { debug } from './index.js'
+import { sleep } from './util.js'
 import { WithId } from 'mongodb'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories' | undefined
@@ -48,7 +49,7 @@ export async function sendCleanApiRequest({ path, args }, included?: Included[],
 	const rawResponse = await sendApiRequest({ path, key, args })
 	if (rawResponse.throttled) {
 		// if it's throttled, wait a second and try again
-		await new Promise(resolve => setTimeout(resolve, 1000))
+		await sleep(1000)
 		return await sendCleanApiRequest({ path, args }, included, options)
 	}
 	// clean the response

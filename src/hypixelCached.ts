@@ -3,8 +3,8 @@
  */
 
 import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/skyblock/profile.js'
+import { isUuid, sleep, undashUuid } from './util.js'
 import { CleanPlayer } from './cleaners/player.js'
-import { isUuid, undashUuid } from './util.js'
 import * as hypixel from './hypixel.js'
 import * as mojang from './mojang.js'
 import NodeCache from 'node-cache'
@@ -166,7 +166,7 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer | null> {
 	// if it's already in the process of fetching, check every 100ms until it's not fetching the player anymore and fetch it again, since it'll be cached now
 	if (fetchingPlayers.has(playerUuid)) {
 		while (fetchingPlayers.has(playerUuid)) {
-			await new Promise(resolve => setTimeout(resolve, 100))
+			await sleep(100)
 		}
 		return await fetchPlayer(user)
 	}

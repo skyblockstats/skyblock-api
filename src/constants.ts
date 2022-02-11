@@ -8,6 +8,7 @@ import * as constants from './constants.js'
 import * as nodeFetch from 'node-fetch'
 import NodeCache from 'node-cache'
 import { debug } from './index.js'
+import { sleep } from './util.js'
 import Queue from 'queue-promise'
 import fetch from 'node-fetch'
 import { Agent } from 'https'
@@ -51,7 +52,7 @@ async function fetchGithubApi(method: string, route: string, headers?: any, json
 		return data
 	} catch {
 		// if there's an error, wait a second and try again
-		await new Promise((resolve) => setTimeout(resolve, 1000))
+		await sleep(1000)
 		return await fetchGithubApi(method, route, headers, json)
 	}
 }
