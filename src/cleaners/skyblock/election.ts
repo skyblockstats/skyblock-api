@@ -1,14 +1,6 @@
-
-const candidateColors = {
-	barry: 'e',
-	paul: '4',
-	aatrox: 'a',
-	foxy: '3',
-	cole: 'e',
-	marina: '5',
-	diaz: '5',
-	diana: '3',
-}
+const candidateColors = [
+	'4', 'a', '3', 'e', '5',
+]
 
 export interface MayorPerk {
 	name: string
@@ -35,26 +27,26 @@ export interface ElectionData {
 	} | null
 }
 
-function cleanCandidate(data: any): Candidate {
+function cleanCandidate(data: any, index: number): Candidate {
 	return {
 		name: data.name,
-		perks: data.perks,
+		perks: data.perks.map(perk => ({
+			name: perk.name,
+			description: '§7' + perk.description,
+		})),
 		votes: data.votes,
-		color: candidateColors[data.name.toLowerCase()],
+		color: candidateColors[index],
 	}
 }
 
 export function cleanElectionResponse(data: any): ElectionData {
+	const previousCandidates = data.mayor.election.candidates.map(cleanCandidate)
 	return {
 		last_updated: data.lastUpdated / 1000,
 		previous: {
 			year: data.mayor.election.year,
-			winner: cleanCandidate({
-				name: data.mayor.name,
-				perks: data.mayor.perks,
-				votes: data.mayor.election.candidates.find(c => c.key === data.mayor.key).votes,
-			}),
-			candidates: data.mayor.election.candidates.map(cleanCandidate)
+			winner: data.mayor.name,
+			candidates: previousCandidates
 		},
 		current: data.current ? {
 			year: data.current.year,
