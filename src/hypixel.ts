@@ -24,6 +24,7 @@ import * as cached from './hypixelCached.js'
 import { debug } from './index.js'
 import { sleep } from './util.js'
 import { WithId } from 'mongodb'
+import { cleanElectionResponse, ElectionData } from './cleaners/skyblock/election.js'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories' | undefined
 
@@ -64,6 +65,7 @@ async function cleanResponse({ path, data }: { path: string, data: HypixelRespon
 		case 'player': return await cleanPlayerResponse(data.player)
 		case 'skyblock/profile': return await cleanSkyblockProfileResponse(data.profile, options)
 		case 'skyblock/profiles': return await cleanSkyblockProfilesResponse(data.profiles)
+		case 'resources/skyblock/election': return await cleanElectionResponse(data)
 	}
 }
 
@@ -268,3 +270,38 @@ export async function fetchMemberProfilesUncached(playerUuid: string): Promise<C
 	}
 	return profiles
 }
+
+let isFetchingElection = false
+let cachedElectionData: ElectionData | null = null
+let nextElectionUpdate: Date = new Date(0)
+
+export async function fetchElection(): Promise<ElectionData> {
+	if (cachedElectionData && nextElectionUpdate > new Date())
+		return cachedElectionData
+
+	// if it's currently fetching the election data and it doesn't have it,
+	// wait until we do have the election data
+	if (isFetchingElection && !cachedElectionData) {
+		await new Promise(resolve => {
+			const interval = setInterval(() => {
+				if (cachedElectionData) {
+					clearInterval(interval)
+					resolve(cachedElectionData)
+				}
+			}, 100)
+		})
+	}
+
+	isFetchingElection = true
+	const election: ElectionData = await sendCleanApiRequest({
+		path: 'resources/skyblock/election',
+		args: {}
+	})
+	isFetchingElection = false
+
+	cachedElectionData = election
+	// updates every 10 minutes
+	nextElectionUpdate = new Date((election.last_updated + 10 * 60) * 1000)
+	return election
+}
+
