@@ -2,9 +2,9 @@
 
 Backend for [skyblock.matdoes.dev](https://github.com/skyblockstats/skyblock-stats).
 
-Basically this is [Slothpixel](https://github.com/slothpixel/core) but more specialized.
+This is kinda like [Slothpixel](https://github.com/slothpixel/core), as in it fetches the SkyBlock API and cleans up the result for use without an API key.
 
-## What it does
+## Basically what it does
 
 1) A request is sent to the Express server in index.js
 2) The express server then calls a function in hypixelCached depending on the request
