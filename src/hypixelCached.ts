@@ -263,7 +263,7 @@ async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[] | n
 
 	const player = await fetchPlayer(playerUuid)
 	if (!player) {
-		console.log('bruh playerUuid', user, playerUuid)
+		// this happens when the player changed their name recently and the old name is cached on hypixel
 		return []
 	}
 	const profiles = player.profiles

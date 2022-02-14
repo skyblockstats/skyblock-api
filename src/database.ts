@@ -297,7 +297,7 @@ async function fetchMemberLeaderboardRaw(name: string): Promise<memberRawLeaderb
 		return cachedRawLeaderboards.get(name) as memberRawLeaderboardItem[]
 	
 	// if it's currently being fetched, check every 100ms until it's in cachedRawLeaderboards
-	if (fetchingRawLeaderboardNames.has(name)) {
+	if (fetchingRawLeaderboardNames.has(name) || !cachedRawLeaderboards.get(name)) {
 		while (true) {
 			await sleep(100)
 			if (cachedRawLeaderboards.has(name))
