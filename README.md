@@ -13,3 +13,10 @@ This is kinda like [Slothpixel](https://github.com/slothpixel/core), as in it fe
 5) hypixel.ts calls one or more of the cleaners, which pretties up the data for us to use
 6) cleaned data is returned to hypixelCached, which will cache it
 7) Data is sent back to express to serve to the user
+
+## API conventions
+
+If you (this is really just here for myself so I don't forget) are adding a new API thing, follow these rules so the API is consistent with how it responds:
+- Use camelCase. Some old things use snake_case but these are going to be changed at some point.
+- Prefer arrays over dictionaries when the keys aren't static. For example `[ { name: "asdf", value: "dsfasg" } ]` rather than `{ "asdf": "dsfasg" }`.
+- Idk I'll add more to here later

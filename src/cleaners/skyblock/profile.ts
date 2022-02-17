@@ -12,14 +12,15 @@ export interface CleanFullProfile extends CleanProfile {
     members: CleanMember[]
     bank: Bank
     minions: CleanMinion[]
-	minion_count: number
+    minion_count: number
+    maxUniqueMinions: number
 }
 
 export interface CleanFullProfileBasicMembers extends CleanProfile {
     members: CleanBasicMember[]
     bank: Bank
     minions: CleanMinion[]
-	minion_count: number
+    minion_count: number
 }
 
 /** Return a `CleanProfile` instead of a `CleanFullProfile`, useful when we need to get members but don't want to waste much ram */
@@ -80,7 +81,7 @@ export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptio
     const minions: CleanMinion[] = combineMinionArrays(memberMinions)
 
     const { max_minions: maxUniqueMinions } = await constants.fetchConstantValues()
-    
+
     const uniqueMinions = countUniqueMinions(minions)
     if (uniqueMinions > (maxUniqueMinions ?? 0))
         await constants.setConstantValues({ max_minions: uniqueMinions })
@@ -92,7 +93,8 @@ export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptio
         members: cleanedMembers,
         bank: cleanBank(data),
         minions: minions,
-		minion_count: uniqueMinions
+        minion_count: uniqueMinions,
+        maxUniqueMinions: maxUniqueMinions ?? 0,
     }
 }
 

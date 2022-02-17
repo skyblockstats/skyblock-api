@@ -27,9 +27,8 @@ export interface CleanBasicMember {
 export interface CleanMember extends CleanBasicMember {
 	purse: number
 	stats: StatItem[]
-	rawHypixelStats?: { [ key: string ]: number }
+	rawHypixelStats?: { [key: string]: number }
 	minions: CleanMinion[]
-	max_minions: number
 	fairy_souls: FairySouls
 	inventories?: Inventories
 	objectives: Objective[]
@@ -62,8 +61,6 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
 	const { max_fairy_souls: maxFairySouls } = await constants.fetchConstantValues()
 	if (fairySouls.total > (maxFairySouls ?? 0))
 		await constants.setConstantValues({ max_fairy_souls: fairySouls.total })
-	
-	const { max_minions } = await constants.fetchConstantValues()
 
 	return {
 		uuid: member.uuid,
@@ -80,7 +77,6 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
 		rawHypixelStats: member.stats ?? {},
 
 		minions: await cleanMinions(member),
-		max_minions: max_minions ?? 0,
 		fairy_souls: fairySouls,
 		inventories: inventoriesIncluded ? await cleanInventories(member) : undefined,
 		objectives: cleanObjectives(member),
@@ -100,7 +96,7 @@ export interface CleanMemberProfilePlayer extends CleanPlayer {
 	bank?: Bank
 	purse?: number
 	stats?: StatItem[]
-	rawHypixelStats?: { [ key: string ]: number }
+	rawHypixelStats?: { [key: string]: number }
 	minions?: CleanMinion[]
 	fairy_souls?: FairySouls
 	inventories?: Inventories
