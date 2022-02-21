@@ -93,6 +93,7 @@ interface SessionSchema {
 export interface AccountCustomization {
 	backgroundUrl?: string
 	pack?: string
+	emoji?: string
 }
 
 export interface AccountSchema {

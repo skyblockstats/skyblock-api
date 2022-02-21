@@ -21,6 +21,7 @@ export interface CleanFullProfileBasicMembers extends CleanProfile {
     bank: Bank
     minions: CleanMinion[]
     minion_count: number
+    maxUniqueMinions: number
 }
 
 /** Return a `CleanProfile` instead of a `CleanFullProfile`, useful when we need to get members but don't want to waste much ram */
