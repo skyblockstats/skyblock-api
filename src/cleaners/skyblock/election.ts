@@ -18,7 +18,7 @@ export interface ElectionData {
 	last_updated: number
 	previous: {
 		year: number
-		winner: Candidate
+		winner: string
 		candidates: Candidate[]
 	}
 	current: {
