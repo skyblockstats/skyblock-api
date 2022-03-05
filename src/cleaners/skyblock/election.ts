@@ -42,7 +42,7 @@ function cleanCandidate(data: any, index: number): Candidate {
 export function cleanElectionResponse(data: any): ElectionData {
 	const previousCandidates = data.mayor.election.candidates.map(cleanCandidate)
 	return {
-		lastUpdated: data.lastUpdated / 1000,
+		lastUpdated: data.lastUpdated,
 		previous: {
 			year: data.mayor.election.year,
 			winner: data.mayor.name,

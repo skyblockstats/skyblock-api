@@ -25,7 +25,6 @@ export async function cleanPlayerResponse(data: HypixelPlayer): Promise<CleanPla
         username: data.displayname,
         rank: cleanRank(data),
         socials: cleanSocialMedia(data),
-        // first_join: data.firstLogin / 1000,
         profiles: cleanPlayerSkyblockProfiles(data.stats?.SkyBlock?.profiles)
     }
 }
