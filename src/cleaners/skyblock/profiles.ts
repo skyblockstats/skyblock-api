@@ -10,8 +10,8 @@ export function cleanPlayerSkyblockProfiles(rawProfiles: HypixelPlayerStatsSkyBl
     let profiles: CleanBasicProfile[] = []
     for (const profile of Object.values(rawProfiles ?? {})) {
         profiles.push({
-            uuid: profile.profile_id,
-            name: profile.cute_name
+            uuid: profile.profileId,
+            name: profile.cuteName
         })
     }
     return profiles

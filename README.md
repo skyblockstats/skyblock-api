@@ -17,12 +17,12 @@ This is kinda like [Slothpixel](https://github.com/slothpixel/core), it fetches 
 ## API conventions
 
 If you (this is really just here for myself so I don't forget) are adding a new API thing, follow these rules so the API is consistent with how it responds:
-- Use camelCase. Some old things use snake_case but these are going to be changed at some point.
+- Use camelCase for keys. Some old things use snake_case but these are going to be changed at some point.
+- Use snake_case for values.
 - Prefer arrays over dictionaries when the keys aren't static. For example `[ { name: "asdf", value: "dsfasg" } ]` rather than `{ "asdf": "dsfasg" }`.
 - "name" fields should be snake_case ids.
 
 ## Breaking changes todo
-- Replace all snake_case keys with camelCase
 - Rename visited_zones to just zones since it contains every zone
 - Rename collection `xp` to `amount`
 - Move `/leaderboard/` to `/leaderboards/`

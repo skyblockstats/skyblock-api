@@ -14,7 +14,6 @@ export interface CleanPlayer extends CleanBasicPlayer {
     rank: CleanRank
     socials: CleanSocialMedia
     profiles?: CleanBasicProfile[]
-    // first_join?: number
 }
 
 export async function cleanPlayerResponse(data: HypixelPlayer): Promise<CleanPlayer | null> {

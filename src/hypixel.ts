@@ -129,8 +129,8 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 	if (includeProfiles) {
 		for (const profile of profilesData!) {
 			const member = profile.members?.find(member => member.uuid === uuid)
-			if (member && member.last_save > lastOnline) {
-				lastOnline = member.last_save
+			if (member && member.lastSave > lastOnline) {
+				lastOnline = member.lastSave
 				activeProfile = profile
 			}
 		}
@@ -181,8 +181,8 @@ export async function fetchMemberProfile(user: string, profile: string, customiz
 		return {
 			uuid: m.uuid,
 			username: m.username,
-			first_join: m.first_join,
-			last_save: m.last_save,
+			firstJoin: m.firstJoin,
+			lastSave: m.lastSave,
 			rank: m.rank
 		}
 	})
@@ -301,7 +301,7 @@ export async function fetchElection(): Promise<ElectionData> {
 
 	cachedElectionData = election
 	// updates every 10 minutes
-	nextElectionUpdate = new Date((election.last_updated + 10 * 60) * 1000)
+	nextElectionUpdate = new Date((election.lastUpdated + 10 * 60) * 1000)
 	return election
 }
 

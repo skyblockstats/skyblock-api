@@ -35,14 +35,14 @@ interface DatabaseMemberLeaderboardItem {
 	uuid: string
 	profile: string
 	stats: any
-	last_updated: Date
+	lastUpdated: Date
 }
 interface DatabaseProfileLeaderboardItem {
 	uuid: string
 	/** An array of uuids for each player in the profile */
 	players: string[]
 	stats: any
-	last_updated: Date
+	lastUpdated: Date
 }
 
 
@@ -161,10 +161,10 @@ function getMemberSlayerAttributes(member: CleanMember): StringNumber {
 	}
 
 	for (const slayer of member.slayers.bosses) {
-		slayerAttributes[`slayer_${slayer.raw_name}_total_xp`] = slayer.xp
-		slayerAttributes[`slayer_${slayer.raw_name}_total_kills`] = slayer.kills
+		slayerAttributes[`slayer_${slayer.rawName}_total_xp`] = slayer.xp
+		slayerAttributes[`slayer_${slayer.rawName}_total_kills`] = slayer.kills
 		for (const tier of slayer.tiers) {
-			slayerAttributes[`slayer_${slayer.raw_name}_${tier.tier}_kills`] = tier.kills
+			slayerAttributes[`slayer_${slayer.rawName}_${tier.tier}_kills`] = tier.kills
 		}
 	}
 
@@ -186,17 +186,17 @@ function getMemberLeaderboardAttributes(member: CleanMember): StringNumber {
 		// slayer leaderboards
 		...getMemberSlayerAttributes(member),
 
-		fairy_souls: member.fairy_souls.total,
-		first_join: member.first_join,
+		fairy_souls: member.fairySouls.total,
+		first_join: member.firstJoin,
 		purse: member.purse,
-		visited_zones: member.visited_zones.length,
+		visited_zones: member.visitedZones.length,
 	}
 }
 
 function getProfileLeaderboardAttributes(profile: CleanFullProfile): StringNumber {
 	// if you want to add a new leaderboard for member attributes, add it here (and getAllLeaderboardAttributes)
 	return {
-		unique_minions: profile.minion_count
+		unique_minions: profile.minionCount
 	}
 }
 
@@ -617,8 +617,8 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 		await constants.addStats(Object.keys(member.rawHypixelStats))
 	await constants.addCollections(member.collections.map(coll => coll.name))
 	await constants.addSkills(member.skills.map(skill => skill.name))
-	await constants.addZones(member.visited_zones.map(zone => zone.name))
-	await constants.addSlayers(member.slayers.bosses.map(s => s.raw_name))
+	await constants.addZones(member.visitedZones.map(zone => zone.name))
+	await constants.addSlayers(member.slayers.bosses.map(s => s.rawName))
 
 	if (debug) console.debug('done constants..')
 
