@@ -140,7 +140,7 @@ function getMemberCollectionAttributes(member: CleanMember): StringNumber {
 	const collectionAttributes = {}
 	for (const collection of member.collections) {
 		const collectionLeaderboardName = `collection_${collection.name}`
-		collectionAttributes[collectionLeaderboardName] = collection.xp
+		collectionAttributes[collectionLeaderboardName] = collection.amount
 	}
 	return collectionAttributes
 }
