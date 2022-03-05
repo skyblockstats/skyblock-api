@@ -23,6 +23,5 @@ If you (this is really just here for myself so I don't forget) are adding a new 
 - "name" fields should be snake_case ids.
 
 ## Breaking changes todo
-- Rename visited_zones to just zones since it contains every zone
 - Rename collection `xp` to `amount`
 - Move `/leaderboard/` to `/leaderboards/`

@@ -33,7 +33,7 @@ export interface CleanMember extends CleanBasicMember {
 	inventories?: Inventories
 	objectives: Objective[]
 	skills: Skill[]
-	visitedZones: Zone[]
+	zones: Zone[]
 	collections: Collection[]
 	slayers: SlayerData
 }
@@ -81,7 +81,7 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
 		inventories: inventoriesIncluded ? await cleanInventories(member) : undefined,
 		objectives: cleanObjectives(member),
 		skills: await cleanSkills(member),
-		visitedZones: await cleanVisitedZones(member),
+		zones: await cleanVisitedZones(member),
 		collections: cleanCollections(member),
 		slayers: cleanSlayers(member)
 	}

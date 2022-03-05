@@ -189,7 +189,7 @@ function getMemberLeaderboardAttributes(member: CleanMember): StringNumber {
 		fairy_souls: member.fairySouls.total,
 		first_join: member.firstJoin,
 		purse: member.purse,
-		visited_zones: member.visitedZones.length,
+		visited_zones: member.zones.filter(z => z.visited).length,
 	}
 }
 
@@ -617,7 +617,7 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 		await constants.addStats(Object.keys(member.rawHypixelStats))
 	await constants.addCollections(member.collections.map(coll => coll.name))
 	await constants.addSkills(member.skills.map(skill => skill.name))
-	await constants.addZones(member.visitedZones.map(zone => zone.name))
+	await constants.addZones(member.zones.map(zone => zone.name))
 	await constants.addSlayers(member.slayers.bosses.map(s => s.rawName))
 
 	if (debug) console.debug('done constants..')
