@@ -21,7 +21,3 @@ If you (this is really just here for myself so I don't forget) are adding a new 
 - Use snake_case for values.
 - Prefer arrays over dictionaries when the keys aren't static. For example `[ { name: "asdf", value: "dsfasg" } ]` rather than `{ "asdf": "dsfasg" }`.
 - "name" fields should be snake_case ids.
-
-## Breaking changes todo
-- Rename collection `xp` to `amount`
-- Move `/leaderboard/` to `/leaderboards/`
