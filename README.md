@@ -17,7 +17,6 @@ This is kinda like [Slothpixel](https://github.com/slothpixel/core), it fetches 
 ## API conventions
 
 If you (this is really just here for myself so I don't forget) are adding a new API thing, follow these rules so the API is consistent with how it responds:
-- Use camelCase for keys. Some old things use snake_case but these are going to be changed at some point.
+- Use camelCase for keys.
 - Use snake_case for values.
 - Prefer arrays over dictionaries when the keys aren't static. For example `[ { name: "asdf", value: "dsfasg" } ]` rather than `{ "asdf": "dsfasg" }`.
-- "name" fields should be snake_case ids.
