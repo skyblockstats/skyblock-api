@@ -164,8 +164,9 @@ app.post('/accounts/createsession', async (req, res) => {
 		const { access_token: accessToken, refresh_token: refreshToken } = codeExchange
 		if (!accessToken) {
 			// access token is invalid :(
-			console.log('error exchanging code:', codeExchange)
-			return res.json({ ok: false })
+			console.log('error exchanging code:', codeExchange, code)
+			const { error, error_description: errorDescription } = codeExchange as any
+			return res.json({ ok: false, error: error ? `Discord error: ${error}: ${errorDescription}` : 'Unknown error' })
 		}
 		const userData = await discord.getUser(accessToken)
 		const sessionId = await createSession(refreshToken, userData)
