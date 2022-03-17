@@ -156,7 +156,9 @@ app.get('/election', async (req, res) => {
 app.post('/accounts/createsession', async (req, res) => {
 	try {
 		const { code } = req.body
-		const codeExchange = await discord.exchangeCode(`${mainSiteUrl}/loggedin`, code)
+		const redirectUri = req.body.redirectUri ?? `${mainSiteUrl}/loggedin`
+
+		const codeExchange = await discord.exchangeCode(redirectUri, code)
 		if (!codeExchange) {
 			res.json({ ok: false, error: 'discord_client_secret isn\'t in env' })
 			return
