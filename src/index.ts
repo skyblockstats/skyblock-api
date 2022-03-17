@@ -1,4 +1,4 @@
-import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount, fetchServerStatus } from './database.js'
+import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount, fetchServerStatus, deleteSession } from './database.js'
 import { fetchElection, fetchMemberProfile, fetchUser } from './hypixel.js'
 import rateLimit from 'express-rate-limit'
 import * as constants from './constants.js'
@@ -180,6 +180,18 @@ app.post('/accounts/session', async (req, res) => {
 			return res.json({ ok: false })
 		const account = await fetchAccountFromDiscord(session.discord_user.id)
 		res.json({ session, account })
+	} catch (err) {
+		console.error(err)
+		res.json({ ok: false })
+	}
+})
+
+app.delete('/accounts/session', async (req, res) => {
+	// delete a session
+	try {
+		const { uuid } = req.body
+		const session = await deleteSession(uuid)
+		res.json({ ok: true })
 	} catch (err) {
 		console.error(err)
 		res.json({ ok: false })

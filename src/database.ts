@@ -803,6 +803,11 @@ export async function fetchSession(sessionId: string): Promise<WithId<SessionSch
 	return await sessionsCollection?.findOne({ _id: sessionId as any } )
 }
 
+
+export async function deleteSession(sessionId: string) {
+	return await sessionsCollection?.deleteOne({ _id: sessionId as any } )
+}
+
 export async function fetchAccount(minecraftUuid: string): Promise<WithId<AccountSchema> | null> {
 	return await accountsCollection?.findOne({ minecraftUuid })
 }
