@@ -30,6 +30,7 @@ app.use(limiter)
 app.use(express.json())
 app.use((req, res, next) => {
 	res.setHeader('Access-Control-Allow-Origin', '*')
+	res.setHeader('Access-Control-Allow-Headers', '*')
 	next()
 })
 
@@ -190,7 +191,7 @@ app.delete('/accounts/session', async (req, res) => {
 	// delete a session
 	try {
 		const { uuid } = req.body
-		const session = await deleteSession(uuid)
+		await deleteSession(uuid)
 		res.json({ ok: true })
 	} catch (err) {
 		console.error(err)
