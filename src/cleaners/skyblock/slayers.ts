@@ -3,7 +3,8 @@ export const slayerLevels = 5
 const SLAYER_NAMES = {
 	spider: 'tarantula',
 	zombie: 'revenant',
-	wolf: 'sven'
+	wolf: 'sven',
+	enderman: 'voidgloom_seraph'
 } as const
 
 type SlayerName = (typeof SLAYER_NAMES)[keyof typeof SLAYER_NAMES]
@@ -14,9 +15,10 @@ interface SlayerTier {
 }
 
 export interface Slayer {
-	name: SlayerName
+	name?: SlayerName
 	rawName: string
 	xp: number
+	level: number
 	kills: number
 	tiers: SlayerTier[]
 }
@@ -44,6 +46,13 @@ export function cleanSlayers(data: any): SlayerData {
 		const slayerXp: number = slayerDataRaw.xp ?? 0
 		let slayerKills: number = 0
 		const slayerTiers: SlayerTier[] = []
+
+		// we get the level by finding the biggest number in "level_<number>"
+		let slayerLevel = Object.keys(slayerDataRaw.claimed_levels)
+			.filter(k => slayerDataRaw.claimed_levels[k])
+			.map(n => parseInt(n.replace(/^level_/, '')))
+			.sort((a, b) => b - a)[0] ?? 0
+
 
 		for (const slayerDataKey in slayerDataRaw) {
 			// if a key starts with boss_kills_tier_ (boss_kills_tier_1), get the last number
@@ -75,6 +84,7 @@ export function cleanSlayers(data: any): SlayerData {
 			rawName: slayerNameRaw,
 			tiers: slayerTiers,
 			xp: slayerXp ?? 0,
+			level: slayerLevel,
 			kills: slayerKills
 		}
 

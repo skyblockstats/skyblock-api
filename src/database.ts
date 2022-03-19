@@ -93,6 +93,7 @@ interface SessionSchema {
 export interface AccountCustomization {
 	backgroundUrl?: string
 	pack?: string
+	blurBackground?: boolean
 	emoji?: string
 }
 
@@ -803,6 +804,11 @@ export async function fetchSession(sessionId: string): Promise<WithId<SessionSch
 	return await sessionsCollection?.findOne({ _id: sessionId as any } )
 }
 
+
+export async function deleteSession(sessionId: string) {
+	return await sessionsCollection?.deleteOne({ _id: sessionId as any } )
+}
+
 export async function fetchAccount(minecraftUuid: string): Promise<WithId<AccountSchema> | null> {
 	return await accountsCollection?.findOne({ minecraftUuid })
 }
@@ -812,6 +818,16 @@ export async function fetchAccountFromDiscord(discordId: string): Promise<WithId
 }
 
 export async function updateAccount(discordId: string, schema: AccountSchema) {
+	if (schema.minecraftUuid) {
+		const existingAccount = await accountsCollection?.findOne({ minecraftUuid: schema.minecraftUuid })
+		// if the discord ids don't match, change the discord id of the existing account
+		if (existingAccount && existingAccount.discordId !== discordId) {
+			await accountsCollection?.updateOne(
+				{ minecraftUuid: schema.minecraftUuid },
+				{ '$set': { discordId } }
+			)
+		}
+	}
 	await accountsCollection?.updateOne({
 		discordId
 	}, { $set: schema }, { upsert: true })
