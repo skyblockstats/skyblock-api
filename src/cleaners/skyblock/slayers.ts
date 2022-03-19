@@ -48,10 +48,10 @@ export function cleanSlayers(data: any): SlayerData {
 		const slayerTiers: SlayerTier[] = []
 
 		// we get the level by finding the biggest number in "level_<number>"
-		let slayerLevel = Object.keys(slayerDataRaw.claimed_levels)
+		let slayerLevel = slayerDataRaw.claimed_levels ? (Object.keys(slayerDataRaw.claimed_levels)
 			.filter(k => slayerDataRaw.claimed_levels[k])
 			.map(n => parseInt(n.replace(/^level_/, '')))
-			.sort((a, b) => b - a)[0] ?? 0
+			.sort((a, b) => b - a)[0] ?? 0) : 0
 
 
 		for (const slayerDataKey in slayerDataRaw) {
