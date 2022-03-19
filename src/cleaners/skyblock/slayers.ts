@@ -3,7 +3,8 @@ export const slayerLevels = 5
 const SLAYER_NAMES = {
 	spider: 'tarantula',
 	zombie: 'revenant',
-	wolf: 'sven'
+	wolf: 'sven',
+	enderman: 'voidgloom_seraph'
 } as const
 
 type SlayerName = (typeof SLAYER_NAMES)[keyof typeof SLAYER_NAMES]
@@ -14,7 +15,7 @@ interface SlayerTier {
 }
 
 export interface Slayer {
-	name: SlayerName
+	name?: SlayerName
 	raw_name: string
 	xp: number
 	kills: number
