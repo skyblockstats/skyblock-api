@@ -85,8 +85,8 @@ export interface HypixelResponse {
 
 export interface HypixelPlayerStatsSkyBlockProfiles {
 	[ uuid: string ]: {
-		profileId: string
-		cuteName: string
+		profile_id: string
+		cute_name: string
 	}
 }
 
