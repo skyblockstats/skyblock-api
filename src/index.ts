@@ -109,7 +109,7 @@ app.get('/player/:user/:profile/leaderboards', async (req, res) => {
 	}
 })
 
-app.get('/leaderboard/:name', async (req, res) => {
+app.get('/leaderboards/:name', async (req, res) => {
 	try {
 		res.json(
 			await fetchLeaderboard(req.params.name)

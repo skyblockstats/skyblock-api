@@ -17,11 +17,11 @@ interface Item {
 	}
 
 	reforge?: string
-	anvil_uses?: number
+	anvilUses?: number
 	timestamp?: string
 	enchantments?: { [ name: string ]: number }
 
-	head_texture?: string
+	headTexture?: string
 }
 
 export type Inventory = Item[]
@@ -63,10 +63,10 @@ function cleanItem(rawItem): Item | null {
 
 		reforge: extraAttributes?.modifier,
 		enchantments: extraAttributes?.enchantments,
-		anvil_uses: extraAttributes?.anvil_uses,
+		anvilUses: extraAttributes?.anvil_uses,
 		timestamp: extraAttributes?.timestamp,
 
-		head_texture: headId,
+		headTexture: headId,
 	}
 }
 

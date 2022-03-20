@@ -12,7 +12,7 @@ export interface CleanFullProfile extends CleanProfile {
     members: CleanMember[]
     bank: Bank
     minions: CleanMinion[]
-    minion_count: number
+    minionCount: number
     maxUniqueMinions: number
 }
 
@@ -20,7 +20,7 @@ export interface CleanFullProfileBasicMembers extends CleanProfile {
     members: CleanBasicMember[]
     bank: Bank
     minions: CleanMinion[]
-    minion_count: number
+    minionCount: number
     maxUniqueMinions: number
 }
 
@@ -94,7 +94,7 @@ export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptio
         members: cleanedMembers,
         bank: cleanBank(data),
         minions: minions,
-        minion_count: uniqueMinions,
+        minionCount: uniqueMinions,
         maxUniqueMinions: maxUniqueMinions ?? 0,
     }
 }

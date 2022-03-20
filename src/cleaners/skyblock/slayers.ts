@@ -16,7 +16,7 @@ interface SlayerTier {
 
 export interface Slayer {
 	name?: SlayerName
-	raw_name: string
+	rawName: string
 	xp: number
 	level: number
 	kills: number
@@ -81,7 +81,7 @@ export function cleanSlayers(data: any): SlayerData {
 
 		const slayer: Slayer = {
 			name: slayerName,
-			raw_name: slayerNameRaw,
+			rawName: slayerNameRaw,
 			tiers: slayerTiers,
 			xp: slayerXp ?? 0,
 			level: slayerLevel,

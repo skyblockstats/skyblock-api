@@ -233,8 +233,8 @@ export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanPr
 				return {
 					uuid: m.uuid,
 					username: m.username,
-					first_join: m.first_join,
-					last_save: m.last_save,
+					firstJoin: m.firstJoin,
+					lastSave: m.lastSave,
 					rank: m.rank
 				}
 			})
@@ -354,8 +354,8 @@ export async function fetchBasicProfileFromUuid(profileUuid: string): Promise<Cl
 			members: profile.members.map(m => ({
 				uuid: m.uuid,
 				username: m.username,
-				last_save: m.last_save,
-				first_join: m.first_join,
+				lastSave: m.lastSave,
+				firstJoin: m.firstJoin,
 				rank: m.rank,
 			})),
 			name: profile.name

@@ -19,21 +19,21 @@ import { Bank } from './bank.js'
 export interface CleanBasicMember {
 	uuid: string
 	username: string
-	last_save: number
-	first_join: number
+	lastSave: number
+	firstJoin: number
 	rank: CleanRank
 }
 
 export interface CleanMember extends CleanBasicMember {
 	purse: number
 	stats: StatItem[]
-	rawHypixelStats?: { [key: string]: number }
+	rawHypixelStats: { [key: string]: number }
 	minions: CleanMinion[]
-	fairy_souls: FairySouls
+	fairySouls: FairySouls
 	inventories?: Inventories
 	objectives: Objective[]
 	skills: Skill[]
-	visited_zones: Zone[]
+	zones: Zone[]
 	collections: Collection[]
 	slayers: SlayerData
 }
@@ -44,8 +44,8 @@ export async function cleanSkyBlockProfileMemberResponseBasic(member: any): Prom
 	return {
 		uuid: member.uuid,
 		username: player.username,
-		last_save: member.last_save / 1000,
-		first_join: member.first_join / 1000,
+		lastSave: member.last_save,
+		firstJoin: member.first_join,
 		rank: player.rank
 	}
 }
@@ -65,8 +65,8 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
 	return {
 		uuid: member.uuid,
 		username: player.username,
-		last_save: member.last_save / 1000,
-		first_join: member.first_join / 1000,
+		lastSave: member.last_save,
+		firstJoin: member.first_join,
 		rank: player.rank,
 
 		purse: member.coin_purse,
@@ -77,11 +77,11 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
 		rawHypixelStats: member.stats ?? {},
 
 		minions: await cleanMinions(member),
-		fairy_souls: fairySouls,
+		fairySouls: fairySouls,
 		inventories: inventoriesIncluded ? await cleanInventories(member) : undefined,
 		objectives: cleanObjectives(member),
 		skills: await cleanSkills(member),
-		visited_zones: await cleanVisitedZones(member),
+		zones: await cleanVisitedZones(member),
 		collections: cleanCollections(member),
 		slayers: cleanSlayers(member)
 	}
@@ -91,20 +91,19 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
 export interface CleanMemberProfilePlayer extends CleanPlayer {
 	// The profile name may be different for each player, so we put it here
 	profileName: string
-	first_join: number
-	last_save: number
-	bank?: Bank
-	purse?: number
-	stats?: StatItem[]
-	rawHypixelStats?: { [key: string]: number }
-	minions?: CleanMinion[]
-	fairy_souls?: FairySouls
+	firstJoin: number
+	lastSave: number
+	purse: number
+	stats: StatItem[]
+	rawHypixelStats: { [key: string]: number }
+	minions: CleanMinion[]
+	fairySouls: FairySouls
 	inventories?: Inventories
-	objectives?: Objective[]
-	skills?: Skill[]
-	visited_zones?: Zone[]
-	collections?: Collection[]
-	slayers?: SlayerData
+	objectives: Objective[]
+	skills: Skill[]
+	zones: Zone[]
+	collections: Collection[]
+	slayers: SlayerData
 }
 
 export interface CleanMemberProfile {
