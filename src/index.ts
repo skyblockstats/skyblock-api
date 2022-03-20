@@ -46,7 +46,7 @@ app.get('/', async (req, res) => {
 		usernameCacheSize: usernameCache.keys().length,
 		basicProfilesCacheSize: basicProfilesCache.keys().length,
 		playerCacheSize: playerCache.keys().length,
-		basicPlayerCacheSize: basicPlayerCache.keys().length,
+		basicPlayerCacheSize: basicPlayerCache.size,
 		profileCacheSize: profileCache.keys().length,
 		profilesCacheSize: profilesCache.keys().length,
 		profileNameCacheSize: profileNameCache.keys().length,
