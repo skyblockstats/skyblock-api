@@ -167,11 +167,12 @@ export async function fetchMemberProfile(user: string, profile: string, customiz
 	if (!profileUuid) return null
 	if (!playerUuid) return null
 
-	const player = await cached.fetchPlayer(playerUuid)
+	const player: CleanPlayer | null = await cached.fetchPlayer(playerUuid)
 
 	if (!player) return null // this should never happen, but if it does just return null
 
-	const cleanProfile = await cached.fetchProfile(playerUuid, profileUuid) as CleanFullProfileBasicMembers
+	const cleanProfile = await cached.fetchProfile(playerUuid, profileUuid)
+	if (!cleanProfile) return null
 
 	const member = cleanProfile.members.find(m => m.uuid === playerUuid)
 	if (!member) return null // this should never happen, but if it does just return null
@@ -187,7 +188,10 @@ export async function fetchMemberProfile(user: string, profile: string, customiz
 		}
 	})
 
-	cleanProfile.members = simpleMembers
+	const cleanProfileBasicMembers: CleanFullProfileBasicMembers = {
+		...cleanProfile,
+		members: simpleMembers
+	}
 
 	let websiteAccount: WithId<AccountSchema> | null = null
 
@@ -203,7 +207,7 @@ export async function fetchMemberProfile(user: string, profile: string, customiz
 			// add all other data relating to the hypixel player, such as username, rank, etc
 			...player
 		},
-		profile: cleanProfile,
+		profile: cleanProfileBasicMembers,
 		customization: websiteAccount?.customization
 	}
 }

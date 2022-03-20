@@ -27,7 +27,7 @@ export interface CleanBasicMember {
 export interface CleanMember extends CleanBasicMember {
 	purse: number
 	stats: StatItem[]
-	rawHypixelStats?: { [key: string]: number }
+	rawHypixelStats: { [key: string]: number }
 	minions: CleanMinion[]
 	fairySouls: FairySouls
 	inventories?: Inventories
@@ -93,18 +93,17 @@ export interface CleanMemberProfilePlayer extends CleanPlayer {
 	profileName: string
 	firstJoin: number
 	lastSave: number
-	bank?: Bank
-	purse?: number
-	stats?: StatItem[]
-	rawHypixelStats?: { [key: string]: number }
-	minions?: CleanMinion[]
-	fairy_souls?: FairySouls
+	purse: number
+	stats: StatItem[]
+	rawHypixelStats: { [key: string]: number }
+	minions: CleanMinion[]
+	fairySouls: FairySouls
 	inventories?: Inventories
-	objectives?: Objective[]
-	skills?: Skill[]
-	visited_zones?: Zone[]
-	collections?: Collection[]
-	slayers?: SlayerData
+	objectives: Objective[]
+	skills: Skill[]
+	zones: Zone[]
+	collections: Collection[]
+	slayers: SlayerData
 }
 
 export interface CleanMemberProfile {
