@@ -81,7 +81,7 @@ type CollectionCategory = keyof typeof COLLECTIONS
 
 export interface Collection {
 	name: string
-	xp: number
+	amount: number
 	level: number
 	category: CollectionCategory
 }
@@ -127,7 +127,7 @@ export function cleanCollections(data: any): Collection[] {
 		if (collectionLevel !== undefined)
 			playerCollections.push({
 				name: collectionName,
-				xp: collectionXp,
+				amount: collectionXp,
 				level: collectionLevel,
 				category: collectionCategory
 			})

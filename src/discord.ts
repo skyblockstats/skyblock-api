@@ -15,6 +15,10 @@ export interface TokenResponse {
 	token_type: string
 }
 
+/**
+ * The information about the Discord user that's directly returned by the
+ * Discord API
+ */
 export interface DiscordUser {
 	id: string
 	username: string

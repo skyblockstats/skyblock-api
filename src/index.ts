@@ -1,4 +1,4 @@
-import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount, fetchServerStatus } from './database.js'
+import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount, fetchServerStatus, deleteSession } from './database.js'
 import { fetchElection, fetchMemberProfile, fetchUser } from './hypixel.js'
 import rateLimit from 'express-rate-limit'
 import * as constants from './constants.js'
@@ -30,6 +30,7 @@ app.use(limiter)
 app.use(express.json())
 app.use((req, res, next) => {
 	res.setHeader('Access-Control-Allow-Origin', '*')
+	res.setHeader('Access-Control-Allow-Headers', '*')
 	next()
 })
 
@@ -108,7 +109,7 @@ app.get('/player/:user/:profile/leaderboards', async (req, res) => {
 	}
 })
 
-app.get('/leaderboard/:name', async (req, res) => {
+app.get('/leaderboards/:name', async (req, res) => {
 	try {
 		res.json(
 			await fetchLeaderboard(req.params.name)
@@ -155,15 +156,20 @@ app.get('/election', async (req, res) => {
 app.post('/accounts/createsession', async (req, res) => {
 	try {
 		const { code } = req.body
-		const codeExchange = await discord.exchangeCode(`${mainSiteUrl}/loggedin`, code)
+		const redirectUri = req.body.redirectUri ?? `${mainSiteUrl}/loggedin`
+
+		const codeExchange = await discord.exchangeCode(redirectUri, code)
 		if (!codeExchange) {
 			res.json({ ok: false, error: 'discord_client_secret isn\'t in env' })
 			return
 		}
 		const { access_token: accessToken, refresh_token: refreshToken } = codeExchange
-		if (!accessToken)
+		if (!accessToken) {
 			// access token is invalid :(
-			return res.json({ ok: false })
+			console.log('error exchanging code:', codeExchange, code)
+			const { error, error_description: errorDescription } = codeExchange as any
+			return res.json({ ok: false, error: error ? `Discord error: ${error}: ${errorDescription}` : 'Unknown error' })
+		}
 		const userData = await discord.getUser(accessToken)
 		const sessionId = await createSession(refreshToken, userData)
 		res.json({ ok: true, session_id: sessionId })
@@ -180,6 +186,18 @@ app.post('/accounts/session', async (req, res) => {
 			return res.json({ ok: false })
 		const account = await fetchAccountFromDiscord(session.discord_user.id)
 		res.json({ session, account })
+	} catch (err) {
+		console.error(err)
+		res.json({ ok: false })
+	}
+})
+
+app.delete('/accounts/session', async (req, res) => {
+	// delete a session
+	try {
+		const { uuid } = req.body
+		await deleteSession(uuid)
+		res.json({ ok: true })
 	} catch (err) {
 		console.error(err)
 		res.json({ ok: false })

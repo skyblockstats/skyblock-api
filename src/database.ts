@@ -35,14 +35,14 @@ interface DatabaseMemberLeaderboardItem {
 	uuid: string
 	profile: string
 	stats: any
-	last_updated: Date
+	lastUpdated: Date
 }
 interface DatabaseProfileLeaderboardItem {
 	uuid: string
 	/** An array of uuids for each player in the profile */
 	players: string[]
 	stats: any
-	last_updated: Date
+	lastUpdated: Date
 }
 
 
@@ -93,6 +93,7 @@ interface SessionSchema {
 export interface AccountCustomization {
 	backgroundUrl?: string
 	pack?: string
+	blurBackground?: boolean
 	emoji?: string
 }
 
@@ -110,10 +111,10 @@ let accountsCollection: Collection<AccountSchema>
 
 
 const leaderboardInfos: { [ leaderboardName: string ]: string } = {
-	highest_crit_damage: 'This leaderboard is capped at the integer limit because Hypixel, look at the <a href="/leaderboard/highest_critical_damage">highest critical damage leaderboard</a> instead.',
+	highest_crit_damage: 'This leaderboard is capped at the integer limit. Look at the <a href="/leaderboard/highest_critical_damage">highest critical damage leaderboard</a> instead.',
 	highest_critical_damage: 'uhhhhh yeah idk either',
-	leaderboards_count: 'This leaderboard counts how many leaderboards players are in the top 100 for.',
-	top_1_leaderboards_count: 'This leaderboard counts how many leaderboards players are #1 for.',
+	leaderboards_count: 'This leaderboard counts how many leaderboards a player is in the top 100 spot for.',
+	top_1_leaderboards_count: 'This leaderboard counts how many leaderboards a player is in the #1 spot for.',
 	skill_social: 'This leaderboard is inaccurate because Hypixel only shows social skill data on some API profiles.'
 }
 
@@ -140,7 +141,7 @@ function getMemberCollectionAttributes(member: CleanMember): StringNumber {
 	const collectionAttributes = {}
 	for (const collection of member.collections) {
 		const collectionLeaderboardName = `collection_${collection.name}`
-		collectionAttributes[collectionLeaderboardName] = collection.xp
+		collectionAttributes[collectionLeaderboardName] = collection.amount
 	}
 	return collectionAttributes
 }
@@ -161,10 +162,10 @@ function getMemberSlayerAttributes(member: CleanMember): StringNumber {
 	}
 
 	for (const slayer of member.slayers.bosses) {
-		slayerAttributes[`slayer_${slayer.raw_name}_total_xp`] = slayer.xp
-		slayerAttributes[`slayer_${slayer.raw_name}_total_kills`] = slayer.kills
+		slayerAttributes[`slayer_${slayer.rawName}_total_xp`] = slayer.xp
+		slayerAttributes[`slayer_${slayer.rawName}_total_kills`] = slayer.kills
 		for (const tier of slayer.tiers) {
-			slayerAttributes[`slayer_${slayer.raw_name}_${tier.tier}_kills`] = tier.kills
+			slayerAttributes[`slayer_${slayer.rawName}_${tier.tier}_kills`] = tier.kills
 		}
 	}
 
@@ -186,17 +187,17 @@ function getMemberLeaderboardAttributes(member: CleanMember): StringNumber {
 		// slayer leaderboards
 		...getMemberSlayerAttributes(member),
 
-		fairy_souls: member.fairy_souls.total,
-		first_join: member.first_join,
+		fairy_souls: member.fairySouls.total,
+		first_join: member.firstJoin,
 		purse: member.purse,
-		visited_zones: member.visited_zones.length,
+		visited_zones: member.zones.filter(z => z.visited).length,
 	}
 }
 
 function getProfileLeaderboardAttributes(profile: CleanFullProfile): StringNumber {
 	// if you want to add a new leaderboard for member attributes, add it here (and getAllLeaderboardAttributes)
 	return {
-		unique_minions: profile.minion_count
+		unique_minions: profile.minionCount
 	}
 }
 
@@ -617,8 +618,8 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 		await constants.addStats(Object.keys(member.rawHypixelStats))
 	await constants.addCollections(member.collections.map(coll => coll.name))
 	await constants.addSkills(member.skills.map(skill => skill.name))
-	await constants.addZones(member.visited_zones.map(zone => zone.name))
-	await constants.addSlayers(member.slayers.bosses.map(s => s.raw_name))
+	await constants.addZones(member.zones.map(zone => zone.name))
+	await constants.addSlayers(member.slayers.bosses.map(s => s.rawName))
 
 	if (debug) console.debug('done constants..')
 
@@ -803,6 +804,11 @@ export async function fetchSession(sessionId: string): Promise<WithId<SessionSch
 	return await sessionsCollection?.findOne({ _id: sessionId as any } )
 }
 
+
+export async function deleteSession(sessionId: string) {
+	return await sessionsCollection?.deleteOne({ _id: sessionId as any } )
+}
+
 export async function fetchAccount(minecraftUuid: string): Promise<WithId<AccountSchema> | null> {
 	return await accountsCollection?.findOne({ minecraftUuid })
 }
@@ -812,6 +818,16 @@ export async function fetchAccountFromDiscord(discordId: string): Promise<WithId
 }
 
 export async function updateAccount(discordId: string, schema: AccountSchema) {
+	if (schema.minecraftUuid) {
+		const existingAccount = await accountsCollection?.findOne({ minecraftUuid: schema.minecraftUuid })
+		// if the discord ids don't match, change the discord id of the existing account
+		if (existingAccount && existingAccount.discordId !== discordId) {
+			await accountsCollection?.updateOne(
+				{ minecraftUuid: schema.minecraftUuid },
+				{ '$set': { discordId } }
+			)
+		}
+	}
 	await accountsCollection?.updateOne({
 		discordId
 	}, { $set: schema }, { upsert: true })

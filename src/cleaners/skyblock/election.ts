@@ -15,10 +15,10 @@ export interface Candidate {
 }
 
 export interface ElectionData {
-	last_updated: number
+	lastUpdated: number
 	previous: {
 		year: number
-		winner: Candidate
+		winner: string
 		candidates: Candidate[]
 	}
 	current: {
@@ -42,7 +42,7 @@ function cleanCandidate(data: any, index: number): Candidate {
 export function cleanElectionResponse(data: any): ElectionData {
 	const previousCandidates = data.mayor.election.candidates.map(cleanCandidate)
 	return {
-		last_updated: data.lastUpdated / 1000,
+		lastUpdated: data.lastUpdated,
 		previous: {
 			year: data.mayor.election.year,
 			winner: data.mayor.name,
