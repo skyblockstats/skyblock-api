@@ -1,5 +1,5 @@
 export interface Bank {
-	balance: number
+	balance?: number
 	history: BankHistoryItem[]
 }
 
@@ -32,7 +32,7 @@ export function cleanBank(data: any): Bank {
 	history.reverse()
 
 	return {
-		balance: data?.banking?.balance ?? 0,
+		balance: data?.banking?.balance ? Math.round(data.banking.balance * 10) / 10 : undefined,
 		history
 	}
 }
