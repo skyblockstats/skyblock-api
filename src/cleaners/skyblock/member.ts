@@ -14,7 +14,6 @@ import * as constants from '../../constants.js'
 import { Included } from '../../hypixel.js'
 import { CleanPlayer } from '../player.js'
 import { CleanRank } from '../rank.js'
-import { Bank } from './bank.js'
 
 export interface CleanBasicMember {
 	uuid: string
@@ -22,6 +21,7 @@ export interface CleanBasicMember {
 	lastSave: number
 	firstJoin: number
 	rank: CleanRank
+	left?: boolean
 }
 
 export interface CleanMember extends CleanBasicMember {

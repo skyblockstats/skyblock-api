@@ -10,6 +10,7 @@ import * as mojang from './mojang.js'
 import NodeCache from 'node-cache'
 import { debug } from './index.js'
 import LRUCache from 'lru-cache'
+import { CleanBasicMember } from './cleaners/skyblock/member.js'
 
 // cache usernames for 30 minutes
 
@@ -233,7 +234,7 @@ export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanPr
 		const basicProfile: CleanProfile = {
 			name: profile.name,
 			uuid: profile.uuid,
-			members: profile.members?.map(m => {
+			members: profile.members?.map((m): CleanBasicMember => {
 				return {
 					uuid: m.uuid,
 					username: m.username,
