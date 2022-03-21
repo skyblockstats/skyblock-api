@@ -87,9 +87,10 @@ export interface CleanUser {
 
 
 /**
- * Higher level function that requests the api for a user, and returns the cleaned response
+ * Higher level function that requests the api for a user, and returns the
+ * cleaned response. This is used by the /player/<name> route.
  * This is safe to fetch many times because the results are cached!
- * @param included lets you choose what is returned, so there's less processing required on the backend
+ * @param included lets you choose what is returned, so there's less processing required on the backend.
  * used inclusions: player, profiles
  */
 export async function fetchUser({ user, uuid, username }: UserAny, included: Included[]=['player'], customization?: boolean): Promise<CleanUser | null> {
@@ -98,7 +99,7 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 		if (!username && !user) return null
 		uuid = await cached.uuidFromUser((user ?? username)!)
 	}
-	if (!uuid) {
+	if (!uuid) { 
 		// the user doesn't exist.
 		if (debug) console.debug('error:', user, 'doesnt exist')
 		return null
@@ -117,6 +118,7 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 		// if not including profiles, include lightweight profiles just in case
 		if (!includeProfiles)
 			basicProfilesData = playerData?.profiles
+		// we don't want the `profiles` field in `player`
 		if (playerData)
 			delete playerData.profiles
 	}
@@ -255,11 +257,11 @@ export async function fetchMemberProfile(user: string, profile: string, customiz
 
 
 export async function fetchMemberProfilesUncached(playerUuid: string): Promise<CleanFullProfile[]> {
-	const profiles: CleanFullProfile[] = await sendCleanApiRequest({
-		path: 'skyblock/profiles',
-		args: {
-			uuid: playerUuid
-		}},
+	const profiles: CleanFullProfile[] = await sendCleanApiRequest(
+		{
+			path: 'skyblock/profiles',
+			args: { uuid: playerUuid }
+		},
 		undefined,
 		{
 			// only the inventories for the main player are generated, this is for optimization purposes

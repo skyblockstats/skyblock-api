@@ -21,7 +21,6 @@ export function cleanPlayerSkyblockProfiles(rawProfiles: HypixelPlayerStatsSkyBl
 export async function cleanSkyblockProfilesResponse(data: any[]): Promise<CleanProfile[]> {
     const promises: Promise<CleanProfile | CleanFullProfile | null>[] = []
     for (const profile of data ?? []) {
-        // let cleanedProfile = await cleanSkyblockProfileResponseLighter(profile)
         promises.push(cleanSkyblockProfileResponse(profile))
     }
     const cleanedProfiles: CleanProfile[] = (await Promise.all(promises)).filter(p => p) as CleanProfile[]

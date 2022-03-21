@@ -2,7 +2,7 @@ import { cleanCollections, Collection } from './collections.js'
 import { cleanInventories, Inventories } from './inventory.js'
 import { cleanFairySouls, FairySouls } from './fairysouls.js'
 import { cleanObjectives, Objective } from './objectives.js'
-import { CleanFullProfileBasicMembers } from './profile.js'
+import { CleanBasicProfile, CleanFullProfileBasicMembers } from './profile.js'
 import { cleanProfileStats, StatItem } from './stats.js'
 import { CleanMinion, cleanMinions } from './minions.js'
 import { cleanSlayers, SlayerData } from './slayers.js'
@@ -36,6 +36,8 @@ export interface CleanMember extends CleanBasicMember {
 	zones: Zone[]
 	collections: Collection[]
 	slayers: SlayerData
+	/** Whether the user left the coop */
+	left: boolean
 }
 
 export async function cleanSkyBlockProfileMemberResponseBasic(member: any): Promise<CleanBasicMember | null> {
@@ -51,7 +53,7 @@ export async function cleanSkyBlockProfileMemberResponseBasic(member: any): Prom
 }
 
 /** Cleans up a member (from skyblock/profile) */
-export async function cleanSkyBlockProfileMemberResponse(member, included: Included[] | undefined = undefined): Promise<CleanMember | null> {
+export async function cleanSkyBlockProfileMemberResponse(member, profileId?: string, included: Included[] | undefined = undefined): Promise<CleanMember | null> {
 	// profiles.members[]
 	const inventoriesIncluded = included === undefined || included.includes('inventories')
 	const player = await cached.fetchPlayer(member.uuid)
@@ -83,7 +85,9 @@ export async function cleanSkyBlockProfileMemberResponse(member, included: Inclu
 		skills: await cleanSkills(member),
 		zones: await cleanVisitedZones(member),
 		collections: cleanCollections(member),
-		slayers: cleanSlayers(member)
+		slayers: cleanSlayers(member),
+
+		left: (player.profiles?.find(profile => profile.uuid === profileId) === undefined) ?? false
 	}
 }
 

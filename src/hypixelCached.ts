@@ -182,12 +182,16 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer | null> {
 
 	if (!cleanPlayer) return null
 
-	// clone in case it gets modified somehow later
 	playerCache.set(playerUuid, cleanPlayer)
 	usernameCache.set(playerUuid, cleanPlayer.username)
-
+	
+	// clone in case it gets modified somehow later
 	const cleanBasicPlayer = Object.assign({}, cleanPlayer)
-	delete cleanBasicPlayer.profiles
+	if (cleanBasicPlayer.profiles) {
+		// remove the names from the profiles so we only keep uuids
+		// this helps save a bit of memory since we don't care about the names
+		cleanBasicPlayer.profiles = cleanBasicPlayer.profiles.map(p => ({ uuid: p.uuid }))
+	}
 	basicPlayerCache.set(playerUuid, cleanBasicPlayer)
 
 	return cleanPlayer
@@ -220,7 +224,7 @@ export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanPr
 
 	if (debug) console.debug('Cache miss: fetchSkyblockProfiles', playerUuid)
 
-	const profiles: CleanProfile[] = await hypixel.fetchMemberProfilesUncached(playerUuid)
+	const profiles: CleanFullProfile[] = await hypixel.fetchMemberProfilesUncached(playerUuid)
 
 	const basicProfiles: CleanProfile[] = []
 
@@ -235,7 +239,8 @@ export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanPr
 					username: m.username,
 					firstJoin: m.firstJoin,
 					lastSave: m.lastSave,
-					rank: m.rank
+					rank: m.rank,
+					left: m.left
 				}
 			})
 		}

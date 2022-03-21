@@ -52,11 +52,15 @@ export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptio
     // We use Promise.all so it can fetch all the users at once instead of waiting for the previous promise to complete
     const promises: Promise<CleanMember | null>[] = []
     if (!data) return null
+
+    const profileId: string = data.profile_id
+
     for (const memberUUID in data.members) {
         const memberRaw = data.members[memberUUID]
         memberRaw.uuid = memberUUID
         promises.push(cleanSkyBlockProfileMemberResponse(
             memberRaw,
+            profileId,
             [
                 !options?.basic ? 'stats' : undefined,
                 options?.mainMemberUuid === memberUUID ? 'inventories' : undefined
@@ -64,11 +68,12 @@ export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptio
         ))
     }
 
-    const cleanedMembers: CleanMember[] = (await Promise.all(promises)).filter(m => m !== null && m !== undefined) as CleanMember[]
+
+    const cleanedMembers: CleanMember[] = (await Promise.all(promises)).filter(m => m) as CleanMember[]
 
     if (options?.basic) {
         return {
-            uuid: data.profile_id,
+            uuid: profileId,
             name: data.cute_name,
             members: cleanedMembers,
         }
