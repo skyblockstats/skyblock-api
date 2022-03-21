@@ -29,7 +29,7 @@ export function cleanBank(data: any): Bank {
 		}
 	}
 
-	history.reverse()
+	// history.reverse()
 
 	return {
 		balance: data?.banking?.balance ? Math.round(data.banking.balance * 10) / 10 : undefined,
