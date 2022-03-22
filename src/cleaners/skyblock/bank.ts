@@ -18,14 +18,14 @@ export function cleanBank(data: any): Bank {
 		// we go in reverse so we can simulate the bank transactions
 		for (const transaction of data.banking.transactions.sort((a, b) => b.timestamp - a.timestamp)) {
 			const change = transaction.action === 'DEPOSIT' ? transaction.amount : -transaction.amount
-			// since we're going in reverse, we remove from the total balance when adding to the history
-			bankBalance -= change
 			history.push({
 				change: Math.round(change * 10) / 10,
 				total: Math.round(bankBalance * 10) / 10,
 				timestamp: transaction.timestamp,
 				name: transaction.initiator_name,
 			})
+			// since we're going in reverse, we remove from the total balance when adding to the history
+			bankBalance -= change
 		}
 	}
 
