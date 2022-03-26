@@ -1,3 +1,6 @@
+import typedHypixelApi from 'typed-hypixel-api'
+
+
 const candidateColors = [
 	'4', 'a', '3', 'e', '5',
 ]
@@ -27,7 +30,10 @@ export interface ElectionData {
 	} | null
 }
 
-function cleanCandidate(data: any, index: number): Candidate {
+function cleanCandidate(
+	data: typedHypixelApi.Candidate & { votes: number },
+	index: number
+): Candidate {
 	return {
 		name: data.name,
 		perks: data.perks.map(perk => ({
@@ -39,7 +45,7 @@ function cleanCandidate(data: any, index: number): Candidate {
 	}
 }
 
-export async function cleanElectionResponse(data: any): Promise<ElectionData> {
+export async function cleanElectionResponse(data: typedHypixelApi.SkyBlockElectionResponse): Promise<ElectionData> {
 	const previousCandidates = data.mayor.election.candidates.map(cleanCandidate)
 	return {
 		lastUpdated: data.lastUpdated,

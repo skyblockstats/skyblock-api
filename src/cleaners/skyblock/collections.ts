@@ -1,4 +1,5 @@
 import { cleanItemId, hypixelItemNames } from './itemId.js'
+import typedHypixelApi from 'typed-hypixel-api'
 
 const COLLECTIONS = {
 	'farming': [
@@ -95,14 +96,14 @@ function getCategory(collectionName): CollectionCategory | undefined {
 	}
 }
 
-export function cleanCollections(data: any): Collection[] {
+export function cleanCollections(data: typedHypixelApi.SkyBlockProfileMember): Collection[] {
 	// collection tiers show up like this: [ GRAVEL_3, GOLD_INGOT_2, MELON_-1, LOG_2:1_7, RAW_FISH:3_-1]
 	// these tiers are the same for all players in a coop
 	const playerCollectionTiersRaw: string[] = data?.unlocked_coll_tiers ?? []
-	const playerCollectionTiers: { [ key: string ]: number } = {}
+	const playerCollectionTiers: { [key: string]: number } = {}
 
 	for (const collectionTierNameValueRaw of playerCollectionTiersRaw) {
-		const [ collectionTierNameRaw, collectionTierValueRaw ] = collectionTierNameValueRaw.split(/_(?=-?\d+$)/)
+		const [collectionTierNameRaw, collectionTierValueRaw] = collectionTierNameValueRaw.split(/_(?=-?\d+$)/)
 		const collectionName = cleanItemId(collectionTierNameRaw)
 		// ensure it's at least 0
 		const collectionValue: number = Math.max(parseInt(collectionTierValueRaw), 0)
@@ -114,9 +115,9 @@ export function cleanCollections(data: any): Collection[] {
 
 	// collection names show up like this: { LOG: 49789, LOG:2: 26219, MUSHROOM_COLLECTION: 2923}
 	// these values are different for each player in a coop
-	const playerCollectionXpsRaw: { [ key in hypixelItemNames ]: number } = data?.collection ?? {}
+	const playerCollectionXpsRaw: { [key in hypixelItemNames]?: number } = data?.collection ?? {}
 	const playerCollections: Collection[] = []
-	
+
 	for (const collectionNameRaw in playerCollectionXpsRaw) {
 		const collectionXp: number = playerCollectionXpsRaw[collectionNameRaw]
 		const collectionName = cleanItemId(collectionNameRaw)

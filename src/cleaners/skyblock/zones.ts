@@ -1,3 +1,4 @@
+import typedHypixelApi from 'typed-hypixel-api'
 import * as constants from '../../constants.js'
 
 export interface Zone {
@@ -6,7 +7,7 @@ export interface Zone {
 }
 
 
-export async function cleanVisitedZones(data: any): Promise<Zone[]> {
+export async function cleanVisitedZones(data: typedHypixelApi.SkyBlockProfileMember): Promise<Zone[]> {
 	const rawZones = data?.visited_zones || []
 	// TODO: store all the zones that exist in SkyBlock, add add those to the array with visited being false
 	const zones: Zone[] = []
@@ -19,7 +20,7 @@ export async function cleanVisitedZones(data: any): Promise<Zone[]> {
 			visited: rawZones.includes(rawZoneName)
 		})
 	}
-	
+
 	// if this user somehow has a zone that we don't know about, just add it to zones
 	for (const rawZoneName of rawZones) {
 		if (!knownZones.includes(rawZoneName)) {

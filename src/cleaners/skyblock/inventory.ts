@@ -1,5 +1,6 @@
-// maybe todo?: create a fast replacement for prismarine-nbt
+import typedHypixelApi from 'typed-hypixel-api'
 import * as nbt from 'prismarine-nbt'
+
 
 function base64decode(base64: string): Buffer {
 	return Buffer.from(base64, 'base64')
@@ -19,7 +20,7 @@ interface Item {
 	reforge?: string
 	anvilUses?: number
 	timestamp?: string
-	enchantments?: { [ name: string ]: number }
+	enchantments?: { [name: string]: number }
 
 	headTexture?: string
 }
@@ -98,9 +99,9 @@ export const INVENTORIES = {
 	personal_vault: 'personal_vault_contents'
 }
 
-export type Inventories = { [name in keyof typeof INVENTORIES ]: Item[] }
+export type Inventories = { [name in keyof typeof INVENTORIES]: Item[] }
 
-export async function cleanInventories(data: any): Promise<Inventories> {
+export async function cleanInventories(data: typedHypixelApi.SkyBlockProfileMember): Promise<Inventories> {
 	const cleanInventories: any = {}
 	for (const cleanInventoryName in INVENTORIES) {
 		const hypixelInventoryName = INVENTORIES[cleanInventoryName]

@@ -1,4 +1,7 @@
-const statCategories: { [ key: string ]: string[] | null } = { // sorted in order of importance
+import typedHypixelApi from 'typed-hypixel-api'
+
+
+const statCategories: { [key: string]: string[] | null } = { // sorted in order of importance
 	'deaths': ['deaths_', 'deaths'],
 	'kills': ['kills_', 'kills'],
 	'fishing': ['items_fished_', 'items_fished', 'shredder_'],
@@ -76,7 +79,7 @@ export interface StatItem {
 }
 
 export function getStatUnit(name: string): string | null {
-	for (const [ unitName, statMatchers ] of Object.entries(statUnits)) {
+	for (const [unitName, statMatchers] of Object.entries(statUnits)) {
 		for (const statMatch of statMatchers) {
 			let trailingEnd = statMatch[0] === '_'
 			let trailingStart = statMatch.substr(-1) === '_'
@@ -92,7 +95,7 @@ export function getStatUnit(name: string): string | null {
 }
 
 
-export function cleanProfileStats(data: any): StatItem[] {
+export function cleanProfileStats(data: typedHypixelApi.SkyBlockProfileMember): StatItem[] {
 	// TODO: add type for statsRaw (probably in hypixelApi.ts since its coming from there)
 	const stats: StatItem[] = []
 

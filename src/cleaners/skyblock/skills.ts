@@ -1,4 +1,4 @@
-import { fetchSkillXp, fetchSkillXpEasier } from '../../constants.js'
+import typedHypixelApi from 'typed-hypixel-api'
 
 export interface Skill {
 	name: string
@@ -13,7 +13,7 @@ export interface Skill {
 
 // the highest level you can have in each skill
 // numbers taken from https://hypixel-skyblock.fandom.com/wiki/Skills
-const skillsMaxLevel: { [ key: string ]: number } = {
+const skillsMaxLevel: { [key: string]: number } = {
 	farming: 60,
 	mining: 60,
 	combat: 60,
@@ -89,8 +89,8 @@ const skillXpTable = [
 	97972425,
 	104672425,
 	111672425 // 60
-  ]
-  
+]
+
 
 const skillXpTableEasier = [
 	50,  // 1
@@ -135,14 +135,14 @@ export function levelForSkillXp(xp: number, maxLevel: number) {
 	return skillLevel === -1 ? 0 : xpTable.length - skillLevel
 }
 
-export async function cleanSkills(data: any): Promise<Skill[]> {
+export async function cleanSkills(data: typedHypixelApi.SkyBlockProfileMember): Promise<Skill[]> {
 	const skills: Skill[] = []
 	for (const item in data) {
 		if (item.startsWith('experience_skill_')) {
-			const skillName = item.substr('experience_skill_'.length)
+			const skillName = item.slice('experience_skill_'.length)
 
 			// the amount of total xp you have in this skill
-			const skillXp = data[item]
+			const skillXp: number = data[item]
 
 			const skillMaxLevel = skillsMaxLevel[skillName] ?? skillsDefaultMaxLevel
 

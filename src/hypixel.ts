@@ -54,16 +54,21 @@ export async function sendCleanApiRequest<P extends keyof typeof cleanResponseFu
 
 const cleanResponseFunctions = {
 	'player': (data, options) => cleanPlayerResponse(data.player),
-	'skyblock/profile': (data, options) => cleanSkyblockProfileResponse(data.profile, options),
+	'skyblock/profile': (data: typedHypixelApi.SkyBlockProfileResponse, options) => cleanSkyblockProfileResponse(data.profile, options),
 	'skyblock/profiles': (data, options) => cleanSkyblockProfilesResponse(data.profiles),
 	'resources/skyblock/election': (data, options) => cleanElectionResponse(data)
 } as const
 
 
-async function cleanResponse<P extends keyof typeof cleanResponseFunctions>(path: P, data: typedHypixelApi.Requests[P]['response'], options: ApiOptions): Promise<Awaited<ReturnType<typeof cleanResponseFunctions[P]>>> {
+async function cleanResponse<P extends keyof typeof cleanResponseFunctions>(
+	path: P,
+	data: typedHypixelApi.Requests[P]['response'],
+	options: ApiOptions
+): Promise<Awaited<ReturnType<typeof cleanResponseFunctions[P]>>> {
 	// Cleans up an api response
 	const cleaningFunction: typeof cleanResponseFunctions[P] = cleanResponseFunctions[path]
-	const cleanedData = await cleaningFunction(data, options)
+	// we do `as any` because typescript unfortunately doesn't know which path it is
+	const cleanedData = await cleaningFunction(data as any, options)
 	return cleanedData as Awaited<ReturnType<typeof cleanResponseFunctions[P]>>
 }
 

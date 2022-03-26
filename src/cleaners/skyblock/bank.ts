@@ -1,3 +1,6 @@
+import typedHypixelApi from 'typed-hypixel-api'
+
+
 export interface Bank {
 	balance?: number
 	history: BankHistoryItem[]
@@ -10,7 +13,7 @@ export interface BankHistoryItem {
 	name: string
 }
 
-export function cleanBank(data: any): Bank {
+export function cleanBank(data: typedHypixelApi.SkyBlockProfile): Bank {
 	let history: BankHistoryItem[] = []
 
 	if (data?.banking?.transactions) {

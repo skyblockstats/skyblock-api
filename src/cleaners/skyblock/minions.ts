@@ -1,5 +1,6 @@
-import { maxMinion } from '../../hypixel.js'
+import typedHypixelApi from 'typed-hypixel-api'
 import * as constants from '../../constants.js'
+import { maxMinion } from '../../hypixel.js'
 
 export interface CleanMinion {
     name: string,
@@ -11,7 +12,7 @@ export interface CleanMinion {
  * Clean the minions provided by Hypixel
  * @param minionsRaw The minion data provided by the Hypixel API
  */
-export async function cleanMinions(member: any): Promise<CleanMinion[]> {
+export async function cleanMinions(member: typedHypixelApi.SkyBlockProfileMember): Promise<CleanMinion[]> {
     const minions: CleanMinion[] = []
     const processedMinionNames: Set<string> = new Set()
 

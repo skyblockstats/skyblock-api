@@ -1,4 +1,4 @@
-import { PlayerDataResponse as HypixelApiPlayerDataResponse } from 'typed-hypixel-api/build/responses/player'
+import typedHypixelApi from 'typed-hypixel-api'
 import { colorCodeFromName, minecraftColorCodes } from '../util.js'
 
 const rankColors: { [name: string]: string } = {
@@ -29,7 +29,7 @@ export function cleanRank({
 	rankPlusColor,
 	rank,
 	prefix
-}: HypixelApiPlayerDataResponse['player']): CleanRank {
+}: typedHypixelApi.PlayerDataResponse['player']): CleanRank {
 	let name: string | undefined
 	let color: string
 	let colored: string

@@ -1,3 +1,4 @@
+import typedHypixelApi from 'typed-hypixel-api'
 import * as constants from '../../constants.js'
 
 export interface FairySouls {
@@ -9,7 +10,7 @@ export interface FairySouls {
 	max: number
 }
 
-export async function cleanFairySouls(data: any): Promise<FairySouls> {
+export async function cleanFairySouls(data: typedHypixelApi.SkyBlockProfileMember): Promise<FairySouls> {
 	const { max_fairy_souls } = await constants.fetchConstantValues()
 	return {
 		total: data?.fairy_souls_collected ?? 0,

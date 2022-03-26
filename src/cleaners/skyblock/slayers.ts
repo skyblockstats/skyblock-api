@@ -1,3 +1,5 @@
+import typedHypixelApi from 'typed-hypixel-api'
+
 export const slayerLevels = 5
 
 const SLAYER_NAMES = {
@@ -29,7 +31,7 @@ export interface SlayerData {
 	bosses: Slayer[]
 }
 
-export function cleanSlayers(data: any): SlayerData {
+export function cleanSlayers(data: typedHypixelApi.SkyBlockProfileMember): SlayerData {
 	const slayers: Slayer[] = []
 
 	const slayersDataRaw = data?.slayer_bosses
