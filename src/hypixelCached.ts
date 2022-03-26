@@ -174,10 +174,9 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer | null> {
 
 	fetchingPlayers.add(playerUuid)
 
-	const cleanPlayer: CleanPlayer = await hypixel.sendCleanApiRequest({
-		path: 'player',
-		args: { uuid: playerUuid }
-	})
+	const cleanPlayer = await hypixel.sendCleanApiRequest('player',
+		{ uuid: playerUuid }
+	)
 
 	fetchingPlayers.delete(playerUuid)
 
@@ -185,7 +184,7 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer | null> {
 
 	playerCache.set(playerUuid, cleanPlayer)
 	usernameCache.set(playerUuid, cleanPlayer.username)
-	
+
 	// clone in case it gets modified somehow later
 	const cleanBasicPlayer = Object.assign({}, cleanPlayer)
 	if (cleanBasicPlayer.profiles) {
@@ -335,7 +334,8 @@ export async function fetchProfile(user: string, profile: string): Promise<Clean
 
 	if (!profileName) return null // uhh this should never happen but if it does just return null
 
-	const cleanProfile: CleanFullProfile = await hypixel.fetchMemberProfileUncached(playerUuid, profileUuid)
+	const cleanProfile = await hypixel.fetchMemberProfileUncached(playerUuid, profileUuid)
+	if (!cleanProfile) return null
 
 	// we know the name from fetchProfileName, so set it here
 	cleanProfile.name = profileName
@@ -349,12 +349,12 @@ export async function fetchProfile(user: string, profile: string): Promise<Clean
  * Fetch a CleanProfile from the uuid
  * @param profileUuid A profile name or profile uuid
 */
-export async function fetchBasicProfileFromUuid(profileUuid: string): Promise<CleanProfile | undefined> {
+export async function fetchBasicProfileFromUuid(profileUuid: string): Promise<CleanProfile | null> {
 	if (profileCache.has(profileUuid)) {
 		// we have the profile cached, return it :)
 		if (debug) console.debug('Cache hit! fetchBasicProfileFromUuid', profileUuid)
 		const profile: CleanFullProfile | undefined = profileCache.get(profileUuid)
-		if (!profile) return undefined
+		if (!profile) return null
 		return {
 			uuid: profile.uuid,
 			members: profile.members.map(m => ({

@@ -16,15 +16,15 @@ import {
 	queueUpdateDatabaseMember,
 	queueUpdateDatabaseProfile
 } from './database.js'
+import { cleanElectionResponse, ElectionData } from './cleaners/skyblock/election.js'
 import { CleanBasicMember, CleanMemberProfile } from './cleaners/skyblock/member.js'
-import { chooseApiKey, HypixelResponse, sendApiRequest } from './hypixelApi.js'
 import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles.js'
 import { CleanPlayer, cleanPlayerResponse } from './cleaners/player.js'
+import { chooseApiKey, sendApiRequest } from './hypixelApi.js'
+import typedHypixelApi from 'typed-hypixel-api'
 import * as cached from './hypixelCached.js'
 import { debug } from './index.js'
-import { sleep } from './util.js'
 import { WithId } from 'mongodb'
-import { cleanElectionResponse, ElectionData } from './cleaners/skyblock/election.js'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories' | undefined
 
@@ -36,7 +36,7 @@ export const maxMinion = 11
 
 /**
  *  Send a request to api.hypixel.net using a random key, clean it up to be more useable, and return it 
- */ 
+ */
 
 export interface ApiOptions {
 	mainMemberUuid?: string
@@ -45,29 +45,28 @@ export interface ApiOptions {
 }
 
 /** Sends an API request to Hypixel and cleans it up. */
-export async function sendCleanApiRequest({ path, args }, included?: Included[], options?: ApiOptions): Promise<any> {
+export async function sendCleanApiRequest<P extends keyof typeof cleanResponseFunctions>(path: P, args: Omit<typedHypixelApi.Requests[P]['options'], 'key'>, options?: ApiOptions): Promise<Awaited<ReturnType<typeof cleanResponseFunctions[P]>>> {
 	const key = await chooseApiKey()
-	const rawResponse = await sendApiRequest({ path, key, args })
-	if (rawResponse.throttled) {
-		// if it's throttled, wait a second and try again
-		await sleep(1000)
-		return await sendCleanApiRequest({ path, args }, included, options)
-	}
+	const data = await sendApiRequest(path, { key, ...args })
 	// clean the response
-	return await cleanResponse({ path, data: rawResponse }, options ?? {})
+	return await cleanResponse(path, data, options ?? {})
 }
 
+const cleanResponseFunctions = {
+	'player': (data, options) => cleanPlayerResponse(data.player),
+	'skyblock/profile': (data, options) => cleanSkyblockProfileResponse(data.profile, options),
+	'skyblock/profiles': (data, options) => cleanSkyblockProfilesResponse(data.profiles),
+	'resources/skyblock/election': (data, options) => cleanElectionResponse(data)
+} as const
 
 
-async function cleanResponse({ path, data }: { path: string, data: HypixelResponse }, options: ApiOptions): Promise<any> {
+async function cleanResponse<P extends keyof typeof cleanResponseFunctions>(path: P, data: typedHypixelApi.Requests[P]['response'], options: ApiOptions): Promise<Awaited<ReturnType<typeof cleanResponseFunctions[P]>>> {
 	// Cleans up an api response
-	switch (path) {
-		case 'player': return await cleanPlayerResponse(data.player)
-		case 'skyblock/profile': return await cleanSkyblockProfileResponse(data.profile, options)
-		case 'skyblock/profiles': return await cleanSkyblockProfilesResponse(data.profiles)
-		case 'resources/skyblock/election': return await cleanElectionResponse(data)
-	}
+	const cleaningFunction: typeof cleanResponseFunctions[P] = cleanResponseFunctions[path]
+	const cleanedData = await cleaningFunction(data, options)
+	return cleanedData as Awaited<ReturnType<typeof cleanResponseFunctions[P]>>
 }
+
 
 /* ----------------------------- */
 
@@ -93,13 +92,13 @@ export interface CleanUser {
  * @param included lets you choose what is returned, so there's less processing required on the backend.
  * used inclusions: player, profiles
  */
-export async function fetchUser({ user, uuid, username }: UserAny, included: Included[]=['player'], customization?: boolean): Promise<CleanUser | null> {
+export async function fetchUser({ user, uuid, username }: UserAny, included: Included[] = ['player'], customization?: boolean): Promise<CleanUser | null> {
 	if (!uuid) {
 		// If the uuid isn't provided, get it
 		if (!username && !user) return null
 		uuid = await cached.uuidFromUser((user ?? username)!)
 	}
-	if (!uuid) { 
+	if (!uuid) {
 		// the user doesn't exist.
 		if (debug) console.debug('error:', user, 'doesnt exist')
 		return null
@@ -146,7 +145,7 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 		player: playerData,
 		profiles: profilesData ?? basicProfilesData,
 		activeProfile: includeProfiles ? activeProfile!?.uuid : undefined,
-		online: includeProfiles ? lastOnline > (Date.now() - saveInterval): undefined,
+		online: includeProfiles ? lastOnline > (Date.now() - saveInterval) : undefined,
 		customization: websiteAccount?.customization
 	}
 }
@@ -219,19 +218,20 @@ export async function fetchMemberProfile(user: string, profile: string, customiz
  * @param playerUuid The UUID of the Minecraft player
  * @param profileUuid The UUID of the Hypixel SkyBlock profile
  */
- export async function fetchMemberProfileUncached(playerUuid: string, profileUuid: string): Promise<CleanFullProfile> {
-	const profile: CleanFullProfile = await sendCleanApiRequest(
-		{
-			path: 'skyblock/profile',
-			args: { profile: profileUuid }
-		},
-		undefined,
+export async function fetchMemberProfileUncached(playerUuid: string, profileUuid: string): Promise<null | CleanFullProfile> {
+	const profile = await sendCleanApiRequest(
+		'skyblock/profile',
+		{ profile: profileUuid },
 		{ mainMemberUuid: playerUuid }
 	)
 
+	// we check for minions in profile to filter out the CleanProfile type (as opposed to CleanFullProfile)
+	if (!profile || !('minions' in profile)) return null
+
 	// queue updating the leaderboard positions for the member, eventually
-	for (const member of profile.members)
-		queueUpdateDatabaseMember(member, profile)
+	if (profile.members)
+		for (const member of profile.members)
+			queueUpdateDatabaseMember(member, profile)
 	queueUpdateDatabaseProfile(profile)
 
 	return profile
@@ -242,13 +242,10 @@ export async function fetchMemberProfile(user: string, profile: string, customiz
  * @param playerUuid The UUID of the Minecraft player
  * @param profileUuid The UUID of the Hypixel SkyBlock profile
  */
- export async function fetchBasicProfileFromUuidUncached(profileUuid: string): Promise<CleanProfile> {
-	const profile: CleanFullProfile = await sendCleanApiRequest(
-		{
-			path: 'skyblock/profile',
-			args: { profile: profileUuid }
-		},
-		undefined,
+export async function fetchBasicProfileFromUuidUncached(profileUuid: string): Promise<CleanProfile | null> {
+	const profile = await sendCleanApiRequest(
+		'skyblock/profile',
+		{ profile: profileUuid },
 		{ basic: true }
 	)
 
@@ -258,11 +255,8 @@ export async function fetchMemberProfile(user: string, profile: string, customiz
 
 export async function fetchMemberProfilesUncached(playerUuid: string): Promise<CleanFullProfile[]> {
 	const profiles: CleanFullProfile[] = await sendCleanApiRequest(
-		{
-			path: 'skyblock/profiles',
-			args: { uuid: playerUuid }
-		},
-		undefined,
+		'skyblock/profiles',
+		{ uuid: playerUuid },
 		{
 			// only the inventories for the main player are generated, this is for optimization purposes
 			mainMemberUuid: playerUuid
@@ -299,10 +293,10 @@ export async function fetchElection(): Promise<ElectionData> {
 	}
 
 	isFetchingElection = true
-	const election: ElectionData = await sendCleanApiRequest({
-		path: 'resources/skyblock/election',
-		args: {}
-	})
+	const election: ElectionData = await sendCleanApiRequest(
+		'resources/skyblock/election',
+		{}
+	)
 	isFetchingElection = false
 
 	cachedElectionData = election

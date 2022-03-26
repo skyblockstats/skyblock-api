@@ -1,8 +1,9 @@
+import { ProfileMember as HypixelApiProfileMember } from 'typed-hypixel-api/build/responses/skyblock/_profile_member'
 import { cleanCollections, Collection } from './collections.js'
 import { cleanInventories, Inventories } from './inventory.js'
 import { cleanFairySouls, FairySouls } from './fairysouls.js'
 import { cleanObjectives, Objective } from './objectives.js'
-import { CleanBasicProfile, CleanFullProfileBasicMembers } from './profile.js'
+import { CleanFullProfileBasicMembers } from './profile.js'
 import { cleanProfileStats, StatItem } from './stats.js'
 import { CleanMinion, cleanMinions } from './minions.js'
 import { cleanSlayers, SlayerData } from './slayers.js'
@@ -53,7 +54,7 @@ export async function cleanSkyBlockProfileMemberResponseBasic(member: any): Prom
 }
 
 /** Cleans up a member (from skyblock/profile) */
-export async function cleanSkyBlockProfileMemberResponse(member, profileId?: string, included: Included[] | undefined = undefined): Promise<CleanMember | null> {
+export async function cleanSkyBlockProfileMemberResponse(member: HypixelApiProfileMember & { uuid: string }, profileId?: string, included: Included[] | undefined = undefined): Promise<CleanMember | null> {
 	// profiles.members[]
 	const inventoriesIncluded = included === undefined || included.includes('inventories')
 	const player = await cached.fetchPlayer(member.uuid)

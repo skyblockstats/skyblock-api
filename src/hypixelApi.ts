@@ -1,22 +1,16 @@
 /**
  * Fetch the raw Hypixel API
  */
-import { jsonToQuery, shuffle, sleep } from './util.js'
-import * as nodeFetch from 'node-fetch'
-import fetch from 'node-fetch'
+import {  shuffle, sleep } from './util.js'
+import typedHypixelApi from 'typed-hypixel-api'
 import { Agent } from 'https'
 
 if (!process.env.hypixel_keys)
 	// if there's no hypixel keys in env, run dotenv
 	(await import('dotenv')).config()
 
-// We need to create an agent to prevent memory leaks and to only do dns lookups once
-const httpsAgent = new Agent({
-	keepAlive: true
-})
 
-
-/** This array should only ever contain one item because using multiple hypixel api keys isn't allowed :) */ 
+/** This array should only ever contain one item because using multiple hypixel api keys isn't allowed :) */
 const apiKeys = process.env?.hypixel_keys?.split(' ') ?? []
 
 interface KeyUsage {
@@ -25,11 +19,9 @@ interface KeyUsage {
 	reset: number
 }
 
-const apiKeyUsage: { [ key: string ]: KeyUsage } = {}
+const apiKeyUsage: { [key: string]: KeyUsage } = {}
 // the usage amount the api key was on right before it reset
-const apiKeyMaxUsage: { [ key: string ]: number } = {}
-
-const baseHypixelAPI = 'https://api.hypixel.net'
+const apiKeyMaxUsage: { [key: string]: number } = {}
 
 
 /** Choose the best current API key */
@@ -77,14 +69,14 @@ export function getKeyUsage() {
 
 export interface HypixelResponse {
 	[key: string]: any | {
-        success: boolean
-        throttled?: boolean
-    }
+		success: boolean
+		throttled?: boolean
+	}
 }
 
 
 export interface HypixelPlayerStatsSkyBlockProfiles {
-	[ uuid: string ]: {
+	[uuid: string]: {
 		profile_id: string
 		cute_name: string
 	}
@@ -103,111 +95,65 @@ export interface HypixelPlayerSocialMedia {
 	}
 }
 
-export interface HypixelPlayer {
-	_id: string
-	achievementsOneTime: string[]
-	displayname: string
 
-	firstLogin: number,
-	lastLogin: number,
-	lastLogout: number
-
-	knownAliases: string[],
-	knownAliasesLower: string[]
-
-	networkExp: number
-	playername: string
-	stats: {
-		SkyBlock: HypixelPlayerStatsSkyBlock
-		[ name: string ]: any
-	},
-	timePlaying: number,
-	uuid: string,
-	achievements: { [ name: string ]: number },
-	petConsumables: { [ name: string ]: number },
-	vanityMeta: {
-		packages: string[]
-	},
-
-	language: string,
-	userLanguage?: string
-
-	packageRank?: string
-	newPackageRank?: string
-	rankPlusColor?: string
-	monthlyPackageRank?: string
-	rank?: string
-	prefix?: string
-
-	claimed_potato_talisman?: number
-	skyblock_free_cookie?: number
-
-	socialMedia?: HypixelPlayerSocialMedia
-}
 
 /** Send an HTTP request to the Hypixel API */
-export let sendApiRequest = async function sendApiRequest({ path, key, args }): Promise<HypixelResponse> {
+export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(path: P, options: typedHypixelApi.Requests[P]['options']): Promise<typedHypixelApi.Requests[P]['response']> => {
 	// Send a raw http request to api.hypixel.net, and return the parsed json
 
-	if (key)
-		// If there's an api key, add it to the arguments
-		args.key = key
-
-	// Construct a url from the base api url, path, and arguments
-	const fetchUrl = baseHypixelAPI + '/' + path + '?' + jsonToQuery(args)
-
-	let fetchResponse: nodeFetch.Response
-	let fetchJsonParsed: any
-
+	let response: typedHypixelApi.Requests[P]['response']
 	try {
-		fetchResponse = await fetch(
-			fetchUrl,
-			{ agent: () => httpsAgent }
+		response = await typedHypixelApi.request(
+			path,
+			options
 		)
-		fetchJsonParsed = await fetchResponse.json()
 	} catch {
-		// if there's an error, wait a second and try again
 		await sleep(1000)
-		return await sendApiRequest({ path, key, args })
+		return await sendApiRequest(path, options)
 	}
 
-	// bruh
-	if (fetchJsonParsed.cause === 'This endpoint is currently disabled') {
-		await sleep(30000)
-		return await sendApiRequest({ path, key, args })
-	}
-
-	// if the cause is "Invalid API key", remove the key from the list of keys and try again
-	if (fetchJsonParsed.cause === 'Invalid API key') {
-		if (apiKeys.includes(key)) {
-			apiKeys.splice(apiKeys.indexOf(key), 1)
-			console.log(`${key} is invalid, removing it from the list of keys`)
+	if (!response.data.success) {
+		// bruh
+		if (response.data.cause === 'This endpoint is currently disabled') {
+			await sleep(30000)
+			return await sendApiRequest(path, options)
 		}
-		return await sendApiRequest({ path, key: chooseApiKey(), args })
+
+		// if the cause is "Invalid API key", remove the key from the list of keys and try again
+		if ('key' in options && response.data.cause === 'Invalid API key') {
+			if (apiKeys.includes(options.key)) {
+				apiKeys.splice(apiKeys.indexOf(options.key), 1)
+				console.log(`${options.key} is invalid, removing it from the list of keys`)
+			}
+			return await sendApiRequest(path, {
+				...options,
+				key: chooseApiKey()
+			})
+		}
 	}
 
-	if (fetchResponse.headers.get('ratelimit-limit')) {
+	if ('key' in options && response.headers['RateLimit-Limit']) {
 		// remember how many uses it has
-		apiKeyUsage[key] = {
-			remaining: parseInt(fetchResponse.headers.get('ratelimit-remaining') ?? '0'),
-			limit: parseInt(fetchResponse.headers.get('ratelimit-limit') ?? '0'),
-			reset: Date.now() + parseInt(fetchResponse.headers.get('ratelimit-reset') ?? '0') * 1000 + 1000,
+		apiKeyUsage[options.key] = {
+			remaining: response.headers['RateLimit-Remaining'] ?? 0,
+			limit: response.headers['Ratelimit-Limit'] ?? 0,
+			reset: Date.now() + response.headers['Ratelimit-Reset'] ?? 0 * 1000 + 1000,
 		}
 
-		let usage = apiKeyUsage[key].limit - apiKeyUsage[key].remaining
+		let usage = apiKeyUsage[options.key].limit - apiKeyUsage[options.key].remaining
 		// if it's not in apiKeyMaxUsage or this usage is higher, update it
-		if (!apiKeyMaxUsage[key] || (usage > apiKeyMaxUsage[key]))
-			apiKeyMaxUsage[key] = usage
+		if (!apiKeyMaxUsage[options.key] || (usage > apiKeyMaxUsage[options.key]))
+			apiKeyMaxUsage[options.key] = usage
 	}
-	
-	if (fetchJsonParsed.throttle) {
-		if (apiKeyUsage[key])
-			apiKeyUsage[key].remaining = 0
+
+	if ('key' in options && !response.data.success && 'throttle' in response.data && response.data.throttle) {
+		if (apiKeyUsage[options.key])
+			apiKeyUsage[options.key].remaining = 0
 		// if it's throttled, wait 10 seconds and try again
 		await sleep(10000)
-		return await sendApiRequest({ path, key, args })
+		return await sendApiRequest(path, options)
 	}
-	return fetchJsonParsed
+	return response
 }
 
 // this is necessary for mocking in the tests because es6

@@ -1,7 +1,7 @@
+import { PlayerDataResponse as HypixelApiPlayerDataResponse } from 'typed-hypixel-api/build/responses/player'
 import { colorCodeFromName, minecraftColorCodes } from '../util.js'
-import { HypixelPlayer } from '../hypixelApi.js'
 
-const rankColors: { [ name: string ]: string } = {
+const rankColors: { [name: string]: string } = {
 	'NONE': '7',
 	'VIP': 'a',
 	'VIP+': 'a',
@@ -29,7 +29,7 @@ export function cleanRank({
 	rankPlusColor,
 	rank,
 	prefix
-}: HypixelPlayer): CleanRank {
+}: HypixelApiPlayerDataResponse['player']): CleanRank {
 	let name: string | undefined
 	let color: string
 	let colored: string
@@ -48,7 +48,7 @@ export function cleanRank({
 				?? packageRank?.replace('_PLUS', '+')
 
 		switch (name) {
-   		// MVP++ is called Superstar for some reason
+			// MVP++ is called Superstar for some reason
 			case 'SUPERSTAR':
 				name = 'MVP++'
 				break
@@ -87,7 +87,7 @@ export function cleanRank({
 			if (bracketColor)
 				colored = `§${bracketColor}[${rankColorPrefix}${name}§${bracketColor}]`
 			else
-			colored = `${rankColorPrefix}[${name}]`
+				colored = `${rankColorPrefix}[${name}]`
 		else
 			// nons don't have a prefix
 			colored = `${rankColorPrefix}`

@@ -4,6 +4,7 @@
 
 globalThis.isTest = true
 
+import typedHypixelApi from 'typed-hypixel-api'
 import * as hypixelApi from '../src/hypixelApi'
 import * as constants from '../src/constants'
 import * as mojang from '../src/mojang'
@@ -24,11 +25,10 @@ async function writeTestData(requestPath: string, name: string, contents: any) {
 	await fs.writeFile(path.join(dir, `${name}.json`), JSON.stringify(contents, null, 2))
 }
 
-async function addResponse(requestPath: string, args: { [ key: string ]: string }, name: string) {
-	const response = await hypixelApi.sendApiRequest({
-		path: requestPath,
-		args: args,
-		key: hypixelApi.chooseApiKey()
+async function addResponse(requestPath: keyof typedHypixelApi.Requests, args: { [ key: string ]: string }, name: string) {
+	const response = await hypixelApi.sendApiRequest(requestPath, {
+		key: hypixelApi.chooseApiKey(),
+		...args,
 	})
 	await writeTestData(requestPath, name, response)
 }

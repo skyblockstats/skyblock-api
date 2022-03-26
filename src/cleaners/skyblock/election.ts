@@ -39,7 +39,7 @@ function cleanCandidate(data: any, index: number): Candidate {
 	}
 }
 
-export function cleanElectionResponse(data: any): ElectionData {
+export async function cleanElectionResponse(data: any): Promise<ElectionData> {
 	const previousCandidates = data.mayor.election.candidates.map(cleanCandidate)
 	return {
 		lastUpdated: data.lastUpdated,

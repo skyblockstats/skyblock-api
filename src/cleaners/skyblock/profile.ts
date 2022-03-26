@@ -1,4 +1,5 @@
 import { CleanBasicMember, CleanMember, cleanSkyBlockProfileMemberResponse, cleanSkyBlockProfileMemberResponseBasic } from './member.js'
+import { SkyBlockProfilesResponse as HypixelApiSkyBlockProfilesResponse } from 'typed-hypixel-api/build/responses/skyblock/profiles'
 import { CleanMinion, combineMinionArrays, countUniqueMinions } from './minions.js'
 import * as constants from '../../constants.js'
 import { ApiOptions } from '../../hypixel.js'
@@ -48,7 +49,7 @@ export async function cleanSkyblockProfileResponseLighter(data): Promise<CleanPr
 /**
  * This function is somewhat costly and shouldn't be called often. Use cleanSkyblockProfileResponseLighter if you don't need all the data
  */
-export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptions): Promise<CleanFullProfile | CleanProfile | null> {
+export async function cleanSkyblockProfileResponse<O extends ApiOptions>(data: HypixelApiSkyBlockProfilesResponse['profiles'][number], options?: O): Promise<(O['basic'] extends true ? CleanProfile : CleanFullProfile) | null> {
     // We use Promise.all so it can fetch all the users at once instead of waiting for the previous promise to complete
     const promises: Promise<CleanMember | null>[] = []
     if (!data) return null
@@ -57,9 +58,9 @@ export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptio
 
     for (const memberUUID in data.members) {
         const memberRaw = data.members[memberUUID]
-        memberRaw.uuid = memberUUID
+        const memberRawWithUuid = { ...memberRaw, uuid: memberUUID }
         promises.push(cleanSkyBlockProfileMemberResponse(
-            memberRaw,
+            memberRawWithUuid,
             profileId,
             [
                 !options?.basic ? 'stats' : undefined,
@@ -72,11 +73,13 @@ export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptio
     const cleanedMembers: CleanMember[] = (await Promise.all(promises)).filter(m => m) as CleanMember[]
 
     if (options?.basic) {
-        return {
+        const cleanProfile: CleanProfile = {
             uuid: profileId,
             name: data.cute_name,
             members: cleanedMembers,
         }
+        // we have to do this because of the basic checking typing
+        return cleanProfile as any
     }
 
     const memberMinions: CleanMinion[][] = []
@@ -93,7 +96,7 @@ export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptio
         await constants.setConstantValues({ max_minions: uniqueMinions })
 
     // return more detailed info
-    return {
+    const cleanFullProfile: CleanFullProfile = {
         uuid: data.profile_id,
         name: data.cute_name,
         members: cleanedMembers,
@@ -102,6 +105,8 @@ export async function cleanSkyblockProfileResponse(data: any, options?: ApiOptio
         minionCount: uniqueMinions,
         maxUniqueMinions: maxUniqueMinions ?? 0,
     }
+    // we have to do this because of the basic checking typing
+    return cleanFullProfile as any
 }
 
 /** A basic profile that only includes the profile uuid and name */
