@@ -16,6 +16,7 @@ import { Included } from '../../hypixel.js'
 import { CleanPlayer } from '../player.js'
 import { CleanRank } from '../rank.js'
 import { cleanPets, Pet, PetsData } from './pets.js'
+import { cleanHarp, HarpData } from './harp.js'
 
 export interface CleanBasicMember {
 	uuid: string
@@ -39,6 +40,7 @@ export interface CleanMember extends CleanBasicMember {
 	collections: Collection[]
 	slayers: SlayerData
 	pets: PetsData
+	harp: HarpData
 	/** Whether the user left the coop */
 	left: boolean
 }
@@ -90,6 +92,7 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 		collections: cleanCollections(member),
 		slayers: cleanSlayers(member),
 		pets: await cleanPets(member),
+		harp: await cleanHarp(member),
 
 		left: (player.profiles?.find(profile => profile.uuid === profileId) === undefined) ?? false
 	}
@@ -113,6 +116,7 @@ export interface CleanMemberProfilePlayer extends CleanPlayer {
 	collections: Collection[]
 	slayers: SlayerData
 	pets: PetsData
+	harp: HarpData
 }
 
 export interface CleanMemberProfile {

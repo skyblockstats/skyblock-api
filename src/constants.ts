@@ -243,6 +243,16 @@ export async function addPets(addingPets: string[]): Promise<void> {
 	await constants.addJSONConstants('pets.json', addingPets, 'pet')
 }
 
+/** Fetch all the known SkyBlock harp songs as an array of strings */
+export async function fetchHarpSongs(): Promise<string[]> {
+	return await constants.fetchJSONConstant('harp_songs.json')
+}
+
+/** Add harp songs to skyblock-constants. This has caching so it's fine to call many times */
+export async function addHarpSongs(addingSongs: string[]): Promise<void> {
+	await constants.addJSONConstants('harp_songs.json', addingSongs, 'harp song')
+}
+
 
 interface constantValues {
 	max_minions?: number

@@ -621,6 +621,7 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 	await constants.addZones(member.zones.map(zone => zone.name))
 	await constants.addSlayers(member.slayers.bosses.map(s => s.rawName))
 	await constants.addPets(member.pets.list.map(s => s.id))
+	await constants.addHarpSongs(member.harp.songs.map(s => s.id))
 
 	if (debug) console.debug('done constants..')
 
