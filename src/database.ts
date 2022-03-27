@@ -176,8 +176,8 @@ function getMemberHarpAttributes(member: CleanMember): StringNumber {
 	const harpAttributes: StringNumber = {}
 
 	for (const song of member.harp.songs) {
-		harpAttributes[`harp_${song.completions}_completions`] = song.completions
-		harpAttributes[`harp_${song.perfectCompletions}_perfect_completions`] = song.perfectCompletions
+		harpAttributes[`harp_${song.id}_completions`] = song.completions
+		harpAttributes[`harp_${song.id}_perfect_completions`] = song.perfectCompletions
 	}
 
 	return harpAttributes
