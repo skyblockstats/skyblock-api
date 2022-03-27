@@ -29,9 +29,9 @@ export async function cleanHarp(data: typedHypixelApi.SkyBlockProfileMember): Pr
 			const songName = item.slice('song_'.length, -'_best_completion'.length)
 			songs.push({
 				id: songName,
-				completions: data.harp_quest[`song_${songName}_completions`],
-				perfectCompletions: data.harp_quest[`song_${songName}_perfect_completions`],
-				progress: data.harp_quest[`song_${songName}_best_completion`]
+				completions: data.harp_quest[`song_${songName}_completions`] ?? 0,
+				perfectCompletions: data.harp_quest[`song_${songName}_perfect_completions`] ?? 0,
+				progress: data.harp_quest[`song_${songName}_best_completion`] ?? 0
 			})
 		}
 	}
