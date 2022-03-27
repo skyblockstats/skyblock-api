@@ -258,6 +258,18 @@ export async function fetchSlayerLeaderboards(): Promise<string[]> {
 	return leaderboardNames
 }
 
+export async function fetchHarpLeaderboards(): Promise<string[]> {
+	const harpSongs = await constants.fetchHarpSongs()
+	const leaderboardNames: string[] = []
+
+	for (const songId of harpSongs) {
+		leaderboardNames.push(`harp_${songId}_completions`)
+		leaderboardNames.push(`harp_${songId}_perfect_completions`)
+	}
+
+	return leaderboardNames
+}
+
 /** Fetch the names of all the leaderboards that rank members */
 export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 	return [
@@ -272,6 +284,9 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 
 		// slayer leaderboards
 		...await fetchSlayerLeaderboards(),
+
+		// harp leaderboards
+		...await fetchHarpLeaderboards(),
 
 		'fairy_souls',
 		'first_join',
