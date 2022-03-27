@@ -11,7 +11,7 @@ export interface HarpSong {
 
 export interface HarpData {
 	selected: {
-		name: string
+		id: string
 		timestamp: number
 	} | null
 	claimedMelodysHair: boolean
