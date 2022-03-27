@@ -27,28 +27,28 @@ async function readJsonData(dir) {
 	return parsedData
 }
 
-hypixelApi.mockSendApiRequest(async ({ path, key, args }) => {
-	requestsSent ++
+hypixelApi.mockSendApiRequest(async (path, options) => {
+	requestsSent++
 	switch (path) {
 		case 'player': {
-			return await readJsonData(`player/${args.uuid}`)
+			return { data: await readJsonData(`player/${options.uuid}`) }
 		}
 		case 'skyblock/profiles': {
-			return await readJsonData(`skyblock/profiles/${args.uuid}`)
+			return { data: await readJsonData(`skyblock/profiles/${options.uuid}`) }
 		}
 	}
 	console.log(path, args)
 })
 
 mojang.mockProfileFromUuid(async (uuid) => {
-	requestsSent ++
+	requestsSent++
 	const uuidToUsername = await readJsonData('mojang')
 	const undashedUuid = undashUuid(uuid)
 	const username = uuidToUsername[undashUuid(undashedUuid)]
 	return { username, uuid: undashedUuid }
 })
 mojang.mockProfileFromUsername(async (username) => {
-	requestsSent ++
+	requestsSent++
 	const uuidToUsername = await readJsonData('mojang')
 	const uuid = Object.keys(uuidToUsername).find(uuid => uuidToUsername[uuid] === username)
 	return { username, uuid }
@@ -60,8 +60,8 @@ mojang.mockProfileFromUser(async (user) => {
 		return await mojang.profileFromUsername(user)
 })
 
-constants.mockAddJSONConstants(async(filename, addingValues, unit) => {})
-constants.mockFetchJSONConstant(async(filename) => {
+constants.mockAddJSONConstants(async (filename, addingValues, unit) => { })
+constants.mockFetchJSONConstant(async (filename) => {
 	return await readJsonData('constants/' + filename.slice(0, filename.length - '.json'.length))
 })
 
@@ -115,20 +115,20 @@ describe('util', () => {
 
 describe('hypixel', () => {
 	describe('#fetchBasicPlayer()', () => {
-		it('Checks user uuid and username', async() => {
+		it('Checks user uuid and username', async () => {
 			resetState()
 			const user = await hypixelCached.fetchBasicPlayer('py5')
 			assert.strictEqual(user.uuid, '6536bfed869548fd83a1ecd24cf2a0fd')
 			assert.strictEqual(user.username, 'py5')
 		})
-		it('Checks the player\'s rank', async() => {
+		it('Checks the player\'s rank', async () => {
 			resetState()
 			const user = await hypixelCached.fetchBasicPlayer('py5')
 			assert.strictEqual(user.rank.name, 'MVP+')
 			assert.strictEqual(user.rank.color, '#3ffefe')
 			assert.strictEqual(user.rank.colored, '§b[MVP§2+§b]')
 		})
-		it('Makes sure caching works properly', async() => {
+		it('Makes sure caching works properly', async () => {
 			resetState()
 			await hypixelCached.fetchBasicPlayer('py5')
 			// 1 request to mojang, 1 request to hypixel
@@ -140,7 +140,7 @@ describe('hypixel', () => {
 	})
 
 	describe('#fetchUser()', () => {
-		it('Makes sure user.player exists', async() => {
+		it('Makes sure user.player exists', async () => {
 			resetState()
 			const user = await hypixel.fetchUser(
 				{ user: 'py5' },
