@@ -1,5 +1,6 @@
-import { cleanPlayerSkyblockProfiles } from './skyblock/profiles.js'
 import { cleanSocialMedia, CleanSocialMedia } from './socialmedia.js'
+import { cleanPlayerSkyblockProfiles } from './skyblock/profiles.js'
+import { cleanPlayerSkyblockClaimed } from './skyblock/claimed.js'
 import { CleanBasicProfile } from './skyblock/profile.js'
 import { cleanRank, CleanRank } from './rank.js'
 import typedHypixelApi from 'typed-hypixel-api'
@@ -10,10 +11,16 @@ export interface CleanBasicPlayer {
     username: string
 }
 
+export interface ClaimedSkyBlockItem {
+    name: string
+    timestamp: number
+}
+
 export interface CleanPlayer extends CleanBasicPlayer {
     rank: CleanRank
     socials: CleanSocialMedia
     profiles?: CleanBasicProfile[]
+    skyblockClaimed?: ClaimedSkyBlockItem[]
 }
 
 export async function cleanPlayerResponse(data: typedHypixelApi.PlayerDataResponse['player']): Promise<CleanPlayer | null> {
@@ -25,6 +32,7 @@ export async function cleanPlayerResponse(data: typedHypixelApi.PlayerDataRespon
         username: data.displayname,
         rank: cleanRank(data),
         socials: cleanSocialMedia(data),
-        profiles: cleanPlayerSkyblockProfiles(data.stats?.SkyBlock?.profiles)
+        profiles: cleanPlayerSkyblockProfiles(data.stats?.SkyBlock?.profiles),
+        skyblockClaimed: cleanPlayerSkyblockClaimed(data)
     }
 }
