@@ -172,6 +172,17 @@ function getMemberSlayerAttributes(member: CleanMember): StringNumber {
 	return slayerAttributes
 }
 
+function getMemberHarpAttributes(member: CleanMember): StringNumber {
+	const harpAttributes: StringNumber = {}
+
+	for (const song of member.harp.songs) {
+		harpAttributes[`harp_${song.completions}_completions`] = song.completions
+		harpAttributes[`harp_${song.perfectCompletions}_perfect_completions`] = song.perfectCompletions
+	}
+
+	return harpAttributes
+}
+
 function getMemberLeaderboardAttributes(member: CleanMember): StringNumber {
 	// if you want to add a new leaderboard for member attributes, add it here (and getAllLeaderboardAttributes)
 	return {
@@ -186,6 +197,9 @@ function getMemberLeaderboardAttributes(member: CleanMember): StringNumber {
 
 		// slayer leaderboards
 		...getMemberSlayerAttributes(member),
+
+		// harp leaderboards
+		...getMemberHarpAttributes(member),
 
 		fairy_souls: member.fairySouls.total,
 		first_join: member.firstJoin,
