@@ -49,7 +49,7 @@ export async function cleanHarp(data: typedHypixelApi.SkyBlockProfileMember): Pr
 
 	return {
 		selected: harpQuestData?.selected_song ? {
-			name: harpQuestData.selected_song,
+			id: harpQuestData.selected_song,
 			// i'm pretty sure the epoch is always there if the name is
 			timestamp: harpQuestData.selected_song_epoch ?? 0
 		} : null,
