@@ -47,8 +47,8 @@ export async function cleanSkyBlockProfileMemberResponseBasic(member: typedHypix
 	return {
 		uuid: member.uuid,
 		username: player.username,
-		lastSave: member.last_save,
-		firstJoin: member.first_join,
+		lastSave: member.last_save ?? 0,
+		firstJoin: member.first_join ?? 0,
 		rank: player.rank
 	}
 }
@@ -68,11 +68,12 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 	return {
 		uuid: member.uuid,
 		username: player.username,
-		lastSave: member.last_save,
-		firstJoin: member.first_join,
+		// members that haven't joined the profile have no last save or first join
+		lastSave: member.last_save ?? 0,
+		firstJoin: member.first_join ?? 0,
 		rank: player.rank,
 
-		purse: member.coin_purse,
+		purse: member.coin_purse ?? 0,
 
 		stats: cleanProfileStats(member),
 

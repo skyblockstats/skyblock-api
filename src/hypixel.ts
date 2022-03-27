@@ -68,7 +68,7 @@ async function cleanResponse<P extends keyof typeof cleanResponseFunctions>(
 	// Cleans up an api response
 	const cleaningFunction: typeof cleanResponseFunctions[P] = cleanResponseFunctions[path]
 	// we do `as any` because typescript unfortunately doesn't know which path it is
-	const cleanedData = await cleaningFunction(data as any, options)
+	const cleanedData = await cleaningFunction(data.data as any, options)
 	return cleanedData as Awaited<ReturnType<typeof cleanResponseFunctions[P]>>
 }
 

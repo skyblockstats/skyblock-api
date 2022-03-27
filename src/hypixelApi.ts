@@ -1,7 +1,7 @@
 /**
  * Fetch the raw Hypixel API
  */
-import {  shuffle, sleep } from './util.js'
+import { shuffle, sleep } from './util.js'
 import typedHypixelApi from 'typed-hypixel-api'
 import { Agent } from 'https'
 
@@ -107,7 +107,7 @@ export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(path
 			path,
 			options
 		)
-	} catch {
+	} catch (e) {
 		await sleep(1000)
 		return await sendApiRequest(path, options)
 	}
