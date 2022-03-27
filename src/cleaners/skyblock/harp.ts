@@ -30,17 +30,18 @@ export async function cleanHarp(data: typedHypixelApi.SkyBlockProfileMember): Pr
 
 	for (const item in data.harp_quest) {
 		if (item.startsWith('song_') && item.endsWith('_best_completion')) {
-			const songName = item.slice('song_'.length, -'_best_completion'.length)
+			const apiSongName = item.slice('song_'.length, -'_best_completion'.length)
+			const songName = renamedSongs[apiSongName] ?? apiSongName
 			songs.push({
-				id: renamedSongs[songName] ?? songName,
-				completions: data.harp_quest[`song_${songName}_completions`] ?? 0,
-				perfectCompletions: data.harp_quest[`song_${songName}_perfect_completions`] ?? 0,
-				progress: data.harp_quest[`song_${songName}_best_completion`] ?? 0
+				id: songName,
+				completions: data.harp_quest[`song_${apiSongName}_completions`] ?? 0,
+				perfectCompletions: data.harp_quest[`song_${apiSongName}_perfect_completions`] ?? 0,
+				progress: data.harp_quest[`song_${apiSongName}_best_completion`] ?? 0
 			})
 		}
 	}
 
-	const missingHarpSongNames = allHarpSongNames.filter(songName => !songs.find(song => song.id === songName))
+	const missingHarpSongNames = allHarpSongNames.filter(songName => !songs.find(song => (renamedSongs[song.id] ?? song.id) === songName))
 	for (const songName of missingHarpSongNames) {
 		songs.push({
 			id: renamedSongs[songName] ?? songName,
