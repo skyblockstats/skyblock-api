@@ -1,4 +1,5 @@
 import typedHypixelApi from 'typed-hypixel-api'
+import { levelFromXpTable } from '../../util'
 
 export interface Skill {
 	name: string
@@ -131,8 +132,7 @@ const skillsDefaultMaxLevel: number = 50
  */
 export function levelForSkillXp(xp: number, maxLevel: number) {
 	const xpTable = (maxLevel <= 25 ? skillXpTableEasier : skillXpTable).slice(0, maxLevel)
-	const skillLevel = [...xpTable].reverse().findIndex(levelXp => xp >= levelXp)
-	return skillLevel === -1 ? 0 : xpTable.length - skillLevel
+	return levelFromXpTable(xp, xpTable)
 }
 
 export async function cleanSkills(data: typedHypixelApi.SkyBlockProfileMember): Promise<Skill[]> {

@@ -108,8 +108,7 @@ export async function cleanSkyblockProfileResponse<O extends ApiOptions>(
         minionCount: uniqueMinions,
         maxUniqueMinions: maxUniqueMinions ?? 0,
     }
-    // we have to do this because of the basic checking typing
-    return cleanFullProfile as any
+    return cleanFullProfile
 }
 
 /** A basic profile that only includes the profile uuid and name */

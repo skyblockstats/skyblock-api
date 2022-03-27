@@ -8,19 +8,19 @@ export function undashUuid(uuid: string): string {
 
 
 export function jsonToQuery(data): string {
-    return Object.entries(data || {}).map(e => e.join('=')).join('&')
+	return Object.entries(data || {}).map(e => e.join('=')).join('&')
 }
 
 export function shuffle<T>(a: T[]): T[] {
-    for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1))
-        ;[a[i], a[j]] = [a[j], a[i]]
-    }
-    return a
+	for (let i = a.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1))
+			;[a[i], a[j]] = [a[j], a[i]]
+	}
+	return a
 }
 
 
-export const minecraftColorCodes: { [ key: string ]: string } = {
+export const minecraftColorCodes: { [key: string]: string } = {
 	'0': '#000000',
 	'1': '#0000be',
 	'2': '#00be00',
@@ -62,12 +62,12 @@ export const minecraftColorCodes: { [ key: string ]: string } = {
  * @param colorName The name of the color (blue, red, aqua, etc)
  */
 export function colorCodeFromName(colorName: string): string | undefined {
-    const hexColor = minecraftColorCodes[colorName.toLowerCase()]
-    for (const key in minecraftColorCodes) {
-        const value = minecraftColorCodes[key]
-        if (key.length === 1 && value === hexColor)
-            return key
-    }
+	const hexColor = minecraftColorCodes[colorName.toLowerCase()]
+	for (const key in minecraftColorCodes) {
+		const value = minecraftColorCodes[key]
+		if (key.length === 1 && value === hexColor)
+			return key
+	}
 }
 
 export async function sleep(ms: number): Promise<void> {
@@ -77,4 +77,14 @@ export async function sleep(ms: number): Promise<void> {
 /** Returns whether a string is a UUID4 (Minecraft uuid) */
 export function isUuid(string: string) {
 	return undashUuid(string).length === 32
+}
+
+/**
+ * Get a level for an amount of total xp
+ * @param xp The xp we're finding the level for
+ * @param xpTable The list of required xp values for each level, starting at 1
+ */
+export function levelFromXpTable(xp: number, xpTable: number[]) {
+	const skillLevel = [...xpTable].reverse().findIndex(levelXp => xp >= levelXp)
+	return skillLevel === -1 ? 0 : xpTable.length - skillLevel
 }

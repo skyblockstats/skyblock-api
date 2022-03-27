@@ -223,23 +223,26 @@ export async function addSlayers(addingSlayers: string[]): Promise<void> {
 	await constants.addJSONConstants('slayers.json', addingSlayers, 'slayer')
 }
 
-/** Fetch all the known SkyBlock slayer names as an array of strings */
+/** Fetch all the known SkyBlock minion names as an array of strings */
 export async function fetchMinions(): Promise<string[]> {
 	return await constants.fetchJSONConstant('minions.json')
 }
 
-export async function fetchSkillXp(): Promise<number[]> {
-	return await constants.fetchJSONConstant('manual/skill_xp.json')
-}
-
-export async function fetchSkillXpEasier(): Promise<number[]> {
-	return await constants.fetchJSONConstant('manual/skill_xp_easier.json')
-}
-
-/** Add skills to skyblock-constants. This has caching so it's fine to call many times */
+/** Add minions to skyblock-constants. This has caching so it's fine to call many times */
 export async function addMinions(addingMinions: string[]): Promise<void> {
 	await constants.addJSONConstants('minions.json', addingMinions, 'minion')
 }
+
+/** Fetch all the known SkyBlock pet ids as an array of strings */
+export async function fetchPets(): Promise<string[]> {
+	return await constants.fetchJSONConstant('pets.json')
+}
+
+/** Add pet ids to skyblock-constants. This has caching so it's fine to call many times */
+export async function addPets(addingPets: string[]): Promise<void> {
+	await constants.addJSONConstants('pets.json', addingPets, 'pet')
+}
+
 
 interface constantValues {
 	max_minions?: number

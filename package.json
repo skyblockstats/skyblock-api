@@ -38,7 +38,7 @@
     "prismarine-nbt": "github:PrismarineJS/prismarine-nbt",
     "prom-client": "^14.0.1",
     "queue-promise": "^2.2.1",
-    "typed-hypixel-api": "^0.3.2",
+    "typed-hypixel-api": "^0.3.3",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

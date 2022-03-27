@@ -20,7 +20,7 @@ export interface CleanPlayer extends CleanBasicPlayer {
     rank: CleanRank
     socials: CleanSocialMedia
     profiles?: CleanBasicProfile[]
-    skyblockClaimed?: ClaimedSkyBlockItem[]
+    claimed?: ClaimedSkyBlockItem[]
 }
 
 export async function cleanPlayerResponse(data: typedHypixelApi.PlayerDataResponse['player']): Promise<CleanPlayer | null> {
@@ -33,6 +33,6 @@ export async function cleanPlayerResponse(data: typedHypixelApi.PlayerDataRespon
         rank: cleanRank(data),
         socials: cleanSocialMedia(data),
         profiles: cleanPlayerSkyblockProfiles(data.stats?.SkyBlock?.profiles),
-        skyblockClaimed: cleanPlayerSkyblockClaimed(data)
+        claimed: cleanPlayerSkyblockClaimed(data)
     }
 }

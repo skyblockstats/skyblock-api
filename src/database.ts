@@ -69,7 +69,7 @@ interface ProfileLeaderboardItem {
 	value: number
 }
 
-export const cachedRawLeaderboards: Map<string, (memberRawLeaderboardItem|profileRawLeaderboardItem)[]> = new Map()
+export const cachedRawLeaderboards: Map<string, (memberRawLeaderboardItem | profileRawLeaderboardItem)[]> = new Map()
 
 const leaderboardMax = 100
 const reversedLeaderboards = [
@@ -110,7 +110,7 @@ let sessionsCollection: Collection<SessionSchema>
 let accountsCollection: Collection<AccountSchema>
 
 
-const leaderboardInfos: { [ leaderboardName: string ]: string } = {
+const leaderboardInfos: { [leaderboardName: string]: string } = {
 	highest_crit_damage: 'This leaderboard is capped at the integer limit. Look at the <a href="/leaderboard/highest_critical_damage">highest critical damage leaderboard</a> instead.',
 	highest_critical_damage: 'uhhhhh yeah idk either',
 	leaderboards_count: 'This leaderboard counts how many leaderboards a player is in the top 100 spot for.',
@@ -134,7 +134,7 @@ async function connect(): Promise<void> {
 }
 
 interface StringNumber {
-	[ name: string]: number
+	[name: string]: number
 }
 
 function getMemberCollectionAttributes(member: CleanMember): StringNumber {
@@ -202,11 +202,11 @@ function getProfileLeaderboardAttributes(profile: CleanFullProfile): StringNumbe
 }
 
 
-export async function fetchAllLeaderboardsCategorized(): Promise<{ [ category: string ]: string[] }> {
+export async function fetchAllLeaderboardsCategorized(): Promise<{ [category: string]: string[] }> {
 	const memberLeaderboardAttributes: string[] = await fetchAllMemberLeaderboardAttributes()
 	const profileLeaderboardAttributes: string[] = await fetchAllProfileLeaderboardAttributes()
 
-	const categorizedLeaderboards: { [ category: string ]: string[] } = {}
+	const categorizedLeaderboards: { [category: string]: string[] } = {}
 	for (const leaderboard of [...memberLeaderboardAttributes, ...profileLeaderboardAttributes]) {
 		const { category } = categorizeStat(leaderboard)
 		if (category) {
@@ -236,7 +236,7 @@ export async function fetchSlayerLeaderboards(): Promise<string[]> {
 	for (const slayerNameRaw of rawSlayerNames) {
 		leaderboardNames.push(`slayer_${slayerNameRaw}_total_xp`)
 		leaderboardNames.push(`slayer_${slayerNameRaw}_total_kills`)
-		for (let slayerTier = 1; slayerTier <= slayerLevels; slayerTier ++) {
+		for (let slayerTier = 1; slayerTier <= slayerLevels; slayerTier++) {
 			leaderboardNames.push(`slayer_${slayerNameRaw}_${slayerTier}_kills`)
 		}
 	}
@@ -297,7 +297,7 @@ async function fetchMemberLeaderboardRaw(name: string): Promise<memberRawLeaderb
 
 	if (cachedRawLeaderboards.has(name))
 		return cachedRawLeaderboards.get(name) as memberRawLeaderboardItem[]
-	
+
 	// if it's currently being fetched, check every 100ms until it's in cachedRawLeaderboards
 	if (fetchingRawLeaderboardNames.has(name) && !cachedRawLeaderboards.get(name)) {
 		while (true) {
@@ -403,7 +403,7 @@ interface ProfileLeaderboard {
 export async function fetchMemberLeaderboard(name: string): Promise<MemberLeaderboard> {
 	const leaderboardRaw = await fetchMemberLeaderboardRaw(name)
 
-	const fetchLeaderboardPlayer = async(i: memberRawLeaderboardItem): Promise<MemberLeaderboardItem> => {
+	const fetchLeaderboardPlayer = async (i: memberRawLeaderboardItem): Promise<MemberLeaderboardItem> => {
 		const player = await cached.fetchBasicPlayer(i.uuid)
 		return {
 			player,
@@ -428,7 +428,7 @@ export async function fetchMemberLeaderboard(name: string): Promise<MemberLeader
 export async function fetchProfileLeaderboard(name: string): Promise<ProfileLeaderboard> {
 	const leaderboardRaw = await fetchProfileLeaderboardRaw(name)
 
-	const fetchLeaderboardProfile = async(i: profileRawLeaderboardItem): Promise<ProfileLeaderboardItem> => {
+	const fetchLeaderboardProfile = async (i: profileRawLeaderboardItem): Promise<ProfileLeaderboardItem> => {
 		const players: CleanPlayer[] = []
 		for (const playerUuid of i.players) {
 			const player = await cached.fetchBasicPlayer(playerUuid)
@@ -454,9 +454,9 @@ export async function fetchProfileLeaderboard(name: string): Promise<ProfileLead
 }
 
 /** Fetch a leaderboard */
-export async function fetchLeaderboard(name: string): Promise<MemberLeaderboard|ProfileLeaderboard> {
+export async function fetchLeaderboard(name: string): Promise<MemberLeaderboard | ProfileLeaderboard> {
 	const profileLeaderboards = await fetchAllProfileLeaderboardAttributes()
-	let leaderboard: MemberLeaderboard|ProfileLeaderboard
+	let leaderboard: MemberLeaderboard | ProfileLeaderboard
 	if (profileLeaderboards.includes(name)) {
 		leaderboard = await fetchProfileLeaderboard(name)
 	} else {
@@ -525,7 +525,7 @@ async function getApplicableMemberLeaderboardAttributes(member: CleanMember): Pr
 	const applicableAttributes = {}
 	const applicableTop1Attributes = {}
 
-	for (const [ leaderboard, attributeValue ] of Object.entries(leaderboardAttributes)) {
+	for (const [leaderboard, attributeValue] of Object.entries(leaderboardAttributes)) {
 		const requirement = await getLeaderboardRequirement(leaderboard, 'member')
 		const leaderboardReversed = isLeaderboardReversed(leaderboard)
 		if (
@@ -555,7 +555,7 @@ async function getApplicableMemberLeaderboardAttributes(member: CleanMember): Pr
 		)
 	)
 		applicableAttributes['leaderboards_count'] = leaderboardsCount
-	
+
 	// add the "first leaderboards count" attribute
 	const top1LeaderboardsCount: number = Object.keys(applicableTop1Attributes).length
 	const top1LeaderboardsCountRequirement = await getLeaderboardRequirement('top_1_leaderboards_count', 'member')
@@ -577,14 +577,14 @@ async function getApplicableProfileLeaderboardAttributes(profile: CleanFullProfi
 	const applicableAttributes = {}
 	const applicableTop1Attributes = {}
 
-	for (const [ leaderboard, attributeValue ] of Object.entries(leaderboardAttributes)) {
+	for (const [leaderboard, attributeValue] of Object.entries(leaderboardAttributes)) {
 		const requirement = await getLeaderboardRequirement(leaderboard, 'profile')
 		const leaderboardReversed = isLeaderboardReversed(leaderboard)
 		if (
 			(requirement.top_100 === null)
 			|| (
 				leaderboardReversed ? attributeValue < requirement.top_100 : attributeValue > requirement.top_100
-				&& attributeValue !== 0
+					&& attributeValue !== 0
 			)
 		) {
 			applicableAttributes[leaderboard] = attributeValue
@@ -593,7 +593,7 @@ async function getApplicableProfileLeaderboardAttributes(profile: CleanFullProfi
 			(requirement.top_1 === null)
 			|| (
 				leaderboardReversed ? attributeValue < requirement.top_1 : attributeValue > requirement.top_1
-				&& attributeValue !== 0
+					&& attributeValue !== 0
 			)
 		) {
 			applicableTop1Attributes[leaderboard] = attributeValue
@@ -620,6 +620,7 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 	await constants.addSkills(member.skills.map(skill => skill.name))
 	await constants.addZones(member.zones.map(zone => zone.name))
 	await constants.addSlayers(member.slayers.bosses.map(s => s.rawName))
+	await constants.addPets(member.pets.list.map(s => s.id))
 
 	if (debug) console.debug('done constants..')
 
@@ -641,7 +642,7 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 		{ upsert: true }
 	)
 
-	for (const [ attributeName, attributeValue ] of Object.entries(leaderboardAttributes)) {
+	for (const [attributeName, attributeValue] of Object.entries(leaderboardAttributes)) {
 		const existingRawLeaderboard = await fetchMemberLeaderboardRaw(attributeName)
 		const leaderboardReverse = isLeaderboardReversed(attributeName)
 
@@ -696,7 +697,7 @@ export async function updateDatabaseProfile(profile: CleanFullProfile): Promise<
 	)
 
 	// add the profile to the cached leaderboard without having to refetch it
-	for (const [ attributeName, attributeValue ] of Object.entries(leaderboardAttributes)) {
+	for (const [attributeName, attributeValue] of Object.entries(leaderboardAttributes)) {
 		const existingRawLeaderboard = await fetchProfileLeaderboardRaw(attributeName)
 		const leaderboardReverse = isLeaderboardReversed(attributeName)
 
@@ -729,14 +730,14 @@ export const leaderboardUpdateProfileQueue = new Queue({
 export function queueUpdateDatabaseMember(member: CleanMember, profile: CleanFullProfile): void {
 	if (recentlyQueued.get(profile.uuid + member.uuid)) return
 	else recentlyQueued.set(profile.uuid + member.uuid, true)
-	leaderboardUpdateMemberQueue.enqueue(async() => await updateDatabaseMember(member, profile))
+	leaderboardUpdateMemberQueue.enqueue(async () => await updateDatabaseMember(member, profile))
 }
 
 /** Queue an update for the profile's leaderboard data on the server if applicable */
 export function queueUpdateDatabaseProfile(profile: CleanFullProfile): void {
 	if (recentlyQueued.get(profile.uuid + 'profile')) return
 	else recentlyQueued.set(profile.uuid + 'profile', true)
-	leaderboardUpdateProfileQueue.enqueue(async() => await updateDatabaseProfile(profile))
+	leaderboardUpdateProfileQueue.enqueue(async () => await updateDatabaseProfile(profile))
 }
 
 
@@ -801,12 +802,12 @@ export async function createSession(refreshToken: string, userData: discord.Disc
 }
 
 export async function fetchSession(sessionId: string): Promise<WithId<SessionSchema> | null> {
-	return await sessionsCollection?.findOne({ _id: sessionId as any } )
+	return await sessionsCollection?.findOne({ _id: sessionId as any })
 }
 
 
 export async function deleteSession(sessionId: string) {
-	return await sessionsCollection?.deleteOne({ _id: sessionId as any } )
+	return await sessionsCollection?.deleteOne({ _id: sessionId as any })
 }
 
 export async function fetchAccount(minecraftUuid: string): Promise<WithId<AccountSchema> | null> {
