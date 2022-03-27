@@ -1,5 +1,5 @@
 import typedHypixelApi from 'typed-hypixel-api'
-import { levelFromXpTable } from '../../util'
+import { levelFromXpTable } from '../../util.js'
 
 export interface Skill {
 	name: string
