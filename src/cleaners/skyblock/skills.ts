@@ -176,13 +176,15 @@ export async function cleanSkills(data: typedHypixelApi.SkyBlockProfileMember): 
 	// add missing skills
 	const missingSkillNames = allSkillNames.filter(skillName => !skills.some(skill => skill.name === skillName))
 	for (const skillName of missingSkillNames) {
+		const skillMaxLevel = skillsMaxLevel[skillName] ?? skillsDefaultMaxLevel
+		const xpTable = (skillMaxLevel <= 25 ? skillXpTableEasier : skillXpTable).slice(0, skillMaxLevel)
 		skills.push({
 			name: skillName,
 			xp: 0,
 			level: 0,
-			maxLevel: skillsMaxLevel[skillName] ?? skillsDefaultMaxLevel,
+			maxLevel: skillMaxLevel,
 			levelXp: 0,
-			levelXpRequired: 0
+			levelXpRequired: xpTable[0]
 		})
 	}
 
