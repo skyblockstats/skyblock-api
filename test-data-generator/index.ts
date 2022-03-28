@@ -20,12 +20,13 @@ const playerUuids = [
 ]
 
 async function writeTestData(requestPath: string, name: string, contents: any) {
-	const dir = path.join(__dirname, '..', 'test', 'data', requestPath)
+	const dir = path.join(process.cwd(), '..', 'test', 'data', requestPath)
 	await fs.mkdir(path.dirname(path.join(dir, `${name}.json`)), { recursive: true })
 	await fs.writeFile(path.join(dir, `${name}.json`), JSON.stringify(contents, null, 2))
 }
 
-async function addResponse(requestPath: keyof typedHypixelApi.Requests, args: { [ key: string ]: string }, name: string) {
+async function addResponse(requestPath: keyof typedHypixelApi.Requests, args: { [key: string]: string }, name: string) {
+	console.log('Fetching', requestPath, args)
 	const response = await hypixelApi.sendApiRequest(requestPath, {
 		key: hypixelApi.chooseApiKey(),
 		...args,
@@ -38,9 +39,11 @@ async function addConstants() {
 	const constantNames = [
 		'collections',
 		'minions',
+		'pets',
 		'skills',
 		'slayers',
 		'stats',
+		'values',
 		'zones',
 	]
 	for (const constantName of constantNames) {

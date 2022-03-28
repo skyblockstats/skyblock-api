@@ -1,3 +1,4 @@
+import { cleanCoopInvitation, CoopInvitation } from './coopInvitation.js'
 import { cleanCollections, Collection } from './collections.js'
 import { cleanInventories, Inventories } from './inventory.js'
 import { cleanFairySouls, FairySouls } from './fairysouls.js'
@@ -11,12 +12,12 @@ import { cleanVisitedZones, Zone } from './zones.js'
 import { cleanSkills, Skill } from './skills.js'
 import * as cached from '../../hypixelCached.js'
 import typedHypixelApi from 'typed-hypixel-api'
+import { cleanPets, PetsData } from './pets.js'
+import { cleanHarp, HarpData } from './harp.js'
 import * as constants from '../../constants.js'
 import { Included } from '../../hypixel.js'
 import { CleanPlayer } from '../player.js'
 import { CleanRank } from '../rank.js'
-import { cleanPets, Pet, PetsData } from './pets.js'
-import { cleanHarp, HarpData } from './harp.js'
 
 export interface CleanBasicMember {
 	uuid: string
@@ -41,6 +42,7 @@ export interface CleanMember extends CleanBasicMember {
 	slayers: SlayerData
 	pets: PetsData
 	harp: HarpData
+	coopInvitation: CoopInvitation | null
 	/** Whether the user left the coop */
 	left: boolean
 }
@@ -93,6 +95,7 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 		slayers: cleanSlayers(member),
 		pets: await cleanPets(member),
 		harp: await cleanHarp(member),
+		coopInvitation: cleanCoopInvitation(member),
 
 		left: (player.profiles?.find(profile => profile.uuid === profileId) === undefined) ?? false
 	}
@@ -117,6 +120,7 @@ export interface CleanMemberProfilePlayer extends CleanPlayer {
 	slayers: SlayerData
 	pets: PetsData
 	harp: HarpData
+	coopInvitation: CoopInvitation | null
 }
 
 export interface CleanMemberProfile {
