@@ -22,8 +22,8 @@ import { CleanRank } from '../rank.js'
 export interface CleanBasicMember {
 	uuid: string
 	username: string
-	lastSave: number
-	firstJoin: number
+	lastSave: number | null
+	firstJoin: number | null
 	rank: CleanRank
 	left?: boolean
 }
@@ -53,8 +53,8 @@ export async function cleanSkyBlockProfileMemberResponseBasic(member: typedHypix
 	return {
 		uuid: member.uuid,
 		username: player.username,
-		lastSave: member.last_save ?? 0,
-		firstJoin: member.first_join ?? 0,
+		lastSave: member.last_save ?? null,
+		firstJoin: member.first_join ?? null,
 		rank: player.rank
 	}
 }
@@ -74,8 +74,8 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 		uuid: member.uuid,
 		username: player.username,
 		// members that haven't joined the profile have no last save or first join
-		lastSave: member.last_save ?? 0,
-		firstJoin: member.first_join ?? 0,
+		lastSave: member.last_save ?? null,
+		firstJoin: member.first_join ?? null,
 		rank: player.rank,
 
 		purse: member.coin_purse ?? 0,
@@ -105,8 +105,8 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 export interface CleanMemberProfilePlayer extends CleanPlayer {
 	// The profile name may be different for each player, so we put it here
 	profileName: string
-	firstJoin: number
-	lastSave: number
+	firstJoin: number | null
+	lastSave: number | null
 	purse: number
 	stats: StatItem[]
 	rawHypixelStats: { [key: string]: number }

@@ -185,7 +185,7 @@ function getMemberHarpAttributes(member: CleanMember): StringNumber {
 
 function getMemberLeaderboardAttributes(member: CleanMember): StringNumber {
 	// if you want to add a new leaderboard for member attributes, add it here (and getAllLeaderboardAttributes)
-	return {
+	const data: StringNumber = {
 		// we use the raw stat names rather than the clean stats in case hypixel adds a new stat and it takes a while for us to clean it
 		...member.rawHypixelStats,
 
@@ -202,10 +202,16 @@ function getMemberLeaderboardAttributes(member: CleanMember): StringNumber {
 		...getMemberHarpAttributes(member),
 
 		fairy_souls: member.fairySouls.total,
-		first_join: member.firstJoin,
 		purse: member.purse,
 		visited_zones: member.zones.filter(z => z.visited).length,
 	}
+
+	if (member.firstJoin)
+		data.first_join = member.firstJoin
+	if (member.lastSave)
+		data.last_save = member.lastSave
+
+	return data
 }
 
 function getProfileLeaderboardAttributes(profile: CleanFullProfile): StringNumber {
@@ -290,6 +296,7 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 
 		'fairy_souls',
 		'first_join',
+		'last_save',
 		'purse',
 		'visited_zones',
 		'leaderboards_count',

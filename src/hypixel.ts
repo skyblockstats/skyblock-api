@@ -135,7 +135,7 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 	if (includeProfiles) {
 		for (const profile of profilesData!) {
 			const member = profile.members?.find(member => member.uuid === uuid)
-			if (member && member.lastSave > lastOnline) {
+			if (member && member.lastSave && member.lastSave > lastOnline) {
 				lastOnline = member.lastSave
 				activeProfile = profile
 			}
