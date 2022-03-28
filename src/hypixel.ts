@@ -343,7 +343,7 @@ export async function fetchItemList() {
 
 	cachedItemListData = itemList
 	// updates every 60 minutes
-	nextElectionUpdate = new Date((itemList.lastUpdated + 60 * 60) * 1000)
+	nextItemListUpdate = new Date((itemList.lastUpdated + 60 * 60) * 1000)
 	return itemList
 }
 
