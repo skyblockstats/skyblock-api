@@ -5271,63 +5271,11 @@
     "parkourCompletions": {
       "Skywars": [
         {
-          "timeStart": 1502116808936,
-          "timeTook": 626512
-        },
-        {
           "timeStart": 1502117489539,
           "timeTook": 88508
         }
       ],
       "Bedwars": [
-        {
-          "timeStart": 1596863827400,
-          "timeTook": 151119
-        },
-        {
-          "timeStart": 1609373759240,
-          "timeTook": 75620
-        },
-        {
-          "timeStart": 1609562244016,
-          "timeTook": 71674
-        },
-        {
-          "timeStart": 1609562398776,
-          "timeTook": 58556
-        },
-        {
-          "timeStart": 1611361102963,
-          "timeTook": 109436
-        },
-        {
-          "timeStart": 1611385887385,
-          "timeTook": 91925
-        },
-        {
-          "timeStart": 1611386143930,
-          "timeTook": 83628
-        },
-        {
-          "timeStart": 1611386569050,
-          "timeTook": 55210
-        },
-        {
-          "timeStart": 1611387272677,
-          "timeTook": 49518
-        },
-        {
-          "timeStart": 1611387609446,
-          "timeTook": 50857
-        },
-        {
-          "timeStart": 1611471435282,
-          "timeTook": 48038
-        },
-        {
-          "timeStart": 1611473102121,
-          "timeTook": 48252
-        },
         {
           "timeStart": 1611540265952,
           "timeTook": 47925
@@ -5337,14 +5285,6 @@
         {
           "timeStart": 1611448292984,
           "timeTook": 80539
-        },
-        {
-          "timeStart": 1611566792557,
-          "timeTook": 178094
-        },
-        {
-          "timeStart": 1611603412771,
-          "timeTook": 157032
         }
       ],
       "MegaWalls": [
@@ -5355,47 +5295,23 @@
       ],
       "BlitzLobby": [
         {
-          "timeStart": 1612848029105,
-          "timeTook": 29203
-        },
-        {
-          "timeStart": 1612848141172,
-          "timeTook": 24401
-        },
-        {
           "timeStart": 1612848186874,
           "timeTook": 22951
-        },
-        {
-          "timeStart": 1612848284440,
-          "timeTook": 28903
         }
       ],
       "mainLobby2017": [
         {
           "timeStart": 1612849133240,
           "timeTook": 55855
-        },
-        {
-          "timeStart": 1613782123589,
-          "timeTook": 79169
         }
       ],
       "Prototype": [
-        {
-          "timeStart": 1613367119647,
-          "timeTook": 282986
-        },
         {
           "timeStart": 1613454351054,
           "timeTook": 169493
         }
       ],
       "BuildBattle": [
-        {
-          "timeStart": 1613455066027,
-          "timeTook": 186025
-        },
         {
           "timeStart": 1613455540348,
           "timeTook": 90889

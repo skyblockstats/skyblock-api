@@ -20,8 +20,17 @@ const playerUuids = [
 ]
 
 async function writeTestData(requestPath: string, name: string, contents: any) {
-	const dir = path.join(process.cwd(), '..', 'test', 'data', requestPath)
-	await fs.mkdir(path.dirname(path.join(dir, `${name}.json`)), { recursive: true })
+	if (!name) {
+		const splitRequestPath = requestPath.split('/')
+		name = splitRequestPath[splitRequestPath.length - 1]
+		requestPath = splitRequestPath.slice(0, -1).join('/')
+	}
+	const dir = path.join(process.cwd(), 'test', 'data', requestPath)
+	try {
+		await fs.mkdir(path.dirname(path.join(dir, `${name}.json`)), { recursive: true })
+	} catch (err) {
+		console.error(err)
+	}
 	await fs.writeFile(path.join(dir, `${name}.json`), JSON.stringify(contents, null, 2))
 }
 
@@ -45,6 +54,7 @@ async function addConstants() {
 		'stats',
 		'values',
 		'zones',
+		'harp_songs'
 	]
 	for (const constantName of constantNames) {
 		const constantData = await constants.fetchJSONConstant(constantName + '.json')
@@ -55,6 +65,7 @@ async function addConstants() {
 }
 
 async function main() {
+	await addResponse('resources/skyblock/items', {}, '')
 	const uuidsToUsername = {}
 	for (const playerUuid of playerUuids) {
 		await addResponse('player', { uuid: playerUuid }, playerUuid)
@@ -66,6 +77,8 @@ async function main() {
 	await writeTestData('', 'mojang', uuidsToUsername)
 
 	await addConstants()
+
+	console.log('Done!')
 }
 
 main()

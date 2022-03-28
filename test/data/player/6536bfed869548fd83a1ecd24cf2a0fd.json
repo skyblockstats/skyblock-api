@@ -275,7 +275,11 @@
       "tntgames_spleef_repulsor",
       "pit_get_endless_quiver_arrows",
       "pit_small_streak",
-      "skyblock_bigger_storage_is_seeded"
+      "skyblock_bigger_storage_is_seeded",
+      "skyblock_resourceful",
+      "murdermystery_uncalculated",
+      "duels_master_builders",
+      "duels_jack_of_all_trades"
     ],
     "displayname": "py5",
     "firstLogin": 1424644924085,
@@ -289,12 +293,12 @@
       "py5",
       "b3abus"
     ],
-    "lastLogin": 1622501301452,
-    "networkExp": 14449927,
+    "lastLogin": 1648421348120,
+    "networkExp": 15223917,
     "playername": "py5",
     "stats": {
       "Arcade": {
-        "coins": 2122258,
+        "coins": 2141266,
         "deaths_throw_out": 13,
         "kills_throw_out": 10,
         "music": true,
@@ -381,7 +385,8 @@
         "eggs_found_easter_simulator": 26,
         "wins_ender": 1,
         "wins_grinch_simulator_v2": 1,
-        "gifts_grinch_simulator_v2": 17
+        "gifts_grinch_simulator_v2": 17,
+        "blocks_destroyed_ender": 207
       },
       "Battleground": {
         "chosen_class": "warrior",
@@ -397,10 +402,10 @@
           "legacyachievement10",
           "legacyachievement9"
         ],
-        "coins": 166325
+        "coins": 175395
       },
       "TNTGames": {
-        "coins": 70584,
+        "coins": 81881,
         "deaths_bowspleef": 15,
         "tags_bowspleef": 271,
         "new_spleef_repulsor": 1,
@@ -436,10 +441,10 @@
         ],
         "run_potions_splashed_on_players": 14,
         "record_tntrun": 184,
-        "deaths_tntrun": 204,
+        "deaths_tntrun": 208,
         "winstreak": 0,
         "votes_Relic": 4,
-        "wizards_selected_class": "new_witherwizard",
+        "wizards_selected_class": "new_bloodwizard",
         "new_witherwizard_deaths": 11,
         "deaths_capture": 11,
         "votes_Asteroids": 1,
@@ -472,7 +477,8 @@
         "air_time_capture": 2807,
         "assists_capture": 4,
         "new_tntrun_speed_potions": 1,
-        "new_tntrun_slowness_potions": 1
+        "new_tntrun_slowness_potions": 1,
+        "lastTourneyAd": 1628999224615
       },
       "GingerBread": {
         "engine_active": "{GingerbreadPart:{PartType:ENGINE,PartRarity:BASIC}}",
@@ -488,7 +494,7 @@
         "shoes_active": "GOLD_SHOES",
         "jacket_active": "GOLD_JACKET",
         "pants_active": "GOLD_PANTS",
-        "coins": 70395,
+        "coins": 80615,
         "lastTourneyAd": 1596934457455
       },
       "SkyWars": {
@@ -570,7 +576,7 @@
         "losses_kit_basic_solo_default": 59,
         "deaths_team_insane": 23,
         "survived_players_kit_mining_team_default": 91,
-        "coins": 603673,
+        "coins": 612333,
         "survived_players_team": 235,
         "losses_team_insane": 22,
         "losses_kit_mining_team_default": 8,
@@ -665,7 +671,7 @@
         "arrows_hit_kit_mining_team_default": 1,
         "arrows_shot_kit_mining_team_default": 10,
         "arrows_shot": 259,
-        "games_played_skywars": 2151,
+        "games_played_skywars": 2152,
         "lastMode": "RANKED",
         "longest_bow_shot_kit_basic_solo_default": 31,
         "longest_bow_shot_solo": 13,
@@ -674,8 +680,8 @@
         "arrows_hit_kit_basic_solo_default": 22,
         "arrows_shot_solo": 111,
         "votes_Tribute": 4,
-        "slime_explained": 14,
-        "slime_explained_last": 1615603973108,
+        "slime_explained": 1,
+        "slime_explained_last": 1645573541946,
         "win_streak_lab": 0,
         "survived_players_lab_solo": 8481,
         "melee_kills_lab_kit_basic_solo_default": 856,
@@ -1171,7 +1177,7 @@
         "melee_kills_lab_kit_mining_team_default": 2
       },
       "MCGO": {
-        "coins": 176555,
+        "coins": 185515,
         "packages": [
           "legacyachievementnewnewnew",
           "achievement_flag_3",
@@ -1206,7 +1212,7 @@
           "achievement_flag_3"
         ],
         "kills": 249,
-        "coins": 76832,
+        "coins": 87052,
         "monthly_kills_b": 110,
         "weekly_kills_b": 225,
         "deaths": 183,
@@ -1242,14 +1248,15 @@
         "distance_travelled_teams": 1106,
         "kills_since_update_feb_2017_teams": 2,
         "shots_fired_teams": 26,
-        "deaths_teams": 9
+        "deaths_teams": 9,
+        "lastTourneyAd": 1639779956173
       },
       "Paintball": {
         "packages": [
           "achievement_flag_1",
           "achievement_flag_2"
         ],
-        "coins": 73907,
+        "coins": 84127,
         "favorite_slots": "null,null,null",
         "showKillPrefix": true,
         "kills": 38,
@@ -1262,7 +1269,7 @@
         "updated_stats": true,
         "human_deaths": 7,
         "zombie_kills": 22,
-        "coins": 72679,
+        "coins": 82899,
         "vampire_deaths": 20,
         "votes_Cavern": 3,
         "vampire_kills": 13,
@@ -1332,83 +1339,83 @@
           "leaderboards_resync_mar_2021"
         ],
         "first_join_7": true,
-        "Experience": 63142,
+        "Experience": 64084,
         "bedwars_boxes": 2,
-        "games_played_bedwars_1": 400,
+        "games_played_bedwars_1": 420,
         "winstreak": 0,
-        "gold_resources_collected_bedwars": 7119,
-        "void_deaths_bedwars": 373,
-        "four_three_void_kills_bedwars": 50,
-        "void_kills_bedwars": 239,
-        "deaths_bedwars": 770,
-        "four_three_iron_resources_collected_bedwars": 5239,
-        "resources_collected_bedwars": 52707,
-        "four_three_games_played_bedwars": 35,
-        "coins": 59928,
-        "four_three__items_purchased_bedwars": 687,
-        "games_played_bedwars": 394,
-        "four_three_void_deaths_bedwars": 73,
-        "four_three_entity_attack_deaths_bedwars": 36,
-        "kills_bedwars": 523,
-        "four_three_gold_resources_collected_bedwars": 839,
-        "four_three_deaths_bedwars": 111,
-        "four_three_losses_bedwars": 30,
-        "entity_attack_deaths_bedwars": 255,
-        "losses_bedwars": 352,
-        "items_purchased_bedwars": 6123,
-        "iron_resources_collected_bedwars": 43512,
-        "four_three_items_purchased_bedwars": 712,
-        "four_three_kills_bedwars": 86,
-        "_items_purchased_bedwars": 5843,
-        "four_three_resources_collected_bedwars": 6285,
-        "eight_one_beds_lost_bedwars": 54,
-        "final_deaths_bedwars": 206,
-        "eight_one_final_deaths_bedwars": 50,
-        "eight_one_deaths_bedwars": 228,
-        "eight_one_void_deaths_bedwars": 58,
-        "eight_one_games_played_bedwars": 195,
-        "diamond_resources_collected_bedwars": 845,
-        "eight_one_entity_attack_deaths_bedwars": 47,
-        "eight_one_entity_attack_final_deaths_bedwars": 24,
-        "entity_attack_final_deaths_bedwars": 110,
-        "eight_one_losses_bedwars": 186,
-        "eight_one_iron_resources_collected_bedwars": 11140,
-        "eight_one__items_purchased_bedwars": 1936,
-        "eight_one_items_purchased_bedwars": 2011,
-        "beds_lost_bedwars": 217,
-        "entity_attack_kills_bedwars": 270,
-        "eight_one_diamond_resources_collected_bedwars": 189,
-        "eight_one_entity_attack_kills_bedwars": 45,
-        "eight_one_void_kills_bedwars": 35,
-        "eight_one_kills_bedwars": 82,
-        "eight_one_resources_collected_bedwars": 13731,
-        "eight_one_gold_resources_collected_bedwars": 2181,
-        "four_three_entity_attack_kills_bedwars": 35,
-        "emerald_resources_collected_bedwars": 1214,
+        "gold_resources_collected_bedwars": 7332,
+        "void_deaths_bedwars": 380,
+        "four_three_void_kills_bedwars": 51,
+        "void_kills_bedwars": 243,
+        "deaths_bedwars": 795,
+        "four_three_iron_resources_collected_bedwars": 5605,
+        "resources_collected_bedwars": 54371,
+        "four_three_games_played_bedwars": 37,
+        "coins": 60824,
+        "four_three__items_purchased_bedwars": 728,
+        "games_played_bedwars": 414,
+        "four_three_void_deaths_bedwars": 76,
+        "four_three_entity_attack_deaths_bedwars": 40,
+        "kills_bedwars": 538,
+        "four_three_gold_resources_collected_bedwars": 910,
+        "four_three_deaths_bedwars": 118,
+        "four_three_losses_bedwars": 32,
+        "entity_attack_deaths_bedwars": 263,
+        "losses_bedwars": 372,
+        "items_purchased_bedwars": 6343,
+        "iron_resources_collected_bedwars": 44925,
+        "four_three_items_purchased_bedwars": 757,
+        "four_three_kills_bedwars": 91,
+        "_items_purchased_bedwars": 6053,
+        "four_three_resources_collected_bedwars": 6735,
+        "eight_one_beds_lost_bedwars": 60,
+        "final_deaths_bedwars": 225,
+        "eight_one_final_deaths_bedwars": 66,
+        "eight_one_deaths_bedwars": 244,
+        "eight_one_void_deaths_bedwars": 61,
+        "eight_one_games_played_bedwars": 212,
+        "diamond_resources_collected_bedwars": 864,
+        "eight_one_entity_attack_deaths_bedwars": 50,
+        "eight_one_entity_attack_final_deaths_bedwars": 26,
+        "entity_attack_final_deaths_bedwars": 114,
+        "eight_one_losses_bedwars": 203,
+        "eight_one_iron_resources_collected_bedwars": 12117,
+        "eight_one__items_purchased_bedwars": 2093,
+        "eight_one_items_purchased_bedwars": 2174,
+        "beds_lost_bedwars": 226,
+        "entity_attack_kills_bedwars": 281,
+        "eight_one_diamond_resources_collected_bedwars": 191,
+        "eight_one_entity_attack_kills_bedwars": 51,
+        "eight_one_void_kills_bedwars": 38,
+        "eight_one_kills_bedwars": 91,
+        "eight_one_resources_collected_bedwars": 14864,
+        "eight_one_gold_resources_collected_bedwars": 2316,
+        "four_three_entity_attack_kills_bedwars": 39,
+        "emerald_resources_collected_bedwars": 1233,
         "four_three_emerald_resources_collected_bedwars": 107,
-        "four_three_beds_lost_bedwars": 28,
-        "void_final_deaths_bedwars": 64,
-        "four_three_void_final_deaths_bedwars": 14,
-        "four_three_diamond_resources_collected_bedwars": 100,
-        "four_three_final_deaths_bedwars": 28,
-        "eight_one_entity_attack_final_kills_bedwars": 38,
-        "eight_one_final_kills_bedwars": 60,
-        "entity_attack_final_kills_bedwars": 112,
-        "eight_one_emerald_resources_collected_bedwars": 221,
-        "final_kills_bedwars": 186,
-        "eight_one_beds_broken_bedwars": 82,
+        "four_three_beds_lost_bedwars": 30,
+        "void_final_deaths_bedwars": 65,
+        "four_three_void_final_deaths_bedwars": 15,
+        "four_three_diamond_resources_collected_bedwars": 113,
+        "four_three_final_deaths_bedwars": 30,
+        "eight_one_entity_attack_final_kills_bedwars": 40,
+        "eight_one_final_kills_bedwars": 63,
+        "entity_attack_final_kills_bedwars": 114,
+        "eight_one_emerald_resources_collected_bedwars": 240,
+        "final_kills_bedwars": 189,
+        "eight_one_beds_broken_bedwars": 90,
         "eight_one_entity_explosion_deaths_bedwars": 3,
         "entity_explosion_deaths_bedwars": 5,
-        "beds_broken_bedwars": 148,
-        "fall_deaths_bedwars": 14,
-        "eight_one_fall_deaths_bedwars": 4,
+        "beds_broken_bedwars": 156,
+        "fall_deaths_bedwars": 15,
+        "eight_one_fall_deaths_bedwars": 5,
         "fall_kills_bedwars": 11,
         "eight_one_fall_kills_bedwars": 1,
         "eight_one_void_final_deaths_bedwars": 5,
         "permanent _items_purchased_bedwars": 222,
         "eight_one_permanent _items_purchased_bedwars": 51,
-        "eight_one_void_final_kills_bedwars": 18,
-        "void_final_kills_bedwars": 67,
+        "eight_one_void_final_kills_bedwars": 19,
+        "void_final_kills_bedwars": 68,
         "eight_two_void_deaths_bedwars": 168,
         "eight_two_beds_broken_bedwars": 57,
         "eight_two_emerald_resources_collected_bedwars": 632,
@@ -1428,28 +1435,28 @@
         "eight_two_void_final_kills_bedwars": 36,
         "wins_bedwars": 36,
         "eight_two_final_kills_bedwars": 92,
-        "four_four__items_purchased_bedwars": 854,
-        "four_four_deaths_bedwars": 114,
-        "four_four_gold_resources_collected_bedwars": 1142,
-        "four_four_diamond_resources_collected_bedwars": 154,
-        "four_four_entity_attack_deaths_bedwars": 45,
-        "four_four_iron_resources_collected_bedwars": 9118,
-        "four_four_games_played_bedwars": 36,
+        "four_four__items_purchased_bedwars": 866,
+        "four_four_deaths_bedwars": 116,
+        "four_four_gold_resources_collected_bedwars": 1149,
+        "four_four_diamond_resources_collected_bedwars": 158,
+        "four_four_entity_attack_deaths_bedwars": 46,
+        "four_four_iron_resources_collected_bedwars": 9188,
+        "four_four_games_played_bedwars": 37,
         "four_four_wins_bedwars": 11,
         "four_four_void_final_kills_bedwars": 6,
-        "four_four_resources_collected_bedwars": 10612,
-        "four_four_void_deaths_bedwars": 64,
-        "four_four_items_purchased_bedwars": 908,
+        "four_four_resources_collected_bedwars": 10693,
+        "four_four_void_deaths_bedwars": 65,
+        "four_four_items_purchased_bedwars": 920,
         "four_four_final_kills_bedwars": 20,
         "four_four_emerald_resources_collected_bedwars": 182,
         "eight_two_losses_bedwars": 108,
-        "four_four_kills_bedwars": 85,
-        "four_four_entity_attack_kills_bedwars": 45,
+        "four_four_kills_bedwars": 86,
+        "four_four_entity_attack_kills_bedwars": 46,
         "four_four_permanent _items_purchased_bedwars": 54,
-        "four_three_entity_attack_final_deaths_bedwars": 13,
-        "four_four_final_deaths_bedwars": 23,
-        "four_four_beds_lost_bedwars": 25,
-        "four_four_losses_bedwars": 24,
+        "four_three_entity_attack_final_deaths_bedwars": 14,
+        "four_four_final_deaths_bedwars": 24,
+        "four_four_beds_lost_bedwars": 26,
+        "four_four_losses_bedwars": 25,
         "fall_final_deaths_bedwars": 3,
         "four_four_fall_final_deaths_bedwars": 2,
         "bedwars_christmas_boxes": 2,
@@ -1526,7 +1533,7 @@
         "castle_kills_bedwars": 2,
         "castle_winstreak": 1,
         "four_four_winstreak": 0,
-        "four_four_entity_attack_final_deaths_bedwars": 9,
+        "four_four_entity_attack_final_deaths_bedwars": 10,
         "eight_two_fall_final_kills_bedwars": 1,
         "fall_final_kills_bedwars": 2,
         "four_three_void_final_kills_bedwars": 7,
@@ -1579,11 +1586,11 @@
         "four_four_armed_void_final_deaths_bedwars": 1,
         "four_three_wins_bedwars": 4,
         "two_four_entity_attack_final_deaths_bedwars": 1,
-        "eight_one_magic_deaths_bedwars": 115,
-        "magic_deaths_bedwars": 121,
+        "eight_one_magic_deaths_bedwars": 124,
+        "magic_deaths_bedwars": 130,
         "two_four_magic_deaths_bedwars": 1,
-        "eight_one_magic_final_deaths_bedwars": 21,
-        "magic_final_deaths_bedwars": 28,
+        "eight_one_magic_final_deaths_bedwars": 25,
+        "magic_final_deaths_bedwars": 32,
         "eight_two_magic_deaths_bedwars": 3,
         "Bedwars_openedChests": 48,
         "Bedwars_openedCommons": 28,
@@ -1627,10 +1634,10 @@
         "entity_explosion_kills_bedwars": 1,
         "eight_two_magic_kills_bedwars": 1,
         "eight_two_permanent_items_purchased_bedwars": 26,
-        "permanent_items_purchased_bedwars": 58,
-        "eight_one_permanent_items_purchased_bedwars": 24,
+        "permanent_items_purchased_bedwars": 68,
+        "eight_one_permanent_items_purchased_bedwars": 30,
         "practice": {
-          "selected": "BRIDGING",
+          "selected": "MLG",
           "records": {
             "bridging_distance_30:elevation_NONE:angle_STRAIGHT:": 9911,
             "bridging_distance_100:elevation_NONE:angle_STRAIGHT:": 40196,
@@ -1639,26 +1646,28 @@
             "bridging_distance_30:elevation_NONE:angle_DIAGONAL:": 8705
           },
           "bridging": {
-            "failed_attempts": 1206,
-            "successful_attempts": 111,
-            "blocks_placed": 14756
+            "failed_attempts": 1275,
+            "successful_attempts": 116,
+            "blocks_placed": 15213
           },
           "mlg": {
-            "failed_attempts": 81,
-            "blocks_placed": 1,
-            "successful_attempts": 38
+            "failed_attempts": 136,
+            "blocks_placed": 5,
+            "successful_attempts": 65
           },
           "fireball_jumping": {
-            "failed_attempts": 20,
-            "successful_attempts": 18
+            "failed_attempts": 45,
+            "successful_attempts": 38
           }
         },
-        "four_three_permanent_items_purchased_bedwars": 8,
+        "four_three_permanent_items_purchased_bedwars": 12,
         "eight_two_entity_explosion_final_kills_bedwars": 1,
-        "entity_explosion_final_kills_bedwars": 1
+        "entity_explosion_final_kills_bedwars": 1,
+        "selected_challenge_type": "COLLECTOR",
+        "lastTourneyAd": 1647475374591
       },
       "HungerGames": {
-        "coins": 123789,
+        "coins": 132749,
         "packages": [
           "fixachievements2",
           "fixachievements1",
@@ -1704,7 +1713,7 @@
         "autoarmor": true
       },
       "Walls": {
-        "coins": 75395,
+        "coins": 85615,
         "monthly_assists_a": 2,
         "assists": 2,
         "weekly_assists_a": 1,
@@ -1713,10 +1722,10 @@
         "weekly_assists_b": 1
       },
       "Arena": {
-        "coins": 70395
+        "coins": 80615
       },
       "Walls3": {
-        "coins": 72950,
+        "coins": 82480,
         "packages": [
           "achievement_fix_flag",
           "legacy_achievement_a"
@@ -1806,13 +1815,13 @@
         "phoenix_wins": 1
       },
       "UHC": {
-        "coins": 63301,
+        "coins": 72351,
         "clearup_achievement": true,
         "saved_stats": true,
         "deaths": 1
       },
       "SuperSmash": {
-        "coins": 117850,
+        "coins": 126175,
         "lastLevel_THE_BULK": 0,
         "active_class": "THE_BULK",
         "win_streak": 0,
@@ -1868,7 +1877,7 @@
         ]
       },
       "SpeedUHC": {
-        "coins": 206600,
+        "coins": 209030,
         "firstJoinLobbyInt": 3,
         "killstreak": 0,
         "win_streak": 0,
@@ -1912,21 +1921,21 @@
         "deaths_ancient_tomb_MURDER_ASSASSINS": 5,
         "games_ancient_tomb": 17,
         "games_ancient_tomb_MURDER_ASSASSINS": 6,
-        "coins": 44172,
+        "coins": 49108,
         "deaths": 62,
         "deaths_ancient_tomb": 10,
         "deaths_MURDER_ASSASSINS": 13,
-        "games": 189,
+        "games": 197,
         "coins_pickedup_MURDER_ASSASSINS": 96,
         "coins_pickedup_ancient_tomb_MURDER_ASSASSINS": 27,
-        "coins_pickedup": 578,
+        "coins_pickedup": 600,
         "coins_pickedup_ancient_tomb": 44,
         "murdermystery_books": [
           "innocent",
           "murderer",
           "detective"
         ],
-        "wins": 128,
+        "wins": 135,
         "wins_MURDER_HARDCORE": 1,
         "deaths_MURDER_HARDCORE": 1,
         "wins_library": 12,
@@ -1941,14 +1950,14 @@
         "coins_pickedup_MURDER_HARDCORE": 4,
         "granted_chests": 1,
         "mm_chests": 1,
-        "coins_pickedup_MURDER_CLASSIC": 449,
+        "coins_pickedup_MURDER_CLASSIC": 471,
         "wins_hollywood": 13,
         "wins_hollywood_MURDER_CLASSIC": 13,
         "coins_pickedup_hollywood_MURDER_CLASSIC": 38,
         "coins_pickedup_hollywood": 38,
         "games_hollywood": 19,
-        "games_MURDER_CLASSIC": 135,
-        "wins_MURDER_CLASSIC": 114,
+        "games_MURDER_CLASSIC": 143,
+        "wins_MURDER_CLASSIC": 121,
         "games_hollywood_MURDER_CLASSIC": 15,
         "coins_pickedup_cruise_ship_MURDER_CLASSIC": 48,
         "games_cruise_ship_MURDER_CLASSIC": 17,
@@ -1961,8 +1970,8 @@
         "knife_kills_library_MURDER_ASSASSINS": 5,
         "kills_library_MURDER_ASSASSINS": 8,
         "games_library_MURDER_ASSASSINS": 3,
-        "knife_kills": 121,
-        "kills": 167,
+        "knife_kills": 129,
+        "kills": 180,
         "knife_kills_MURDER_ASSASSINS": 14,
         "kills_MURDER_ASSASSINS": 24,
         "kills_library": 8,
@@ -1971,8 +1980,8 @@
         "knife_kills_ancient_tomb_MURDER_ASSASSINS": 6,
         "kills_ancient_tomb": 9,
         "kills_ancient_tomb_MURDER_ASSASSINS": 8,
-        "detective_chance": 25,
-        "murderer_chance": 5,
+        "detective_chance": 3,
+        "murderer_chance": 7,
         "wins_gold_rush_MURDER_CLASSIC": 13,
         "games_gold_rush_MURDER_CLASSIC": 13,
         "wins_gold_rush": 13,
@@ -1989,25 +1998,25 @@
         "games_cruise_ship_MURDER_ASSASSINS": 2,
         "coins_pickedup_cruise_ship_MURDER_ASSASSINS": 21,
         "deaths_cruise_ship_MURDER_ASSASSINS": 2,
-        "kills_as_murderer": 131,
+        "kills_as_murderer": 144,
         "kills_as_murderer_hollywood_MURDER_CLASSIC": 1,
-        "thrown_knife_kills": 32,
+        "thrown_knife_kills": 37,
         "kills_hollywood": 1,
         "kills_hollywood_MURDER_CLASSIC": 1,
         "thrown_knife_kills_hollywood": 1,
         "kills_as_murderer_hollywood": 1,
         "deaths_hollywood_MURDER_CLASSIC": 4,
         "deaths_hollywood": 4,
-        "kills_MURDER_CLASSIC": 128,
-        "thrown_knife_kills_MURDER_CLASSIC": 24,
+        "kills_MURDER_CLASSIC": 141,
+        "thrown_knife_kills_MURDER_CLASSIC": 29,
         "thrown_knife_kills_hollywood_MURDER_CLASSIC": 1,
-        "kills_as_murderer_MURDER_CLASSIC": 126,
+        "kills_as_murderer_MURDER_CLASSIC": 139,
         "detective_wins_ancient_tomb_MURDER_CLASSIC": 1,
         "games_ancient_tomb_MURDER_CLASSIC": 7,
         "wins_ancient_tomb_MURDER_CLASSIC": 6,
-        "detective_wins": 6,
+        "detective_wins": 7,
         "detective_wins_ancient_tomb": 1,
-        "detective_wins_MURDER_CLASSIC": 6,
+        "detective_wins_MURDER_CLASSIC": 7,
         "wins_ancient_tomb": 8,
         "detective_wins_gold_rush_MURDER_CLASSIC": 1,
         "detective_wins_gold_rush": 1,
@@ -2043,7 +2052,7 @@
         "last_one_alive_library": 1,
         "total_time_survived_seconds_towerfall": 3366,
         "total_time_survived_seconds_towerfall_MURDER_INFECTION": 3366,
-        "games_towerfall": 7,
+        "games_towerfall": 9,
         "games_towerfall_MURDER_INFECTION": 3,
         "total_time_survived_seconds_archives_MURDER_INFECTION": 1440,
         "total_time_survived_seconds_archives": 1440,
@@ -2091,16 +2100,16 @@
         "coins_pickedup_hypixel_world_MURDER_CLASSIC": 26,
         "coins_pickedup_hypixel_world": 26,
         "wins_hypixel_world": 7,
-        "games_towerfall_MURDER_CLASSIC": 4,
-        "coins_pickedup_towerfall": 31,
-        "wins_towerfall_MURDER_CLASSIC": 4,
-        "wins_towerfall": 5,
-        "coins_pickedup_towerfall_MURDER_CLASSIC": 20,
+        "games_towerfall_MURDER_CLASSIC": 6,
+        "coins_pickedup_towerfall": 34,
+        "wins_towerfall_MURDER_CLASSIC": 5,
+        "wins_towerfall": 6,
+        "coins_pickedup_towerfall_MURDER_CLASSIC": 23,
         "games_transport_MURDER_CLASSIC": 14,
         "wins_transport": 12,
         "games_transport": 14,
         "wins_transport_MURDER_CLASSIC": 12,
-        "knife_kills_MURDER_CLASSIC": 102,
+        "knife_kills_MURDER_CLASSIC": 110,
         "deaths_cruise_ship_MURDER_CLASSIC": 6,
         "thrown_knife_kills_cruise_ship": 3,
         "kills_as_murderer_cruise_ship": 26,
@@ -2137,7 +2146,8 @@
           "kill_note_cookies_and_milk",
           "knife_skin_shears",
           "kill_note_master_sword",
-          "kill_note_big_skull"
+          "kill_note_big_skull",
+          "sep2021achievementsync"
         ],
         "MurderMystery_openedChests": 13,
         "MurderMystery_openedCommons": 9,
@@ -2471,12 +2481,42 @@
         "survivor_wins_towerfall": 1,
         "survivor_wins_towerfall_MURDER_INFECTION": 1,
         "wins_MURDER_INFECTION": 1,
-        "wins_towerfall_MURDER_INFECTION": 1
+        "wins_towerfall_MURDER_INFECTION": 1,
+        "coins_pickedup_villa": 18,
+        "coins_pickedup_villa_MURDER_CLASSIC": 18,
+        "games_villa": 5,
+        "games_villa_MURDER_CLASSIC": 5,
+        "wins_villa": 5,
+        "wins_villa_MURDER_CLASSIC": 5,
+        "coins_pickedup_subway": 1,
+        "coins_pickedup_subway_MURDER_CLASSIC": 1,
+        "games_subway": 1,
+        "games_subway_MURDER_CLASSIC": 1,
+        "wins_subway": 1,
+        "wins_subway_MURDER_CLASSIC": 1,
+        "kills_as_murderer_villa": 13,
+        "kills_as_murderer_villa_MURDER_CLASSIC": 13,
+        "kills_villa": 13,
+        "kills_villa_MURDER_CLASSIC": 13,
+        "knife_kills_villa": 8,
+        "knife_kills_villa_MURDER_CLASSIC": 8,
+        "murderer_wins": 1,
+        "murderer_wins_MURDER_CLASSIC": 1,
+        "murderer_wins_villa": 1,
+        "murderer_wins_villa_MURDER_CLASSIC": 1,
+        "quickest_murderer_win_time_seconds": 103,
+        "quickest_murderer_win_time_seconds_MURDER_CLASSIC": 103,
+        "quickest_murderer_win_time_seconds_villa": 103,
+        "quickest_murderer_win_time_seconds_villa_MURDER_CLASSIC": 103,
+        "thrown_knife_kills_villa": 5,
+        "thrown_knife_kills_villa_MURDER_CLASSIC": 5,
+        "detective_wins_villa": 1,
+        "detective_wins_villa_MURDER_CLASSIC": 1
       },
       "Duels": {
         "kit_menu_option": "off",
         "sw_duels_kit": "kit_ranked_ranked_champion",
-        "games_played_duels": 16801,
+        "games_played_duels": 17411,
         "show_lb_option": "on",
         "rematch_option_1": "default",
         "duels_recently_played": "BRIDGE_DUEL#SUMO_DUEL#BRIDGE_DUEL",
@@ -2493,62 +2533,62 @@
         "duels_winstreak_best_op_duel": 14,
         "duels_winstreak_best_combo_duel": 6,
         "duels_winstreak_best_classic_duel": 18,
-        "melee_swings": 322031,
-        "losses": 5366,
-        "melee_hits": 113648,
-        "rounds_played": 13060,
-        "sw_duel_health_regenerated": 6475,
-        "sw_duel_losses": 781,
-        "deaths": 7435,
-        "sw_duel_damage_dealt": 16893,
-        "health_regenerated": 38180,
-        "sw_duel_rounds_played": 2035,
-        "damage_dealt": 166773,
-        "sw_duel_deaths": 782,
-        "sw_duel_melee_hits": 7860,
-        "sw_duel_melee_swings": 23838,
-        "combo_duel_melee_hits": 7920,
-        "combo_duel_losses": 31,
-        "combo_duel_rounds_played": 77,
-        "combo_duel_health_regenerated": 7274,
-        "combo_duel_damage_dealt": 44,
-        "combo_duel_deaths": 30,
-        "combo_duel_melee_swings": 15388,
+        "melee_swings": 335415,
+        "losses": 5564,
+        "melee_hits": 118809,
+        "rounds_played": 13666,
+        "sw_duel_health_regenerated": 6492,
+        "sw_duel_losses": 790,
+        "deaths": 7622,
+        "sw_duel_damage_dealt": 16986,
+        "health_regenerated": 39631,
+        "sw_duel_rounds_played": 2048,
+        "damage_dealt": 176963,
+        "sw_duel_deaths": 791,
+        "sw_duel_melee_hits": 7892,
+        "sw_duel_melee_swings": 24064,
+        "combo_duel_melee_hits": 8227,
+        "combo_duel_losses": 34,
+        "combo_duel_rounds_played": 80,
+        "combo_duel_health_regenerated": 7836,
+        "combo_duel_damage_dealt": 281,
+        "combo_duel_deaths": 33,
+        "combo_duel_melee_swings": 16200,
         "combo_duel_wins": 32,
-        "wins": 6689,
-        "kills": 6086,
+        "wins": 7087,
+        "kills": 6478,
         "combo_duel_kills": 26,
-        "classic_duel_rounds_played": 7555,
-        "classic_duel_melee_hits": 62262,
-        "classic_duel_health_regenerated": 14788,
-        "classic_duel_damage_dealt": 120534,
-        "classic_duel_melee_swings": 171826,
-        "classic_duel_wins": 4204,
-        "bow_shots": 21564,
-        "classic_duel_losses": 3177,
-        "classic_duel_bow_shots": 18257,
-        "classic_duel_deaths": 3177,
-        "bow_hits": 8914,
-        "classic_duel_bow_hits": 7928,
-        "classic_duel_kills": 4176,
+        "classic_duel_rounds_played": 8070,
+        "classic_duel_melee_hits": 66506,
+        "classic_duel_health_regenerated": 15646,
+        "classic_duel_damage_dealt": 130173,
+        "classic_duel_melee_swings": 182149,
+        "classic_duel_wins": 4570,
+        "bow_shots": 23341,
+        "classic_duel_losses": 3319,
+        "classic_duel_bow_shots": 19916,
+        "classic_duel_deaths": 3323,
+        "bow_hits": 9762,
+        "classic_duel_bow_hits": 8753,
+        "classic_duel_kills": 4542,
         "op_duel_deaths": 187,
         "op_duel_damage_dealt": 8869,
         "op_duel_melee_swings": 27744,
         "op_duel_melee_hits": 9686,
         "op_duel_health_regenerated": 6498,
-        "op_duel_rounds_played": 446,
+        "op_duel_rounds_played": 447,
         "op_duel_losses": 187,
-        "sw_duel_kills": 831,
-        "sw_duel_wins": 1043,
+        "sw_duel_kills": 834,
+        "sw_duel_wins": 1047,
         "sw_duel_bow_hits": 270,
         "sw_duel_bow_shots": 880,
-        "bow_duel_bow_hits": 44,
-        "bow_duel_deaths": 1,
-        "bow_duel_losses": 1,
-        "bow_duel_bow_shots": 139,
+        "bow_duel_bow_hits": 65,
+        "bow_duel_deaths": 3,
+        "bow_duel_losses": 3,
+        "bow_duel_bow_shots": 245,
         "bow_duel_health_regenerated": 46,
-        "bow_duel_damage_dealt": 151,
-        "bow_duel_rounds_played": 10,
+        "bow_duel_damage_dealt": 213,
+        "bow_duel_rounds_played": 14,
         "selected_1": "sumo",
         "selected_2": "blitz",
         "sw_tournament_health_regenerated": 206,
@@ -2557,7 +2597,7 @@
         "sw_tournament_damage_dealt": 1556,
         "sw_tournament_melee_swings": 2457,
         "current_tnt_games_winstreak": 0,
-        "current_winstreak": 0,
+        "current_winstreak": 4,
         "bowspleef_duel_rounds_played": 126,
         "bowspleef_duel_bow_shots": 755,
         "bowspleef_duel_deaths": 42,
@@ -2569,14 +2609,14 @@
         "chat_enabled": "on",
         "current_combo_winstreak": 0,
         "best_combo_winstreak": 7,
-        "current_classic_winstreak": 0,
+        "current_classic_winstreak": 4,
         "best_classic_winstreak": 19,
         "current_skywars_winstreak": 2,
         "best_skywars_winstreak": 14,
         "sw_duel_champion_kit_wins": 124,
-        "sw_duel_kit_wins": 1036,
+        "sw_duel_kit_wins": 1040,
         "champion_kit_wins": 124,
-        "kit_wins": 1051,
+        "kit_wins": 1055,
         "sw_tournament_deaths": 67,
         "sw_tournament_kills": 63,
         "sw_tournament_bow_hits": 1,
@@ -2608,24 +2648,24 @@
         },
         "current_bow_winstreak": 0,
         "best_bow_winstreak": 1,
-        "coins": 458208,
-        "bow_duel_wins": 1,
-        "bow_duel_kills": 1,
+        "coins": 532289,
+        "bow_duel_wins": 3,
+        "bow_duel_kills": 3,
         "current_sumo_winstreak": 0,
-        "sumo_duel_losses": 770,
-        "sumo_duel_melee_swings": 64993,
-        "sumo_duel_rounds_played": 1945,
-        "sumo_duel_melee_hits": 20623,
-        "sumo_duel_deaths": 698,
+        "sumo_duel_losses": 799,
+        "sumo_duel_melee_swings": 66691,
+        "sumo_duel_rounds_played": 1998,
+        "sumo_duel_melee_hits": 21127,
+        "sumo_duel_deaths": 725,
         "best_sumo_winstreak": 18,
-        "sumo_duel_wins": 864,
+        "sumo_duel_wins": 888,
         "sumo_tournament_deaths": 51,
         "sumo_tournament_rounds_played": 74,
         "sumo_tournament_melee_hits": 628,
         "sumo_tournament_melee_swings": 1066,
         "sumo_tournament_losses": 51,
         "sumo_tournament_kills": 7,
-        "sumo_duel_kills": 728,
+        "sumo_duel_kills": 749,
         "duels_winstreak_best_sumo_duel": 17,
         "sw_duels_kit_new": "kit_ranked_ranked_champion",
         "sw_duel_armorer_kit_wins": 6,
@@ -2711,7 +2751,7 @@
           "projectile_trail_water"
         ],
         "challenges_enabled": true,
-        "duels_chests": 7,
+        "duels_chests": 13,
         "Duels_openedChests": 107,
         "Duels_openedCommons": 62,
         "Duels_openedRares": 34,
@@ -2811,14 +2851,14 @@
         "bridge_doubles_wins": 21,
         "bridge_3v3v3v3_deaths": 34,
         "bridge_four_wins": 4,
-        "bridge_duel_wins": 219,
+        "bridge_duel_wins": 221,
         "bridge_duel_deaths": 2180,
         "bridge_3v3v3v3_losses": 7,
         "bridge_3v3v3v3_rounds_played": 7,
         "bridge_doubles_deaths": 120,
         "bridge_four_deaths": 45,
-        "goals": 1069,
-        "bridge_duel_goals": 997,
+        "goals": 1073,
+        "bridge_duel_goals": 1001,
         "bridge_doubles_goals": 52,
         "bridge_four_rounds_played": 10,
         "bridge_four_kills": 37,
@@ -2829,8 +2869,8 @@
         "bridge_duel_kills": 1551,
         "bridge_3v3v3v3_goals": 4,
         "bridge_four_losses": 6,
-        "bridge_duel_losses": 251,
-        "bridge_duel_rounds_played": 537,
+        "bridge_duel_losses": 261,
+        "bridge_duel_rounds_played": 550,
         "bridge_iron_title_prestige": 5,
         "current_bridge_winstreak": 0,
         "best_winstreak_mode_bridge_duel": 5,
@@ -2858,14 +2898,14 @@
           "Mister Cheesy"
         ],
         "current_winstreak_mode_bridge_duel": 0,
-        "bridge_duel_health_regenerated": 2119,
-        "bridge_duel_damage_dealt": 16797,
-        "bridge_duel_melee_swings": 12104,
-        "bridge_duel_bow_hits": 599,
-        "blocks_placed": 34901,
-        "bridge_duel_melee_hits": 3353,
-        "bridge_duel_blocks_placed": 18160,
-        "bridge_duel_bow_shots": 1343,
+        "bridge_duel_health_regenerated": 2131,
+        "bridge_duel_damage_dealt": 16956,
+        "bridge_duel_melee_swings": 12202,
+        "bridge_duel_bow_hits": 601,
+        "blocks_placed": 35402,
+        "bridge_duel_melee_hits": 3386,
+        "bridge_duel_blocks_placed": 18588,
+        "bridge_duel_bow_shots": 1355,
         "bridge_tournament_rounds_played": 2,
         "bridge_tournament_losses": 1,
         "bridge_tournament_bow_shots": 6,
@@ -2881,18 +2921,18 @@
         "best_winstreak_mode_sumo_duel": 18,
         "current_winstreak_mode_sumo_duel": 0,
         "all_modes_master_title_prestige": 5,
-        "bridge_duel_bridge_deaths": 955,
-        "bridge_duel_bridge_kills": 510,
-        "bridge_kills": 556,
-        "bridge_deaths": 1018,
-        "current_winstreak_mode_classic_duel": 0,
+        "bridge_duel_bridge_deaths": 980,
+        "bridge_duel_bridge_kills": 519,
+        "bridge_kills": 565,
+        "bridge_deaths": 1043,
+        "current_winstreak_mode_classic_duel": 4,
         "best_winstreak_mode_classic_duel": 16,
         "sw_duels_kit_new3": "kit_ranked_ranked_pyromancer",
         "current_winstreak_mode_sw_duel": 2,
         "best_winstreak_mode_sw_duel": 14,
-        "sw_duel_blocks_placed": 14217,
+        "sw_duel_blocks_placed": 14290,
         "blitz_duel_blocks_placed": 25,
-        "duels_recently_played2": "SW_DUEL#SUMO_DUEL#OP_DUEL",
+        "duels_recently_played2": "BOWSPLEEF_DUEL#PARKOUR_EIGHT#BOXING_DUEL#PARKOUR_EIGHT#COMBO_DUEL",
         "bridge_duel": true,
         "leaderboardPage_win_streak": 1,
         "current_winstreak_mode_bridge_four": 0,
@@ -2902,7 +2942,7 @@
         "bridge_four_health_regenerated": 3,
         "bridge_four_melee_hits": 2,
         "bridge_four_melee_swings": 12,
-        "golden_apples_eaten": 159,
+        "golden_apples_eaten": 171,
         "uhc_duel_blocks_placed": 51,
         "uhc_duel_bow_hits": 21,
         "uhc_duel_bow_shots": 43,
@@ -2979,14 +3019,14 @@
         "bridge_doubles_bridge_deaths": 60,
         "best_winstreak_mode_bridge_doubles": 4,
         "bridge_doubles_bridge_kills": 46,
-        "pyromancer_kit_wins": 690,
-        "sw_duel_pyromancer_kit_wins": 681,
+        "pyromancer_kit_wins": 694,
+        "sw_duel_pyromancer_kit_wins": 685,
         "golem_kit_wins": 148,
         "sw_duel_golem_kit_wins": 142,
         "skywars_gold_title_prestige": 5,
         "best_winstreak_mode_combo_duel": 7,
         "current_winstreak_mode_combo_duel": 0,
-        "combo_duel_golden_apples_eaten": 144,
+        "combo_duel_golden_apples_eaten": 156,
         "current_winstreak_mode_sw_doubles": 2,
         "best_winstreak_mode_sw_doubles": 5,
         "sw_doubles_blocks_placed": 286,
@@ -3001,13 +3041,6 @@
         "duels_winstreak_best_bridge_doubles": 3,
         "sw_doubles_losses": 10,
         "sw_doubles_pyromancer_kit_wins": 9,
-        "layout_classic_duel_layout": {
-          "0": "iron_sword",
-          "1": "fishing_rod",
-          "2": "bow",
-          "3": "flint_and_steel",
-          "8": "arrow"
-        },
         "layout_bow_duel_layout": {
           "0": "bow",
           "1": "ender_pearl",
@@ -3042,7 +3075,7 @@
         "uhc_four_wins": 1,
         "uhc_four_deaths": 1,
         "uhc_four_losses": 1,
-        "classic_legend_title_prestige": 4,
+        "classic_legend_title_prestige": 5,
         "skywars_diamond_title_prestige": 5,
         "sumo_iron_title_prestige": 5,
         "sumo_gold_title_prestige": 5,
@@ -3066,18 +3099,42 @@
         "current_winstreak_mode_bowspleef_duel": 0,
         "best_winstreak_mode_bowspleef_duel": 3,
         "op_iron_title_prestige": 5,
-        "layout_op_duel_layout": {
-          "0": "diamond_sword",
-          "1": "fishing_rod",
-          "2": "bow",
-          "3": "flint_and_steel",
-          "4": "golden_apple",
-          "5": "speed_potion",
-          "6": "regen_potion",
-          "7": "speed_potion",
-          "8": "regen_potion",
-          "9": "arrow"
-        }
+        "moved_to_redis_2": true,
+        "boxing_rookie_title_prestige": 1,
+        "parkour_rookie_title_prestige": 1,
+        "best_all_modes_winstreak": 19,
+        "best_mega_walls_winstreak": 0,
+        "best_no_debuff_winstreak": 0,
+        "best_parkour_winstreak": 0,
+        "best_boxing_winstreak": 0,
+        "best_arena_winstreak": 0,
+        "best_winstreak_mode_uhc_duel": 0,
+        "best_winstreak_mode_potion_duel": 0,
+        "best_winstreak_mode_blitz_duel": 0,
+        "best_winstreak_mode_mw_duel": 0,
+        "moved_to_redis_3": true,
+        "best_winstreak_mode_bow_duel": 0,
+        "best_winstreak_mode_capture_threes": 0,
+        "best_winstreak_mode_bridge_four": 0,
+        "best_winstreak_mode_mw_doubles": 0,
+        "best_winstreak_mode_bridge_threes": 0,
+        "best_winstreak_mode_uhc_doubles": 0,
+        "best_winstreak_mode_bridge_3v3v3v3": 0,
+        "best_winstreak_mode_parkour_eight": 0,
+        "best_winstreak_mode_op_doubles": 0,
+        "best_winstreak_mode_duel_arena": 0,
+        "best_winstreak_mode_boxing_duel": 0,
+        "best_winstreak_mode_uhc_meetup": 0,
+        "best_winstreak_mode_bridge_2v2v2v2": 0,
+        "parkour_eight_losses": 2,
+        "parkour_eight_rounds_played": 2,
+        "boxing_duel_losses": 1,
+        "boxing_duel_melee_hits": 41,
+        "boxing_duel_melee_swings": 215,
+        "boxing_duel_rounds_played": 1,
+        "duel_arena_health_regenerated": 2,
+        "duel_arena_melee_swings": 12,
+        "duel_arena_rounds_played": 1
       },
       "BuildBattle": {
         "votes_Birthday": 3,
@@ -3137,11 +3194,12 @@
           "items_last_buy": {
             "diamond_sword": 1619392126761
           },
-          "last_save": 1619479914117,
+          "last_save": 1647379547362,
           "king_quest": {
-            "kills": 440,
+            "kills": 468,
             "renown": 3
           },
+          "last_passive_xp": 1647379511500,
           "prestiges": [
             {
               "index": 1,
@@ -3399,215 +3457,214 @@
               0,
               -19,
               -110,
-              -51,
-              10,
-              -126,
-              80,
-              16,
-              -123,
-              -49,
-              53,
-              43,
-              -75,
-              109,
-              -48,
-              34,
-              -120,
               -69,
-              108,
-              85,
-              68,
-              65,
-              -76,
-              11,
-              106,
-              25,
-              -19,
-              -94,
-              -11,
-              -88,
-              67,
-              -119,
-              -26,
-              21,
-              -77,
-              69,
-              79,
-              -28,
-              123,
-              -12,
-              100,
-              89,
-              98,
-              -5,
-              43,
-              21,
-              45,
-              -102,
-              -19,
-              -103,
-              111,
-              -26,
-              -52,
-              -113,
-              3,
-              -40,
+              10,
+              -62,
+              64,
               16,
-              -127,
-              3,
-              -96,
-              111,
-              -64,
-              8,
-              124,
-              49,
-              23,
-              104,
-              -82,
-              -44,
-              37,
-              -50,
-              -124,
-              -125,
-              70,
-              70,
-              7,
-              -127,
-              -50,
-              46,
-              118,
-              83,
-              -90,
+              69,
+              -17,
+              -58,
+              87,
+              18,
+              91,
+              -63,
+              66,
               -112,
-              -36,
+              45,
+              -83,
+              20,
+              81,
+              8,
+              118,
+              66,
+              44,
+              -59,
+              78,
+              -84,
+              39,
+              -55,
+              -96,
+              33,
+              -113,
+              -107,
+              36,
+              22,
+              126,
+              -111,
+              -1,
+              -111,
+              47,
+              51,
+              26,
+              -75,
+              -78,
+              89,
+              11,
+              65,
+              112,
+              -38,
+              59,
+              103,
+              -26,
+              -20,
+              -80,
+              54,
+              96,
+              65,
+              -124,
+              54,
+              -128,
+              -127,
+              1,
+              35,
+              12,
+              -124,
+              35,
+              -48,
+              114,
+              -43,
+              41,
+              45,
+              -124,
+              -115,
+              70,
+              65,
+              123,
+              -127,
+              -18,
+              54,
+              -11,
+              50,
+              -90,
               -120,
+              -68,
+              -104,
               5,
               12,
               -76,
-              -42,
-              116,
-              -94,
-              3,
-              23,
-              72,
-              73,
-              44,
-              -76,
-              -119,
-              -23,
-              23,
-              122,
-              116,
-              -75,
-              9,
-              -3,
-              -55,
-              -11,
-              -119,
-              -103,
-              46,
-              -127,
-              73,
-              69,
-              44,
-              -75,
-              -76,
-              26,
-              59,
-              -42,
-              -97,
-              -90,
-              -7,
-              -47,
-              59,
-              -42,
-              62,
-              -28,
-              -16,
-              -75,
-              -106,
-              -110,
-              112,
+              87,
+              -108,
               -48,
-              -10,
-              -125,
-              115,
-              18,
-              -47,
-              -43,
-              -122,
-              -71,
-              81,
-              41,
-              91,
-              -49,
-              -44,
-              -63,
-              45,
-              -97,
-              -81,
-              40,
-              -106,
-              46,
-              75,
-              79,
-              -87,
-              -112,
-              125,
-              25,
-              -60,
-              -103,
-              -110,
-              -113,
-              -46,
-              -66,
-              84,
-              41,
-              122,
-              -123,
               -98,
-              -112,
-              23,
-              22,
-              -91,
               43,
-              -119,
-              34,
-              62,
-              -113,
-              44,
-              -104,
-              91,
-              58,
-              49,
-              -84,
-              91,
-              -50,
-              -5,
-              35,
+              4,
+              53,
+              50,
+              -45,
+              64,
+              106,
+              98,
+              -95,
+              -65,
+              68,
+              -57,
+              -21,
               83,
-              -122,
-              -73,
-              -68,
-              -33,
+              98,
+              -82,
+              75,
+              96,
+              -6,
+              36,
+              -106,
+              90,
+              -103,
+              -42,
+              -55,
+              30,
+              72,
+              -21,
+              27,
+              87,
+              -18,
+              105,
               47,
-              -72,
-              -2,
-              123,
-              40,
-              61,
-              -116,
-              117,
-              -34,
-              -12,
               25,
-              119,
-              -14,
-              71,
+              -67,
+              94,
               89,
+              19,
+              54,
+              58,
+              65,
+              -104,
+              31,
+              99,
+              58,
+              91,
               104,
-              73,
-              5,
+              -82,
+              85,
+              -58,
+              -26,
+              -67,
+              117,
+              88,
+              94,
+              28,
+              -105,
+              82,
+              -23,
+              -79,
+              -12,
+              -107,
+              -118,
+              56,
+              -112,
+              97,
+              90,
+              40,
+              121,
+              27,
+              29,
+              72,
+              -107,
+              -95,
+              95,
+              -27,
+              71,
+              -14,
+              -93,
+              106,
+              -12,
+              51,
+              -94,
+              -104,
+              -13,
+              -79,
+              -119,
+              -26,
+              -122,
+              18,
+              -122,
+              89,
+              94,
+              120,
+              119,
+              96,
+              42,
+              -16,
+              -58,
+              -31,
+              55,
+              -83,
+              -1,
+              14,
+              -75,
+              -61,
+              68,
+              -25,
+              -101,
+              -34,
+              -21,
+              10,
+              33,
+              -85,
+              -117,
+              39,
+              -74,
+              4,
               0,
               0
             ]
@@ -5922,7 +5979,7 @@
               0
             ]
           },
-          "cash": 32142.82994999997,
+          "cash": 34431.00794999992,
           "last_midfight_disconnect": 1585948055747,
           "leaderboard_stats": {
             "Pit_blockhead_blocks_2021_winter": 108,
@@ -5962,7 +6019,7 @@
               76,
               97,
               52,
-              100,
+              101,
               100,
               96,
               117,
@@ -6007,7 +6064,7 @@
               -127,
               -24,
               48,
-              33,
+              32,
               89,
               -121,
               62,
@@ -6057,10 +6114,10 @@
               88,
               6,
               0,
-              102,
-              -82,
-              41,
-              -47,
+              71,
+              -72,
+              -7,
+              109,
               -6,
               0,
               0,
@@ -6070,6 +6127,40 @@
           "selected_perk_1": "golden_heads",
           "selected_perk_0": "safety_first",
           "last_contract": 1530076856750,
+          "item_stash": {
+            "type": 0,
+            "data": [
+              31,
+              -117,
+              8,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              -29,
+              98,
+              96,
+              -32,
+              100,
+              96,
+              -52,
+              100,
+              0,
+              3,
+              0,
+              -58,
+              2,
+              -70,
+              27,
+              13,
+              0,
+              0,
+              0
+            ]
+          },
           "selected_killstreak_2": null,
           "selected_killstreak_1": "second_gapple",
           "login_messages": [],
@@ -6078,13 +6169,13 @@
             261,
             0,
             262,
-            4,
+            267,
             309,
             309,
             262,
             397
           ],
-          "xp": 125866,
+          "xp": 126734,
           "inv_contents": {
             "type": 0,
             "data": [
@@ -6497,37 +6588,37 @@
               "key": "streaker"
             }
           ],
-          "cash_during_prestige_1": 128477.8299499997,
+          "cash_during_prestige_1": 130766.00794999982,
           "cash_during_prestige_0": 119643.57274241406
         },
         "pit_stats_ptl": {
-          "arrow_hits": 1037,
-          "arrows_fired": 3126,
+          "arrow_hits": 1088,
+          "arrows_fired": 3266,
           "blocks_placed": 283,
-          "bow_damage_dealt": 2640,
-          "bow_damage_received": 1261,
-          "cash_earned": 54976,
-          "damage_dealt": 17097,
-          "damage_received": 19211,
-          "deaths": 794,
-          "joins": 55,
-          "jumped_into_pit": 379,
-          "kills": 440,
-          "left_clicks": 10375,
-          "melee_damage_dealt": 14439,
-          "melee_damage_received": 17587,
-          "sword_hits": 5814,
-          "assists": 1233,
-          "ghead_eaten": 231,
-          "launched_by_launchers": 407,
-          "playtime_minutes": 450,
+          "bow_damage_dealt": 2731,
+          "bow_damage_received": 1337,
+          "cash_earned": 57277,
+          "damage_dealt": 18456,
+          "damage_received": 20881,
+          "deaths": 857,
+          "joins": 59,
+          "jumped_into_pit": 388,
+          "kills": 468,
+          "left_clicks": 11124,
+          "melee_damage_dealt": 15704,
+          "melee_damage_received": 19128,
+          "sword_hits": 6323,
+          "assists": 1264,
+          "ghead_eaten": 265,
+          "launched_by_launchers": 463,
+          "playtime_minutes": 500,
           "max_streak": 11,
-          "chat_messages": 51,
+          "chat_messages": 52,
           "blocks_broken": 13,
           "gapple_eaten": 22,
-          "ingots_cash": 398,
-          "ingots_picked_up": 166,
-          "enderchest_opened": 14,
+          "ingots_cash": 446,
+          "ingots_picked_up": 190,
+          "enderchest_opened": 16,
           "lucky_diamond_pieces": 8,
           "endless_quiver_arrows": 1632,
           "extra_from_trickle_down": 40,
@@ -6573,7 +6664,11 @@
           {
             "time": 1616054284499
           }
-        ]
+        ],
+        "active": {
+          "objectives": {},
+          "started": 1645573540857
+        }
       },
       "skywars_solo_kills": {
         "completions": [
@@ -6712,6 +6807,9 @@
           },
           {
             "time": 1619479185504
+          },
+          {
+            "time": 1647377894179
           }
         ]
       },
@@ -6752,7 +6850,13 @@
           {
             "time": 1619391080069
           }
-        ]
+        ],
+        "active": {
+          "objectives": {
+            "prototype_pit_weekly_gold": 2301
+          },
+          "started": 1640659847648
+        }
       },
       "mm_daily_win": {
         "completions": [
@@ -6764,22 +6868,28 @@
           },
           {
             "time": 1590879913732
+          },
+          {
+            "time": 1631751095624
           }
         ],
         "active": {
           "objectives": {},
-          "started": 1591417025109
+          "started": 1645573691512
         }
       },
       "mm_daily_power_play": {
         "completions": [
           {
             "time": 1533065217152
+          },
+          {
+            "time": 1631751308330
           }
         ],
         "active": {
           "objectives": {},
-          "started": 1590879057562
+          "started": 1645573691512
         }
       },
       "mm_daily_target_kill": {
@@ -6801,7 +6911,7 @@
         ],
         "active": {
           "objectives": {
-            "mm_weekly_win": 1
+            "mm_weekly_win": 8
           },
           "started": 1590879057562
         }
@@ -6813,7 +6923,9 @@
           }
         ],
         "active": {
-          "objectives": {},
+          "objectives": {
+            "mm_weekly_kills_as_murderer": 13
+          },
           "started": 1590879057562
         }
       },
@@ -7100,12 +7212,71 @@
           },
           {
             "time": 1620944032412
+          },
+          {
+            "time": 1624940110725
+          },
+          {
+            "time": 1628887421073
+          },
+          {
+            "time": 1631752440535
+          },
+          {
+            "time": 1640478985232
+          },
+          {
+            "time": 1640570405298
+          },
+          {
+            "time": 1640659702060
+          },
+          {
+            "time": 1642034946051
+          },
+          {
+            "time": 1645220539584
+          },
+          {
+            "time": 1645397395378
+          },
+          {
+            "time": 1645576135101
+          },
+          {
+            "time": 1646183510467
+          },
+          {
+            "time": 1646455880068
+          },
+          {
+            "time": 1646456779612
+          },
+          {
+            "time": 1646879613641
+          },
+          {
+            "time": 1646879634746
+          },
+          {
+            "time": 1647108264681
+          },
+          {
+            "time": 1647108290958
+          },
+          {
+            "time": 1647223864630
+          },
+          {
+            "time": 1647277557643
+          },
+          {
+            "time": 1647362260439
+          },
+          {
+            "time": 1647477108616
           }
-        ],
-        "active": {
-          "objectives": {},
-          "started": 1621036060760
-        }
+        ]
       },
       "duels_killer": {
         "completions": [
@@ -7375,12 +7546,65 @@
           },
           {
             "time": 1620943937050
+          },
+          {
+            "time": 1624940356543
+          },
+          {
+            "time": 1628887421047
+          },
+          {
+            "time": 1640479023136
+          },
+          {
+            "time": 1640570084863
+          },
+          {
+            "time": 1640659621561
+          },
+          {
+            "time": 1642034976533
+          },
+          {
+            "time": 1645220587821
+          },
+          {
+            "time": 1645397395378
+          },
+          {
+            "time": 1645576135101
+          },
+          {
+            "time": 1646183510467
+          },
+          {
+            "time": 1646455880068
+          },
+          {
+            "time": 1646457628781
+          },
+          {
+            "time": 1646879613641
+          },
+          {
+            "time": 1646879634746
+          },
+          {
+            "time": 1647108378331
+          },
+          {
+            "time": 1647224145671
+          },
+          {
+            "time": 1647277619415
+          },
+          {
+            "time": 1647362287423
+          },
+          {
+            "time": 1647477284620
           }
-        ],
-        "active": {
-          "objectives": {},
-          "started": 1621036060760
-        }
+        ]
       },
       "duels_winner": {
         "completions": [
@@ -7671,12 +7895,65 @@
           },
           {
             "time": 1620943937050
+          },
+          {
+            "time": 1624940009261
+          },
+          {
+            "time": 1628887273250
+          },
+          {
+            "time": 1631752331321
+          },
+          {
+            "time": 1640478844583
+          },
+          {
+            "time": 1640569987758
+          },
+          {
+            "time": 1640659419541
+          },
+          {
+            "time": 1642034845844
+          },
+          {
+            "time": 1645220408550
+          },
+          {
+            "time": 1645397247331
+          },
+          {
+            "time": 1645576037891
+          },
+          {
+            "time": 1646183366330
+          },
+          {
+            "time": 1646455670354
+          },
+          {
+            "time": 1646456597399
+          },
+          {
+            "time": 1646879474715
+          },
+          {
+            "time": 1647108124142
+          },
+          {
+            "time": 1647223741448
+          },
+          {
+            "time": 1647277431167
+          },
+          {
+            "time": 1647362122973
+          },
+          {
+            "time": 1647475460003
           }
-        ],
-        "active": {
-          "objectives": {},
-          "started": 1621036060760
-        }
+        ]
       },
       "duels_weekly_kills": {
         "completions": [
@@ -7736,12 +8013,14 @@
           },
           {
             "time": 1620944251790
+          },
+          {
+            "time": 1645221870367
+          },
+          {
+            "time": 1647278356517
           }
-        ],
-        "active": {
-          "objectives": {},
-          "started": 1621036060760
-        }
+        ]
       },
       "duels_weekly_wins": {
         "completions": [
@@ -7816,14 +8095,20 @@
           },
           {
             "time": 1619331620296
-          }
-        ],
-        "active": {
-          "objectives": {
-            "win": 32
           },
-          "started": 1619837300742
-        }
+          {
+            "time": 1628887298516
+          },
+          {
+            "time": 1645221587651
+          },
+          {
+            "time": 1646879982085
+          },
+          {
+            "time": 1647278037532
+          }
+        ]
       },
       "tnt_daily_win": {
         "completions": [
@@ -7836,7 +8121,11 @@
           {
             "time": 1616037634775
           }
-        ]
+        ],
+        "active": {
+          "objectives": {},
+          "started": 1645578024629
+        }
       },
       "bedwars_daily_win": {
         "completions": [
@@ -7889,7 +8178,9 @@
           }
         ],
         "active": {
-          "objectives": {},
+          "objectives": {
+            "bedwars_daily_played": 1
+          },
           "started": 1616466806097
         }
       },
@@ -7904,7 +8195,7 @@
         ],
         "active": {
           "objectives": {
-            "bedwars_bed_elims": 15
+            "bedwars_bed_elims": 23
           },
           "started": 1614727293385
         }
@@ -7975,8 +8266,15 @@
           },
           {
             "time": 1616036754140
+          },
+          {
+            "time": 1647480105278
           }
-        ]
+        ],
+        "active": {
+          "objectives": {},
+          "started": 1647911531824
+        }
       },
       "tnt_bowspleef_weekly": {
         "active": {
@@ -8020,7 +8318,13 @@
           {
             "time": 1616037039487
           }
-        ]
+        ],
+        "active": {
+          "objectives": {
+            "tnt_tntrun_weekly": 1037
+          },
+          "started": 1645578024642
+        }
       },
       "paintball_expert": {
         "active": {
@@ -8222,7 +8526,7 @@
       "arcade_specialist": {
         "active": {
           "objectives": {
-            "play": 6
+            "play": 7
           },
           "started": 1591417736564
         }
@@ -8231,14 +8535,11 @@
         "completions": [
           {
             "time": 1614393502451
-          }
-        ],
-        "active": {
-          "objectives": {
-            "play": 2
           },
-          "started": 1614405101008
-        }
+          {
+            "time": 1645577904339
+          }
+        ]
       },
       "build_battle_player": {
         "completions": [
@@ -8358,6 +8659,62 @@
           "objectives": {},
           "started": 1618632125277
         }
+      },
+      "mm_daily_infector": {
+        "active": {
+          "objectives": {},
+          "started": 1631750898715
+        }
+      },
+      "bedwars_weekly_challenges": {
+        "active": {
+          "objectives": {
+            "bedwars_weekly_challenge_played": 1
+          },
+          "started": 1645397942953
+        }
+      },
+      "warlords_domination": {
+        "active": {
+          "objectives": {},
+          "started": 1645578629015
+        }
+      },
+      "warlords_tdm": {
+        "active": {
+          "objectives": {},
+          "started": 1645578629015
+        }
+      },
+      "warlords_ctf": {
+        "active": {
+          "objectives": {},
+          "started": 1645578629015
+        }
+      },
+      "warlords_victorious": {
+        "active": {
+          "objectives": {},
+          "started": 1645578629015
+        }
+      },
+      "warlords_objectives": {
+        "active": {
+          "objectives": {},
+          "started": 1645578629015
+        }
+      },
+      "warlords_dedication": {
+        "active": {
+          "objectives": {},
+          "started": 1645578629015
+        }
+      },
+      "warlords_all_star": {
+        "active": {
+          "objectives": {},
+          "started": 1645578629016
+        }
       }
     },
     "achievements": {
@@ -8380,11 +8737,11 @@
       "warlords_paladin_level": 0,
       "quake_kills": 251,
       "quake_wins": 3,
-      "general_challenger": 1037,
+      "general_challenger": 1063,
       "quake_killing_sprees": 8,
-      "general_wins": 6817,
+      "general_wins": 7227,
       "copsandcrims_bomb_specialist": 0,
-      "general_quest_master": 397,
+      "general_quest_master": 467,
       "tntgames_bow_spleef_wins": 0,
       "tntgames_tnt_run_wins": 5,
       "tntgames_wizards_wins": 0,
@@ -8392,9 +8749,9 @@
       "tntgames_pvp_run_killer": 1,
       "tntgames_tnt_wizards_kills": 4,
       "tntgames_tnt_tag_wins": 0,
-      "tntgames_tnt_triathlon": 643,
-      "general_coins": 81821,
-      "tntgames_tnt_banker": 44179,
+      "tntgames_tnt_triathlon": 652,
+      "general_coins": 82517,
+      "tntgames_tnt_banker": 44851,
       "quake_coins": 1017,
       "paintball_wins": 3,
       "paintball_kills": 38,
@@ -8403,14 +8760,14 @@
       "tntgames_tnt_wizards_caps": 2,
       "arcade_miniwalls_winner": 0,
       "arcade_team_work": 32,
-      "arcade_arcade_banker": 30165,
+      "arcade_arcade_banker": 30189,
       "bedwars_level": 15,
       "bedwars_wins": 36,
       "arcade_arcade_winner": 17,
       "arcade_bounty_hunter": 92,
-      "murdermystery_wins_as_survivor": 97,
-      "murdermystery_kills_as_murderer": 131,
-      "bedwars_beds": 148,
+      "murdermystery_wins_as_survivor": 104,
+      "murdermystery_kills_as_murderer": 144,
+      "bedwars_beds": 156,
       "walls3_kills": 0,
       "walls3_wins": 1,
       "walls3_coins": 60,
@@ -8431,7 +8788,7 @@
       "buildbattle_build_battle_score": 610,
       "buildbattle_guess_the_build_guesses": 35,
       "bedwars_loot_box": 17,
-      "duels_duels_winner": 6704,
+      "duels_duels_winner": 7106,
       "duels_duels_win_streak": 20,
       "duels_duels_trophies": 3,
       "gingerbread_banker": 49675,
@@ -8440,35 +8797,35 @@
       "bridge_win_streak": 11,
       "bridge_one_v_one_wins": 141,
       "bridge_unique_map_wins": 18,
-      "bedwars_collectors_edition": 49,
+      "bedwars_collectors_edition": 53,
       "skywars_wins_lab": 140,
       "skyclash_cards_unlocked": 6,
-      "bedwars_bedwars_killer": 344,
+      "bedwars_bedwars_killer": 348,
       "bridge_two_v_two_wins": 11,
       "bridge_four_v_four_wins": 2,
-      "duels_duels_division": 6,
+      "duels_duels_division": 5,
       "duels_duels_traveller": 46,
-      "duels_goals": 1067,
-      "duels_bridge_wins": 244,
-      "duels_bridge_duels_wins": 219,
+      "duels_goals": 1071,
+      "duels_bridge_wins": 246,
+      "duels_bridge_duels_wins": 221,
       "duels_unique_map_wins": 20,
       "duels_bridge_win_streak": 5,
       "duels_bridge_teams_wins": 4,
       "duels_bridge_doubles_wins": 21,
-      "murdermystery_hoarder": 160,
+      "murdermystery_hoarder": 183,
       "tntgames_clinic": 93,
       "arena_climb_the_ranks": 2000,
       "paintball_coins": 3512,
       "paintball_kill_streaks": 3,
       "vampirez_kill_vampires": 13,
-      "skyblock_excavator": 26,
+      "skyblock_excavator": 29,
       "skyblock_gatherer": 23,
       "skyblock_harvester": 18,
-      "skyblock_treasury": 59,
-      "skyblock_minion_lover": 266,
+      "skyblock_treasury": 62,
+      "skyblock_minion_lover": 370,
       "skyblock_combat": 19,
-      "tntgames_block_runner": 41625,
-      "skyblock_angler": 29,
+      "tntgames_block_runner": 42334,
+      "skyblock_angler": 31,
       "skyblock_augmentation": 14,
       "halloween2017_pumpkinator": 11,
       "christmas2017_advent_2019": 17,
@@ -8488,15 +8845,25 @@
       "uhc_bounty": 1750,
       "arcade_hide_and_seek_hider_kills": 2,
       "pit_prestiges": 1,
-      "pit_gold": 54148,
-      "pit_kills": 440,
+      "pit_gold": 56393,
+      "pit_kills": 468,
       "pit_renown": 13,
-      "pit_events": 3,
+      "pit_events": 4,
       "skyblock_domesticator": 20,
       "skyblock_slayer": 7,
       "summer_shopaholic": 4918,
       "skywars_you_re_a_star": 6,
-      "arcade_ctw_slayer": 3
+      "arcade_ctw_slayer": 3,
+      "skyblock_dungeoneer": 2,
+      "murdermystery_wins_as_murderer": 1,
+      "duels_duels_mastery": 6,
+      "murdermystery_brainiac": 40,
+      "murdermystery_countermeasures": 2,
+      "murdermystery_hitman": 48,
+      "murdermystery_survival_skills": 16,
+      "arcade_ender_spleef_block_stealer": 207,
+      "arcade_galaxy_wars_kills": 2,
+      "arcade_throw_out_kills": 10
     },
     "housingMeta": {
       "tutorialStep": "FINISH_FINISHED",
@@ -8620,7 +8987,7 @@
         "specialoccasion_summer_2016_skull_portable_grill"
       ],
       "playerSettings": {
-        "VISIBILITY": "IntegerState-4",
+        "VISIBILITY": "IntegerState-2",
         "customVisibility": 1,
         "BORDER": "BooleanState-true",
         "TIPS": "BooleanState-false"
@@ -8646,7 +9013,7 @@
         "fa94e2a6-732f-40f8-b8d6-52de2b1e5c00",
         "b70aa28a-e7f6-44d5-a47e-687d35f113d9"
       ],
-      "playlist": "HOPPIN_BLOCKS,ENDLOBBY,HAPPY,CORPSE_PARTY,CANTINA,KIRBY_GOURMET,GAMEMODE8,NYNY,PHWEE,BAD_APPLE,KEWL,MAD_WORLD,MBISON,SIMILAR,FUN,AZTEC,CHASED_BY_CREEPER,COMPTINE,LARGER_THAN_LIFE,VICTORY,VOTING,SCREAMING_OUT,DRAGONFLIES,ENTERTAINER,FEASIBILITY,CROSSING_FIELD,HILLY_ESCAPADES,PUMP_IT_UP,SUSPENSEFUL,INTERDIMENSIONAL,FEELS,OLYMPUS,ORIGINAL,MINECRAFT_IS_MY_LIFE,RED_HOUSE,ROLL,CIRNO,LET_GO_IT,",
+      "playlist": "HOPPIN_BLOCKS,ENDLOBBY,HAPPY,CORPSE_PARTY,CANTINA,KIRBY_GOURMET,GAMEMODE8,NYNY,PHWEE,BAD_APPLE,KEWL,MAD_WORLD,MBISON,SIMILAR,FUN,AZTEC,CHASED_BY_CREEPER,COMPTINE,LARGER_THAN_LIFE,VICTORY,VOTING,SCREAMING_OUT,DRAGONFLIES,ENTERTAINER,FEASIBILITY,CROSSING_FIELD,HILLY_ESCAPADES,PUMP_IT_UP,SUSPENSEFUL,INTERDIMENSIONAL,FEELS,OLYMPUS,ORIGINAL,MINECRAFT_IS_MY_LIFE,RED_HOUSE,ROLL,CIRNO,",
       "given_cookies_105056": [
         "455bba45-bb67-4863-9d56-1123b241b290",
         "50f7e9a8-39d1-47bc-973d-9fad999a06cf"
@@ -8716,35 +9083,35 @@
       "last_mcmp": 1519590874735
     },
     "mcVersionRp": "1.11.2",
-    "karma": 10231740,
+    "karma": 11007640,
     "petConsumables": {
-      "CARROT_ITEM": 297,
-      "FEATHER": 919,
-      "BREAD": 325,
-      "SLIME_BALL": 959,
-      "RED_ROSE": 299,
-      "COOKED_BEEF": 307,
-      "WATER_BUCKET": 1885,
-      "MELON": 339,
-      "WOOD_SWORD": 996,
-      "STICK": 987,
-      "MILK_BUCKET": 1943,
-      "PORK": 339,
-      "GOLD_RECORD": 950,
+      "CARROT_ITEM": 299,
+      "FEATHER": 928,
+      "BREAD": 328,
+      "SLIME_BALL": 966,
+      "RED_ROSE": 304,
+      "COOKED_BEEF": 310,
+      "WATER_BUCKET": 1903,
+      "MELON": 340,
+      "WOOD_SWORD": 1006,
+      "STICK": 995,
+      "MILK_BUCKET": 1957,
+      "PORK": 341,
+      "GOLD_RECORD": 955,
       "PUMPKIN_PIE": 332,
-      "LEASH": 979,
-      "LAVA_BUCKET": 1929,
-      "BONE": 337,
-      "WHEAT": 303,
-      "BAKED_POTATO": 303,
-      "HAY_BLOCK": 322,
-      "RAW_FISH": 299,
-      "MAGMA_CREAM": 333,
-      "ROTTEN_FLESH": 296,
+      "LEASH": 985,
+      "LAVA_BUCKET": 1946,
+      "BONE": 340,
+      "WHEAT": 310,
+      "BAKED_POTATO": 306,
+      "HAY_BLOCK": 325,
+      "RAW_FISH": 303,
+      "MAGMA_CREAM": 336,
+      "ROTTEN_FLESH": 299,
       "CAKE": 321,
-      "APPLE": 303,
-      "MUSHROOM_SOUP": 321,
-      "COOKIE": 316
+      "APPLE": 306,
+      "MUSHROOM_SOUP": 326,
+      "COOKIE": 318
     },
     "levelingReward_0": true,
     "levelingReward_1": true,
@@ -8989,7 +9356,8 @@
         "hat_mummy",
         "hat_bird",
         "hat_polar_bear",
-        "hat_football_star"
+        "hat_football_star",
+        "hat_letter_b"
       ]
     },
     "parkourCompletions": {
@@ -9019,10 +9387,10 @@
       ]
     },
     "lastAdsenseGenerateTime": 1621125384799,
-    "lastLogout": 1622501380845,
+    "lastLogout": 1648421511765,
     "friendRequestsUuid": [],
     "levelingReward_4": true,
-    "channel": "PARTY",
+    "channel": "ALL",
     "newPackageRank": "MVP_PLUS",
     "levelUp_VIP": 1505951821790,
     "currentPet": "SLIME_SMALL",
@@ -9088,7 +9456,8 @@
       "for_points_3500": 1590879053022,
       "for_points_3600": 1594196501471,
       "for_points_3700": 1610146993020,
-      "for_points_3800": 1619394382748
+      "for_points_3800": 1619394382748,
+      "for_points_3900": 1640660605575
     },
     "achievementTracking": [],
     "levelingReward_8": true,
@@ -9108,7 +9477,7 @@
     "socialMedia": {
       "YOUTUBE": "1;UCYgvdBh-OdrhHg2GTxlcBTg",
       "links": {
-        "DISCORD": "mat#6207",
+        "DISCORD": "mat#1592",
         "HYPIXEL": "https://hypixel.net/members/matdoesdev.1849717/"
       },
       "prompt": true
@@ -9121,16 +9490,16 @@
         "BUILD_BATTLE__guesser_challenge": 3,
         "BUILD_BATTLE__top_3_challenge": 12,
         "SKYWARS__rush_challenge": 36,
-        "BEDWARS__support": 28,
-        "DUELS__feed_the_void_challenge": 705,
-        "MURDER_MYSTERY__murder_spree": 15,
+        "BEDWARS__support": 29,
+        "DUELS__feed_the_void_challenge": 728,
+        "MURDER_MYSTERY__murder_spree": 16,
         "MURDER_MYSTERY__sherlock": 1,
         "MURDER_MYSTERY__hero": 1,
         "TNTGAMES__tnt_tag_challenge": 9,
         "WALLS__looting_challenge": 2,
         "VAMPIREZ__last_stand_challenge": 2,
         "ARCADE__hypixel_says_challenge": 2,
-        "BEDWARS__offensive": 27,
+        "BEDWARS__offensive": 28,
         "DUELS__target_practice_challenge": 2,
         "SURVIVAL_GAMES__resistance_challenge": 1,
         "ARCADE__galaxy_wars_challenge": 1,
@@ -9185,13 +9554,13 @@
         "5": 85923
       },
       "Bedwars": {
-        "0": 19326,
+        "0": 13651,
         "1": 8348,
-        "2": 41540
+        "2": 27155
       }
     },
     "levelingReward_31": true,
-    "achievementPoints": 3700,
+    "achievementPoints": 3785,
     "levelingReward_32": true,
     "levelingReward_33": true,
     "levelingReward_34": true,
@@ -9420,6 +9789,7 @@
       "day20": 1576893108869,
       "day21": 1576906795987
     },
+    "claimed_year143_cake": 1624939081224,
     "mostRecentGameType": "PROTOTYPE"
   }
 }

@@ -98,7 +98,7 @@ export interface HypixelPlayerSocialMedia {
 
 
 /** Send an HTTP request to the Hypixel API */
-export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(path: P, options: typedHypixelApi.Requests[P]['options']): Promise<typedHypixelApi.Requests[P]['response']> => {
+export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(path: P, options: typedHypixelApi.Requests[P]['options']): Promise<typedHypixelApi.Requests[P]['response']['data']> => {
 	// Send a raw http request to api.hypixel.net, and return the parsed json
 	let response: typedHypixelApi.Requests[P]['response']
 	try {
@@ -152,7 +152,7 @@ export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(path
 		await sleep(10000)
 		return await sendApiRequest(path, options)
 	}
-	return response
+	return response.data
 }
 
 // this is necessary for mocking in the tests because es6

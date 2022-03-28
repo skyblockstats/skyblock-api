@@ -31,13 +31,14 @@ hypixelApi.mockSendApiRequest(async (path, options) => {
 	requestsSent++
 	switch (path) {
 		case 'player': {
-			return { data: await readJsonData(`player/${options.uuid}`) }
+			return await readJsonData(`player/${options.uuid}`)
 		}
 		case 'skyblock/profiles': {
-			return { data: await readJsonData(`skyblock/profiles/${options.uuid}`) }
+			return await readJsonData(`skyblock/profiles/${options.uuid}`)
 		}
+		case 'resources/skyblock/items':
+			return await readJsonData('resources/skyblock/items')
 	}
-	console.log(path, args)
 })
 
 mojang.mockProfileFromUuid(async (uuid) => {
