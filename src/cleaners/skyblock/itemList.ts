@@ -18,7 +18,7 @@ export interface ItemListItem {
         name: string
         glint: boolean
     }
-    npc_sell_price: number | null
+    npcSellPrice: number | null
     requirements: ItemRequirement | null
 }
 
@@ -47,7 +47,7 @@ function cleanItemListItem(item: typedHypixelApi.SkyBlockItemsResponse['items'][
             name: item.name,
             glint: item.glowing ?? false
         },
-        npc_sell_price: item.npc_sell_price ?? null,
+        npcSellPrice: item.npc_sell_price ?? null,
         requirements: cleanItemRequirements(item.catacombs_requirements ?? item.requirements)
     }
 }
