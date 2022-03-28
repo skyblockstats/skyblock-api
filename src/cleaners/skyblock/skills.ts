@@ -1,4 +1,5 @@
 import typedHypixelApi from 'typed-hypixel-api'
+import { fetchSkills } from '../../constants.js'
 import { levelFromXpTable } from '../../util.js'
 
 export interface Skill {
@@ -136,6 +137,7 @@ export function levelForSkillXp(xp: number, maxLevel: number) {
 }
 
 export async function cleanSkills(data: typedHypixelApi.SkyBlockProfileMember): Promise<Skill[]> {
+	const allSkillNames = await fetchSkills()
 	const skills: Skill[] = []
 	for (const item in data) {
 		if (item.startsWith('experience_skill_')) {
@@ -170,5 +172,22 @@ export async function cleanSkills(data: typedHypixelApi.SkyBlockProfileMember): 
 			})
 		}
 	}
+
+	// add missing skills
+	const missingSkillNames = allSkillNames.filter(skillName => !skills.some(skill => skill.name === skillName))
+	for (const skillName of missingSkillNames) {
+		skills.push({
+			name: skillName,
+			xp: 0,
+			level: 0,
+			maxLevel: skillsMaxLevel[skillName] ?? skillsDefaultMaxLevel,
+			levelXp: 0,
+			levelXpRequired: 0
+		})
+	}
+
+	// sort skills by name
+	skills.sort((a, b) => a.name.localeCompare(b.name))
+
 	return skills
 }
