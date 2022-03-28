@@ -25,6 +25,7 @@ import typedHypixelApi from 'typed-hypixel-api'
 import * as cached from './hypixelCached.js'
 import { debug } from './index.js'
 import { WithId } from 'mongodb'
+import { cleanItemListResponse, ItemListData } from './cleaners/skyblock/itemList.js'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories' | undefined
 
@@ -56,7 +57,8 @@ const cleanResponseFunctions = {
 	'player': (data, options) => cleanPlayerResponse(data.player),
 	'skyblock/profile': (data: typedHypixelApi.SkyBlockProfileResponse, options) => cleanSkyblockProfileResponse(data.profile, options),
 	'skyblock/profiles': (data, options) => cleanSkyblockProfilesResponse(data.profiles),
-	'resources/skyblock/election': (data, options) => cleanElectionResponse(data)
+	'resources/skyblock/election': (data, options) => cleanElectionResponse(data),
+	'resources/skyblock/items': (data, options) => cleanItemListResponse(data)
 } as const
 
 
@@ -308,5 +310,40 @@ export async function fetchElection(): Promise<ElectionData> {
 	// updates every 10 minutes
 	nextElectionUpdate = new Date((election.lastUpdated + 10 * 60) * 1000)
 	return election
+}
+
+
+let isFetchingItemList = false
+let cachedItemListData: ItemListData | null = null
+let nextItemListUpdate: Date = new Date(0)
+
+export async function fetchItemList() {
+	if (cachedItemListData && nextItemListUpdate > new Date())
+		return cachedItemListData
+
+	// if it's currently fetching the election data and it doesn't have it,
+	// wait until we do have the election data
+	if (isFetchingItemList && !cachedItemListData) {
+		await new Promise(resolve => {
+			const interval = setInterval(() => {
+				if (cachedItemListData) {
+					clearInterval(interval)
+					resolve(cachedItemListData)
+				}
+			}, 100)
+		})
+	}
+
+	isFetchingItemList = true
+	const itemList: ItemListData = await sendCleanApiRequest(
+		'resources/skyblock/items',
+		{}
+	)
+	isFetchingItemList = false
+
+	cachedItemListData = itemList
+	// updates every 60 minutes
+	nextElectionUpdate = new Date((itemList.lastUpdated + 60 * 60) * 1000)
+	return itemList
 }
 

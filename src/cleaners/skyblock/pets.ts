@@ -1,6 +1,8 @@
 import typedHypixelApi from 'typed-hypixel-api'
-import { fetchPets } from '../../constants.js'
+import { fetchItemList } from '../../hypixel.js'
 import { levelFromXpTable } from '../../util.js'
+import { fetchPets } from '../../constants.js'
+import { ItemListItem } from './itemList.js'
 
 // https://hypixel-skyblock.fandom.com/wiki/Module:Pet/LevelingData?action=edit
 
@@ -43,7 +45,7 @@ export interface Pet {
 	level: number
 	tier: typedHypixelApi.Pet['tier']
 	skin: string | null
-	item: string | null
+	item: ItemListItem | null
 }
 
 export interface PetsData {
@@ -59,6 +61,8 @@ export async function cleanPets(data: typedHypixelApi.SkyBlockProfileMember): Pr
 	const allPetIds = await fetchPets()
 	const obtainedPetIds: string[] = []
 
+	const itemList = await fetchItemList()
+
 	for (const petData of data.pets ?? []) {
 		const xpTable = RARITY_XP_TABLES[petData.tier]
 		const level = levelFromXpTable(petData.exp, xpTable)
@@ -69,7 +73,7 @@ export async function cleanPets(data: typedHypixelApi.SkyBlockProfileMember): Pr
 			level,
 			tier: petData.tier,
 			skin: petData.skin ?? null,
-			item: petData.heldItem
+			item: petData.heldItem ? (itemList.list.find(i => i.id === petData.heldItem) ?? null) : null
 		}
 		obtainedPetIds.push(pet.id)
 		obtainedPets.push(pet)

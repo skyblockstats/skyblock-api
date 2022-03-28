@@ -1,5 +1,5 @@
 import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount, fetchServerStatus, deleteSession } from './database.js'
-import { fetchElection, fetchMemberProfile, fetchUser } from './hypixel.js'
+import { fetchElection, fetchItemList, fetchMemberProfile, fetchUser } from './hypixel.js'
 import rateLimit from 'express-rate-limit'
 import * as constants from './constants.js'
 import * as discord from './discord.js'
@@ -146,6 +146,17 @@ app.get('/election', async (req, res) => {
 	try {
 		res.json(
 			await fetchElection()
+		)
+	} catch (err) {
+		console.error(err)
+		res.json({ ok: false })
+	}
+})
+
+app.get('/items', async (req, res) => {
+	try {
+		res.json(
+			await fetchItemList()
 		)
 	} catch (err) {
 		console.error(err)
