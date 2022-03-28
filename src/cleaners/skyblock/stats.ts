@@ -66,7 +66,7 @@ export function categorizeStat(statNameRaw: string): StatCategory {
 
 export const statUnits = {
 	time: ['_best_time', '_best_time_2'],
-	date: ['first_join'],
+	date: ['first_join', 'last_save'],
 	coins: ['purse'],
 	leaderboards: ['leaderboards_count', 'top_1_leaderboards_count']
 }

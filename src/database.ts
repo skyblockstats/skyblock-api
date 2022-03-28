@@ -73,7 +73,7 @@ export const cachedRawLeaderboards: Map<string, (memberRawLeaderboardItem | prof
 
 const leaderboardMax = 100
 const reversedLeaderboards = [
-	'first_join',
+	'first_join', 'last_save',
 	'_best_time', '_best_time_2'
 ]
 
