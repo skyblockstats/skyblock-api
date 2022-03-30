@@ -23,7 +23,7 @@ export interface FarmingContests {
     list: PlayerFarmingContestStats[]
 }
 
-export function cleanFarmingContest(data: typedHypixelApi.SkyBlockProfileMember): FarmingContests {
+export function cleanFarmingContests(data: typedHypixelApi.SkyBlockProfileMember): FarmingContests {
     if (!data.jacob2) return {
         talkedToJacob: false,
         list: []
