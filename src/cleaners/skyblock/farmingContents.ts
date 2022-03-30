@@ -1,5 +1,5 @@
 import typedHypixelApi from 'typed-hypixel-api'
-import { cleanItemId } from './itemId'
+import { cleanItemId } from './itemId.js'
 
 export interface PlayerFarmingContestStats {
     year: number
