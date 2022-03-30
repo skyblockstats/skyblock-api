@@ -8,6 +8,7 @@ import { cleanProfileStats, StatItem } from './stats.js'
 import { CleanMinion, cleanMinions } from './minions.js'
 import { cleanSlayers, SlayerData } from './slayers.js'
 import { AccountCustomization } from '../../database.js'
+import { cleanFarmingContest, FarmingContests } from './farmingContents.js'
 import { cleanVisitedZones, Zone } from './zones.js'
 import { cleanSkills, Skill } from './skills.js'
 import * as cached from '../../hypixelCached.js'
@@ -43,6 +44,7 @@ export interface CleanMember extends CleanBasicMember {
 	pets: PetsData
 	harp: HarpData
 	coopInvitation: CoopInvitation | null
+	farmingContest: FarmingContests
 	/** Whether the user left the coop */
 	left: boolean
 }
@@ -96,6 +98,7 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 		pets: await cleanPets(member),
 		harp: await cleanHarp(member),
 		coopInvitation: cleanCoopInvitation(member),
+		farmingContest: cleanFarmingContest(member),
 
 		left: (player.profiles?.find(profile => profile.uuid === profileId) === undefined) ?? false
 	}
@@ -121,6 +124,7 @@ export interface CleanMemberProfilePlayer extends CleanPlayer {
 	pets: PetsData
 	harp: HarpData
 	coopInvitation: CoopInvitation | null
+	farmingContest: FarmingContests
 }
 
 export interface CleanMemberProfile {
