@@ -35,7 +35,7 @@ export function cleanFarmingContests(data: typedHypixelApi.SkyBlockProfileMember
         const [month, day] = monthDay.split('_')
         const contestByDateKey = `${year}:${month}:${day}`
         const cropData: PlayerFarmingContestStats['crops'][number] = {
-            item,
+            item: item.toLowerCase(),
             amount: contestData.collected,
             // the api returns the position 0-indexed, so we add 1
             position: contestData.claimed_position ? contestData.claimed_position + 1 : null,
