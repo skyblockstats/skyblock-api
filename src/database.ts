@@ -4,9 +4,9 @@
 
 import { categorizeStat, getStatUnit } from './cleaners/skyblock/stats.js'
 import { CleanFullProfile } from './cleaners/skyblock/profile.js'
-import { slayerLevels } from './cleaners/skyblock/slayers.js'
+import { SLAYER_TIERS } from './cleaners/skyblock/slayers.js'
+import { Collection, Db, MongoClient, WithId } from 'mongodb'
 import { CleanMember } from './cleaners/skyblock/member.js'
-import { Collection, Db, Filter, MongoClient, WithId } from 'mongodb'
 import { CleanPlayer } from './cleaners/player.js'
 import * as cached from './hypixelCached.js'
 import * as constants from './constants.js'
@@ -14,8 +14,8 @@ import { shuffle, sleep } from './util.js'
 import * as discord from './discord.js'
 import NodeCache from 'node-cache'
 import { v4 as uuid4 } from 'uuid'
-import Queue from 'queue-promise'
 import { debug } from './index.js'
+import Queue from 'queue-promise'
 
 // don't update the user for 3 minutes
 const recentlyUpdated = new NodeCache({
@@ -256,7 +256,7 @@ export async function fetchSlayerLeaderboards(): Promise<string[]> {
 	for (const slayerNameRaw of rawSlayerNames) {
 		leaderboardNames.push(`slayer_${slayerNameRaw}_total_xp`)
 		leaderboardNames.push(`slayer_${slayerNameRaw}_total_kills`)
-		for (let slayerTier = 1; slayerTier <= slayerLevels; slayerTier++) {
+		for (let slayerTier = 1; slayerTier <= SLAYER_TIERS[slayerNameRaw]; slayerTier++) {
 			leaderboardNames.push(`slayer_${slayerNameRaw}_${slayerTier}_kills`)
 		}
 	}
@@ -652,6 +652,8 @@ async function getApplicableProfileLeaderboardAttributes(profile: CleanFullProfi
  * deleted. This only makes one database call if there's no profiles to delete.
  */
 export async function removeDeletedProfilesFromLeaderboards(memberUuid: string, profilesUuids: string[]) {
+	if (!client) return
+
 	const leaderboardProfilesInDatabase = (await (await memberLeaderboardsCollection.find({
 		uuid: memberUuid,
 	})).toArray())

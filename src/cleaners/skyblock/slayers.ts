@@ -1,6 +1,5 @@
 import typedHypixelApi from 'typed-hypixel-api'
 
-export const slayerLevels = 5
 
 const SLAYER_NAMES = {
 	spider: 'tarantula',
@@ -8,6 +7,14 @@ const SLAYER_NAMES = {
 	wolf: 'sven',
 	enderman: 'voidgloom_seraph'
 } as const
+
+// todo: put this in skyblock-constants since it can be determined from other people's profiles
+export const SLAYER_TIERS: Record<keyof typeof SLAYER_NAMES, number> = {
+	spider: 4,
+	zombie: 5,
+	enderman: 4,
+	wolf: 4
+}
 
 type SlayerName = (typeof SLAYER_NAMES)[keyof typeof SLAYER_NAMES]
 
@@ -75,7 +82,7 @@ export function cleanSlayers(data: typedHypixelApi.SkyBlockProfileMember): Slaye
 		}
 
 		// if the slayer tier length is less than the max, add more empty ones
-		while (slayerTiers.length < slayerLevels)
+		while (slayerTiers.length < SLAYER_TIERS[slayerName])
 			slayerTiers.push({
 				tier: slayerTiers.length + 1,
 				kills: 0
