@@ -673,19 +673,27 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 
 	if (debug) console.debug('done getApplicableMemberLeaderboardAttributes..', leaderboardAttributes, member.username, profile.name)
 
-	await memberLeaderboardsCollection.updateOne(
-		{
+	if (leaderboardAttributes.length > 0) {
+		await memberLeaderboardsCollection.updateOne(
+			{
+				uuid: member.uuid,
+				profile: profile.uuid
+			},
+			{
+				'$set': {
+					stats: leaderboardAttributes,
+					last_updated: new Date()
+				}
+			},
+			{ upsert: true }
+		)
+	} else {
+		// no leaderboard attributes, delete them!
+		await memberLeaderboardsCollection.deleteOne({
 			uuid: member.uuid,
 			profile: profile.uuid
-		},
-		{
-			'$set': {
-				stats: leaderboardAttributes,
-				last_updated: new Date()
-			}
-		},
-		{ upsert: true }
-	)
+		})
+	}
 
 	for (const [attributeName, attributeValue] of Object.entries(leaderboardAttributes)) {
 		const existingRawLeaderboard = await fetchMemberLeaderboardRaw(attributeName)
@@ -727,19 +735,28 @@ export async function updateDatabaseProfile(profile: CleanFullProfile): Promise<
 
 	if (debug) console.debug('done getApplicableProfileLeaderboardAttributes..', leaderboardAttributes, profile.name)
 
-	await profileLeaderboardsCollection.updateOne(
-		{
+	if (leaderboardAttributes.length > 0) {
+		await profileLeaderboardsCollection.updateOne(
+			{
+				uuid: profile.uuid
+			},
+			{
+				'$set': {
+					players: profile.members.map(p => p.uuid),
+					stats: leaderboardAttributes,
+					last_updated: new Date()
+				}
+			},
+			{ upsert: true }
+		)
+
+	} else {
+		// no leaderboard attributes, delete them!
+		await profileLeaderboardsCollection.deleteOne({
 			uuid: profile.uuid
-		},
-		{
-			'$set': {
-				players: profile.members.map(p => p.uuid),
-				stats: leaderboardAttributes,
-				last_updated: new Date()
-			}
-		},
-		{ upsert: true }
-	)
+		})
+	}
+
 
 	// add the profile to the cached leaderboard without having to refetch it
 	for (const [attributeName, attributeValue] of Object.entries(leaderboardAttributes)) {
