@@ -34,14 +34,14 @@ const recentlyQueued = new NodeCache({
 interface DatabaseMemberLeaderboardItem {
 	uuid: string
 	profile: string
-	stats: any
+	stats: Record<string, number>
 	lastUpdated: Date
 }
 interface DatabaseProfileLeaderboardItem {
 	uuid: string
 	/** An array of uuids for each player in the profile */
 	players: string[]
-	stats: any
+	stats: Record<string, number>
 	lastUpdated: Date
 }
 
@@ -652,18 +652,22 @@ async function getApplicableProfileLeaderboardAttributes(profile: CleanFullProfi
  * deleted. This only makes one database call if there's no profiles to delete.
  */
 export async function removeDeletedProfilesFromLeaderboards(memberUuid: string, profilesUuids: string[]) {
-	const profilesUuidsFromDatabase = (await (await memberLeaderboardsCollection.find({
+	const leaderboardProfilesInDatabase = (await (await memberLeaderboardsCollection.find({
 		uuid: memberUuid,
-	})).toArray()).map(m => m.profile)
+	})).toArray())
 
-	for (const profileUuid of profilesUuidsFromDatabase) {
-		if (!profilesUuids.includes(profileUuid)) {
+	for (const leaderboardProfile of leaderboardProfilesInDatabase) {
+		if (!profilesUuids.includes(leaderboardProfile.profile)) {
 			await memberLeaderboardsCollection.deleteOne({
 				uuid: memberUuid,
-				profile: profileUuid
+				profile: leaderboardProfile.profile
 			})
-			if (debug)
-				console.log(`Profile ${profileUuid} (member ${memberUuid}) was deleted but was still in leaderboards database, removed.`)
+			if (debug) {
+				console.log(`Profile ${leaderboardProfile.profile} (member ${memberUuid}) was deleted but was still in leaderboards database, removed.`)
+			}
+			for (const leaderboardName in leaderboardProfile.stats)
+				// we want to refresh the leaderboard so we just remove the cache
+				cachedRawLeaderboards.delete(leaderboardName)
 		}
 	}
 }
