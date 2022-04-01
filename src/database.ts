@@ -441,6 +441,12 @@ export async function fetchMemberLeaderboard(name: string): Promise<MemberLeader
 
 	const fetchLeaderboardPlayer = async (i: memberRawLeaderboardItem): Promise<MemberLeaderboardItem> => {
 		const player = await cached.fetchBasicPlayer(i.uuid)
+
+		if (player) {
+			// we don't need this in leaderboards
+			delete player.claimed
+		}
+
 		return {
 			player,
 			profileUuid: i.profile,
@@ -537,6 +543,8 @@ export async function fetchMemberLeaderboardSpots(player: string, profile: strin
 			unit: getStatUnit(leaderboardName) ?? null
 		})
 	}
+
+	memberLeaderboardSpots.sort((a, b) => a.positionIndex - b.positionIndex)
 
 	return memberLeaderboardSpots
 }
@@ -808,7 +816,6 @@ async function removeBadMemberLeaderboardAttributes(): Promise<void> {
 
 	await memberLeaderboardsCollection.deleteMany({ stats: {} })
 	await profileLeaderboardsCollection.deleteMany({ stats: {} })
-
 }
 
 export let finishedCachingRawLeaderboards = false
