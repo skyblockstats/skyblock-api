@@ -647,6 +647,27 @@ async function getApplicableProfileLeaderboardAttributes(profile: CleanFullProfi
 	return applicableAttributes
 }
 
+/**
+ * Make sure there's no lingering profiles from when a player's profile was
+ * deleted. This only makes one database call if there's no profiles to delete.
+ */
+export async function removeDeletedProfilesFromLeaderboards(memberUuid: string, profilesUuids: string[]) {
+	const profilesUuidsFromDatabase = (await (await memberLeaderboardsCollection.find({
+		uuid: memberUuid,
+	})).toArray()).map(m => m.profile)
+
+	for (const profileUuid of profilesUuidsFromDatabase) {
+		if (!profilesUuids.includes(profileUuid)) {
+			await memberLeaderboardsCollection.deleteOne({
+				uuid: memberUuid,
+				profile: profileUuid
+			})
+			if (debug)
+				console.log(`Profile ${profileUuid} (member ${memberUuid}) was deleted but was still in leaderboards database, removed.`)
+		}
+	}
+}
+
 /** Update the member's leaderboard data on the server if applicable */
 export async function updateDatabaseMember(member: CleanMember, profile: CleanFullProfile): Promise<void> {
 	if (!client) return // the db client hasn't been initialized

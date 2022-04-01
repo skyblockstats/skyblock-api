@@ -14,9 +14,11 @@ import {
 	AccountSchema,
 	fetchAccount,
 	queueUpdateDatabaseMember,
-	queueUpdateDatabaseProfile
+	queueUpdateDatabaseProfile,
+	removeDeletedProfilesFromLeaderboards
 } from './database.js'
 import { cleanElectionResponse, ElectionData } from './cleaners/skyblock/election.js'
+import { cleanItemListResponse, ItemListData } from './cleaners/skyblock/itemList.js'
 import { CleanBasicMember, CleanMemberProfile } from './cleaners/skyblock/member.js'
 import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles.js'
 import { CleanPlayer, cleanPlayerResponse } from './cleaners/player.js'
@@ -25,7 +27,6 @@ import typedHypixelApi from 'typed-hypixel-api'
 import * as cached from './hypixelCached.js'
 import { debug } from './index.js'
 import { WithId } from 'mongodb'
-import { cleanItemListResponse, ItemListData } from './cleaners/skyblock/itemList.js'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories' | undefined
 
@@ -142,11 +143,15 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 				activeProfile = profile
 			}
 		}
+
+		// we don't await so it happens in the background
+		removeDeletedProfilesFromLeaderboards(uuid, profilesData!.map(p => p.uuid))
 	}
 	let websiteAccount: WithId<AccountSchema> | null = null
 
 	if (websiteAccountPromise)
 		websiteAccount = await websiteAccountPromise
+
 
 	return {
 		player: playerData,
