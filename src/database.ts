@@ -780,7 +780,8 @@ export async function updateDatabaseProfile(profile: CleanFullProfile): Promise<
 	} else {
 		// no leaderboard attributes, delete them!
 		await profileLeaderboardsCollection.deleteOne({
-			uuid: profile.uuid
+			uuid: profile.uuid,
+			profile: profile.uuid
 		})
 	}
 
