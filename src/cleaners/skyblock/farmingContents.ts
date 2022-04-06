@@ -49,7 +49,11 @@ export function cleanFarmingContests(data: typedHypixelApi.SkyBlockProfileMember
             contestsByDate[contestByDateKey].push(cropData)
     }
 
-    const contests: PlayerFarmingContestStats[] = Object.entries(contestsByDate).map(([contestDateKey, crops]) => {
+    const contestsByDateEntries = Object.entries(contestsByDate)
+    // this is to sort by newest first
+    contestsByDateEntries.reverse()
+
+    const contests: PlayerFarmingContestStats[] = contestsByDateEntries.map(([contestDateKey, crops]) => {
         const [year, month, day] = contestDateKey.split(':')
         return {
             year: parseInt(year),
