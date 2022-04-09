@@ -133,6 +133,7 @@ export interface CleanMemberProfilePlayer extends CleanPlayer {
 	harp: HarpData
 	coopInvitation: CoopInvitation | null
 	farmingContests: FarmingContests
+	left: boolean
 }
 
 export interface CleanMemberProfile {
