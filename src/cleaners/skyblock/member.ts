@@ -72,6 +72,14 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 	if (fairySouls.total > (maxFairySouls ?? 0))
 		await constants.setConstantValues({ max_fairy_souls: fairySouls.total })
 
+	const coopInvitationPromise = cleanCoopInvitation(member)
+	const minionsPromise = cleanMinions(member)
+	const skillsPromise = cleanSkills(member)
+	const zonesPromise = cleanVisitedZones(member)
+	const petsPromise = cleanPets(member)
+	const harpPromise = cleanHarp(member)
+	const inventoriesPromise = inventoriesIncluded ? cleanInventories(member) : Promise.resolve(undefined)
+
 	return {
 		uuid: member.uuid,
 		username: player.username,
@@ -87,17 +95,17 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 		// this is used for leaderboards
 		rawHypixelStats: member.stats ?? {},
 
-		minions: await cleanMinions(member),
+		minions: await minionsPromise,
 		fairySouls: fairySouls,
-		inventories: inventoriesIncluded ? await cleanInventories(member) : undefined,
+		inventories: inventoriesPromise ? await inventoriesPromise : undefined,
 		objectives: cleanObjectives(member),
-		skills: await cleanSkills(member),
-		zones: await cleanVisitedZones(member),
+		skills: await skillsPromise,
+		zones: await zonesPromise,
 		collections: cleanCollections(member),
 		slayers: cleanSlayers(member),
-		pets: await cleanPets(member),
-		harp: await cleanHarp(member),
-		coopInvitation: cleanCoopInvitation(member),
+		pets: await petsPromise,
+		harp: await harpPromise,
+		coopInvitation: await coopInvitationPromise,
 		farmingContests: cleanFarmingContests(member),
 
 		left: (player.profiles?.find(profile => profile.uuid === profileId) === undefined) ?? false

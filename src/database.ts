@@ -440,12 +440,7 @@ export async function fetchMemberLeaderboard(name: string): Promise<MemberLeader
 	const leaderboardRaw = await fetchMemberLeaderboardRaw(name)
 
 	const fetchLeaderboardPlayer = async (i: memberRawLeaderboardItem): Promise<MemberLeaderboardItem> => {
-		const player = await cached.fetchBasicPlayer(i.uuid)
-
-		if (player) {
-			// we don't need this in leaderboards
-			delete player.claimed
-		}
+		const player = await cached.fetchBasicPlayer(i.uuid, false)
 
 		return {
 			player,

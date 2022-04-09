@@ -198,13 +198,17 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer | null> {
 }
 
 /** Fetch a player without their profiles. This is heavily cached. */
-export async function fetchBasicPlayer(user: string): Promise<CleanPlayer | null> {
+export async function fetchBasicPlayer(user: string, includeClaimed: boolean = true): Promise<CleanPlayer | null> {
 	const playerUuid = await uuidFromUser(user)
 
 	if (!playerUuid) return null
 
-	if (basicPlayerCache.has(playerUuid))
-		return basicPlayerCache.get(playerUuid)!
+	if (basicPlayerCache.has(playerUuid)) {
+		const player = basicPlayerCache.get(playerUuid)!
+		if (!includeClaimed)
+			delete player.claimed
+		return player
+	}
 
 	const player = await fetchPlayer(playerUuid)
 	if (!player) {
@@ -213,6 +217,8 @@ export async function fetchBasicPlayer(user: string): Promise<CleanPlayer | null
 	}
 
 	delete player.profiles
+	if (!includeClaimed)
+		delete player.claimed
 	return player
 }
 
