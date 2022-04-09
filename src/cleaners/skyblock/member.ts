@@ -72,7 +72,7 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 	if (fairySouls.total > (maxFairySouls ?? 0))
 		await constants.setConstantValues({ max_fairy_souls: fairySouls.total })
 
-	const coopInvitationPromise = cleanCoopInvitation(member)
+	const coopInvitationPromise = cleanCoopInvitation(member, member.uuid)
 	const minionsPromise = cleanMinions(member)
 	const skillsPromise = cleanSkills(member)
 	const zonesPromise = cleanVisitedZones(member)

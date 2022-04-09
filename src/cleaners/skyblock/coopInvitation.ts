@@ -10,9 +10,10 @@ export interface CoopInvitation {
 	acceptedTimestamp: number | null
 }
 
-export async function cleanCoopInvitation(data: typedHypixelApi.SkyBlockProfileMember): Promise<CoopInvitation | null> {
+export async function cleanCoopInvitation(data: typedHypixelApi.SkyBlockProfileMember, uuid: string): Promise<CoopInvitation | null> {
 	if (!data.coop_invitation)
 		return null
+
 	return {
 		invitedTimestamp: data.coop_invitation.timestamp,
 		invitedBy: await cached.fetchBasicPlayer(data.coop_invitation.invited_by, false),

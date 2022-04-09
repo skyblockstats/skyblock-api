@@ -313,6 +313,10 @@ export async function fetchProfileUuid(user: string, profile: string): Promise<s
 	if (!profiles) return null // user probably doesnt exist
 
 	const profileUuid = undashUuid(profile)
+	if (isUuid(profileUuid)) {
+		// if the profile is already a uuid, just return it
+		return profileUuid
+	}
 
 	for (const p of profiles) {
 		if (p.name?.toLowerCase() === profileUuid.toLowerCase())
@@ -411,11 +415,11 @@ export async function fetchProfileName(user: string, profile: string): Promise<s
 
 	if (!basicProfiles) return null
 
-	let profileName: string | null = null
+	let profileName = profile // we default to the profile uuid provided
 
 	for (const basicProfile of basicProfiles)
-		if (basicProfile.uuid === playerUuid)
-			profileName = basicProfile.name ?? null
+		if (basicProfile.uuid === playerUuid && basicProfile.name)
+			profileName = basicProfile.name
 
 	profileNameCache.set(`${playerUuid}.${profileUuid}`, profileName)
 	return profileName
