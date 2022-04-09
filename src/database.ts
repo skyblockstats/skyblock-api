@@ -701,9 +701,9 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 
 	const leaderboardAttributes = await getApplicableMemberLeaderboardAttributes(member)
 
-	if (debug) console.debug('done getApplicableMemberLeaderboardAttributes..', leaderboardAttributes, member.username, profile.name)
+	if (debug) console.debug('done getApplicableMemberLeaderboardAttributes..', member.username, profile.name)
 
-	if (leaderboardAttributes.length > 0) {
+	if (Object.values(leaderboardAttributes).length > 0) {
 		await memberLeaderboardsCollection.updateOne(
 			{
 				uuid: member.uuid,
@@ -742,7 +742,7 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 		cachedRawLeaderboards.set(attributeName, newRawLeaderboard)
 	}
 
-	if (debug) console.debug('added member to leaderboards', member.username, leaderboardAttributes)
+	if (debug) console.debug('added member to leaderboards', leaderboardAttributes, member.username)
 }
 
 /**
@@ -862,8 +862,12 @@ async function removeBadMemberLeaderboardAttributes(): Promise<void> {
 		}
 	}
 
+	if (debug)
+		console.log('Deleted profiles that have no stats from leaderboards')
 	await memberLeaderboardsCollection.deleteMany({ stats: {} })
 	await profileLeaderboardsCollection.deleteMany({ stats: {} })
+	if (debug)
+		console.log('Finished deleted profiles that have no stats from leaderboards')
 }
 
 export let finishedCachingRawLeaderboards = false
