@@ -74,7 +74,8 @@ export const cachedRawLeaderboards: Map<string, (memberRawLeaderboardItem | prof
 const leaderboardMax = 100
 const reversedLeaderboards = [
 	'first_join', 'last_save',
-	'_best_time', '_best_time_2'
+	'_best_time', '_best_time_2',
+	'fastest_coop_join'
 ]
 
 let client: MongoClient
@@ -211,6 +212,9 @@ function getMemberLeaderboardAttributes(member: CleanMember): StringNumber {
 	if (member.lastSave)
 		data.last_save = member.lastSave
 
+	if (member.coopInvitation && member.coopInvitation.acceptedTimestamp && member.coopInvitation?.invitedBy?.uuid !== member.uuid)
+		data.fastest_coop_join = member.coopInvitation.acceptedTimestamp - member.coopInvitation.invitedTimestamp
+
 	return data
 }
 
@@ -300,7 +304,8 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 		'purse',
 		'visited_zones',
 		'leaderboards_count',
-		'top_1_leaderboards_count'
+		'top_1_leaderboards_count',
+		'fastest_coop_join'
 	]
 }
 
