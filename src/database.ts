@@ -212,8 +212,10 @@ function getMemberLeaderboardAttributes(member: CleanMember): StringNumber {
 	if (member.lastSave)
 		data.last_save = member.lastSave
 
-	if (member.coopInvitation && member.coopInvitation.acceptedTimestamp && member.coopInvitation?.invitedBy?.uuid !== member.uuid)
+	if (member.coopInvitation && member.coopInvitation.acceptedTimestamp && member.coopInvitation?.invitedBy?.uuid !== member.uuid) {
 		data.fastest_coop_join = member.coopInvitation.acceptedTimestamp - member.coopInvitation.invitedTimestamp
+		data.slowest_coop_join = member.coopInvitation.acceptedTimestamp - member.coopInvitation.invitedTimestamp
+	}
 
 	return data
 }
@@ -305,7 +307,8 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 		'visited_zones',
 		'leaderboards_count',
 		'top_1_leaderboards_count',
-		'fastest_coop_join'
+		'fastest_coop_join',
+		'slowest_coop_join'
 	]
 }
 
