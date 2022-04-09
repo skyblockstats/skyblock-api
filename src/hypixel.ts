@@ -197,7 +197,8 @@ export async function fetchMemberProfile(user: string, profile: string, customiz
 			username: m.username,
 			firstJoin: m.firstJoin,
 			lastSave: m.lastSave,
-			rank: m.rank
+			rank: m.rank,
+			left: m.left
 		}
 	})
 
