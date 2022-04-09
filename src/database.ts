@@ -699,7 +699,7 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 
 	if (debug) console.debug('done constants..')
 
-	const leaderboardAttributes = await getApplicableMemberLeaderboardAttributes(member)
+	const leaderboardAttributes = member.left ? {} : await getApplicableMemberLeaderboardAttributes(member)
 
 	if (debug) console.debug('done getApplicableMemberLeaderboardAttributes..', member.username, profile.name)
 
