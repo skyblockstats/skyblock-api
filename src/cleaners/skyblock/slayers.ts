@@ -66,7 +66,7 @@ export function cleanSlayers(data: typedHypixelApi.SkyBlockProfileMember): Slaye
 		for (const slayerDataKey in slayerDataRaw) {
 			// if a key starts with boss_kills_tier_ (boss_kills_tier_1), get the last number
 			if (slayerDataKey.startsWith('boss_kills_tier_')) {
-				const slayerTierRaw = parseInt(slayerDataKey.substr('boss_kills_tier_'.length))
+				const slayerTierRaw = parseInt(slayerDataKey.slice('boss_kills_tier_'.length))
 				const slayerTierKills = slayerDataRaw[slayerDataKey] ?? 0
 				// add 1 since hypixel is using 0 indexed tiers
 				const slayerTier = slayerTierRaw + 1

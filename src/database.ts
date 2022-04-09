@@ -184,6 +184,47 @@ function getMemberHarpAttributes(member: CleanMember): StringNumber {
 	return harpAttributes
 }
 
+function getFarmingContestAttributes(member: CleanMember): StringNumber {
+	const farmingContestAttributes: StringNumber = {}
+
+	let participated = 0
+	let top1 = 0
+
+	let participatedRecord: StringNumber = {}
+	let top1Record: StringNumber = {}
+	let highestScoreRecord: StringNumber = {}
+
+	for (const contest of member.farmingContests.list) {
+		participated++
+		for (const cropContest of contest.crops) {
+			if (participatedRecord[cropContest.item] === undefined)
+				participatedRecord[cropContest.item] = 0
+			participatedRecord[cropContest.item]++
+
+			if (highestScoreRecord[cropContest.item] === undefined || highestScoreRecord[cropContest.item] < cropContest.amount)
+				highestScoreRecord[cropContest.item] = cropContest.amount
+
+			if (cropContest.position === 1) {
+				top1++
+				if (top1Record[cropContest.item] === undefined)
+					top1Record[cropContest.item] = 0
+				top1Record[cropContest.item]++
+			}
+		}
+	}
+	farmingContestAttributes['farming_contests_participated'] = participated
+	farmingContestAttributes['farming_contests_top_1'] = top1
+
+	for (const [cropName, value] of Object.entries(participatedRecord))
+		farmingContestAttributes[`farming_contests_participated_${cropName}`] = value
+	for (const [cropName, value] of Object.entries(top1Record))
+		farmingContestAttributes[`farming_contests_top_1_${cropName}`] = value
+	for (const [cropName, value] of Object.entries(highestScoreRecord))
+		farmingContestAttributes[`farming_contests_highest_score_${cropName}`] = value
+
+	return farmingContestAttributes
+}
+
 function getMemberLeaderboardAttributes(member: CleanMember): StringNumber {
 	// if you want to add a new leaderboard for member attributes, add it here (and getAllLeaderboardAttributes)
 	const data: StringNumber = {
@@ -201,6 +242,9 @@ function getMemberLeaderboardAttributes(member: CleanMember): StringNumber {
 
 		// harp leaderboards
 		...getMemberHarpAttributes(member),
+
+		// farming contest leaderboards
+		...getFarmingContestAttributes(member),
 
 		fairy_souls: member.fairySouls.total,
 		purse: member.purse,
@@ -270,13 +314,27 @@ export async function fetchSlayerLeaderboards(): Promise<string[]> {
 	return leaderboardNames
 }
 
-export async function fetchHarpLeaderboards(): Promise<string[]> {
+async function fetchHarpLeaderboards(): Promise<string[]> {
 	const harpSongs = await constants.fetchHarpSongs()
 	const leaderboardNames: string[] = []
 
 	for (const songId of harpSongs) {
 		leaderboardNames.push(`harp_${songId}_completions`)
 		leaderboardNames.push(`harp_${songId}_perfect_completions`)
+	}
+
+	return leaderboardNames
+}
+
+async function fetchFarmingContestLeaderboards(): Promise<string[]> {
+	const leaderboardNames: string[] = []
+
+	leaderboardNames.push(`farming_contests_participated`)
+	leaderboardNames.push(`farming_contests_top_1`)
+	for (const crop of await constants.fetchCrops()) {
+		leaderboardNames.push(`farming_contests_participated_${crop}`)
+		leaderboardNames.push(`farming_contests_top_1_${crop}`)
+		leaderboardNames.push(`farming_contests_highest_score_${crop}`)
 	}
 
 	return leaderboardNames
@@ -300,6 +358,9 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 		// harp leaderboards
 		...await fetchHarpLeaderboards(),
 
+		// farming contest leaderboards
+		...await fetchFarmingContestLeaderboards(),
+
 		'fairy_souls',
 		'first_join',
 		'last_save',
@@ -308,7 +369,7 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 		'leaderboards_count',
 		'top_1_leaderboards_count',
 		'fastest_coop_join',
-		'slowest_coop_join'
+		'slowest_coop_join',
 	]
 }
 
@@ -322,7 +383,7 @@ async function fetchAllProfileLeaderboardAttributes(): Promise<string[]> {
 function isLeaderboardReversed(name: string): boolean {
 	for (const leaderboardMatch of reversedLeaderboards) {
 		let trailingEnd = leaderboardMatch[0] === '_'
-		let trailingStart = leaderboardMatch.substr(-1) === '_'
+		let trailingStart = leaderboardMatch.slice(-1) === '_'
 		if (
 			(trailingStart && name.startsWith(leaderboardMatch))
 			|| (trailingEnd && name.endsWith(leaderboardMatch))

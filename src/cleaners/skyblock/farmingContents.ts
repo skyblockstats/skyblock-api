@@ -1,4 +1,5 @@
 import typedHypixelApi from 'typed-hypixel-api'
+import { addCrops } from '../../constants.js'
 import { cleanItemId } from './itemId.js'
 
 export interface PlayerFarmingContestStats {
@@ -24,30 +25,36 @@ export interface FarmingContests {
     list: PlayerFarmingContestStats[]
 }
 
-export function cleanFarmingContests(data: typedHypixelApi.SkyBlockProfileMember): FarmingContests {
+export async function cleanFarmingContests(data: typedHypixelApi.SkyBlockProfileMember): Promise<FarmingContests> {
     if (!data.jacob2) return {
         talkedToJacob: false,
         list: []
     }
+
+    let cropNames: Set<string> = new Set()
 
     const contestsByDate: Record<string, PlayerFarmingContestStats['crops']> = {}
     for (const [contestName, contestData] of Object.entries(data.jacob2?.contests ?? {})) {
         const [year, monthDay, item] = contestName.split(':')
         const [month, day] = monthDay.split('_')
         const contestByDateKey = `${year}:${month}:${day}`
+        const cropId = cleanItemId(item)
         const cropData: PlayerFarmingContestStats['crops'][number] = {
-            item: cleanItemId(item),
+            item: cropId,
             amount: contestData.collected,
             // the api returns the position 0-indexed, so we add 1
             position: contestData.claimed_position !== undefined ? contestData.claimed_position + 1 : null,
             claimed: contestData.claimed_rewards ?? null,
             participants: contestData.claimed_participants ?? null
         }
+        cropNames.add(cropId)
         if (!(contestByDateKey in contestsByDate))
             contestsByDate[contestByDateKey] = [cropData]
         else
             contestsByDate[contestByDateKey].push(cropData)
     }
+
+    await addCrops(Array.from(cropNames))
 
     const contestsByDateEntries = Object.entries(contestsByDate)
     // this is to sort by newest first

@@ -120,6 +120,9 @@ async function editFile(file: GithubFile, message: string, newContent: string): 
 		}
 	)
 	const data = await r.json() as any
+	if (!data.content?.path)
+		// failed to set the data, probably ratelimited or something
+		return
 	fileCache.set(file.path, {
 		path: data.content.path,
 		content: newContent,
@@ -251,6 +254,17 @@ export async function fetchHarpSongs(): Promise<string[]> {
 /** Add harp songs to skyblock-constants. This has caching so it's fine to call many times */
 export async function addHarpSongs(addingSongs: string[]): Promise<void> {
 	await constants.addJSONConstants('harp_songs.json', addingSongs, 'harp song')
+}
+
+
+/** Fetch all the known crops (used in farming contests) as an array of strings */
+export async function fetchCrops(): Promise<string[]> {
+	return await constants.fetchJSONConstant('crops.json')
+}
+
+/** Add crop names (used in farming contests) to skyblock-constants. This has caching so it's fine to call many times */
+export async function addCrops(addingCrops: string[]): Promise<void> {
+	await constants.addJSONConstants('crops.json', addingCrops, 'crop')
 }
 
 

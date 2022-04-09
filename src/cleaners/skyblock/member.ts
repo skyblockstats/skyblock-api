@@ -79,6 +79,7 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 	const petsPromise = cleanPets(member)
 	const harpPromise = cleanHarp(member)
 	const inventoriesPromise = inventoriesIncluded ? cleanInventories(member) : Promise.resolve(undefined)
+	const farmingContestsPromise = cleanFarmingContests(member)
 
 	return {
 		uuid: member.uuid,
@@ -106,7 +107,7 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 		pets: await petsPromise,
 		harp: await harpPromise,
 		coopInvitation: await coopInvitationPromise,
-		farmingContests: cleanFarmingContests(member),
+		farmingContests: await farmingContestsPromise,
 
 		left: (player.profiles?.find(profile => profile.uuid === profileId) === undefined) ?? false
 	}

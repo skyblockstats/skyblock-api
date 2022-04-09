@@ -9,6 +9,8 @@ const statCategories: { [key: string]: string[] | null } = { // sorted in order 
 	'races': ['_best_time', '_best_time_2'],
 	'mythos': ['mythos_burrows_', 'mythos_kills'],
 
+	'farming_contests': ['farming_contests_'],
+
 	'collection': ['collection_'],
 	'skills': ['skill_'],
 	'slayer': ['slayer_'],
@@ -37,16 +39,16 @@ export function categorizeStat(statNameRaw: string): StatCategory {
 		for (const categoryMatch of statCategoryMatchers) {
 			// ['deaths_']
 			let trailingEnd = categoryMatch[0] === '_'
-			let trailingStart = categoryMatch.substr(-1) === '_'
+			let trailingStart = categoryMatch.slice(-1) === '_'
 			if (trailingStart && statNameRaw.startsWith(categoryMatch)) {
 				return {
 					category: statCategory,
-					name: statNameRaw.substr(categoryMatch.length)
+					name: statNameRaw.slice(categoryMatch.length)
 				}
 			} else if (trailingEnd && statNameRaw.endsWith(categoryMatch)) {
 				return {
 					category: statCategory,
-					name: statNameRaw.substr(0, statNameRaw.length - categoryMatch.length)
+					name: statNameRaw.slice(0, statNameRaw.length - categoryMatch.length)
 				}
 			} else if (statNameRaw == categoryMatch) {
 				// if it matches exactly, we don't know the name. will be defaulted to category later on
@@ -83,7 +85,7 @@ export function getStatUnit(name: string): string | null {
 	for (const [unitName, statMatchers] of Object.entries(statUnits)) {
 		for (const statMatch of statMatchers) {
 			let trailingEnd = statMatch[0] === '_'
-			let trailingStart = statMatch.substr(-1) === '_'
+			let trailingStart = statMatch.slice(-1) === '_'
 			if (
 				(trailingStart && name.startsWith(statMatch))
 				|| (trailingEnd && name.endsWith(statMatch))
