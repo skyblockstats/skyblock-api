@@ -39,7 +39,7 @@ export function cleanFarmingContests(data: typedHypixelApi.SkyBlockProfileMember
             item: cleanItemId(item),
             amount: contestData.collected,
             // the api returns the position 0-indexed, so we add 1
-            position: contestData.claimed_position ? contestData.claimed_position + 1 : null,
+            position: contestData.claimed_position !== undefined ? contestData.claimed_position + 1 : null,
             claimed: contestData.claimed_rewards ?? null,
             participants: contestData.claimed_participants ?? null
         }
