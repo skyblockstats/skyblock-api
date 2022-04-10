@@ -10,7 +10,7 @@ import { register } from './metrics.js'
 
 const app = express()
 
-export const debug = true
+export const debug = false
 
 const mainSiteUrl = 'https://skyblock.matdoes.dev'
 
