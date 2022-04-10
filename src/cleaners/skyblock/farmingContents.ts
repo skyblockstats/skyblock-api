@@ -35,10 +35,10 @@ export async function cleanFarmingContests(data: typedHypixelApi.SkyBlockProfile
 
     const contestsByDate: Record<string, PlayerFarmingContestStats['crops']> = {}
     for (const [contestName, contestData] of Object.entries(data.jacob2?.contests ?? {})) {
-        const [year, monthDay, item] = contestName.split(':')
+        const [year, monthDay, item, itemDamage] = contestName.split(':')
         const [month, day] = monthDay.split('_')
         const contestByDateKey = `${year}:${month}:${day}`
-        const cropId = cleanItemId(item)
+        const cropId = cleanItemId(itemDamage !== undefined ? `${item}:${itemDamage}` : item)
         const cropData: PlayerFarmingContestStats['crops'][number] = {
             item: cropId,
             amount: contestData.collected,

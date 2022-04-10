@@ -9,11 +9,11 @@ export interface Objective {
 export function cleanObjectives(data: typedHypixelApi.SkyBlockProfileMember): Objective[] {
 	const rawObjectives = data?.objectives || {}
 	const objectives: Objective[] = []
-	for (const rawObjectiveName in rawObjectives) {
-		const rawObjectiveValue = rawObjectives[rawObjectiveName]
+	for (const [name, value] of Object.entries(rawObjectives)) {
+
 		objectives.push({
-			name: rawObjectiveName,
-			completed: rawObjectiveValue.status === 'COMPLETE',
+			name: name,
+			completed: value.status === 'COMPLETE',
 		})
 	}
 	return objectives

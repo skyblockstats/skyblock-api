@@ -1,7 +1,8 @@
 import typedHypixelApi from 'typed-hypixel-api'
 
 
-const statCategories: { [key: string]: string[] | null } = { // sorted in order of importance
+// sorted in order of importance
+const statCategories: { [key: string]: string[] | null } = {
 	'deaths': ['deaths_', 'deaths'],
 	'kills': ['kills_', 'kills'],
 	'fishing': ['items_fished_', 'items_fished', 'shredder_'],
