@@ -18,7 +18,7 @@ export function cleanPlayerSkyblockClaimed(data: typedHypixelApi.PlayerDataRespo
 
 	const centuryCakes = Object.keys(data).filter((key) => key.startsWith('claimed_century_cake'))
 	for (const centuryCake of centuryCakes) {
-		const centuryCakeYear = centuryCake === 'claimed_century_cake' ? '100' : centuryCakes.slice('claimed_century_cake'.length)
+		const centuryCakeYear = centuryCake === 'claimed_century_cake' ? '100' : centuryCake.slice('claimed_century_cake'.length)
 		claimedItems.push({
 			name: `year_${centuryCakeYear}_century_cake`,
 			timestamp: data[centuryCake]

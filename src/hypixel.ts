@@ -50,6 +50,8 @@ export interface ApiOptions {
 export async function sendCleanApiRequest<P extends keyof typeof cleanResponseFunctions>(path: P, args: Omit<typedHypixelApi.Requests[P]['options'], 'key'>, options?: ApiOptions): Promise<Awaited<ReturnType<typeof cleanResponseFunctions[P]>>> {
 	const key = await chooseApiKey()
 	const data = await sendApiRequest(path, { key, ...args })
+	if (!data)
+		throw new Error(`No data returned from ${path}`)
 	// clean the response
 	return await cleanResponse(path, data, options ?? {})
 }

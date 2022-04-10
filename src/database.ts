@@ -934,7 +934,7 @@ async function removeBadMemberLeaderboardAttributes(): Promise<void> {
 export let finishedCachingRawLeaderboards = false
 
 /** Fetch all the leaderboards, used for caching. Don't call this often! */
-async function fetchAllLeaderboards(fast?: boolean): Promise<void> {
+async function fetchAllLeaderboards(): Promise<void> {
 	const leaderboards: string[] = await fetchAllMemberLeaderboardAttributes()
 
 	if (debug) console.debug('Caching raw leaderboards!')
@@ -1006,7 +1006,7 @@ if (!globalThis.isTest) {
 		// when it connects, cache the leaderboards and remove bad members
 		removeBadMemberLeaderboardAttributes()
 		// cache leaderboards on startup so its faster later on
-		fetchAllLeaderboards(true)
+		fetchAllLeaderboards()
 		// cache leaderboard players again every 4 hours
 		setInterval(fetchAllLeaderboards, 4 * 60 * 60 * 1000)
 	})
