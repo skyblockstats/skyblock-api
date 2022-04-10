@@ -222,7 +222,7 @@ export async function fetchBasicPlayer(user: string, includeClaimed: boolean = t
 	return player
 }
 
-export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanProfile[]> {
+export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanProfile[] | null> {
 	if (profilesCache.has(playerUuid)) {
 		if (debug) console.debug('Cache hit! fetchSkyblockProfiles', playerUuid)
 		return profilesCache.get(playerUuid)!
@@ -230,7 +230,9 @@ export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanPr
 
 	if (debug) console.debug('Cache miss: fetchSkyblockProfiles', playerUuid)
 
-	const profiles: CleanFullProfile[] = await hypixel.fetchMemberProfilesUncached(playerUuid)
+	const profiles = await hypixel.fetchMemberProfilesUncached(playerUuid)
+	if (profiles === null)
+		return null
 
 	const basicProfiles: CleanProfile[] = []
 

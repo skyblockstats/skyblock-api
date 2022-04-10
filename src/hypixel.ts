@@ -132,13 +132,13 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 			delete playerData.profiles
 	}
 	if (includeProfiles)
-		profilesData = await cached.fetchSkyblockProfiles(uuid)
+		profilesData = await cached.fetchSkyblockProfiles(uuid) ?? []
 
 	let activeProfile: CleanProfile
 	let lastOnline: number = 0
 
-	if (includeProfiles) {
-		for (const profile of profilesData!) {
+	if (includeProfiles && profilesData !== undefined) {
+		for (const profile of profilesData) {
 			const member = profile.members?.find(member => member.uuid === uuid)
 			if (member && member.lastSave && member.lastSave > lastOnline) {
 				lastOnline = member.lastSave
@@ -147,7 +147,7 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 		}
 
 		// we don't await so it happens in the background
-		removeDeletedProfilesFromLeaderboards(uuid, profilesData!.map(p => p.uuid))
+		removeDeletedProfilesFromLeaderboards(uuid, profilesData.map(p => p.uuid))
 	}
 	let websiteAccount: WithId<AccountSchema> | null = null
 
@@ -268,8 +268,8 @@ export async function fetchBasicProfileFromUuidUncached(profileUuid: string): Pr
 }
 
 
-export async function fetchMemberProfilesUncached(playerUuid: string): Promise<CleanFullProfile[]> {
-	const profiles: CleanFullProfile[] = await sendCleanApiRequest(
+export async function fetchMemberProfilesUncached(playerUuid: string): Promise<CleanFullProfile[] | null> {
+	const profiles = await sendCleanApiRequest(
 		'skyblock/profiles',
 		{ uuid: playerUuid },
 		{
@@ -277,6 +277,8 @@ export async function fetchMemberProfilesUncached(playerUuid: string): Promise<C
 			mainMemberUuid: playerUuid
 		}
 	)
+	if (profiles === null)
+		return null
 	for (const profile of profiles) {
 		for (const member of profile.members) {
 			queueUpdateDatabaseMember(member, profile)

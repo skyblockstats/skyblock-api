@@ -7,15 +7,15 @@ import { CleanFullProfile } from './cleaners/skyblock/profile.js'
 import { SLAYER_TIERS } from './cleaners/skyblock/slayers.js'
 import { Collection, Db, MongoClient, WithId } from 'mongodb'
 import { CleanMember } from './cleaners/skyblock/member.js'
-import { CleanPlayer } from './cleaners/player.js'
 import * as cached from './hypixelCached.js'
 import * as constants from './constants.js'
-import { letterFromColorCode, shuffle, sleep } from './util.js'
+import { colorCodeFromName, letterFromColorCode, shuffle, sleep } from './util.js'
 import * as discord from './discord.js'
 import NodeCache from 'node-cache'
 import { v4 as uuid4 } from 'uuid'
 import { debug } from './index.js'
 import Queue from 'queue-promise'
+import { RANK_COLORS } from './cleaners/rank.js'
 
 // don't update the user for 3 minutes
 const recentlyUpdated = new NodeCache({
@@ -69,12 +69,12 @@ interface profileRawLeaderboardItem {
 }
 
 interface MemberLeaderboardItem {
-	player: CleanPlayer | null
+	player: LeaderboardBasicPlayer
 	profileUuid: string
 	value: number
 }
 interface ProfileLeaderboardItem {
-	players: CleanPlayer[]
+	players: LeaderboardBasicPlayer[]
 	profileUuid: string
 	value: number
 }
@@ -517,13 +517,26 @@ interface ProfileLeaderboard {
 	info?: string
 }
 
+interface LeaderboardBasicPlayer {
+	uuid: string
+	username: string
+	rank: {
+		color: string
+	}
+}
 
 /** Fetch a leaderboard that ranks members, as opposed to profiles */
 export async function fetchMemberLeaderboard(name: string): Promise<MemberLeaderboard> {
 	const leaderboardRaw = await fetchMemberLeaderboardRaw(name)
 
 	const fetchLeaderboardPlayer = async (i: memberRawLeaderboardItem): Promise<MemberLeaderboardItem> => {
-		const player = await cached.fetchBasicPlayer(i.uuid, false)
+		const player: LeaderboardBasicPlayer = {
+			uuid: i.uuid,
+			username: i.username,
+			rank: {
+				color: (i.color ? colorCodeFromName(i.color) : null) ?? colorCodeFromName(RANK_COLORS.NONE)!,
+			},
+		}
 
 		return {
 			player,
@@ -549,9 +562,15 @@ export async function fetchProfileLeaderboard(name: string): Promise<ProfileLead
 	const leaderboardRaw = await fetchProfileLeaderboardRaw(name)
 
 	const fetchLeaderboardProfile = async (i: profileRawLeaderboardItem): Promise<ProfileLeaderboardItem> => {
-		const players: CleanPlayer[] = []
+		const players: LeaderboardBasicPlayer[] = []
 		for (const playerUuid of i.players) {
-			const player = await cached.fetchBasicPlayer(playerUuid)
+			const player: LeaderboardBasicPlayer = {
+				uuid: playerUuid,
+				username: i.usernames[i.players.indexOf(playerUuid)],
+				rank: {
+					color: i.colors[i.players.indexOf(playerUuid)]
+				}
+			}
 			if (player)
 				players.push(player)
 		}
@@ -742,9 +761,9 @@ export async function removeDeletedProfilesFromLeaderboards(memberUuid: string, 
 				uuid: memberUuid,
 				profile: leaderboardProfile.profile
 			})
-			if (debug) {
+			if (debug)
 				console.log(`Profile ${leaderboardProfile.profile} (member ${memberUuid}) was deleted but was still in leaderboards database, removed.`)
-			}
+
 			for (const leaderboardName in leaderboardProfile.stats)
 				// we want to refresh the leaderboard so we just remove the cache
 				cachedRawLeaderboards.delete(leaderboardName)

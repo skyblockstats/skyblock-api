@@ -1,7 +1,7 @@
 import typedHypixelApi from 'typed-hypixel-api'
 import { colorCodeFromName, minecraftColorCodes } from '../util.js'
 
-const rankColors: { [name: string]: string } = {
+export const RANK_COLORS: { [name: string]: string } = {
 	'NONE': '7',
 	'VIP': 'a',
 	'VIP+': 'a',
@@ -69,8 +69,8 @@ export function cleanRank({
 		}
 
 		const plusColor = rankPlusColor ? colorCodeFromName(rankPlusColor) : null
-		color = minecraftColorCodes[rankColors[name]]
-		let rankColorPrefix = rankColors[name] ? '§' + rankColors[name] : ''
+		color = minecraftColorCodes[RANK_COLORS[name]]
+		let rankColorPrefix = RANK_COLORS[name] ? '§' + RANK_COLORS[name] : ''
 
 		// the text is white, but only in the prefix
 		if (name === 'YOUTUBE')

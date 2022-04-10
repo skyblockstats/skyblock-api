@@ -61,20 +61,22 @@ export const minecraftColorCodes: { [key: string]: string } = {
  * For example: blue -> 9
  * @param colorName The name of the color (blue, red, aqua, etc)
  */
-export function colorCodeFromName(colorName: string): string | undefined {
+export function colorCodeFromName(colorName: string): string | null {
 	const hexColor = minecraftColorCodes[colorName.toLowerCase()]
 	for (const key in minecraftColorCodes) {
 		const value = minecraftColorCodes[key]
 		if (key.length === 1 && value === hexColor)
 			return key
 	}
+	return null
 }
 
-export function letterFromColorCode(colorCode: string): string | undefined {
+export function letterFromColorCode(colorCode: string): string | null {
 	for (const [key, value] of Object.entries(minecraftColorCodes)) {
 		if (value === colorCode)
 			return key
 	}
+	return null
 }
 
 export async function sleep(ms: number): Promise<void> {
@@ -94,4 +96,12 @@ export function isUuid(string: string) {
 export function levelFromXpTable(xp: number, xpTable: number[]) {
 	const skillLevel = [...xpTable].reverse().findIndex(levelXp => xp >= levelXp)
 	return skillLevel === -1 ? 0 : xpTable.length - skillLevel
+}
+
+// https://stackoverflow.com/a/51365037
+export type RecursivePartial<T> = {
+	[P in keyof T]?:
+	T[P] extends (infer U)[] ? RecursivePartial<U>[] :
+	T[P] extends object ? RecursivePartial<T[P]> :
+	T[P]
 }
