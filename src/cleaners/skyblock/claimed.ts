@@ -15,11 +15,16 @@ export function cleanPlayerSkyblockClaimed(data: typedHypixelApi.PlayerDataRespo
 			name: 'potato_talisman',
 			timestamp: data.claimed_potato_talisman
 		})
-	if (data.claimed_century_cake)
+
+	const centuryCakes = Object.keys(data).filter((key) => key.startsWith('claimed_century_cake'))
+	for (const centuryCake of centuryCakes) {
+		const centuryCakeYear = centuryCake === 'claimed_century_cake' ? '100' : centuryCakes.slice('claimed_century_cake'.length)
 		claimedItems.push({
-			name: 'century_cake',
-			timestamp: data.claimed_century_cake
+			name: `year_${centuryCakeYear}_century_cake`,
+			timestamp: data[centuryCake]
 		})
+	}
+
 	if (data.claimed_year143_cake)
 		claimedItems.push({
 			name: 'year_143_cake',

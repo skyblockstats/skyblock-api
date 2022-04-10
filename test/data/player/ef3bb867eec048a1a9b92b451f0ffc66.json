@@ -5,7 +5,7 @@
     "uuid": "ef3bb867eec048a1a9b92b451f0ffc66",
     "firstLogin": 1482769356469,
     "playername": "nmart",
-    "lastLogin": 1648428667364,
+    "lastLogin": 1649203838218,
     "displayname": "NMART",
     "knownAliases": [
       "Foxydasher101",
@@ -312,7 +312,7 @@
     "stats": {
       "Arcade": {
         "weekly_coins_a": 10016,
-        "coins": 200298,
+        "coins": 200374,
         "monthly_coins_a": 7556,
         "dec2016_achievements": true,
         "dec2016_achievements2": true,
@@ -414,7 +414,7 @@
       },
       "TNTGames": {
         "record_pvprun": 38,
-        "coins": 62699,
+        "coins": 62729,
         "deaths_bowspleef": 34,
         "tags_bowspleef": 623,
         "packages": [
@@ -517,7 +517,7 @@
           "cakes_fix_flag_2"
         ],
         "chosen_class": "Shark",
-        "coins": 21179,
+        "coins": 21224,
         "classes": {
           "skeleton": {
             "skill_level_dChecked5": true,
@@ -671,7 +671,7 @@
         "kills_deathmatch": 16,
         "headshot_kills": 11,
         "criminal_kills_deathmatch": 11,
-        "coins": 44912,
+        "coins": 44927,
         "shots_fired": 680,
         "round_wins": 9,
         "deaths": 17,
@@ -690,7 +690,7 @@
         "game_plays": 1
       },
       "UHC": {
-        "coins": 16293,
+        "coins": 16308,
         "clearup_achievement": true,
         "deaths": 19,
         "packages": [
@@ -788,7 +788,7 @@
         ],
         "kills": 17,
         "wins": 2,
-        "coins": 23170,
+        "coins": 23200,
         "shots_fired": 618,
         "deaths": 33,
         "killstreaks": 2,
@@ -1072,7 +1072,7 @@
         "blocks_broken": 2078,
         "games_solo": 991,
         "losses": 3481,
-        "coins": 468396,
+        "coins": 468426,
         "chests_opened_solo": 10676,
         "time_played_solo": 231962,
         "losses_solo": 3130,
@@ -3431,7 +3431,7 @@
         "damage_dealt": 3050,
         "losses_teams": 9,
         "smashed_teams": 11,
-        "coins": 28749,
+        "coins": 28764,
         "losses_weekly_a": 20,
         "games_weekly_a": 23,
         "losses_monthly_b": 5,
@@ -3515,7 +3515,7 @@
           "achievementsupdatedd",
           "achievementsupdatedc"
         ],
-        "coins": 23164,
+        "coins": 23194,
         "horn": "DEFAULT",
         "parts": "{GingerbreadPart:{PartType:TURBOCHARGER,PartRarity:SUPER,Attributes:[{KartAttributeType:DRIFTING_EFFICIENCY,Level:3},{KartAttributeType:BOOSTER_SPEED,Level:4}]}}",
         "banana_hits_received": 1,
@@ -3538,7 +3538,7 @@
         "packages": [
           "achievement_flag_3"
         ],
-        "coins": 21985,
+        "coins": 22015,
         "alternative_gun_cooldown_indicator": true,
         "compass_selected": true,
         "showDashCooldown": true,
@@ -3557,7 +3557,7 @@
         "updated_stats": true,
         "vampire_deaths": 41,
         "most_vampire_kills_new": 0,
-        "coins": 25246,
+        "coins": 25276,
         "human_deaths": 6,
         "human_kills": 2
       },
@@ -3751,7 +3751,7 @@
         "weekly_assists_b": 1,
         "losses": 1,
         "deaths": 1,
-        "coins": 21985
+        "coins": 22015
       },
       "Bedwars": {
         "first_join_7": true,
@@ -5658,7 +5658,7 @@
         "time_played_knight": 2731,
         "damage_knight": 1550,
         "games_played_knight": 23,
-        "coins": 62717,
+        "coins": 62732,
         "wins_backup": 0,
         "wins_solo_normal": 0,
         "autoarmor": true,
@@ -5704,7 +5704,7 @@
         "inGamePresentsCap_2021_6": 2
       },
       "Arena": {
-        "coins": 22058,
+        "coins": 22088,
         "offensive": "lightning_strike",
         "win_streaks_1v1": 0,
         "deaths_1v1": 1,
@@ -8742,7 +8742,7 @@
         ]
       }
     },
-    "networkExp": 12941888,
+    "networkExp": 12943204,
     "petConsumables": {
       "CARROT_ITEM": 886,
       "BAKED_POTATO": 855,
@@ -9024,7 +9024,7 @@
       "duels_bridge_wins": 11,
       "duels_unique_map_wins": 14,
       "duels_bridge_doubles_wins": 8,
-      "skyblock_angler": 31,
+      "skyblock_angler": 32,
       "duels_bridge_win_streak": 3,
       "christmas2017_advent_2019": 19,
       "christmas2017_present_collector": 564,
@@ -9495,7 +9495,7 @@
         "hat_demon_knight"
       ]
     },
-    "karma": 5900440,
+    "karma": 5907940,
     "levelingReward_0": true,
     "eugene": {
       "dailyTwoKExp": 1647226328400
@@ -13233,7 +13233,7 @@
       }
     },
     "levelingReward_4": true,
-    "lastLogout": 1648429033225,
+    "lastLogout": 1649204182342,
     "levelingReward_5": true,
     "levelingReward_6": true,
     "levelingReward_7": true,

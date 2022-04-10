@@ -1,17 +1,7 @@
 {
   "success": true,
-  "lastUpdated": 1648157371000,
+  "lastUpdated": 1648819370000,
   "items": [
-    {
-      "material": "SKULL_ITEM",
-      "durability": 3,
-      "skin": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2Y1MGFhM2U3MjI5MjQ3YWE1OTgyNDljODNhZWM0NjJhYjE2NTQ4NjVlMjAxZTY5MjVmNTVmNWRkMzY0M2VjYSJ9fX0=",
-      "name": "Barry Century Cake",
-      "furniture": "EPOCH_CAKE_AQUA",
-      "tier": "UNCOMMON",
-      "museum": true,
-      "id": "EPOCH_CAKE_AQUA"
-    },
     {
       "material": "SKULL_ITEM",
       "durability": 3,
@@ -4568,6 +4558,26 @@
       },
       "dungeon_item": true,
       "id": "BOUNCY_CHESTPLATE"
+    },
+    {
+      "material": "FEATHER",
+      "name": "Editor's Pencil",
+      "glowing": true,
+      "tier": "VERY_SPECIAL",
+      "unstackable": true,
+      "soulbound": "COOP",
+      "museum": true,
+      "id": "EDITOR_PENCIL"
+    },
+    {
+      "material": "BOOK",
+      "name": "Wiki Journal",
+      "glowing": true,
+      "tier": "SPECIAL",
+      "unstackable": true,
+      "soulbound": "COOP",
+      "museum": true,
+      "id": "WIKI_JOURNAL"
     },
     {
       "material": "LEATHER_LEGGINGS",
@@ -10985,16 +10995,6 @@
       "id": "CHEAP_TUXEDO_BOOTS"
     },
     {
-      "material": "SKULL_ITEM",
-      "durability": 3,
-      "skin": "ewogICJ0aW1lc3RhbXAiIDogMTYwNDQ2MzAxNjEwOSwKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmE3YmZhODBhODVlNzA3ZWVkZjk0NWI4ODkwNTk0MmY1Zjc3OTVlYTUyNjRkNjkyYTIyZTcwN2ZjNTc3YTg4YiIKICAgIH0KICB9Cn0=",
-      "name": "Pet Rock Century Cake",
-      "furniture": "EPOCH_CAKE_GREEN",
-      "tier": "UNCOMMON",
-      "museum": true,
-      "id": "EPOCH_CAKE_GREEN"
-    },
-    {
       "material": "GOLD_CHESTPLATE",
       "name": "Chestplate of the Stars",
       "category": "CHESTPLATE",
@@ -12495,16 +12495,6 @@
       "generator_tier": 1,
       "tier": "RARE",
       "id": "GRAVEL_GENERATOR_1"
-    },
-    {
-      "material": "SKULL_ITEM",
-      "durability": 3,
-      "skin": "ewogICJ0aW1lc3RhbXAiIDogMTYwNDQ2Mjk0MTc3MCwKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjQ1OTI3NDZjYzM1NjcyZWUyOWJiM2ExNTNkNzRmN2E1ZDBlNWZlODYxMjcyOWEzNGZhZDI1MmZlNzkwNDI4MyIKICAgIH0KICB9Cn0=",
-      "name": "Century Cake of the Next Dungeon Floor",
-      "furniture": "EPOCH_CAKE_BLACK",
-      "tier": "UNCOMMON",
-      "museum": true,
-      "id": "EPOCH_CAKE_BLACK"
     },
     {
       "material": "GOLD_CHESTPLATE",
@@ -14328,6 +14318,96 @@
       },
       "dungeon_item": true,
       "id": "TANK_WITHER_HELMET"
+    },
+    {
+      "material": "SKULL_ITEM",
+      "durability": 3,
+      "skin": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2Y1MGFhM2U3MjI5MjQ3YWE1OTgyNDljODNhZWM0NjJhYjE2NTQ4NjVlMjAxZTY5MjVmNTVmNWRkMzY0M2VjYSJ9fX0=",
+      "name": "Barry Century Cake",
+      "furniture": "EPOCH_CAKE_AQUA",
+      "tier": "UNCOMMON",
+      "museum": true,
+      "id": "EPOCH_CAKE_AQUA"
+    },
+    {
+      "material": "SKULL_ITEM",
+      "durability": 3,
+      "skin": "ewogICJ0aW1lc3RhbXAiIDogMTYwNDQ2MzAxNjEwOSwKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmE3YmZhODBhODVlNzA3ZWVkZjk0NWI4ODkwNTk0MmY1Zjc3OTVlYTUyNjRkNjkyYTIyZTcwN2ZjNTc3YTg4YiIKICAgIH0KICB9Cn0=",
+      "name": "Pet Rock Century Cake",
+      "furniture": "EPOCH_CAKE_GREEN",
+      "tier": "UNCOMMON",
+      "museum": true,
+      "id": "EPOCH_CAKE_GREEN"
+    },
+    {
+      "material": "SKULL_ITEM",
+      "durability": 3,
+      "skin": "ewogICJ0aW1lc3RhbXAiIDogMTYwNDQ2Mjk0MTc3MCwKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjQ1OTI3NDZjYzM1NjcyZWUyOWJiM2ExNTNkNzRmN2E1ZDBlNWZlODYxMjcyOWEzNGZhZDI1MmZlNzkwNDI4MyIKICAgIH0KICB9Cn0=",
+      "name": "Century Cake of the Next Dungeon Floor",
+      "furniture": "EPOCH_CAKE_BLACK",
+      "tier": "UNCOMMON",
+      "museum": true,
+      "id": "EPOCH_CAKE_BLACK"
+    },
+    {
+      "material": "SKULL_ITEM",
+      "durability": 3,
+      "skin": "ewogICJ0aW1lc3RhbXAiIDogMTYwNDQ2MzE4Mzk3NiwKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjVkOTI0M2M2MWUyYzNlMWUwZjk5MzE4NDNjYWRiZDBkZmY0YTY0NjIyNWVmNTRjNTU3OTc5Y2YzOWJiMjA1NyIKICAgIH0KICB9Cn0=",
+      "name": "Streamer's Century Cake",
+      "furniture": "EPOCH_CAKE_PURPLE",
+      "tier": "EPIC",
+      "museum": true,
+      "id": "EPOCH_CAKE_PURPLE"
+    },
+    {
+      "material": "SKULL_ITEM",
+      "durability": 3,
+      "skin": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzljMjhkYTAxZTAxMjg4MGVhY2MzYWIxZDM0ZDkxNDUzNTdkMmUyZDQ2ZDQyYWEzYjU5ZWRiOTFiMWY3YmQ2ZCJ9fX0=",
+      "name": "Crab-Colored Century Cake",
+      "furniture": "EPOCH_CAKE_PINK",
+      "tier": "UNCOMMON",
+      "museum": true,
+      "id": "EPOCH_CAKE_PINK"
+    },
+    {
+      "material": "SKULL_ITEM",
+      "durability": 3,
+      "skin": "ewogICJ0aW1lc3RhbXAiIDogMTYwNDQ2MzA0MzI2NywKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjU4Y2QyNzUwODg0NDcxYzA4MzYzNDMzNDNlYzZlMTg4MjI5ZGEwNTRlZjM2NzEwMTNhZThkNDNkNmIwMjU0OCIKICAgIH0KICB9Cn0=",
+      "name": "Latest Update Century Cake",
+      "furniture": "EPOCH_CAKE_ORANGE",
+      "tier": "UNCOMMON",
+      "museum": true,
+      "id": "EPOCH_CAKE_ORANGE"
+    },
+    {
+      "material": "SKULL_ITEM",
+      "durability": 3,
+      "skin": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTQwOWJkOTYwN2Y0YzFkNjk0ZjYyNTNjOGI2NzFkMDkyZjhiMTZjYTdmNjZlYmZkNjdlZjlkODY0MDI0Nzc0YiJ9fX0=",
+      "name": "aPunch Century Cake",
+      "furniture": "EPOCH_CAKE_RED",
+      "tier": "UNCOMMON",
+      "museum": true,
+      "id": "EPOCH_CAKE_RED"
+    },
+    {
+      "material": "SKULL_ITEM",
+      "durability": 3,
+      "skin": "ewogICJ0aW1lc3RhbXAiIDogMTYwNDQ2MjkxNzQ0MCwKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTEyYTI4ZTY5ZGE1ZTQzY2U4ZmRlY2M2YTgyM2M5MmZmZjg0NzE5ZTAxNDdjYWFjNzFjNWM4ZDk5ZGE1NzgxYyIKICAgIH0KICB9Cn0=",
+      "name": "Sea Emperor Century Cake",
+      "furniture": "EPOCH_CAKE_BLUE",
+      "tier": "UNCOMMON",
+      "museum": true,
+      "id": "EPOCH_CAKE_BLUE"
+    },
+    {
+      "material": "SKULL_ITEM",
+      "durability": 3,
+      "skin": "ewogICJ0aW1lc3RhbXAiIDogMTYwNDQ2MzA2OTkwNywKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTI1NTg4OTk5YjY3NGIzOTlhMTk4MGEyNWQ5Y2EzMjM2MzlkMDMzZTNmODUwNDBjMWRlN2ZmYjQyOGJjYTA5NSIKICAgIH0KICB9Cn0=",
+      "name": "Potato-Style Century Cake",
+      "furniture": "EPOCH_CAKE_YELLOW",
+      "tier": "UNCOMMON",
+      "museum": true,
+      "id": "EPOCH_CAKE_YELLOW"
     },
     {
       "material": "SKULL_ITEM",
@@ -22191,16 +22271,6 @@
     {
       "material": "SKULL_ITEM",
       "durability": 3,
-      "skin": "ewogICJ0aW1lc3RhbXAiIDogMTYwNDQ2MzE4Mzk3NiwKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjVkOTI0M2M2MWUyYzNlMWUwZjk5MzE4NDNjYWRiZDBkZmY0YTY0NjIyNWVmNTRjNTU3OTc5Y2YzOWJiMjA1NyIKICAgIH0KICB9Cn0=",
-      "name": "Streamer's Century Cake",
-      "furniture": "EPOCH_CAKE_PURPLE",
-      "tier": "EPIC",
-      "museum": true,
-      "id": "EPOCH_CAKE_PURPLE"
-    },
-    {
-      "material": "SKULL_ITEM",
-      "durability": 3,
       "skin": "eyJ0aW1lc3RhbXAiOjE1NTc5MTk4MTgzOTYsInByb2ZpbGVJZCI6IjVkMjRiYTBiMjg4YzQyOTM4YmExMGVjOTkwNjRkMjU5IiwicHJvZmlsZU5hbWUiOiIxbnYzbnQxdjN0NGwzbnQiLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzJmZTczZDk4MTY5MGMxYmUzNDZhMTYzMzE4MTljNGU4ODAwODU5ZmNkYzNlNTE1MzcxOGM2YWQ0NTg2MTkyNGMifX19",
       "name": "Jungle Minion I",
       "generator": "JUNGLE",
@@ -22636,16 +22706,6 @@
       "name": "Chewed Piece of Gum",
       "tier": "RARE",
       "id": "CHEWED_GUM"
-    },
-    {
-      "material": "SKULL_ITEM",
-      "durability": 3,
-      "skin": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzljMjhkYTAxZTAxMjg4MGVhY2MzYWIxZDM0ZDkxNDUzNTdkMmUyZDQ2ZDQyYWEzYjU5ZWRiOTFiMWY3YmQ2ZCJ9fX0=",
-      "name": "Crab-Colored Century Cake",
-      "furniture": "EPOCH_CAKE_PINK",
-      "tier": "UNCOMMON",
-      "museum": true,
-      "id": "EPOCH_CAKE_PINK"
     },
     {
       "material": "SKULL_ITEM",
@@ -27567,16 +27627,6 @@
     {
       "material": "SKULL_ITEM",
       "durability": 3,
-      "skin": "ewogICJ0aW1lc3RhbXAiIDogMTYwNDQ2MzA0MzI2NywKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjU4Y2QyNzUwODg0NDcxYzA4MzYzNDMzNDNlYzZlMTg4MjI5ZGEwNTRlZjM2NzEwMTNhZThkNDNkNmIwMjU0OCIKICAgIH0KICB9Cn0=",
-      "name": "Latest Update Century Cake",
-      "furniture": "EPOCH_CAKE_ORANGE",
-      "tier": "UNCOMMON",
-      "museum": true,
-      "id": "EPOCH_CAKE_ORANGE"
-    },
-    {
-      "material": "SKULL_ITEM",
-      "durability": 3,
       "skin": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2FiNGM0ZDZlZTY5YmMyNGJiYTJiOGZhZjY3YjlmNzA0YTA2YjAxYWE5M2YzZWZhNmFlZjdhOTY5NmM0ZmVlZiJ9fX0=",
       "name": "Radiant Power Orb",
       "tier": "UNCOMMON",
@@ -29806,16 +29856,6 @@
       "id": "CELESTE_HELMET"
     },
     {
-      "material": "SKULL_ITEM",
-      "durability": 3,
-      "skin": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTQwOWJkOTYwN2Y0YzFkNjk0ZjYyNTNjOGI2NzFkMDkyZjhiMTZjYTdmNjZlYmZkNjdlZjlkODY0MDI0Nzc0YiJ9fX0=",
-      "name": "aPunch Century Cake",
-      "furniture": "EPOCH_CAKE_RED",
-      "tier": "UNCOMMON",
-      "museum": true,
-      "id": "EPOCH_CAKE_RED"
-    },
-    {
       "material": "BRICK",
       "name": "Pop-up Wall",
       "glowing": true,
@@ -30533,15 +30573,6 @@
       "id": "MELON_GENERATOR_12"
     },
     {
-      "material": "BOOK",
-      "name": "Wiki Journal",
-      "glowing": true,
-      "tier": "SPECIAL",
-      "unstackable": true,
-      "museum": true,
-      "id": "WIKI_JOURNAL"
-    },
-    {
       "material": "SKULL_ITEM",
       "durability": 3,
       "skin": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDc0NmMyNmFhYzE2ZTM4ODA5ODJkMTM5OWZiNWY5Zjc5OTEzZGQ2MTZlNzE2NTRmOWJmNGQ0MWZiMzMifX19",
@@ -30580,16 +30611,6 @@
         }
       },
       "id": "GYROKINETIC_WAND"
-    },
-    {
-      "material": "SKULL_ITEM",
-      "durability": 3,
-      "skin": "ewogICJ0aW1lc3RhbXAiIDogMTYwNDQ2MjkxNzQ0MCwKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTEyYTI4ZTY5ZGE1ZTQzY2U4ZmRlY2M2YTgyM2M5MmZmZjg0NzE5ZTAxNDdjYWFjNzFjNWM4ZDk5ZGE1NzgxYyIKICAgIH0KICB9Cn0=",
-      "name": "Sea Emperor Century Cake",
-      "furniture": "EPOCH_CAKE_BLUE",
-      "tier": "UNCOMMON",
-      "museum": true,
-      "id": "EPOCH_CAKE_BLUE"
     },
     {
       "material": "SKULL_ITEM",
@@ -34667,16 +34688,6 @@
       "name": "Hay Bed",
       "furniture": "HAY_BED",
       "id": "HAY_BED"
-    },
-    {
-      "material": "SKULL_ITEM",
-      "durability": 3,
-      "skin": "ewogICJ0aW1lc3RhbXAiIDogMTYwNDQ2MzA2OTkwNywKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTI1NTg4OTk5YjY3NGIzOTlhMTk4MGEyNWQ5Y2EzMjM2MzlkMDMzZTNmODUwNDBjMWRlN2ZmYjQyOGJjYTA5NSIKICAgIH0KICB9Cn0=",
-      "name": "Potato-Style Century Cake",
-      "furniture": "EPOCH_CAKE_YELLOW",
-      "tier": "UNCOMMON",
-      "museum": true,
-      "id": "EPOCH_CAKE_YELLOW"
     },
     {
       "material": "SPONGE",
