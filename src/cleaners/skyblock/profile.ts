@@ -4,6 +4,7 @@ import typedHypixelApi from 'typed-hypixel-api'
 import * as constants from '../../constants.js'
 import { ApiOptions } from '../../hypixel.js'
 import { Bank, cleanBank } from './bank.js'
+import { cleanGameMode, GameMode } from './gameMode.js'
 
 export interface CleanProfile extends CleanBasicProfile {
     members?: CleanBasicMember[]
@@ -15,6 +16,7 @@ export interface CleanFullProfile extends CleanProfile {
     minions: CleanMinion[]
     minionCount: number
     maxUniqueMinions: number
+    mode: GameMode
 }
 
 export interface CleanFullProfileBasicMembers extends CleanProfile {
@@ -23,6 +25,7 @@ export interface CleanFullProfileBasicMembers extends CleanProfile {
     minions: CleanMinion[]
     minionCount: number
     maxUniqueMinions: number
+    mode: GameMode
 }
 
 /** Return a `CleanProfile` instead of a `CleanFullProfile`, useful when we need to get members but don't want to waste much ram */
@@ -107,6 +110,7 @@ export async function cleanSkyblockProfileResponse<O extends ApiOptions>(
         minions: minions,
         minionCount: uniqueMinions,
         maxUniqueMinions: maxUniqueMinions ?? 0,
+        mode: cleanGameMode(data)
     }
     return cleanFullProfile
 }
