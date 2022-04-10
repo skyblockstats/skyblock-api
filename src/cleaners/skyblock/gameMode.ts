@@ -1,8 +1,4 @@
 import typedHypixelApi from 'typed-hypixel-api'
-import { fetchItemList } from '../../hypixel.js'
-import { levelFromXpTable } from '../../util.js'
-import { fetchPets } from '../../constants.js'
-import { ItemListItem } from './itemList.js'
 
 export type GameMode = 'normal' | 'stranded' | 'bingo' | 'ironman'
 const gameModeMap: Record<NonNullable<typedHypixelApi.SkyBlockProfile['game_mode']>, GameMode> = {

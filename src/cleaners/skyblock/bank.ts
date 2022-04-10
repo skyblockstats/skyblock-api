@@ -15,6 +15,12 @@ export interface BankHistoryItem {
 
 export function cleanBank(data: typedHypixelApi.SkyBlockProfile): Bank {
 	let history: BankHistoryItem[] = []
+	if (!(data?.banking && 'transactions' in data?.banking)) {
+		return {
+			history: [],
+			balance: undefined
+		}
+	}
 
 	if (data?.banking?.transactions) {
 		let bankBalance = Math.round(data.banking.balance * 10) / 10
@@ -35,7 +41,7 @@ export function cleanBank(data: typedHypixelApi.SkyBlockProfile): Bank {
 	// history.reverse()
 
 	return {
-		balance: data?.banking?.balance ? Math.round(data.banking.balance * 10) / 10 : undefined,
+		balance: (data?.banking && 'balance' in data.banking && data.banking.balance) ? Math.round(data.banking.balance * 10) / 10 : undefined,
 		history
 	}
 }
