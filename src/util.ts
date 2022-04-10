@@ -70,6 +70,13 @@ export function colorCodeFromName(colorName: string): string | undefined {
 	}
 }
 
+export function letterFromColorCode(colorCode: string): string | undefined {
+	for (const [key, value] of Object.entries(minecraftColorCodes)) {
+		if (value === colorCode)
+			return key
+	}
+}
+
 export async function sleep(ms: number): Promise<void> {
 	await new Promise(resolve => setTimeout(resolve, ms))
 }

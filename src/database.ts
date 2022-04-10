@@ -10,7 +10,7 @@ import { CleanMember } from './cleaners/skyblock/member.js'
 import { CleanPlayer } from './cleaners/player.js'
 import * as cached from './hypixelCached.js'
 import * as constants from './constants.js'
-import { shuffle, sleep } from './util.js'
+import { letterFromColorCode, shuffle, sleep } from './util.js'
 import * as discord from './discord.js'
 import NodeCache from 'node-cache'
 import { v4 as uuid4 } from 'uuid'
@@ -34,13 +34,19 @@ const recentlyQueued = new NodeCache({
 interface DatabaseMemberLeaderboardItem {
 	uuid: string
 	profile: string
+	/** The color code of this player's rank */
+	color: string
+	username: string
 	stats: Record<string, number>
 	lastUpdated: Date
 }
 interface DatabaseProfileLeaderboardItem {
 	uuid: string
+	/** The color codes of the players ranks */
+	colors: string[]
 	/** An array of uuids for each player in the profile */
 	players: string[]
+	usernames: string[]
 	stats: Record<string, number>
 	lastUpdated: Date
 }
@@ -49,12 +55,16 @@ interface DatabaseProfileLeaderboardItem {
 interface memberRawLeaderboardItem {
 	uuid: string
 	profile: string
+	color: string
+	username: string
 	value: number
 }
 interface profileRawLeaderboardItem {
 	uuid: string
 	/** An array of uuids for each player in the profile */
 	players: string[]
+	colors: string[]
+	usernames: string[]
 	value: number
 }
 
@@ -431,6 +441,8 @@ async function fetchMemberLeaderboardRaw(name: string): Promise<memberRawLeaderb
 				return {
 					profile: i.profile,
 					uuid: i.uuid,
+					color: i.color,
+					username: i.username,
 					value: i.stats[name]
 				}
 			})
@@ -474,6 +486,8 @@ async function fetchProfileLeaderboardRaw(name: string): Promise<profileRawLeade
 			.map((i: DatabaseProfileLeaderboardItem): profileRawLeaderboardItem => {
 				return {
 					players: i.players,
+					colors: i.colors,
+					usernames: i.usernames,
 					uuid: i.uuid,
 					value: i.stats[name]
 				}
@@ -772,6 +786,8 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 			},
 			{
 				'$set': {
+					color: member.rank.color ? (letterFromColorCode(member.rank.color) ?? '') : '',
+					username: member.username,
 					stats: leaderboardAttributes,
 					last_updated: new Date()
 				}
@@ -796,7 +812,9 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 			.concat([{
 				value: attributeValue,
 				uuid: member.uuid,
-				profile: profile.uuid
+				profile: profile.uuid,
+				color: member.rank.color ? (letterFromColorCode(member.rank.color) ?? '') : '',
+				username: member.username
 			}])
 			.sort((a, b) => leaderboardReverse ? a.value - b.value : b.value - a.value)
 			.slice(0, 100)
@@ -834,6 +852,8 @@ export async function updateDatabaseProfile(profile: CleanFullProfile): Promise<
 			{
 				'$set': {
 					players: profile.members.map(p => p.uuid),
+					colors: profile.members.map(p => p.rank.color ? (letterFromColorCode(p.rank.color) ?? '') : ''),
+					usernames: profile.members.map(p => p.username),
 					stats: leaderboardAttributes,
 					last_updated: new Date()
 				}
@@ -861,7 +881,9 @@ export async function updateDatabaseProfile(profile: CleanFullProfile): Promise<
 			.concat([{
 				value: attributeValue,
 				uuid: profile.uuid,
-				players: profile.members.map(p => p.uuid)
+				players: profile.members.map(p => p.uuid),
+				colors: profile.members.map(p => p.rank.color ? (letterFromColorCode(p.rank.color) ?? '') : ''),
+				usernames: profile.members.map(p => p.username),
 			}])
 			.sort((a, b) => leaderboardReverse ? a.value - b.value : b.value - a.value)
 			.slice(0, 100)
