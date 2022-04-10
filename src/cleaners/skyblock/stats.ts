@@ -70,7 +70,9 @@ export const statUnits = {
 	time: ['_best_time', '_best_time_2', 'fastest_coop_join', 'slowest_coop_join'],
 	date: ['first_join', 'last_save'],
 	coins: ['purse'],
-	leaderboards: ['leaderboards_count', 'top_1_leaderboards_count']
+	leaderboards: ['leaderboards_count', 'top_1_leaderboards_count'],
+	contests: ['farming_contests_top_1', 'farming_contests_top_1_', 'farming_contests_participated', 'farming_contests_participated_'],
+	score: ['farming_contests_highest_score_potato']
 }
 
 export interface StatItem {
