@@ -7,7 +7,8 @@ import { Bank, cleanBank } from './bank.js'
 import { cleanGameMode, GameMode } from './gameMode.js'
 
 export interface CleanProfile extends CleanBasicProfile {
-    members?: CleanBasicMember[]
+    members: CleanBasicMember[]
+    mode: GameMode
 }
 
 export interface CleanFullProfile extends CleanProfile {
@@ -16,7 +17,6 @@ export interface CleanFullProfile extends CleanProfile {
     minions: CleanMinion[]
     minionCount: number
     maxUniqueMinions: number
-    mode: GameMode
 }
 
 export interface CleanFullProfileBasicMembers extends CleanProfile {
@@ -25,7 +25,6 @@ export interface CleanFullProfileBasicMembers extends CleanProfile {
     minions: CleanMinion[]
     minionCount: number
     maxUniqueMinions: number
-    mode: GameMode
 }
 
 /** Return a `CleanProfile` instead of a `CleanFullProfile`, useful when we need to get members but don't want to waste much ram */
@@ -46,6 +45,7 @@ export async function cleanSkyblockProfileResponseLighter(data: typedHypixelApi.
         uuid: data.profile_id,
         name: 'cute_name' in data ? data.cute_name : undefined,
         members: cleanedMembers,
+        mode: cleanGameMode(data)
     }
 }
 
@@ -83,6 +83,7 @@ export async function cleanSkyblockProfileResponse<O extends ApiOptions>(
             uuid: profileId,
             name: 'cute_name' in data ? data.cute_name : undefined,
             members: cleanedMembers,
+            mode: cleanGameMode(data)
         }
         // we have to do this because of the basic checking typing
         return cleanProfile as any

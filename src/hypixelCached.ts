@@ -248,7 +248,8 @@ export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanPr
 					rank: m.rank,
 					left: m.left
 				}
-			})
+			}),
+			mode: profile.mode
 		}
 		basicProfiles.push(basicProfile)
 	}
@@ -381,7 +382,8 @@ export async function fetchBasicProfileFromUuid(profileUuid: string): Promise<Cl
 				firstJoin: m.firstJoin,
 				rank: m.rank,
 			})),
-			name: profile.name
+			name: profile.name,
+			mode: profile.mode
 		}
 	}
 	// TODO: cache this

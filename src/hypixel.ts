@@ -86,7 +86,7 @@ export interface UserAny {
 
 export interface CleanUser {
 	player: CleanPlayer | null
-	profiles?: CleanProfile[]
+	profiles?: CleanProfile[] | CleanBasicProfile[]
 	activeProfile?: string
 	online?: boolean
 	customization?: AccountCustomization
