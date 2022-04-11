@@ -9,7 +9,7 @@ import { Collection, Db, MongoClient, WithId } from 'mongodb'
 import { CleanMember } from './cleaners/skyblock/member.js'
 import * as cached from './hypixelCached.js'
 import * as constants from './constants.js'
-import { letterFromColorCode, minecraftColorCodes, shuffle, sleep } from './util.js'
+import { isUuid, letterFromColorCode, minecraftColorCodes, shuffle, sleep } from './util.js'
 import * as discord from './discord.js'
 import NodeCache from 'node-cache'
 import { v4 as uuid4 } from 'uuid'
@@ -431,6 +431,7 @@ async function fetchMemberLeaderboardRaw(name: string): Promise<memberRawLeaderb
 
 	fetchingRawLeaderboardNames.add(name)
 
+	if (debug) console.debug(`Fetching leaderboard ${name} from database...`)
 	try {
 		const leaderboardRaw: memberRawLeaderboardItem[] = (await memberLeaderboardsCollection
 			.find(query)
@@ -452,6 +453,7 @@ async function fetchMemberLeaderboardRaw(name: string): Promise<memberRawLeaderb
 	} catch (e) {
 		// if it fails while fetching, remove it from fetchingRawLeaderboardNames
 		fetchingRawLeaderboardNames.delete(name)
+		if (debug) console.debug(`Failed getting leaderboard ${name}!`)
 		throw e
 	}
 }
@@ -611,22 +613,52 @@ interface LeaderboardSpot {
 }
 
 /** Get the leaderboard positions a member is on. This may take a while depending on whether stuff is cached */
-export async function fetchMemberLeaderboardSpots(player: string, profile: string): Promise<LeaderboardSpot[] | null> {
-	const fullProfile = await cached.fetchProfile(player, profile)
-	if (!fullProfile) return null
-	const fullMember = fullProfile.members.find(m => m.username.toLowerCase() === player.toLowerCase() || m.uuid === player)
-	if (!fullMember) return null
+export async function fetchMemberLeaderboardSpots(player: string, profile: string, lazy = false): Promise<LeaderboardSpot[] | null> {
+	let playerUuid: string | undefined
+	let profileUuid: string | undefined
+	if (isUuid(player)) playerUuid = player
+	if (isUuid(profile)) profileUuid = profile
 
-	// update the leaderboard positions for the member
-	await updateDatabaseMember(fullMember, fullProfile)
+	let fullProfile: CleanFullProfile
+	let fullMember: CleanMember
+	if (!(lazy && profileUuid)) {
+		const fullProfileNullable = await cached.fetchProfile(player, profile)
+		if (!fullProfileNullable) return null
+		fullProfile = fullProfileNullable
+		profileUuid = fullProfile.uuid
 
-	const applicableAttributes = await getApplicableMemberLeaderboardAttributes(fullMember)
+		if (!(lazy && playerUuid)) {
+			const fullMemberNullable = fullProfile.members.find(m => m.username.toLowerCase() === player.toLowerCase() || m.uuid === player)
+			if (!fullMemberNullable) return null
+			fullMember = fullMemberNullable
+			playerUuid = fullMember.uuid
+		}
+	}
+
+	let applicableAttributes: StringNumber = {}
+	if (!lazy) {
+		// update the leaderboard positions for the member
+		await updateDatabaseMember(fullMember!, fullProfile!)
+
+		applicableAttributes = await getApplicableMemberLeaderboardAttributes(fullMember!)
+	} else {
+		const memberDoc = await memberLeaderboardsCollection.findOne({
+			uuid: playerUuid,
+			profile: profileUuid
+		})
+		applicableAttributes = memberDoc?.stats ?? {}
+	}
 
 	const memberLeaderboardSpots: LeaderboardSpot[] = []
 
+	let leaderboardPromises: Promise<memberRawLeaderboardItem[]>[] = []
+	for (const leaderboardName in applicableAttributes)
+		leaderboardPromises.push(fetchMemberLeaderboardRaw(leaderboardName))
 	for (const leaderboardName in applicableAttributes) {
-		const leaderboard = await fetchMemberLeaderboardRaw(leaderboardName)
-		const leaderboardPositionIndex = leaderboard.findIndex(i => i.uuid === fullMember.uuid && i.profile === fullProfile.uuid)
+		const leaderboard = await leaderboardPromises.shift()!
+		const leaderboardPositionIndexByValue = leaderboard.findIndex(i => i.value === applicableAttributes[leaderboardName])
+		const leaderboardPositionIndexByUser = leaderboard.findIndex(i => i.uuid === playerUuid && i.profile === profileUuid)
+		const leaderboardPositionIndex = leaderboardPositionIndexByValue !== -1 ? leaderboardPositionIndexByValue : leaderboardPositionIndexByUser
 
 		memberLeaderboardSpots.push({
 			name: leaderboardName,
@@ -975,8 +1007,17 @@ async function fetchAllLeaderboards(): Promise<void> {
 
 	if (debug) console.debug('Caching raw leaderboards!')
 
-	for (const leaderboard of shuffle(leaderboards))
-		await fetchMemberLeaderboardRaw(leaderboard)
+	let concurrentlyFetching = 0
+
+	for (const leaderboard of shuffle(leaderboards)) {
+		let fetchLeaderboardPromise = fetchMemberLeaderboardRaw(leaderboard)
+		concurrentlyFetching++
+		if (concurrentlyFetching > 10) {
+			await fetchLeaderboardPromise
+			concurrentlyFetching--
+		} else
+			fetchLeaderboardPromise.then(() => concurrentlyFetching--)
+	}
 	finishedCachingRawLeaderboards = true
 }
 

@@ -101,7 +101,7 @@ app.get('/player/:user/:profile', async (req, res) => {
 app.get('/player/:user/:profile/leaderboards', async (req, res) => {
 	try {
 		res.json(
-			await fetchMemberLeaderboardSpots(req.params.user, req.params.profile)
+			await fetchMemberLeaderboardSpots(req.params.user, req.params.profile, req.query.lazy === 'true')
 		)
 	} catch (err) {
 		console.error(err)
