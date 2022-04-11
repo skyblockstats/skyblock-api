@@ -778,13 +778,13 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 	if (debug) console.debug('adding member to leaderboards', member.username)
 
 	if (member.rawHypixelStats)
-		await constants.addStats(Object.keys(member.rawHypixelStats))
-	await constants.addCollections(member.collections.map(coll => coll.name))
-	await constants.addSkills(member.skills.map(skill => skill.name))
-	await constants.addZones(member.zones.map(zone => zone.name))
-	await constants.addSlayers(member.slayers.bosses.map(s => s.rawName))
-	await constants.addPets(member.pets.list.map(s => s.id))
-	await constants.addHarpSongs(member.harp.songs.map(s => s.id))
+		constants.addStats(Object.keys(member.rawHypixelStats))
+	constants.addCollections(member.collections.map(coll => coll.name))
+	constants.addSkills(member.skills.map(skill => skill.name))
+	constants.addZones(member.zones.map(zone => zone.name))
+	constants.addSlayers(member.slayers.bosses.map(s => s.rawName))
+	constants.addPets(member.pets.list.map(s => s.id))
+	constants.addHarpSongs(member.harp.songs.map(s => s.id))
 
 	if (debug) console.debug('done constants..')
 
@@ -908,7 +908,7 @@ export async function updateDatabaseProfile(profile: CleanFullProfile): Promise<
 }
 
 export const leaderboardUpdateMemberQueue = new Queue({
-	concurrent: 1,
+	concurrent: 2,
 	interval: 50
 })
 export const leaderboardUpdateProfileQueue = new Queue({
