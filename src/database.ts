@@ -519,7 +519,7 @@ interface ProfileLeaderboard {
 
 interface LeaderboardBasicPlayer {
 	uuid: string
-	username: string
+	username: string | undefined
 	rank: {
 		color: string
 	}
@@ -561,9 +561,9 @@ export async function fetchProfileLeaderboard(name: string): Promise<ProfileLead
 		for (const playerUuid of i.players) {
 			const player: LeaderboardBasicPlayer = {
 				uuid: playerUuid,
-				username: i.usernames[i.players.indexOf(playerUuid)],
+				username: i.usernames ? i.usernames[i.players.indexOf(playerUuid)] : undefined,
 				rank: {
-					color: i.colors[i.players.indexOf(playerUuid)]
+					color: i.colors ? i.colors[i.players.indexOf(playerUuid)] : minecraftColorCodes[RANK_COLORS.NONE]!
 				}
 			}
 			if (player)
