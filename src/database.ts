@@ -9,7 +9,7 @@ import { Collection, Db, MongoClient, WithId } from 'mongodb'
 import { CleanMember } from './cleaners/skyblock/member.js'
 import * as cached from './hypixelCached.js'
 import * as constants from './constants.js'
-import { colorCodeFromName, letterFromColorCode, shuffle, sleep } from './util.js'
+import { letterFromColorCode, minecraftColorCodes, shuffle, sleep } from './util.js'
 import * as discord from './discord.js'
 import NodeCache from 'node-cache'
 import { v4 as uuid4 } from 'uuid'
@@ -529,26 +529,21 @@ interface LeaderboardBasicPlayer {
 export async function fetchMemberLeaderboard(name: string): Promise<MemberLeaderboard> {
 	const leaderboardRaw = await fetchMemberLeaderboardRaw(name)
 
-	const fetchLeaderboardPlayer = async (i: memberRawLeaderboardItem): Promise<MemberLeaderboardItem> => {
-		const player: LeaderboardBasicPlayer = {
-			uuid: i.uuid,
-			username: i.username,
-			rank: {
-				color: (i.color ? colorCodeFromName(i.color) : null) ?? colorCodeFromName(RANK_COLORS.NONE)!,
-			},
-		}
 
-		return {
-			player,
+	const leaderboard: MemberLeaderboardItem[] = []
+	for (const i of leaderboardRaw) {
+		leaderboard.push({
+			player: {
+				uuid: i.uuid,
+				username: i.username,
+				rank: {
+					color: (i.color ? minecraftColorCodes[i.color] : null) ?? minecraftColorCodes[RANK_COLORS.NONE]!,
+				},
+			},
 			profileUuid: i.profile,
 			value: i.value
-		}
+		})
 	}
-	const promises: Promise<MemberLeaderboardItem>[] = []
-	for (const item of leaderboardRaw) {
-		promises.push(fetchLeaderboardPlayer(item))
-	}
-	const leaderboard = await Promise.all(promises)
 	return {
 		name: name,
 		unit: getStatUnit(name) ?? null,
