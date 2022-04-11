@@ -131,12 +131,12 @@ export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(path
 		}
 	}
 
-	if ('key' in options && response.headers['RateLimit-Limit']) {
+	if ('key' in options && response.headers['ratelimit-limit']) {
 		// remember how many uses it has
 		apiKeyUsage[options.key] = {
-			remaining: response.headers['RateLimit-Remaining'] ?? 0,
-			limit: response.headers['Ratelimit-Limit'] ?? 0,
-			reset: Date.now() + response.headers['Ratelimit-Reset'] ?? 0 * 1000 + 1000,
+			remaining: response.headers['ratelimit-remaining'] ?? 0,
+			limit: response.headers['ratelimit-limit'] ?? 0,
+			reset: Date.now() + response.headers['ratelimit-reset'] ?? 0 * 1000 + 1000,
 		}
 
 		let usage = apiKeyUsage[options.key].limit - apiKeyUsage[options.key].remaining
