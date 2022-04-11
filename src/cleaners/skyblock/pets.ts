@@ -63,7 +63,7 @@ export async function cleanPets(data: typedHypixelApi.SkyBlockProfileMember): Pr
 	const itemList = await fetchItemList()
 
 	for (const petData of data.pets ?? []) {
-		const xpTable = RARITY_XP_TABLES[petData.tier]
+		const xpTable = RARITY_XP_TABLES[petData.tier] ?? RARITY_XP_TABLES.LEGENDARY
 		const level = levelFromXpTable(petData.exp, xpTable)
 		const pet: Pet = {
 			id: petData.type,
