@@ -25,12 +25,16 @@ export interface Quest {
 	objectives: Objective
 }
 
+/** A record of objective ids to quest ids */
+let knownAttachedQuests: Record<string, string> = {}
+
 export function cleanQuests(data: typedHypixelApi.SkyBlockProfileMember): Quest[] {
-	// objective: [ quests ]
-	const possibleAttachedQuests: Record<string, string[]> = {}
 	for (const [objectiveId, objectiveValue] of Object.entries(data.objectives)) {
-		possibleAttachedQuests[objectiveId] = []
-		// figure out what quests this objective could belong to
+		if (objectiveId in knownAttachedQuests)
+			continue
+
+		// here we try to figure out what quests this objective could belong to
+		let possibleAttachedQuests: string[] = []
 		if (objectiveValue.status === 'COMPLETE') {
 			for (const [questId, questValue] of Object.entries(data.quests)) {
 				if (questValue.status === 'COMPLETE') {
@@ -39,7 +43,7 @@ export function cleanQuests(data: typedHypixelApi.SkyBlockProfileMember): Quest[
 						&& objectiveValue.completed_at <= questValue.completed_at
 					) {
 						// console.log('objective', objectiveId, 'could belong to quest', questId)
-						possibleAttachedQuests[objectiveId].push(questId)
+						possibleAttachedQuests.push(questId)
 					}
 				}
 			}
@@ -47,15 +51,15 @@ export function cleanQuests(data: typedHypixelApi.SkyBlockProfileMember): Quest[
 		if (objectiveValue.status === 'ACTIVE') {
 			for (const [questId, questValue] of Object.entries(data.quests)) {
 				if (questValue.status === 'ACTIVE') {
-					console.log('active objective', objectiveId, 'could belong to quest', questId)
-					possibleAttachedQuests[objectiveId].push(questId)
+					possibleAttachedQuests.push(questId)
 				}
 			}
 		}
+		if (possibleAttachedQuests.length === 1) {
+			knownAttachedQuests[objectiveId] = possibleAttachedQuests[0]
+			console.log('Figured out that', objectiveId, 'belongs to quest', possibleAttachedQuests[0])
+		}
 	}
-
-	console.log('possibleAttachedQuests', possibleAttachedQuests)
-
 
 	return []
 }
