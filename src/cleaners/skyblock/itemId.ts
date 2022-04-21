@@ -7,6 +7,8 @@ const ITEMS = {
 	'log_2': 'acacia_log',
 	'log_2:1': 'dark_oak_log',
 
+	'sand:1': 'red_sand',
+
 	'ink_sack': 'ink_sac',
 	'ink_sack:3': 'cocoa_beans',
 	'ink_sack:4': 'lapis_lazuli',
