@@ -20,6 +20,7 @@ const ITEMS = {
 
 	'raw_salmon': 'salmon',
 	'cooked_fish': 'cooked_cod',
+	'magma_fish': 'magmafish',
 
 	'seeds': 'wheat_seeds',
 	'sulphur': 'gunpowder',
@@ -43,6 +44,8 @@ const ITEMS = {
 
 	'iron': 'iron_ingot',
 	'gold': 'gold_ingot',
+
+	'sulphur_ore': 'sulphur',
 
 	'endstone': 'end_stone',
 	'lapis_lazuli_block': 'lapis_block',

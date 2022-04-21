@@ -20,7 +20,8 @@ const COLLECTIONS = {
 		'chicken',
 		'mutton',
 		'rabbit',
-		'nether_wart'
+		'nether_wart',
+		'sulphur'
 	],
 	'mining': [
 		'cobblestone',
@@ -38,10 +39,13 @@ const COLLECTIONS = {
 		'ice',
 		'netherrack',
 		'sand',
+		'red_sand',
 		'end_stone',
 		'mithril_ore',
 		'gemstone',
-		'hard_stone'
+		'hard_stone',
+		'sulphur',
+		'mycelium'
 	],
 	'combat': [
 		'rotten_flesh',
@@ -68,6 +72,7 @@ const COLLECTIONS = {
 		'salmon',
 		'tropical_fish',
 		'pufferfish',
+		'magmafish',
 		'prismarine_shard',
 		'prismarine_crystals',
 		'clay_ball',
