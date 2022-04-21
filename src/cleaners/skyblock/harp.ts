@@ -1,5 +1,5 @@
 import typedHypixelApi from 'typed-hypixel-api'
-import { fetchHarpSongs } from '../../constants.js'
+import * as constants from '../../constants.js'
 
 export interface HarpSong {
 	id: string
@@ -26,11 +26,14 @@ export async function cleanHarp(data: typedHypixelApi.SkyBlockProfileMember): Pr
 	const harpQuestData = data.harp_quest ?? {}
 	const songs: HarpSong[] = []
 
-	const allHarpSongNames = await fetchHarpSongs()
+	let songIds: string[] = []
+
+	const allHarpSongIds = await constants.fetchHarpSongs()
 
 	for (const item in data.harp_quest) {
 		if (item.startsWith('song_') && item.endsWith('_best_completion')) {
 			const apiSongName = item.slice('song_'.length, -'_best_completion'.length)
+			songIds.push(apiSongName)
 			const songName = renamedSongs[apiSongName] ?? apiSongName
 			songs.push({
 				id: songName,
@@ -41,10 +44,12 @@ export async function cleanHarp(data: typedHypixelApi.SkyBlockProfileMember): Pr
 		}
 	}
 
-	const missingHarpSongNames = allHarpSongNames.filter(songName => !songs.find(song => (renamedSongs[song.id] ?? song.id) === songName))
-	for (const songName of missingHarpSongNames) {
+	constants.addHarpSongs(songIds)
+
+	const missingHarpSongId = allHarpSongIds.filter(songId => !songIds.includes(songId))
+	for (const songId of missingHarpSongId) {
 		songs.push({
-			id: renamedSongs[songName] ?? songName,
+			id: renamedSongs[songId] ?? songId,
 			completions: 0,
 			perfectCompletions: 0,
 			progress: 0

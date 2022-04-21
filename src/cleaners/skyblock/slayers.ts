@@ -1,4 +1,5 @@
 import typedHypixelApi from 'typed-hypixel-api'
+import * as constants from '../../constants.js'
 
 
 const SLAYER_NAMES = {
@@ -48,7 +49,10 @@ export function cleanSlayers(data: typedHypixelApi.SkyBlockProfileMember): Slaye
 	let totalXp: number = 0
 	let totalKills: number = 0
 
+	let slayerIds: string[] = []
+
 	for (const slayerNameRaw in slayersDataRaw) {
+		slayerIds.push(slayerNameRaw)
 		const slayerDataRaw = slayersDataRaw[slayerNameRaw]
 
 		// convert name provided by api (spider) to the real name (tarantula)
@@ -107,6 +111,8 @@ export function cleanSlayers(data: typedHypixelApi.SkyBlockProfileMember): Slaye
 		if (slayerKills)
 			totalKills += slayerKills
 	}
+
+	constants.addSlayers(slayerIds)
 
 	return {
 		xp: totalXp,

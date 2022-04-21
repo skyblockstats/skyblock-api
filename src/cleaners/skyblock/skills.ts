@@ -1,6 +1,7 @@
 import typedHypixelApi from 'typed-hypixel-api'
 import { fetchSkills } from '../../constants.js'
 import { levelFromXpTable } from '../../util.js'
+import * as constants from '../../constants.js'
 
 export interface Skill {
 	name: string
@@ -139,9 +140,13 @@ export function levelForSkillXp(xp: number, maxLevel: number) {
 export async function cleanSkills(data: typedHypixelApi.SkyBlockProfileMember): Promise<Skill[]> {
 	const allSkillNames = await fetchSkills()
 	const skills: Skill[] = []
+
+	let skillNamesFound: string[] = []
+
 	for (const item in data) {
 		if (item.startsWith('experience_skill_')) {
 			const skillName = item.slice('experience_skill_'.length)
+			skillNamesFound.push(skillName)
 
 			// the amount of total xp you have in this skill
 			const skillXp: number = data[item]
@@ -172,6 +177,9 @@ export async function cleanSkills(data: typedHypixelApi.SkyBlockProfileMember): 
 			})
 		}
 	}
+
+	constants.addSkills(skillNamesFound)
+
 
 	// add missing skills
 	const missingSkillNames = allSkillNames.filter(skillName => !skills.some(skill => skill.name === skillName))

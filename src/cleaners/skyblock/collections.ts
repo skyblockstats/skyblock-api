@@ -1,5 +1,6 @@
 import { cleanItemId, hypixelItemNames } from './itemId.js'
 import typedHypixelApi from 'typed-hypixel-api'
+import * as constants from '../../constants.js'
 
 const COLLECTIONS = {
 	'farming': [
@@ -97,13 +98,17 @@ function getCategory(collectionName): CollectionCategory | undefined {
 }
 
 export function cleanCollections(data: typedHypixelApi.SkyBlockProfileMember): Collection[] {
+
 	// collection tiers show up like this: [ GRAVEL_3, GOLD_INGOT_2, MELON_-1, LOG_2:1_7, RAW_FISH:3_-1]
 	// these tiers are the same for all players in a coop
 	const playerCollectionTiersRaw: string[] = data?.unlocked_coll_tiers ?? []
 	const playerCollectionTiers: { [key: string]: number } = {}
 
+	let rawCollectionNames: Set<string> = new Set()
+
 	for (const collectionTierNameValueRaw of playerCollectionTiersRaw) {
 		const [collectionTierNameRaw, collectionTierValueRaw] = collectionTierNameValueRaw.split(/_(?=-?\d+$)/)
+		rawCollectionNames.add(collectionTierNameRaw)
 		const collectionName = cleanItemId(collectionTierNameRaw)
 		// ensure it's at least 0
 		const collectionValue: number = Math.max(parseInt(collectionTierValueRaw), 0)
@@ -112,6 +117,9 @@ export function cleanCollections(data: typedHypixelApi.SkyBlockProfileMember): C
 		if (!playerCollectionTiers[collectionName] || collectionValue > playerCollectionTiers[collectionName])
 			playerCollectionTiers[collectionName] = collectionValue
 	}
+
+	constants.addCollections(Array.from(rawCollectionNames))
+
 
 	// collection names show up like this: { LOG: 49789, LOG:2: 26219, MUSHROOM_COLLECTION: 2923}
 	// these values are different for each player in a coop

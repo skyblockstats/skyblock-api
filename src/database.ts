@@ -16,6 +16,7 @@ import { v4 as uuid4 } from 'uuid'
 import { debug } from './index.js'
 import Queue from 'queue-promise'
 import { RANK_COLORS } from './cleaners/rank.js'
+import { cleanItemId } from './cleaners/skyblock/itemId.js'
 
 // don't update the user for 3 minutes
 const recentlyUpdated = new NodeCache({
@@ -357,7 +358,7 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 		...await constants.fetchStats(),
 
 		// collection leaderboards
-		...(await constants.fetchCollections()).map(value => `collection_${value}`),
+		...(await constants.fetchCollections()).map(value => `collection_${cleanItemId(value)}`),
 
 		// skill leaderboards
 		...(await constants.fetchSkills()).map(value => `skill_${value}`),
@@ -811,12 +812,6 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 
 	if (member.rawHypixelStats)
 		constants.addStats(Object.keys(member.rawHypixelStats))
-	constants.addCollections(member.collections.map(coll => coll.name))
-	constants.addSkills(member.skills.map(skill => skill.name))
-	constants.addZones(member.zones.map(zone => zone.name))
-	constants.addSlayers(member.slayers.bosses.map(s => s.rawName))
-	constants.addPets(member.pets.list.map(s => s.id))
-	constants.addHarpSongs(member.harp.songs.map(s => s.id))
 
 	if (debug) console.debug('done constants..')
 
