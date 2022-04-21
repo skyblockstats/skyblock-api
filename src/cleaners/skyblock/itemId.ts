@@ -13,8 +13,6 @@ const ITEMS = {
 	'ink_sack:3': 'cocoa_beans',
 	'ink_sack:4': 'lapis_lazuli',
 
-	'cocoa': 'cocoa_beans',
-
 	'raw_fish': 'cod',
 	'raw_fish:1': 'salmon',
 	'raw_fish:2': 'tropical_fish',
@@ -35,6 +33,8 @@ const ITEMS = {
 	'melon': 'melon_slice',
 	'ender_stone': 'end_stone',
 	'gemstone_collection': 'gemstone',
+	'mycel': 'mycelium',
+	'cocoa': 'cocoa_beans',
 
 	'huge_mushroom_1': 'red_mushroom_block',
 	'huge_mushroom_2': 'brown_mushroom_block',
