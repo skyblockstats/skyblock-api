@@ -27,6 +27,16 @@ interface Item {
 
 export type Inventory = Item[]
 
+export function headIdFromBase64(headDataBase64: string): string | undefined {
+	const headData = JSON.parse(base64decode(headDataBase64).toString())
+	const headDataUrl = headData?.textures?.SKIN?.url
+	if (headDataUrl) {
+		const splitUrl = headDataUrl.split('/')
+		return splitUrl[splitUrl.length - 1]
+	}
+	return undefined
+}
+
 function cleanItem(rawItem): Item | null {
 	// if the item doesn't have an id, it isn't an item
 	if (rawItem.id === undefined) return null
@@ -40,14 +50,8 @@ function cleanItem(rawItem): Item | null {
 
 	if (vanillaId === 397) {
 		const headDataBase64 = itemTag?.SkullOwner?.Properties?.textures?.[0]?.Value
-		if (headDataBase64) {
-			const headData = JSON.parse(base64decode(headDataBase64).toString())
-			const headDataUrl = headData?.textures?.SKIN?.url
-			if (headDataUrl) {
-				const splitUrl = headDataUrl.split('/')
-				headId = splitUrl[splitUrl.length - 1]
-			}
-		}
+		if (headDataBase64)
+			headId = headIdFromBase64(headDataBase64)
 	}
 
 	return {

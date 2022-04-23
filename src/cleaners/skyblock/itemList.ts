@@ -1,4 +1,5 @@
 import typedHypixelApi from 'typed-hypixel-api'
+import { headIdFromBase64 } from './inventory.js'
 
 export interface ItemRequirement {
     // idk what these do
@@ -42,7 +43,7 @@ function cleanItemListItem(item: typedHypixelApi.SkyBlockItemsResponse['items'][
     const vanillaId = item.material.toLowerCase()
     return {
         id: item.id,
-        headTexture: (item.material === 'SKULL_ITEM' && 'skin' in item) ? item.skin : undefined,
+        headTexture: (item.material === 'SKULL_ITEM' && 'skin' in item) ? headIdFromBase64(item.skin) : undefined,
         vanillaId: item.durability ? `${vanillaId}:${item.durability}` : vanillaId,
         tier: item.tier ?? null,
         display: {
