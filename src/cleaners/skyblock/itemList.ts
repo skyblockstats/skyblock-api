@@ -12,6 +12,7 @@ export interface ItemRequirement {
 // based on Item from inventory.ts
 export interface ItemListItem {
     id: string
+    headTexture?: string
     vanillaId: string
     tier: string | null
     display: {
@@ -41,6 +42,7 @@ function cleanItemListItem(item: typedHypixelApi.SkyBlockItemsResponse['items'][
     const vanillaId = item.material.toLowerCase()
     return {
         id: item.id,
+        headTexture: (item.material === 'SKULL_ITEM' && 'skin' in item) ? item.skin : undefined,
         vanillaId: item.durability ? `${vanillaId}:${item.durability}` : vanillaId,
         tier: item.tier ?? null,
         display: {
