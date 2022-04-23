@@ -12,7 +12,12 @@ export interface CleanBasicPlayer {
 }
 
 export interface ClaimedSkyBlockItem {
+    /**
+     * name is kept for backwards compatibility, it will be changed to a more
+     * human readable name later
+     */
     name: string
+    id: string
     timestamp: number
 }
 

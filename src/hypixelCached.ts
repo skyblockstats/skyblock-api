@@ -205,8 +205,9 @@ export async function fetchBasicPlayer(user: string, includeClaimed: boolean = t
 
 	if (basicPlayerCache.has(playerUuid)) {
 		const player = basicPlayerCache.get(playerUuid)!
-		if (!includeClaimed)
+		if (!includeClaimed) {
 			delete player.claimed
+		}
 		return player
 	}
 

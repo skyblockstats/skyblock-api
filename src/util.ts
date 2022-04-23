@@ -1,6 +1,5 @@
-/**
- * Random utility functions that are not related to Hypixel
- */
+// Random utility functions that are not related to Hypixel
+
 
 export function undashUuid(uuid: string): string {
 	return uuid.replace(/-/g, '').toLowerCase()

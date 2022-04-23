@@ -22,3 +22,11 @@ If you (this is really just here for myself so I don't forget) are adding a new 
 - Use snake_case for values.
 - Prefer arrays over dictionaries when the keys aren't static. For example `[ { name: "asdf", value: "dsfasg" } ]` rather than `{ "asdf": "dsfasg" }`.
 - Dates are done with milliseconds since epoch
+- Fields that contain a snake_case ID should be called `id`. At the moment some of them are called `name`, this will be changed soon.
+
+## Development
+
+First, install the dependencies with `npm i`.
+Then to run it, do `tsc -w` in one terminal, `npx nodemon build` in another. This makes it automatically restart when you make a change.
+If you don't like it auto restarting, then just do `node build` instead of `npx nodemon build`.
+
