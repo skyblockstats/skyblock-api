@@ -92,6 +92,10 @@ const ITEMS = {
 
 	'sulphur_ore': 'sulphur',
 
+	'step': 'stone_slab',
+	'nether_fence': 'nether_brick_fence',
+	'empty_map': 'map',
+	'nether_brick_item': 'nether_brick',
 	'book_and_quill': 'writable_book',
 	'mushroom_soup': 'mushroom_stew',
 	'red_rose': 'red_flower',
