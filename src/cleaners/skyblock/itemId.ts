@@ -1,4 +1,4 @@
-// change weird item names to be more consistent with vanilla
+// change weird item names to be more consistent with modern vanilla
 const ITEMS = {
 	'log': 'oak_log',
 	'log:1': 'spruce_log',
@@ -9,7 +9,7 @@ const ITEMS = {
 
 	'sand:1': 'red_sand',
 
-	'ink_sack': 'dye',
+	'ink_sack': 'ink_sac',
 	'ink_sack:3': 'cocoa_beans',
 	'ink_sack:4': 'lapis_lazuli',
 
