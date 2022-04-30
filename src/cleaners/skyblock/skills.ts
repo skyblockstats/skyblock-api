@@ -223,7 +223,7 @@ export async function cleanSkills(data: typedHypixelApi.SkyBlockProfileMember, p
 
 	// if the player has no skills but has kills, we can assume they have the skills api off
 	// (we check kills to know whether the profile is actually used, this is kinda arbitrary)
-	if (skills.length === 0 && Object.keys(data.stats).includes('kills')) {
+	if (skills.length === 0 && 'stats' in data && Object.keys(data.stats).includes('kills')) {
 		return skillsFromSkyBlockAchievements(player.achievements.skyblock)
 	}
 
