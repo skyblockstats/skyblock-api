@@ -159,9 +159,10 @@ function getMemberCollectionAttributes(member: CleanMember): StringNumber {
 }
 
 function getMemberSkillAttributes(member: CleanMember): StringNumber {
+	if (!member.skills.apiEnabled) return {}
 	const skillAttributes = {}
-	for (const collection of member.skills) {
-		const skillLeaderboardName = `skill_${collection.name}`
+	for (const collection of member.skills.list) {
+		const skillLeaderboardName = `skill_${collection.id}`
 		skillAttributes[skillLeaderboardName] = collection.xp
 	}
 	return skillAttributes

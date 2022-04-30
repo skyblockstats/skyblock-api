@@ -123,7 +123,7 @@ export async function fetchUser({ user, uuid, username }: UserAny, included: Inc
 	let playerData: CleanPlayer | null = null
 
 	if (includePlayers) {
-		playerData = await cached.fetchPlayer(uuid)
+		playerData = await cached.fetchPlayer(uuid, true)
 		// if not including profiles, include lightweight profiles just in case
 		if (!includeProfiles)
 			basicProfilesData = playerData?.profiles
@@ -182,7 +182,7 @@ export async function fetchMemberProfile(user: string, profile: string, customiz
 	if (!profileUuid) return null
 	if (!playerUuid) return null
 
-	const player: CleanPlayer | null = await cached.fetchPlayer(playerUuid)
+	const player: CleanPlayer | null = await cached.fetchPlayer(playerUuid, true)
 
 	if (!player) return null // this should never happen, but if it does just return null
 

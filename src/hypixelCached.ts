@@ -4,7 +4,7 @@
 
 import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/skyblock/profile.js'
 import { isUuid, sleep, undashUuid } from './util.js'
-import { CleanPlayer } from './cleaners/player.js'
+import { CleanFullPlayer, CleanPlayer } from './cleaners/player.js'
 import * as hypixel from './hypixel.js'
 import * as mojang from './mojang.js'
 import NodeCache from 'node-cache'
@@ -157,19 +157,32 @@ export async function usernameFromUser(user: string): Promise<string | null> {
 
 let fetchingPlayers: Set<string> = new Set()
 
-export async function fetchPlayer(user: string): Promise<CleanPlayer | null> {
+function cleanFullPlayerToCleanPlayer(player: CleanFullPlayer): CleanPlayer {
+	return {
+		rank: player.rank,
+		socials: player.socials,
+		username: player.username,
+		uuid: player.uuid,
+		claimed: player.claimed,
+		profiles: player.profiles
+	}
+}
+
+export async function fetchPlayer<Full extends boolean = true>(user: string, full: Full): Promise<(Full extends true ? CleanFullPlayer : CleanPlayer) | null> {
 	const playerUuid = await uuidFromUser(user)
 	if (!playerUuid) return null
 
-	if (playerCache.has(playerUuid))
-		return playerCache.get(playerUuid)!
+	if (playerCache.has(playerUuid)) {
+		const player: CleanFullPlayer = playerCache.get(playerUuid)!
+		return full ? player : cleanFullPlayerToCleanPlayer(player) as any
+	}
 
 	// if it's already in the process of fetching, check every 100ms until it's not fetching the player anymore and fetch it again, since it'll be cached now
 	if (fetchingPlayers.has(playerUuid)) {
 		while (fetchingPlayers.has(playerUuid)) {
 			await sleep(100)
 		}
-		return await fetchPlayer(user)
+		return await fetchPlayer(user, full)
 	}
 
 	fetchingPlayers.add(playerUuid)
@@ -194,7 +207,7 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer | null> {
 	}
 	basicPlayerCache.set(playerUuid, cleanBasicPlayer)
 
-	return cleanPlayer
+	return full ? cleanPlayer : cleanFullPlayerToCleanPlayer(cleanPlayer) as any
 }
 
 /** Fetch a player without their profiles. This is heavily cached. */
@@ -211,7 +224,7 @@ export async function fetchBasicPlayer(user: string, includeClaimed: boolean = t
 		return player
 	}
 
-	const player = await fetchPlayer(playerUuid)
+	const player = await fetchPlayer(playerUuid, false)
 	if (!player) {
 		console.debug('no player? this should never happen, perhaps the uuid is invalid or the player hasn\'t played hypixel', playerUuid)
 		return null
@@ -283,7 +296,7 @@ async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[] | n
 
 	if (debug) console.debug('Cache miss: fetchBasicProfiles', user)
 
-	const player = await fetchPlayer(playerUuid)
+	const player = await fetchPlayer(playerUuid, false)
 	if (!player) {
 		// this happens when the player changed their name recently and the old name is cached on hypixel
 		return []

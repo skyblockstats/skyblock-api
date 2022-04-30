@@ -10,7 +10,7 @@ import { CleanMinion, cleanMinions } from './minions.js'
 import { cleanSlayers, SlayerData } from './slayers.js'
 import { AccountCustomization } from '../../database.js'
 import { cleanVisitedZones, Zone } from './zones.js'
-import { cleanSkills, Skill } from './skills.js'
+import { cleanSkills, Skills } from './skills.js'
 import * as cached from '../../hypixelCached.js'
 import typedHypixelApi from 'typed-hypixel-api'
 import { cleanPets, PetsData } from './pets.js'
@@ -37,7 +37,7 @@ export interface CleanMember extends CleanBasicMember {
 	fairySouls: FairySouls
 	inventories?: Inventories
 	objectives: Objective[]
-	skills: Skill[]
+	skills: Skills
 	zones: Zone[]
 	collections: Collection[]
 	slayers: SlayerData
@@ -50,7 +50,7 @@ export interface CleanMember extends CleanBasicMember {
 }
 
 export async function cleanSkyBlockProfileMemberResponseBasic(member: typedHypixelApi.SkyBlockProfileMember & { uuid: string }): Promise<CleanBasicMember | null> {
-	const player = await cached.fetchPlayer(member.uuid)
+	const player = await cached.fetchPlayer(member.uuid, false)
 	if (!player) return null
 	return {
 		uuid: member.uuid,
@@ -64,7 +64,7 @@ export async function cleanSkyBlockProfileMemberResponseBasic(member: typedHypix
 /** Cleans up a member (from skyblock/profile) */
 export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi.SkyBlockProfileMember & { uuid: string }, profileId?: string, included: Included[] | undefined = undefined): Promise<CleanMember | null> {
 	const inventoriesIncluded = included === undefined || included.includes('inventories')
-	const player = await cached.fetchPlayer(member.uuid)
+	const player = await cached.fetchPlayer(member.uuid, true)
 	if (!player) return null
 
 	const fairySouls = await cleanFairySouls(member)
@@ -74,7 +74,7 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 
 	const coopInvitationPromise = cleanCoopInvitation(member, member.uuid)
 	const minionsPromise = cleanMinions(member)
-	const skillsPromise = cleanSkills(member)
+	const skillsPromise = cleanSkills(member, player)
 	const zonesPromise = cleanVisitedZones(member)
 	const petsPromise = cleanPets(member)
 	const harpPromise = cleanHarp(member)
@@ -100,7 +100,9 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 		fairySouls: fairySouls,
 		inventories: inventoriesPromise ? await inventoriesPromise : undefined,
 		objectives: cleanObjectives(member),
+
 		skills: await skillsPromise,
+
 		zones: await zonesPromise,
 		collections: cleanCollections(member),
 		slayers: cleanSlayers(member),
@@ -126,7 +128,7 @@ export interface CleanMemberProfilePlayer extends CleanPlayer {
 	fairySouls: FairySouls
 	inventories?: Inventories
 	objectives: Objective[]
-	skills: Skill[]
+	skills: Skills
 	zones: Zone[]
 	collections: Collection[]
 	slayers: SlayerData

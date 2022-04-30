@@ -21,7 +21,7 @@ If you (this is really just here for myself so I don't forget) are adding a new 
 - Use camelCase for keys.
 - Use snake_case for values.
 - Prefer arrays over dictionaries when the keys aren't static. For example `[ { name: "asdf", value: "dsfasg" } ]` rather than `{ "asdf": "dsfasg" }`.
-- Dates are done with milliseconds since epoch
+- Dates are milliseconds since epoch.
 - Fields that contain a snake_case ID should be called `id`. At the moment some of them are called `name`, this will be changed soon.
 
 ## Development
