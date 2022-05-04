@@ -1,6 +1,5 @@
 import typedHypixelApi from 'typed-hypixel-api'
 import * as constants from '../../constants.js'
-import { maxMinion } from '../../hypixel.js'
 
 export interface CleanMinion {
     name: string,
@@ -14,19 +13,28 @@ export interface CleanMinion {
  */
 export async function cleanMinions(member: typedHypixelApi.SkyBlockProfileMember): Promise<CleanMinion[]> {
     const minions: CleanMinion[] = []
-    const processedMinionNames: Set<string> = new Set()
+    const processedMinionIds: Set<string> = new Set()
+
+    const maxMinionTiers = await constants.fetchMaxMinionTiers()
+    let updatedMaxMinionTiers = false
 
     for (const minionRaw of member?.crafted_generators ?? []) {
         // do some regex magic to get the minion name and level
         // examples of potential minion names: CLAY_11, PIG_1, MAGMA_CUBE_4
-        const minionName = minionRaw.split(/_\d/)[0].toLowerCase()
+        const minionId = minionRaw.split(/_\d/)[0].toLowerCase()
         const minionLevel = parseInt(minionRaw.split(/\D*_/)[1])
-        let matchingMinion = minions.find(m => m.name === minionName)
+
+        if (minionLevel > (maxMinionTiers[minionId] ?? -1)) {
+            maxMinionTiers[minionId] = minionLevel
+            updatedMaxMinionTiers = true
+        }
+
+        let matchingMinion = minions.find(m => m.name === minionId)
         if (!matchingMinion) {
             // if the minion doesnt already exist in the minions array, then create it
             matchingMinion = {
-                name: minionName,
-                levels: new Array(maxMinion).fill(false)
+                name: minionId,
+                levels: new Array(maxMinionTiers[minionId]).fill(false)
             }
             minions.push(matchingMinion)
         }
@@ -36,29 +44,35 @@ export async function cleanMinions(member: typedHypixelApi.SkyBlockProfileMember
 
         // set the minion at that level to true
         matchingMinion.levels[minionLevel - 1] = true
-        processedMinionNames.add(minionName)
+        processedMinionIds.add(minionId)
     }
 
     const allMinionNames = new Set(await constants.fetchMinions())
 
-    for (const minionName of processedMinionNames) {
+    for (const minionName of processedMinionIds) {
         if (!allMinionNames.has(minionName)) {
-            constants.addMinions(Array.from(processedMinionNames))
+            constants.addMinions(Array.from(processedMinionIds))
             break
         }
     }
 
-    for (const minionName of allMinionNames) {
-        if (!processedMinionNames.has(minionName)) {
-            processedMinionNames.add(minionName)
+    for (const minionId of allMinionNames) {
+        if (!processedMinionIds.has(minionId)) {
+            processedMinionIds.add(minionId)
             minions.push({
-                name: minionName,
-                levels: new Array(maxMinion).fill(false)
+                name: minionId,
+                levels: new Array(maxMinionTiers[minionId]).fill(false)
             })
         }
     }
 
-    return minions.sort((a, b) => a.name > b.name ? 1 : (a.name < b.name ? -1 : 0))
+    if (updatedMaxMinionTiers) {
+        await constants.addMaxMinionTiers(maxMinionTiers)
+    }
+
+    minions.sort((a, b) => a.name > b.name ? 1 : (a.name < b.name ? -1 : 0))
+
+    return minions
 }
 
 /**

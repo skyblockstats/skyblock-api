@@ -267,6 +267,45 @@ export async function addCrops(addingCrops: string[]): Promise<void> {
 	await constants.addJSONConstants('crops.json', addingCrops, 'crop')
 }
 
+export async function fetchMaxMinionTiers(): Promise<Record<string, number>> {
+	return await constants.fetchJSONConstant('max_minion_tiers.json')
+}
+
+export async function addMaxMinionTiers(addingTiers: Record<string, number>): Promise<void> {
+	let file: GithubFile = await fetchFile('max_minion_tiers.json')
+	if (!file.path)
+		return
+
+	let maxTiers: Record<string, number>
+	try {
+		maxTiers = JSON.parse(file.content)
+	} catch {
+		// invalid json, set it as an empty array and continue
+		console.warn('Invalid max minion tiers file, resetting to empty')
+		maxTiers = {}
+	}
+
+	let updated = false
+
+	for (const [minionId, potentialMaxTier] of Object.entries(addingTiers)) {
+		if (potentialMaxTier > (maxTiers[minionId] ?? -1)) {
+			maxTiers[minionId] = potentialMaxTier
+			updated = true
+		}
+	}
+
+	if (!updated) return
+
+	const commitMessage = 'Update max minion tiers'
+	try {
+		await editFile(file, commitMessage, JSON.stringify(maxTiers, null, 2))
+	} catch {
+		// the file probably changed or something, try again
+		file = await fetchFile('max_minion_tiers.json')
+		await editFile(file, commitMessage, JSON.stringify(maxTiers, null, 2))
+	}
+}
+
 
 interface constantValues {
 	max_minions?: number

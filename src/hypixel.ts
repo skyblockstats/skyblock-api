@@ -33,10 +33,6 @@ export type Included = 'profiles' | 'player' | 'stats' | 'inventories' | undefin
 // the interval at which the "last_save" parameter updates in the hypixel api, this is 3 minutes
 export const saveInterval = 60 * 3 * 1000
 
-// the highest level a minion can be
-// TODO: have this be auto updated
-export const maxMinion = 12
-
 /**
  *  Send a request to api.hypixel.net using a random key, clean it up to be more useable, and return it 
  */
