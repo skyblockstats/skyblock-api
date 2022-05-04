@@ -34,7 +34,8 @@ export type Included = 'profiles' | 'player' | 'stats' | 'inventories' | undefin
 export const saveInterval = 60 * 3 * 1000
 
 // the highest level a minion can be
-export const maxMinion = 11
+// TODO: have this be auto updated
+export const maxMinion = 12
 
 /**
  *  Send a request to api.hypixel.net using a random key, clean it up to be more useable, and return it 
