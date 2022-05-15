@@ -19,6 +19,7 @@ import * as constants from '../../constants.js'
 import { Included } from '../../hypixel.js'
 import { CleanPlayer } from '../player.js'
 import { CleanRank } from '../rank.js'
+import { AccessoryBagUpgrades, cleanAccessoryBagUpgrades } from './accessoryBagUpgrades.js'
 
 export interface CleanBasicMember {
 	uuid: string
@@ -45,6 +46,7 @@ export interface CleanMember extends CleanBasicMember {
 	harp: HarpData
 	coopInvitation: CoopInvitation | null
 	farmingContests: FarmingContests
+	accessoryBagUpgrades: AccessoryBagUpgrades
 	/** Whether the user left the coop */
 	left: boolean
 }
@@ -110,6 +112,7 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 		harp: await harpPromise,
 		coopInvitation: await coopInvitationPromise,
 		farmingContests: await farmingContestsPromise,
+		accessoryBagUpgrades: cleanAccessoryBagUpgrades(member),
 
 		left: (player.profiles?.find(profile => profile.uuid === profileId) === undefined) ?? false
 	}
@@ -136,6 +139,7 @@ export interface CleanMemberProfilePlayer extends CleanPlayer {
 	harp: HarpData
 	coopInvitation: CoopInvitation | null
 	farmingContests: FarmingContests
+	accessoryBagUpgrades: AccessoryBagUpgrades
 	left: boolean
 }
 
