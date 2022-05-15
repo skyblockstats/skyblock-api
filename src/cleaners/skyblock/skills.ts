@@ -148,7 +148,9 @@ export function levelForSkillXp(xp: number, maxLevel: number) {
 	return levelFromXpTable(xp, xpTable)
 }
 
-function skillFromLevel(id: string, level: number): Skill {
+function skillFromLevel(id: string, level: number | undefined): Skill {
+	if (level === undefined)
+		level = 0
 	const maxLevel = skillsMaxLevel[id] ?? skillsDefaultMaxLevel
 	const xpTable = (maxLevel <= 25 ? skillXpTableEasier : skillXpTable).slice(0, maxLevel)
 	const xp = level > 0 ? xpTable[level - 1] ?? 0 : 0
