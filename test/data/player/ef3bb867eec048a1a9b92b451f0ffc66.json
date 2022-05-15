@@ -3,9 +3,9 @@
   "player": {
     "_id": "586143ccbbca559a3a795bb1",
     "uuid": "ef3bb867eec048a1a9b92b451f0ffc66",
-    "firstLogin": 1482769356469,
+    "firstLogin": 1482769356000,
     "playername": "nmart",
-    "lastLogin": 1649203838218,
+    "lastLogin": 1651883021910,
     "displayname": "NMART",
     "knownAliases": [
       "Foxydasher101",
@@ -307,12 +307,14 @@
       "murdermystery_clear_cacti",
       "murdermystery_block_with_barrier",
       "arcade_party_in_sync",
-      "buildbattle_braniac"
+      "buildbattle_braniac",
+      "skyblock_friend_for_life",
+      "easter_happy_easter_2022"
     ],
     "stats": {
       "Arcade": {
         "weekly_coins_a": 10016,
-        "coins": 200374,
+        "coins": 203792,
         "monthly_coins_a": 7556,
         "dec2016_achievements": true,
         "dec2016_achievements2": true,
@@ -414,7 +416,7 @@
       },
       "TNTGames": {
         "record_pvprun": 38,
-        "coins": 62729,
+        "coins": 62894,
         "deaths_bowspleef": 34,
         "tags_bowspleef": 623,
         "packages": [
@@ -517,7 +519,7 @@
           "cakes_fix_flag_2"
         ],
         "chosen_class": "Shark",
-        "coins": 21224,
+        "coins": 21374,
         "classes": {
           "skeleton": {
             "skill_level_dChecked5": true,
@@ -671,7 +673,7 @@
         "kills_deathmatch": 16,
         "headshot_kills": 11,
         "criminal_kills_deathmatch": 11,
-        "coins": 44927,
+        "coins": 45077,
         "shots_fired": 680,
         "round_wins": 9,
         "deaths": 17,
@@ -690,7 +692,7 @@
         "game_plays": 1
       },
       "UHC": {
-        "coins": 16308,
+        "coins": 16458,
         "clearup_achievement": true,
         "deaths": 19,
         "packages": [
@@ -788,7 +790,7 @@
         ],
         "kills": 17,
         "wins": 2,
-        "coins": 23200,
+        "coins": 23350,
         "shots_fired": 618,
         "deaths": 33,
         "killstreaks": 2,
@@ -1063,34 +1065,34 @@
         "usedSoulWell": true,
         "souls": 4314,
         "soul_well": 167,
-        "games_played_skywars": 4949,
+        "games_played_skywars": 4950,
         "win_streak": 0,
         "lastMode": "SOLO",
-        "survived_players_solo": 19425,
-        "blocks_placed": 31324,
+        "survived_players_solo": 19426,
+        "blocks_placed": 31333,
         "time_played_kit_basic_solo_default": 1397,
         "blocks_broken": 2078,
         "games_solo": 991,
-        "losses": 3481,
-        "coins": 468426,
-        "chests_opened_solo": 10676,
-        "time_played_solo": 231962,
-        "losses_solo": 3130,
+        "losses": 3482,
+        "coins": 469698,
+        "chests_opened_solo": 10679,
+        "time_played_solo": 231998,
+        "losses_solo": 3131,
         "deaths_solo_normal": 1319,
         "chests_opened_kit_basic_solo_default": 40,
-        "survived_players": 23628,
-        "chests_opened": 11349,
-        "time_played": 263569,
+        "survived_players": 23629,
+        "chests_opened": 11352,
+        "time_played": 263605,
         "survived_players_kit_basic_solo_default": 99,
         "losses_kit_basic_solo_default": 15,
         "games": 1062,
         "deaths_kit_basic_solo_default": 15,
-        "deaths": 3493,
+        "deaths": 3494,
         "losses_solo_normal": 1319,
         "games_kit_basic_solo_default": 4,
-        "deaths_solo": 3130,
+        "deaths_solo": 3131,
         "activeKit_SOLO": "kit_advanced_solo_knight",
-        "quits": 2639,
+        "quits": 2640,
         "chests_opened_kit_attacking_team_default": 3,
         "deaths_kit_attacking_team_default": 4,
         "chests_opened_team": 581,
@@ -1128,8 +1130,8 @@
         "activeKit_TEAMS": "kit_attacking_team_knight",
         "quits_lab": 776,
         "egg_thrown": 2610,
-        "losses_solo_insane": 1811,
-        "deaths_solo_insane": 1811,
+        "losses_solo_insane": 1812,
+        "deaths_solo_insane": 1812,
         "games_team": 59,
         "losses_kit_attacking_team_grenade": 53,
         "survived_players_kit_attacking_team_grenade": 640,
@@ -1634,11 +1636,11 @@
         "kills_lab_kit_advanced_solo_enchanter": 11,
         "longest_bow_kill_lab_kit_advanced_solo_enchanter": 5,
         "melee_kills_lab_kit_advanced_solo_enchanter": 3,
-        "time_played_kit_attacking_team_knight": 12994,
-        "survived_players_kit_attacking_team_knight": 1226,
-        "deaths_kit_attacking_team_knight": 223,
-        "losses_kit_attacking_team_knight": 223,
-        "chests_opened_kit_attacking_team_knight": 833,
+        "time_played_kit_attacking_team_knight": 13030,
+        "survived_players_kit_attacking_team_knight": 1227,
+        "deaths_kit_attacking_team_knight": 224,
+        "losses_kit_attacking_team_knight": 224,
+        "chests_opened_kit_attacking_team_knight": 836,
         "games_kit_attacking_team_jester": 12,
         "hunters_vs_beasts_explained": 1,
         "hunters_vs_beasts_explained_last": 1609138496934,
@@ -2725,7 +2727,7 @@
         "mob_kills_lab_kit_defending_team_armorer": 9,
         "angel_of_death_level": 2,
         "mob_kills_kit_defending_team_armorer": 5,
-        "skywars_easter_boxes": 0,
+        "skywars_easter_boxes": 1,
         "free_event_key_skywars_easter_boxes_2020": true,
         "mob_kills_team": 2,
         "heads_team": 20,
@@ -3102,7 +3104,8 @@
         "assists_kit_attacking_team_energix": 2,
         "longest_bow_shot_kit_attacking_team_energix": 18,
         "heads_yucky_kit_attacking_team_energix": 1,
-        "fall_kills_kit_basic_solo_baseball-player": 1
+        "fall_kills_kit_basic_solo_baseball-player": 1,
+        "free_event_key_skywars_easter_boxes_2022_2": true
       },
       "SuperSmash": {
         "lastLevel_THE_BULK": 5,
@@ -3431,7 +3434,7 @@
         "damage_dealt": 3050,
         "losses_teams": 9,
         "smashed_teams": 11,
-        "coins": 28764,
+        "coins": 28914,
         "losses_weekly_a": 20,
         "games_weekly_a": 23,
         "losses_monthly_b": 5,
@@ -3515,7 +3518,7 @@
           "achievementsupdatedd",
           "achievementsupdatedc"
         ],
-        "coins": 23194,
+        "coins": 23344,
         "horn": "DEFAULT",
         "parts": "{GingerbreadPart:{PartType:TURBOCHARGER,PartRarity:SUPER,Attributes:[{KartAttributeType:DRIFTING_EFFICIENCY,Level:3},{KartAttributeType:BOOSTER_SPEED,Level:4}]}}",
         "banana_hits_received": 1,
@@ -3538,7 +3541,7 @@
         "packages": [
           "achievement_flag_3"
         ],
-        "coins": 22015,
+        "coins": 22165,
         "alternative_gun_cooldown_indicator": true,
         "compass_selected": true,
         "showDashCooldown": true,
@@ -3557,7 +3560,7 @@
         "updated_stats": true,
         "vampire_deaths": 41,
         "most_vampire_kills_new": 0,
-        "coins": 25276,
+        "coins": 25426,
         "human_deaths": 6,
         "human_kills": 2
       },
@@ -3742,7 +3745,7 @@
         "heal": 1446,
         "kills": 1,
         "damage_prevented_mage": 1300,
-        "coins": 31236,
+        "coins": 31401,
         "damage_taken": 30960
       },
       "Walls": {
@@ -3751,7 +3754,7 @@
         "weekly_assists_b": 1,
         "losses": 1,
         "deaths": 1,
-        "coins": 22015
+        "coins": 22165
       },
       "Bedwars": {
         "first_join_7": true,
@@ -4375,7 +4378,7 @@
         "eight_one_magic_final_deaths_bedwars": 1,
         "magic_final_deaths_bedwars": 15,
         "free_event_key_bedwars_easter_boxes_2020": true,
-        "bedwars_easter_boxes": 0,
+        "bedwars_easter_boxes": 1,
         "eight_one_magic_deaths_bedwars": 3,
         "four_three_magic_final_deaths_bedwars": 6,
         "four_four_magic_final_deaths_bedwars": 6,
@@ -4447,7 +4450,8 @@
         "free_event_key_bedwars_christmas_boxes_2021": true,
         "selected_challenge_type": "NONE",
         "four_four_lucky_void_deaths_bedwars": 3,
-        "lastTourneyAd": 1647712332305
+        "lastTourneyAd": 1647712332305,
+        "free_event_key_bedwars_easter_boxes_2022": true
       },
       "MurderMystery": {
         "games_MURDER_ASSASSINS": 28,
@@ -5658,7 +5662,7 @@
         "time_played_knight": 2731,
         "damage_knight": 1550,
         "games_played_knight": 23,
-        "coins": 62732,
+        "coins": 62897,
         "wins_backup": 0,
         "wins_solo_normal": 0,
         "autoarmor": true,
@@ -5704,7 +5708,7 @@
         "inGamePresentsCap_2021_6": 2
       },
       "Arena": {
-        "coins": 22088,
+        "coins": 22238,
         "offensive": "lightning_strike",
         "win_streaks_1v1": 0,
         "deaths_1v1": 1,
@@ -8742,7 +8746,7 @@
         ]
       }
     },
-    "networkExp": 12943204,
+    "networkExp": 12954167,
     "petConsumables": {
       "CARROT_ITEM": 886,
       "BAKED_POTATO": 855,
@@ -9054,7 +9058,7 @@
       "murdermystery_wins_as_murderer": 3,
       "skywars_you_re_a_star": 9,
       "skyblock_concoctor": 13,
-      "skyblock_domesticator": 26,
+      "skyblock_domesticator": 27,
       "arcade_ctw_slayer": 19,
       "christmas2017_advent_2020": 24,
       "pit_events": 1,
@@ -9495,10 +9499,10 @@
         "hat_demon_knight"
       ]
     },
-    "karma": 5907940,
+    "karma": 5960440,
     "levelingReward_0": true,
     "eugene": {
-      "dailyTwoKExp": 1647226328400
+      "dailyTwoKExp": 1650214908317
     },
     "friendRequestsUuid": [],
     "levelingReward_1": true,
@@ -13233,7 +13237,7 @@
       }
     },
     "levelingReward_4": true,
-    "lastLogout": 1649204182342,
+    "lastLogout": 1651883249804,
     "levelingReward_5": true,
     "levelingReward_6": true,
     "levelingReward_7": true,
@@ -13399,7 +13403,7 @@
     "levelingReward_17": true,
     "levelingReward_18": true,
     "levelingReward_19": true,
-    "achievementPoints": 4265,
+    "achievementPoints": 4285,
     "levelingReward_20": true,
     "levelingReward_21": true,
     "levelingReward_22": true,
