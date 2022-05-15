@@ -94,7 +94,7 @@ export const INVENTORIES = {
 	armor: 'inv_armor',
 	inventory: 'inv_contents',
 	ender_chest: 'ender_chest_contents',
-	talisman_bag: 'accessory_bag',
+	accessory_bag: 'talisman_bag',
 	potion_bag: 'potion_bag',
 	fishing_bag: 'fishing_bag',
 	quiver: 'quiver',
