@@ -17,6 +17,7 @@ import { debug } from './index.js'
 import Queue from 'queue-promise'
 import { RANK_COLORS } from './cleaners/rank.js'
 import { cleanItemId } from './cleaners/skyblock/itemId.js'
+import { periodicallyFetchRecentlyEndedAuctions } from './hypixel.js'
 
 // don't update the user for 3 minutes
 const recentlyUpdated = new NodeCache({
@@ -116,10 +117,30 @@ export interface AccountSchema {
 	customization?: AccountCustomization
 }
 
+export interface SimpleAuctionSchema {
+	/** The UUID of the auction so we can look it up later. */
+	id: string
+	coins: number
+	/**
+	 * The timestamp as **seconds** since epoch. It's in seconds instead of ms
+	 * since we don't need to be super exact and so it's shorter.
+	 */
+	ts: number
+	/** Whether the auction was bought or simply expired. */
+	success: boolean
+	bin: boolean
+}
+export interface ItemAuctionsSchema {
+	/** The id of the item */
+	_id: string
+	auctions: SimpleAuctionSchema[]
+}
+
 let memberLeaderboardsCollection: Collection<DatabaseMemberLeaderboardItem>
 let profileLeaderboardsCollection: Collection<DatabaseProfileLeaderboardItem>
 let sessionsCollection: Collection<SessionSchema>
 let accountsCollection: Collection<AccountSchema>
+let itemAuctionsCollection: Collection<ItemAuctionsSchema>
 
 
 const leaderboardInfos: { [leaderboardName: string]: string } = {
@@ -142,6 +163,10 @@ async function connect(): Promise<void> {
 	profileLeaderboardsCollection = database.collection('profile-leaderboards')
 	sessionsCollection = database.collection('sessions')
 	accountsCollection = database.collection('accounts')
+	itemAuctionsCollection = database.collection('item-auctions')
+
+	periodicallyFetchRecentlyEndedAuctions()
+
 	console.log('Connected to database :)')
 }
 
@@ -1063,6 +1088,28 @@ export async function updateAccount(discordId: string, schema: AccountSchema) {
 		discordId
 	}, { $set: schema }, { upsert: true })
 }
+
+/** Fetch all the Item Auctions for the item ids in the given array. */
+export async function fetchItemsAuctions(itemIds: string[]): Promise<ItemAuctionsSchema[]> {
+	const auctions = await itemAuctionsCollection?.find({
+		_id: { $in: itemIds }
+	}).toArray()
+	return auctions
+}
+
+
+/** Fetch all the Item Auctions for the item ids in the given array. */
+export async function fetchPaginatedItemsAuctions(skip: number, limit: number): Promise<ItemAuctionsSchema[]> {
+	const auctions = await itemAuctionsCollection?.find({}).skip(skip).limit(limit).toArray()
+	return auctions
+}
+
+export async function updateItemAuction(auction: ItemAuctionsSchema) {
+	await itemAuctionsCollection?.updateOne({
+		_id: auction._id,
+	}, { $set: auction }, { upsert: true })
+}
+
 
 export async function fetchServerStatus() {
 	return await database.admin().serverStatus()

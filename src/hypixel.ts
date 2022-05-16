@@ -13,9 +13,13 @@ import {
 	AccountCustomization,
 	AccountSchema,
 	fetchAccount,
+	fetchItemsAuctions,
+	ItemAuctionsSchema,
 	queueUpdateDatabaseMember,
 	queueUpdateDatabaseProfile,
-	removeDeletedProfilesFromLeaderboards
+	removeDeletedProfilesFromLeaderboards,
+	SimpleAuctionSchema,
+	updateItemAuction
 } from './database.js'
 import { cleanElectionResponse, ElectionData } from './cleaners/skyblock/election.js'
 import { cleanItemListResponse, ItemListData } from './cleaners/skyblock/itemList.js'
@@ -27,6 +31,7 @@ import typedHypixelApi from 'typed-hypixel-api'
 import * as cached from './hypixelCached.js'
 import { debug } from './index.js'
 import { WithId } from 'mongodb'
+import { cleanEndedAuctions } from './cleaners/skyblock/endedAuctions.js'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories' | undefined
 
@@ -57,8 +62,9 @@ const cleanResponseFunctions = {
 	'player': (data, options) => cleanPlayerResponse(data.player),
 	'skyblock/profile': (data: typedHypixelApi.SkyBlockProfileResponse, options) => cleanSkyblockProfileResponse(data.profile, options),
 	'skyblock/profiles': (data, options) => cleanSkyblockProfilesResponse(data.profiles),
+	'skyblock/auctions_ended': (data, options) => cleanEndedAuctions(data),
 	'resources/skyblock/election': (data, options) => cleanElectionResponse(data),
-	'resources/skyblock/items': (data, options) => cleanItemListResponse(data)
+	'resources/skyblock/items': (data, options) => cleanItemListResponse(data),
 } as const
 
 
@@ -353,4 +359,92 @@ export async function fetchItemList() {
 	nextItemListUpdate = new Date((itemList.lastUpdated + 60 * 60) * 1000)
 	return itemList
 }
+
+// this function is called from database.ts so it starts when we connect to the database
+// it should only ever be called once!
+export async function periodicallyFetchRecentlyEndedAuctions() {
+	let previousAuctionIds = new Set()
+
+	while (true) {
+		const endedAuctions = await sendCleanApiRequest(
+			'skyblock/auctions_ended',
+			{}
+		)
+
+
+		let newAuctionUuids: Set<string> = new Set()
+		let newAuctionItemIds: Set<string> = new Set()
+
+		for (const auction of endedAuctions.auctions) {
+			if (previousAuctionIds.has(auction.id)) continue
+			newAuctionUuids.add(auction.id)
+			newAuctionItemIds.add(auction.item.id)
+		}
+		let updatedDatabaseAuctionItems: Map<string, ItemAuctionsSchema> = new Map()
+
+		const itemsAuctions = await fetchItemsAuctions(Array.from(newAuctionItemIds))
+		for (const itemAuctions of itemsAuctions) {
+			updatedDatabaseAuctionItems[itemAuctions._id] = itemAuctions
+		}
+
+		for (const auction of endedAuctions.auctions) {
+			if (previousAuctionIds.has(auction.id)) continue
+
+			let auctions: SimpleAuctionSchema[]
+			if (!updatedDatabaseAuctionItems.has(auction.item.id)) {
+				updatedDatabaseAuctionItems.set(auction.item.id, {
+					_id: auction.item.id,
+					auctions: [],
+				})
+				auctions = []
+			} else {
+				auctions = updatedDatabaseAuctionItems.get(auction.item.id)!.auctions
+			}
+
+			const simpleAuction: SimpleAuctionSchema = {
+				success: true,
+				coins: auction.coins,
+				id: auction.id,
+				ts: Math.floor(auction.timestamp / 1000),
+				bin: auction.bin,
+			}
+			// make sure the auction isn't already in there
+			if (auctions.findIndex((a) => a.id === simpleAuction.id) !== null) {
+				auctions.push(simpleAuction)
+				// keep only the last 100 items
+				if (auctions.length > 100)
+					auctions = auctions.slice(auctions.length - 100)
+			}
+
+			updatedDatabaseAuctionItems.set(auction.item.id, {
+				_id: auction.item.id,
+				auctions,
+			})
+		}
+
+		// we use a promise pool to set all the things fast but not overload the database
+		let tasks = Array.from(updatedDatabaseAuctionItems.values()).map(t => updateItemAuction(t))
+		async function doTasks() {
+			let hasTask = true
+			while (hasTask) {
+				const task = tasks.pop()
+				if (task) {
+					await task
+				} else
+					hasTask = false
+			}
+		}
+		// Promise.all 5 cycles
+		await Promise.all(Array(5).fill(0).map(_ => doTasks()))
+
+		previousAuctionIds = newAuctionUuids
+
+		let endedAgo = Date.now() - endedAuctions.lastUpdated
+		// +10 seconds just so we're sure we'll get the update
+		let refetchIn = 60 * 1000 - endedAgo + 10000
+
+		await new Promise(resolve => setTimeout(resolve, refetchIn))
+	}
+}
+
 

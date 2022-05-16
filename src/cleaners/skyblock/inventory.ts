@@ -6,7 +6,7 @@ function base64decode(base64: string): Buffer {
 	return Buffer.from(base64, 'base64')
 }
 
-interface Item {
+export interface Item {
 	id: string
 	count: number
 	vanillaId: string
@@ -79,15 +79,12 @@ function cleanItems(rawItems): Inventory {
 	return rawItems.map(cleanItem)
 }
 
-export function cleanInventory(encodedNbt: string): Promise<Inventory> {
-	return new Promise(resolve => {
-		const base64Data = base64decode(encodedNbt)
-		nbt.parse(base64Data, false, (err, value) => {
-			const simplifiedNbt = nbt.simplify(value)
-			// do some basic cleaning on the items and return
-			resolve(cleanItems(simplifiedNbt.i))
-		})
-	})
+export async function cleanInventory(encodedNbt: string): Promise<Inventory> {
+	const base64Data = base64decode(encodedNbt)
+	const value: any = await new Promise((resolve, reject) => nbt.parse(base64Data, false, (err, value) => { if (err) reject(err); else resolve(value) }))
+	const simplifiedNbt = nbt.simplify(value)
+	// do some basic cleaning on the items and return
+	return cleanItems(simplifiedNbt.i)
 }
 
 export const INVENTORIES = {

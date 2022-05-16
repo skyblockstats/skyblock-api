@@ -1,4 +1,4 @@
-import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount, deleteSession } from './database.js'
+import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount, deleteSession, fetchPaginatedItemsAuctions } from './database.js'
 import { fetchElection, fetchItemList, fetchMemberProfile, fetchUser } from './hypixel.js'
 import rateLimit from 'express-rate-limit'
 import * as constants from './constants.js'
@@ -158,6 +158,20 @@ app.get('/items', async (req, res) => {
 		res.json(
 			await fetchItemList()
 		)
+	} catch (err) {
+		console.error(err)
+		res.json({ ok: false })
+	}
+})
+
+
+app.get('/auctionprices', async (req, res) => {
+	try {
+		res
+			.setHeader('Cache-Control', 'public, max-age=600')
+			.json(
+				await fetchPaginatedItemsAuctions(0, 100)
+			)
 	} catch (err) {
 		console.error(err)
 		res.json({ ok: false })
