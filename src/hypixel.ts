@@ -384,7 +384,7 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 
 		const itemsAuctions = await fetchItemsAuctions(Array.from(newAuctionItemIds))
 		for (const itemAuctions of itemsAuctions) {
-			updatedDatabaseAuctionItems[itemAuctions._id] = itemAuctions
+			updatedDatabaseAuctionItems.set(itemAuctions._id, itemAuctions)
 		}
 
 		for (const auction of endedAuctions.auctions) {
@@ -392,10 +392,6 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 
 			let auctions: SimpleAuctionSchema[]
 			if (!updatedDatabaseAuctionItems.has(auction.item.id)) {
-				updatedDatabaseAuctionItems.set(auction.item.id, {
-					_id: auction.item.id,
-					auctions: [],
-				})
 				auctions = []
 			} else {
 				auctions = updatedDatabaseAuctionItems.get(auction.item.id)!.auctions
@@ -413,7 +409,7 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 				auctions.push(simpleAuction)
 				// keep only the last 100 items
 				if (auctions.length > 100)
-					auctions = auctions.slice(auctions.length - 100)
+					auctions = auctions.slice(-100)
 			}
 
 			updatedDatabaseAuctionItems.set(auction.item.id, {
