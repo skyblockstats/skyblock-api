@@ -1110,6 +1110,17 @@ export async function updateItemAuction(auction: ItemAuctionsSchema) {
 	}, { $set: auction }, { upsert: true })
 }
 
+/**
+ * Fetches the SkyBlock ids of all the items in the auctions database. This method is slow and should be cached!
+ */
+export async function fetchItemsAuctionsIds(): Promise<string[]> {
+	const docs = await itemAuctionsCollection?.aggregate([
+		// this removes everything except the _id
+		{ $project: { _id: true } }
+	]).toArray()
+	return docs.map(r => r._id)
+}
+
 
 export async function fetchServerStatus() {
 	return await database.admin().serverStatus()

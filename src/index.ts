@@ -1,5 +1,5 @@
 import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount, deleteSession, fetchPaginatedItemsAuctions, fetchItemsAuctions } from './database.js'
-import { fetchAuctionUncached, fetchElection, fetchItemList, fetchMemberProfile, fetchUser } from './hypixel.js'
+import { fetchAuctionItems, fetchAuctionUncached, fetchElection, fetchItemList, fetchMemberProfile, fetchUser } from './hypixel.js'
 import rateLimit from 'express-rate-limit'
 import * as constants from './constants.js'
 import * as discord from './discord.js'
@@ -166,7 +166,6 @@ app.get('/items', async (req, res) => {
 	}
 })
 
-
 app.get('/auctionprices', async (req, res) => {
 	const itemIds = typeof req.query.items === 'string' ? req.query.items.split(',') : null
 	if (itemIds && itemIds.length > 100)
@@ -180,6 +179,17 @@ app.get('/auctionprices', async (req, res) => {
 			.json(
 				itemIds ? await fetchItemsAuctions(itemIds) : await fetchPaginatedItemsAuctions(0, 100)
 			)
+	} catch (err) {
+		console.error(err)
+		res.json({ ok: false })
+	}
+})
+
+app.get('/auctionitems', async (req, res) => {
+	try {
+		res
+			.setHeader('Cache-Control', 'public, max-age=600')
+			.json(await fetchAuctionItems())
 	} catch (err) {
 		console.error(err)
 		res.json({ ok: false })

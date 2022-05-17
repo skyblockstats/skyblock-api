@@ -14,6 +14,7 @@ import {
 	AccountSchema,
 	fetchAccount,
 	fetchItemsAuctions,
+	fetchItemsAuctionsIds,
 	ItemAuctionsSchema,
 	queueUpdateDatabaseMember,
 	queueUpdateDatabaseProfile,
@@ -33,6 +34,7 @@ import { debug } from './index.js'
 import { WithId } from 'mongodb'
 import { cleanEndedAuctions } from './cleaners/skyblock/endedAuctions.js'
 import { cleanAuctions } from './cleaners/skyblock/auctions.js'
+import { string } from 'prismarine-nbt'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories' | undefined
 
@@ -452,4 +454,51 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 	}
 }
 
+let isFetchingAuctionItemList = false
+let cachedAuctionItemListData: Map<string, string> | null = null
+let nextAuctionItemListUpdate: Date = new Date(0)
+
+export async function fetchAuctionItems() {
+	if (cachedAuctionItemListData && nextAuctionItemListUpdate > new Date())
+		return cachedAuctionItemListData
+
+	// if it's currently fetching the election data and it doesn't have it,
+	// wait until we do have the election data
+	if (isFetchingAuctionItemList && !cachedAuctionItemListData) {
+		await new Promise(resolve => {
+			const interval = setInterval(() => {
+				if (cachedAuctionItemListData) {
+					clearInterval(interval)
+					resolve(cachedAuctionItemListData)
+				}
+			}, 100)
+		})
+	}
+
+	isFetchingAuctionItemList = true
+	const itemList = await fetchAuctionItemsUncached()
+	isFetchingAuctionItemList = false
+
+	cachedAuctionItemListData = itemList
+	// updates every 60 minutes
+	nextAuctionItemListUpdate = new Date(Date.now() + 10 * 60 * 1000);
+	return Object.fromEntries(itemList)
+}
+
+async function fetchAuctionItemsUncached() {
+	const auctionItemIds = await fetchItemsAuctionsIds()
+	const itemList = await fetchItemList()
+	const idsToNames: Map<string, string> = new Map()
+	for (const item of itemList.list)
+		// we only return items in auctionItemIds so the response isn't too big,
+		// since usually it would contain stuff that we don't care about like
+		// minions
+		if (auctionItemIds.includes(item.id))
+			idsToNames.set(item.id, item.display.name)
+	// if the item in the database isn't in the items api, just set the name to the id
+	for (const item of auctionItemIds)
+		if (!idsToNames.has(item))
+			idsToNames.set(item, item)
+	return idsToNames
+}
 
