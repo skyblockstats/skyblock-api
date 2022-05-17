@@ -455,7 +455,7 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 }
 
 let isFetchingAuctionItemList = false
-let cachedAuctionItemListData: Map<string, string> | null = null
+let cachedAuctionItemListData: Record<string, string> | null = null
 let nextAuctionItemListUpdate: Date = new Date(0)
 
 export async function fetchAuctionItems() {
@@ -480,10 +480,10 @@ export async function fetchAuctionItems() {
 	isFetchingAuctionItemList = false
 	if (!itemList) return undefined
 
-	cachedAuctionItemListData = itemList
+	cachedAuctionItemListData = Object.fromEntries(itemList)
 	// updates every 60 minutes
 	nextAuctionItemListUpdate = new Date(Date.now() + 10 * 60 * 1000);
-	return Object.fromEntries(itemList)
+	return itemList
 }
 
 async function fetchAuctionItemsUncached() {
