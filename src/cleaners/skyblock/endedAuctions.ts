@@ -3,7 +3,7 @@ import { cleanInventory, headIdFromBase64, Item } from './inventory.js'
 import { cleanItemId } from './itemId.js'
 
 
-interface Auction {
+interface EndedAuction {
     id: string
     sellerUuid: string
     sellerProfileUuid: string
@@ -16,11 +16,11 @@ interface Auction {
 
 export interface EndedAuctions {
     lastUpdated: number
-    auctions: Auction[]
+    auctions: EndedAuction[]
 }
 
 export async function cleanEndedAuctions(data: typedHypixelApi.SkyBlockRecentlyEndedAuctionsResponse): Promise<EndedAuctions> {
-    const auctions: Auction[] = []
+    const auctions: EndedAuction[] = []
     for (const auction of data.auctions) {
         auctions.push({
             id: auction.auction_id,

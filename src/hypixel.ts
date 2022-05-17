@@ -32,6 +32,7 @@ import * as cached from './hypixelCached.js'
 import { debug } from './index.js'
 import { WithId } from 'mongodb'
 import { cleanEndedAuctions } from './cleaners/skyblock/endedAuctions.js'
+import { cleanAuctions } from './cleaners/skyblock/auctions.js'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories' | undefined
 
@@ -63,6 +64,7 @@ const cleanResponseFunctions = {
 	'skyblock/profile': (data: typedHypixelApi.SkyBlockProfileResponse, options) => cleanSkyblockProfileResponse(data.profile, options),
 	'skyblock/profiles': (data, options) => cleanSkyblockProfilesResponse(data.profiles),
 	'skyblock/auctions_ended': (data, options) => cleanEndedAuctions(data),
+	'skyblock/auction': (data, options) => cleanAuctions(data),
 	'resources/skyblock/election': (data, options) => cleanElectionResponse(data),
 	'resources/skyblock/items': (data, options) => cleanItemListResponse(data),
 } as const
@@ -360,6 +362,13 @@ export async function fetchItemList() {
 	return itemList
 }
 
+export async function fetchAuctionUncached(uuid: string) {
+	return await sendCleanApiRequest(
+		'skyblock/auction',
+		{ uuid }
+	)
+}
+
 // this function is called from database.ts so it starts when we connect to the database
 // it should only ever be called once!
 export async function periodicallyFetchRecentlyEndedAuctions() {
@@ -398,7 +407,7 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 			}
 
 			const simpleAuction: SimpleAuctionSchema = {
-				success: true,
+				s: true,
 				coins: auction.coins,
 				id: auction.id,
 				ts: Math.floor(auction.timestamp / 1000),

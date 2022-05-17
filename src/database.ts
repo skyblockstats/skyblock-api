@@ -126,8 +126,8 @@ export interface SimpleAuctionSchema {
 	 * since we don't need to be super exact and so it's shorter.
 	 */
 	ts: number
-	/** Whether the auction was bought or simply expired. */
-	success: boolean
+	/** Whether the auction was successfully bought or simply expired. */
+	s: boolean
 	bin: boolean
 }
 export interface ItemAuctionsSchema {
