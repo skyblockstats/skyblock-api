@@ -477,6 +477,7 @@ export async function fetchAuctionItems() {
 
 	isFetchingAuctionItemList = true
 	const itemList = await fetchAuctionItemsUncached()
+	if (!itemList) return undefined
 	isFetchingAuctionItemList = false
 
 	cachedAuctionItemListData = itemList
@@ -487,6 +488,7 @@ export async function fetchAuctionItems() {
 
 async function fetchAuctionItemsUncached() {
 	const auctionItemIds = await fetchItemsAuctionsIds()
+	if (!auctionItemIds) return undefined
 	const itemList = await fetchItemList()
 	const idsToNames: Map<string, string> = new Map()
 	for (const item of itemList.list)
