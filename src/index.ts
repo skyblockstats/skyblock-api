@@ -197,9 +197,7 @@ app.get('/auctionitems', async (req, res) => {
 })
 
 app.get('/auction/:uuid', async (req, res) => {
-	console.log('fetching auction', req.params.uuid)
 	const auction = await fetchAuctionUncached(req.params.uuid)
-	console.log('fetched auction', req.params.uuid)
 	try {
 		res
 			// .setHeader('Cache-Control', 'public, max-age=600')

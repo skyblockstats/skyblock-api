@@ -15,7 +15,6 @@ export interface Auction {
 }
 
 export async function cleanAuctions(data: typedHypixelApi.SkyBlockRequestAuctionResponse): Promise<Auction[]> {
-    console.log(data)
     const auctions: Auction[] = []
     for (const auction of data.auctions) {
         auctions.push({
