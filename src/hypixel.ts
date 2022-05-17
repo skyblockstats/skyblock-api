@@ -483,7 +483,7 @@ export async function fetchAuctionItems() {
 	cachedAuctionItemListData = Object.fromEntries(itemList)
 	// updates every 60 minutes
 	nextAuctionItemListUpdate = new Date(Date.now() + 10 * 60 * 1000);
-	return itemList
+	return cachedAuctionItemListData
 }
 
 async function fetchAuctionItemsUncached() {
