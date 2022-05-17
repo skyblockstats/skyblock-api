@@ -477,8 +477,8 @@ export async function fetchAuctionItems() {
 
 	isFetchingAuctionItemList = true
 	const itemList = await fetchAuctionItemsUncached()
-	if (!itemList) return undefined
 	isFetchingAuctionItemList = false
+	if (!itemList) return undefined
 
 	cachedAuctionItemListData = itemList
 	// updates every 60 minutes
