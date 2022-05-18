@@ -331,9 +331,19 @@ export async function fetchAuctionUncached(uuid: string) {
 	)
 }
 
-function createAuctionItemId(item: Item) {
+/**
+ * Create an id that we use to differenciate between different items that are sold in auctions. This can also be used to filter out specific items by returning undefined.
+ */
+function createAuctionItemId(item: Item): string | undefined {
 	if (item.id === 'PET' && item.petInfo?.id)
 		return `${item.petInfo.id}_${item.id}`
+	if (item.id === 'ENCHANTED_BOOK') {
+		if (Object.keys(item.enchantments ?? {}).length !== 1)
+			// we only care about enchanted books that have a single enchantment
+			return
+		const [[enchantName, enchantValue]] = Object.entries(item.enchantments ?? {})
+		return `${item.id}_${enchantName.toUpperCase()}_${enchantValue}`
+	}
 	return item.id
 }
 
@@ -354,8 +364,11 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 
 		for (const auction of endedAuctions.auctions) {
 			if (previousAuctionIds.has(auction.id)) continue
+			const auctionItemId = createAuctionItemId(auction.item)
+			if (!auctionItemId) continue
+
 			newAuctionUuids.add(auction.id)
-			newAuctionItemIds.add(createAuctionItemId(auction.item))
+			newAuctionItemIds.add(auctionItemId)
 		}
 		let updatedDatabaseAuctionItems: Map<string, ItemAuctionsSchema> = new Map()
 
@@ -368,6 +381,7 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 			if (previousAuctionIds.has(auction.id)) continue
 
 			const auctionItemId = createAuctionItemId(auction.item)
+			if (!auctionItemId) continue
 
 			let auctions: SimpleAuctionSchema[]
 			if (!updatedDatabaseAuctionItems.has(auctionItemId)) {
