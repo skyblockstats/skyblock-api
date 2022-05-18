@@ -104,3 +104,51 @@ export type RecursivePartial<T> = {
 	T[P] extends object ? RecursivePartial<T[P]> :
 	T[P]
 }
+
+let caches: Map<string, {
+	data: any
+	isFetching: boolean
+	nextUpdate: Date
+}> = new Map()
+
+export async function withCache<T>(key: string, ttl: number | ((arg: T) => Date), task: () => Promise<T>): Promise<T> {
+	if (caches.get(key)?.data && caches.get(key)!.nextUpdate > new Date())
+		return caches.get(key)!.data
+
+	// if it's currently fetching the election data and it doesn't have it,
+	// wait until we do have the election data
+	if (caches.get(key)?.isFetching && !caches.get(key)?.data) {
+		await new Promise(resolve => {
+			const interval = setInterval(() => {
+				if (caches.get(key)?.data) {
+					clearInterval(interval)
+					resolve(caches.get(key)!.data)
+				}
+			}, 100)
+		})
+	}
+
+	caches.set(key, {
+		...(caches.get(key) ?? { data: undefined, nextUpdate: new Date(0) }),
+		isFetching: true,
+	})
+	const data = await task()
+	caches.set(key, {
+		...caches.get(key)!,
+		isFetching: false,
+	})
+	if (!data) return undefined as any
+
+	caches.set(key, {
+		...caches.get(key)!,
+		data
+	})
+
+	const nextUpdate = typeof ttl === 'number' ? new Date(Date.now() + ttl) : ttl(data)
+
+	caches.set(key, {
+		...caches.get(key)!,
+		nextUpdate
+	})
+	return data
+}

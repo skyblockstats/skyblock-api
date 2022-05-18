@@ -35,6 +35,7 @@ import { WithId } from 'mongodb'
 import { cleanEndedAuctions } from './cleaners/skyblock/endedAuctions.js'
 import { cleanAuctions } from './cleaners/skyblock/auctions.js'
 import { string } from 'prismarine-nbt'
+import { withCache } from './util.js'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories' | undefined
 
@@ -295,73 +296,31 @@ export async function fetchMemberProfilesUncached(playerUuid: string): Promise<C
 	return profiles
 }
 
-let isFetchingElection = false
-let cachedElectionData: ElectionData | null = null
-let nextElectionUpdate: Date = new Date(0)
-
 export async function fetchElection(): Promise<ElectionData> {
-	if (cachedElectionData && nextElectionUpdate > new Date())
-		return cachedElectionData
-
-	// if it's currently fetching the election data and it doesn't have it,
-	// wait until we do have the election data
-	if (isFetchingElection && !cachedElectionData) {
-		await new Promise(resolve => {
-			const interval = setInterval(() => {
-				if (cachedElectionData) {
-					clearInterval(interval)
-					resolve(cachedElectionData)
-				}
-			}, 100)
-		})
-	}
-
-	isFetchingElection = true
-	const election: ElectionData = await sendCleanApiRequest(
-		'resources/skyblock/election',
-		{}
+	return await withCache(
+		'election',
+		(r) => new Date((r.lastUpdated + 60 * 60) * 1000),
+		async () => {
+			return await sendCleanApiRequest(
+				'resources/skyblock/election',
+				{}
+			)
+		}
 	)
-	isFetchingElection = false
-
-	cachedElectionData = election
-	// updates every 10 minutes
-	nextElectionUpdate = new Date((election.lastUpdated + 10 * 60) * 1000)
-	return election
 }
 
 
-let isFetchingItemList = false
-let cachedItemListData: ItemListData | null = null
-let nextItemListUpdate: Date = new Date(0)
-
 export async function fetchItemList() {
-	if (cachedItemListData && nextItemListUpdate > new Date())
-		return cachedItemListData
-
-	// if it's currently fetching the election data and it doesn't have it,
-	// wait until we do have the election data
-	if (isFetchingItemList && !cachedItemListData) {
-		await new Promise(resolve => {
-			const interval = setInterval(() => {
-				if (cachedItemListData) {
-					clearInterval(interval)
-					resolve(cachedItemListData)
-				}
-			}, 100)
-		})
-	}
-
-	isFetchingItemList = true
-	const itemList: ItemListData = await sendCleanApiRequest(
-		'resources/skyblock/items',
-		{}
+	return await withCache(
+		'itemList',
+		(r) => new Date((r.lastUpdated + 60 * 60) * 1000),
+		async () => {
+			return await sendCleanApiRequest(
+				'resources/skyblock/items',
+				{}
+			)
+		}
 	)
-	isFetchingItemList = false
-
-	cachedItemListData = itemList
-	// updates every 60 minutes
-	nextItemListUpdate = new Date((itemList.lastUpdated + 60 * 60) * 1000)
-	return itemList
 }
 
 export async function fetchAuctionUncached(uuid: string) {
@@ -454,36 +413,12 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 	}
 }
 
-let isFetchingAuctionItemList = false
-let cachedAuctionItemListData: Record<string, string> | null = null
-let nextAuctionItemListUpdate: Date = new Date(0)
-
 export async function fetchAuctionItems() {
-	if (cachedAuctionItemListData && nextAuctionItemListUpdate > new Date())
-		return cachedAuctionItemListData
-
-	// if it's currently fetching the election data and it doesn't have it,
-	// wait until we do have the election data
-	if (isFetchingAuctionItemList && !cachedAuctionItemListData) {
-		await new Promise(resolve => {
-			const interval = setInterval(() => {
-				if (cachedAuctionItemListData) {
-					clearInterval(interval)
-					resolve(cachedAuctionItemListData)
-				}
-			}, 100)
-		})
-	}
-
-	isFetchingAuctionItemList = true
-	const itemList = await fetchAuctionItemsUncached()
-	isFetchingAuctionItemList = false
-	if (!itemList) return undefined
-
-	cachedAuctionItemListData = Object.fromEntries(itemList)
-	// updates every 60 minutes
-	nextAuctionItemListUpdate = new Date(Date.now() + 10 * 60 * 1000)
-	return cachedAuctionItemListData
+	return await withCache(
+		'auctionItems',
+		10 * 60 * 1000,
+		fetchAuctionItemsUncached
+	)
 }
 
 async function fetchAuctionItemsUncached() {

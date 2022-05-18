@@ -175,7 +175,6 @@ app.get('/auctionprices', async (req, res) => {
 		})
 	try {
 		res
-			.setHeader('Cache-Control', 'public, max-age=600')
 			.json(
 				itemIds ? await fetchItemsAuctions(itemIds) : await fetchPaginatedItemsAuctions(0, 100)
 			)
@@ -188,7 +187,6 @@ app.get('/auctionprices', async (req, res) => {
 app.get('/auctionitems', async (req, res) => {
 	try {
 		res
-			.setHeader('Cache-Control', 'public, max-age=600')
 			.json(await fetchAuctionItems())
 	} catch (err) {
 		console.error(err)
