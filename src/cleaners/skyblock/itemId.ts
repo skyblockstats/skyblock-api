@@ -36,6 +36,7 @@ const ITEMS = {
 	'gemstone_collection': 'gemstone',
 	'mycel': 'mycelium',
 	'cocoa': 'cocoa_beans',
+	'smooth_brick': 'stonebrick',
 
 	'redstone_lamp_off': 'redstone_lamp',
 	'redstone_comparator': 'comparator',
