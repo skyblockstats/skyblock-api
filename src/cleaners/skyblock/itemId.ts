@@ -37,6 +37,7 @@ const ITEMS = {
 	'mycel': 'mycelium',
 	'cocoa': 'cocoa_beans',
 	'smooth_brick': 'stonebrick',
+	'lily_pad': 'waterlily',
 
 	'redstone_lamp_off': 'redstone_lamp',
 	'redstone_comparator': 'comparator',

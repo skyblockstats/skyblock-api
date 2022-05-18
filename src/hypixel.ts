@@ -469,7 +469,14 @@ async function fetchAuctionItemsUncached() {
 	// if the item in the database isn't in the items api, just set the name to the id
 	for (const item of auctionItemIds)
 		if (!(item in idsToData))
-			idsToData[item] = { display: { name: item.toLowerCase().replace(/^./, item[0].toUpperCase()).replace(/_/g, ' ') } }
+			idsToData[item] = {
+				display: {
+					name: (item.toLowerCase().replace(/^./, item[0].toUpperCase()).replace(/_/g, ' ')).replace(
+						/\w\S*/g,
+						w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+					)
+				}
+			}
 	return idsToData
 }
 
