@@ -369,7 +369,7 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 
 			const simpleAuction: SimpleAuctionSchema = {
 				s: true,
-				coins: auction.coins,
+				coins: auction.coins / auction.item.count,
 				id: auction.id,
 				ts: Math.floor(auction.timestamp / 1000),
 				bin: auction.bin,
