@@ -110,6 +110,7 @@ const ITEMS = {
 	'grilled_pork': 'cooked_porkchop',
 	'glistering_melon': 'glistering_melon_slice',
 	'cactus_green': 'green_dye',
+	'leash': 'lead',
 
 	'enchanted_lapis_lazuli': 'enchanted_lapis_lazuli',
 	'enchanted_potato': 'enchanted_potato',

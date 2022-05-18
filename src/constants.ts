@@ -44,7 +44,7 @@ async function fetchGithubApi(method: string, route: string, headers?: any, json
 				body: json ? JSON.stringify(json) : undefined,
 				method,
 				headers: Object.assign({
-					'Authorization': `token ${process.env.github_token}`
+					'Authorization': process.env.github_token ? `token ${process.env.github_token}` : undefined
 				}, headers),
 			}
 		)
