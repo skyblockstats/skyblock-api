@@ -39,6 +39,7 @@ const ITEMS = {
 	'smooth_brick': 'stonebrick',
 	'lily_pad': 'waterlily',
 
+	'command': 'command_block',
 	'redstone_lamp_off': 'redstone_lamp',
 	'redstone_comparator': 'comparator',
 	'redstone_torch_on': 'redstone_torch',
