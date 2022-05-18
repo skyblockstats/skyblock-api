@@ -374,6 +374,8 @@ export async function fetchAuctionUncached(uuid: string) {
 // this function is called from database.ts so it starts when we connect to the database
 // it should only ever be called once!
 export async function periodicallyFetchRecentlyEndedAuctions() {
+	return
+
 	let previousAuctionIds = new Set()
 
 	while (true) {
@@ -482,7 +484,7 @@ export async function fetchAuctionItems() {
 
 	cachedAuctionItemListData = Object.fromEntries(itemList)
 	// updates every 60 minutes
-	nextAuctionItemListUpdate = new Date(Date.now() + 10 * 60 * 1000);
+	nextAuctionItemListUpdate = new Date(Date.now() + 10 * 60 * 1000)
 	return cachedAuctionItemListData
 }
 
