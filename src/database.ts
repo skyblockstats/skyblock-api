@@ -5,7 +5,7 @@
 import { categorizeStat, getStatUnit } from './cleaners/skyblock/stats.js'
 import { CleanFullProfile } from './cleaners/skyblock/profile.js'
 import { SLAYER_TIERS } from './cleaners/skyblock/slayers.js'
-import { Collection, Db, MongoClient, WithId } from 'mongodb'
+import { Binary, Collection, Db, MongoClient, WithId } from 'mongodb'
 import { CleanMember } from './cleaners/skyblock/member.js'
 import * as cached from './hypixelCached.js'
 import * as constants from './constants.js'
@@ -117,6 +117,19 @@ export interface AccountSchema {
 	customization?: AccountCustomization
 }
 
+export interface SimpleAuctionSchemaBson {
+	/** The UUID of the auction so we can look it up later. */
+	id: Binary
+	coins: number
+	/**
+	 * The timestamp as **seconds** since epoch. It's in seconds instead of ms
+	 * since we don't need to be super exact and so it's shorter.
+	 */
+	ts: number
+	/** Whether the auction was successfully bought or simply expired. */
+	s: boolean
+	bin: boolean
+}
 export interface SimpleAuctionSchema {
 	/** The UUID of the auction so we can look it up later. */
 	id: string
@@ -132,15 +145,20 @@ export interface SimpleAuctionSchema {
 }
 export interface ItemAuctionsSchema {
 	/** The id of the item */
-	_id: string
+	id: string
 	auctions: SimpleAuctionSchema[]
+}
+export interface ItemAuctionsSchemaBson {
+	/** The id of the item */
+	_id: string
+	auctions: SimpleAuctionSchemaBson[]
 }
 
 let memberLeaderboardsCollection: Collection<DatabaseMemberLeaderboardItem>
 let profileLeaderboardsCollection: Collection<DatabaseProfileLeaderboardItem>
 let sessionsCollection: Collection<SessionSchema>
 let accountsCollection: Collection<AccountSchema>
-let itemAuctionsCollection: Collection<ItemAuctionsSchema>
+let itemAuctionsCollection: Collection<ItemAuctionsSchemaBson>
 
 
 const leaderboardInfos: { [leaderboardName: string]: string } = {
@@ -172,6 +190,10 @@ async function connect(): Promise<void> {
 
 interface StringNumber {
 	[name: string]: number
+}
+
+function createUuid(uuid: string): Binary {
+	return new Binary(Buffer.from((uuid).replace(/-/g, ''), 'hex'), Binary.SUBTYPE_UUID)
 }
 
 function getMemberCollectionAttributes(member: CleanMember): StringNumber {
@@ -1089,25 +1111,49 @@ export async function updateAccount(discordId: string, schema: AccountSchema) {
 	}, { $set: schema }, { upsert: true })
 }
 
+function toItemAuctionsSchema(i: ItemAuctionsSchemaBson) {
+	return {
+		id: i._id,
+		auctions: i.auctions.map(a => {
+			return {
+				...a,
+				id: a.id.toString('hex'),
+			}
+		}),
+	}
+}
+
+function toItemAuctionsSchemaBson(i: ItemAuctionsSchema) {
+	return {
+		_id: i.id,
+		auctions: i.auctions.map(a => {
+			return {
+				...a,
+				id: createUuid(a.id)
+			}
+		}),
+	}
+}
+
 /** Fetch all the Item Auctions for the item ids in the given array. */
 export async function fetchItemsAuctions(itemIds: string[]): Promise<ItemAuctionsSchema[]> {
 	const auctions = await itemAuctionsCollection?.find({
 		_id: { $in: itemIds }
 	}).toArray()
-	return auctions
+	return auctions.map(toItemAuctionsSchema)
 }
 
 
 /** Fetch all the Item Auctions for the item ids in the given array. */
 export async function fetchPaginatedItemsAuctions(skip: number, limit: number): Promise<ItemAuctionsSchema[]> {
 	const auctions = await itemAuctionsCollection?.find({}).skip(skip).limit(limit).toArray()
-	return auctions
+	return auctions.map(toItemAuctionsSchema)
 }
 
 export async function updateItemAuction(auction: ItemAuctionsSchema) {
 	await itemAuctionsCollection?.updateOne({
-		_id: auction._id,
-	}, { $set: auction }, { upsert: true })
+		_id: auction.id,
+	}, { $set: toItemAuctionsSchemaBson(auction) }, { upsert: true })
 }
 
 /**

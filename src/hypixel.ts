@@ -374,8 +374,6 @@ export async function fetchAuctionUncached(uuid: string) {
 // this function is called from database.ts so it starts when we connect to the database
 // it should only ever be called once!
 export async function periodicallyFetchRecentlyEndedAuctions() {
-	return
-
 	let previousAuctionIds = new Set()
 
 	while (true) {
@@ -397,7 +395,7 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 
 		const itemsAuctions = await fetchItemsAuctions(Array.from(newAuctionItemIds))
 		for (const itemAuctions of itemsAuctions) {
-			updatedDatabaseAuctionItems.set(itemAuctions._id, itemAuctions)
+			updatedDatabaseAuctionItems.set(itemAuctions.id, itemAuctions)
 		}
 
 		for (const auction of endedAuctions.auctions) {
@@ -418,7 +416,7 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 				bin: auction.bin,
 			}
 			// make sure the auction isn't already in there
-			if (auctions.findIndex((a) => a.id === simpleAuction.id) === -1) {
+			if (auctions.find((a) => a.id === simpleAuction.id)) {
 				auctions.push(simpleAuction)
 				// keep only the last 100 items
 				if (auctions.length > 100)
@@ -426,7 +424,7 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 			}
 
 			updatedDatabaseAuctionItems.set(auction.item.id, {
-				_id: auction.item.id,
+				id: auction.item.id,
 				auctions,
 			})
 		}
