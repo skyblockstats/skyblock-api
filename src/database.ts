@@ -146,11 +146,13 @@ export interface SimpleAuctionSchema {
 export interface ItemAuctionsSchema {
 	/** The id of the item */
 	id: string
+	sbId: string
 	auctions: SimpleAuctionSchema[]
 }
 export interface ItemAuctionsSchemaBson {
 	/** The id of the item */
 	_id: string
+	sbId: string
 	auctions: SimpleAuctionSchemaBson[]
 	/** This is here so it can be indexed by Mongo, it can easily be figured out by getting the first item in auctions */
 	oldestDate: number
@@ -1116,6 +1118,7 @@ export async function updateAccount(discordId: string, schema: AccountSchema) {
 function toItemAuctionsSchema(i: ItemAuctionsSchemaBson): ItemAuctionsSchema {
 	return {
 		id: i._id,
+		sbId: i.sbId,
 		auctions: i.auctions.map(a => {
 			return {
 				...a,
@@ -1128,6 +1131,7 @@ function toItemAuctionsSchema(i: ItemAuctionsSchemaBson): ItemAuctionsSchema {
 function toItemAuctionsSchemaBson(i: ItemAuctionsSchema): ItemAuctionsSchemaBson {
 	return {
 		_id: i.id,
+		sbId: i.sbId,
 		auctions: i.auctions.map(a => {
 			return {
 				...a,

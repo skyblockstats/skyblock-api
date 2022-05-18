@@ -21,6 +21,9 @@ export interface Item {
 	anvilUses?: number
 	timestamp?: string
 	enchantments?: { [name: string]: number }
+	petInfo?: {
+		id: string
+	}
 
 	headTexture?: string
 }
@@ -54,6 +57,7 @@ function cleanItem(rawItem): Item | null {
 			headId = headIdFromBase64(headDataBase64)
 	}
 
+
 	return {
 		id: extraAttributes?.id ?? null,
 		count: itemCount ?? 1,
@@ -70,6 +74,9 @@ function cleanItem(rawItem): Item | null {
 		enchantments: extraAttributes?.enchantments,
 		anvilUses: extraAttributes?.anvil_uses,
 		timestamp: extraAttributes?.timestamp,
+		petInfo: extraAttributes?.petInfo ? {
+			id: JSON.parse(extraAttributes.petInfo).type
+		} : undefined,
 
 		headTexture: headId,
 	}

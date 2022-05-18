@@ -36,6 +36,7 @@ import { cleanEndedAuctions } from './cleaners/skyblock/endedAuctions.js'
 import { cleanAuctions } from './cleaners/skyblock/auctions.js'
 import { string } from 'prismarine-nbt'
 import { withCache } from './util.js'
+import { Item } from './cleaners/skyblock/inventory.js'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories' | undefined
 
@@ -330,6 +331,12 @@ export async function fetchAuctionUncached(uuid: string) {
 	)
 }
 
+function createAuctionItemId(item: Item) {
+	if (item.id === 'PET' && item.petInfo?.id)
+		return `${item.petInfo.id}_${item.id}`
+	return item.id
+}
+
 // this function is called from database.ts so it starts when we connect to the database
 // it should only ever be called once!
 export async function periodicallyFetchRecentlyEndedAuctions() {
@@ -348,7 +355,7 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 		for (const auction of endedAuctions.auctions) {
 			if (previousAuctionIds.has(auction.id)) continue
 			newAuctionUuids.add(auction.id)
-			newAuctionItemIds.add(auction.item.id)
+			newAuctionItemIds.add(createAuctionItemId(auction.item))
 		}
 		let updatedDatabaseAuctionItems: Map<string, ItemAuctionsSchema> = new Map()
 
@@ -360,11 +367,13 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 		for (const auction of endedAuctions.auctions) {
 			if (previousAuctionIds.has(auction.id)) continue
 
+			const auctionItemId = createAuctionItemId(auction.item)
+
 			let auctions: SimpleAuctionSchema[]
-			if (!updatedDatabaseAuctionItems.has(auction.item.id)) {
+			if (!updatedDatabaseAuctionItems.has(auctionItemId)) {
 				auctions = []
 			} else {
-				auctions = updatedDatabaseAuctionItems.get(auction.item.id)!.auctions
+				auctions = updatedDatabaseAuctionItems.get(auctionItemId)!.auctions
 			}
 
 			const simpleAuction: SimpleAuctionSchema = {
@@ -382,8 +391,9 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 					auctions = auctions.slice(-100)
 			}
 
-			updatedDatabaseAuctionItems.set(auction.item.id, {
-				id: auction.item.id,
+			updatedDatabaseAuctionItems.set(auctionItemId, {
+				id: auctionItemId,
+				sbId: auction.item.id,
 				auctions,
 			})
 		}
