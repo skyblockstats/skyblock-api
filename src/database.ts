@@ -1167,14 +1167,14 @@ export async function updateItemAuction(auction: ItemAuctionsSchema) {
 /**
  * Fetches the SkyBlock ids of all the items in the auctions database. This method is slow and should be cached!
  */
-export async function fetchItemsAuctionsIds(): Promise<string[] | undefined> {
+export async function fetchItemsAuctionsIds(skyblockIds: boolean = false): Promise<string[] | undefined> {
 	if (!itemAuctionsCollection) return undefined
 	const docs = await itemAuctionsCollection?.aggregate([
 		{ $sort: { oldestDate: -1 } },
 		// this removes everything except the _id
-		{ $project: { _id: true } }
+		{ $project: skyblockIds ? { _id: false, sbId: true } : { _id: true } }
 	]).toArray()
-	return docs.map(r => r._id)
+	return skyblockIds ? docs.filter(r => r.sbId).map(r => r.sbId) : docs.map(r => r._id)
 }
 
 
