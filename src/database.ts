@@ -1138,7 +1138,8 @@ function toItemAuctionsSchemaBson(i: ItemAuctionsSchema): ItemAuctionsSchemaBson
 				id: createUuid(a.id)
 			}
 		}),
-		oldestDate: i.auctions[0]?.ts ?? 0
+		// we sort by oldestDate to get the volume sold, but we don't want brand new items with like no data having a high frequency
+		oldestDate: i.auctions.length > 10 ? i.auctions[0]?.ts ?? 0 : 0
 	}
 }
 
