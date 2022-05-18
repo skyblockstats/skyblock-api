@@ -1142,14 +1142,14 @@ function toItemAuctionsSchemaBson(i: ItemAuctionsSchema): ItemAuctionsSchemaBson
 export async function fetchItemsAuctions(itemIds: string[]): Promise<ItemAuctionsSchema[]> {
 	const auctions = await itemAuctionsCollection?.find({
 		_id: { $in: itemIds }
-	}).toArray()
+	}).sort('oldestDate', -1).toArray()
 	return auctions.map(toItemAuctionsSchema)
 }
 
 
 /** Fetch all the Item Auctions for the item ids in the given array. */
 export async function fetchPaginatedItemsAuctions(skip: number, limit: number): Promise<ItemAuctionsSchema[]> {
-	const auctions = await itemAuctionsCollection?.find({}).skip(skip).limit(limit).toArray()
+	const auctions = await itemAuctionsCollection?.find({}).sort('oldestDate', -1).skip(skip).limit(limit).toArray()
 	return auctions.map(toItemAuctionsSchema)
 }
 
@@ -1165,6 +1165,7 @@ export async function updateItemAuction(auction: ItemAuctionsSchema) {
 export async function fetchItemsAuctionsIds(): Promise<string[] | undefined> {
 	if (!itemAuctionsCollection) return undefined
 	const docs = await itemAuctionsCollection?.aggregate([
+		{ $sort: { oldestDate: -1 } },
 		// this removes everything except the _id
 		{ $project: { _id: true } }
 	]).toArray()
