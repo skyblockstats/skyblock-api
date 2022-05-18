@@ -416,7 +416,7 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 				bin: auction.bin,
 			}
 			// make sure the auction isn't already in there
-			if (auctions.find((a) => a.id === simpleAuction.id)) {
+			if (!auctions.find((a) => a.id === simpleAuction.id)) {
 				auctions.push(simpleAuction)
 				// keep only the last 100 items
 				if (auctions.length > 100)

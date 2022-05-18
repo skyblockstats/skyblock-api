@@ -152,6 +152,8 @@ export interface ItemAuctionsSchemaBson {
 	/** The id of the item */
 	_id: string
 	auctions: SimpleAuctionSchemaBson[]
+	/** This is here so it can be indexed by Mongo, it can easily be figured out by getting the first item in auctions */
+	oldestDate: number
 }
 
 let memberLeaderboardsCollection: Collection<DatabaseMemberLeaderboardItem>
@@ -1111,7 +1113,7 @@ export async function updateAccount(discordId: string, schema: AccountSchema) {
 	}, { $set: schema }, { upsert: true })
 }
 
-function toItemAuctionsSchema(i: ItemAuctionsSchemaBson) {
+function toItemAuctionsSchema(i: ItemAuctionsSchemaBson): ItemAuctionsSchema {
 	return {
 		id: i._id,
 		auctions: i.auctions.map(a => {
@@ -1123,7 +1125,7 @@ function toItemAuctionsSchema(i: ItemAuctionsSchemaBson) {
 	}
 }
 
-function toItemAuctionsSchemaBson(i: ItemAuctionsSchema) {
+function toItemAuctionsSchemaBson(i: ItemAuctionsSchema): ItemAuctionsSchemaBson {
 	return {
 		_id: i.id,
 		auctions: i.auctions.map(a => {
@@ -1132,6 +1134,7 @@ function toItemAuctionsSchemaBson(i: ItemAuctionsSchema) {
 				id: createUuid(a.id)
 			}
 		}),
+		oldestDate: i.auctions[0]?.ts ?? 0
 	}
 }
 
