@@ -425,17 +425,17 @@ async function fetchAuctionItemsUncached() {
 	const auctionItemIds = await fetchItemsAuctionsIds()
 	if (!auctionItemIds) return undefined
 	const itemList = await fetchItemList()
-	const idsToNames: Map<string, string> = new Map()
+	const idsToNames: Record<string, string> = {}
 	for (const item of itemList.list)
 		// we only return items in auctionItemIds so the response isn't too big,
 		// since usually it would contain stuff that we don't care about like
 		// minions
 		if (auctionItemIds.includes(item.id))
-			idsToNames.set(item.id, item.display.name)
+			idsToNames[item.id] = item.display.name
 	// if the item in the database isn't in the items api, just set the name to the id
 	for (const item of auctionItemIds)
-		if (!idsToNames.has(item))
-			idsToNames.set(item, item.toLowerCase().replace(/^./, item[0].toUpperCase()).replace(/_/g, ' '))
+		if (!(item in idsToNames))
+			idsToNames[item] = item.toLowerCase().replace(/^./, item[0].toUpperCase()).replace(/_/g, ' ')
 	return idsToNames
 }
 
