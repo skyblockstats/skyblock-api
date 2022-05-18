@@ -77,6 +77,7 @@ const ITEMS = {
 	'iron_spade': 'iron_shovel',
 
 	'diamond_spade': 'diamond_shovel',
+	'diamond_barding': 'diamond_horse_armor',
 
 	'gold_record': 'record_13',
 	'green_record': 'record_cat',
