@@ -165,19 +165,19 @@ function skillFromLevel(id: string, level: number | undefined): Skill {
 	}
 }
 
-function skillsFromSkyBlockAchievements(achievements: CleanFullPlayer['achievements']['skyblock']): Skills {
+function skillsFromSkyBlockAchievements(achievements: CleanFullPlayer['achievements']): Skills {
 	return {
 		apiEnabled: false,
 		list: [
-			skillFromLevel('fishing', achievements['angler']),
-			skillFromLevel('enchanting', achievements['augmentation']),
-			skillFromLevel('combat', achievements['combat']),
-			skillFromLevel('alchemy', achievements['concoctor']),
-			skillFromLevel('taming', achievements['domesticator']),
-			skillFromLevel('dungeoneering', achievements['dungeoneer']),
-			skillFromLevel('mining', achievements['excavator']),
-			skillFromLevel('foraging', achievements['gatherer']),
-			skillFromLevel('farming', achievements['harvester'])
+			skillFromLevel('fishing', achievements.tiered.find(a => a.id === 'angler')?.value ?? 0),
+			skillFromLevel('enchanting', achievements.tiered.find(a => a.id === 'augmentation')?.value ?? 0),
+			skillFromLevel('combat', achievements.tiered.find(a => a.id === 'combat')?.value ?? 0),
+			skillFromLevel('alchemy', achievements.tiered.find(a => a.id === 'concoctor')?.value ?? 0),
+			skillFromLevel('taming', achievements.tiered.find(a => a.id === 'domesticator')?.value ?? 0),
+			skillFromLevel('dungeoneering', achievements.tiered.find(a => a.id === 'dungeoneer')?.value ?? 0),
+			skillFromLevel('mining', achievements.tiered.find(a => a.id === 'excavator')?.value ?? 0),
+			skillFromLevel('foraging', achievements.tiered.find(a => a.id === 'gatherer')?.value ?? 0),
+			skillFromLevel('farming', achievements.tiered.find(a => a.id === 'harvester')?.value ?? 0)
 		]
 	}
 }
@@ -226,7 +226,7 @@ export async function cleanSkills(data: typedHypixelApi.SkyBlockProfileMember, p
 	// if the player has no skills but has kills, we can assume they have the skills api off
 	// (we check kills to know whether the profile is actually used, this is kinda arbitrary)
 	if (skills.length === 0 && 'stats' in data && Object.keys(data.stats).includes('kills')) {
-		return skillsFromSkyBlockAchievements(player.achievements.skyblock)
+		return skillsFromSkyBlockAchievements(player.achievements)
 	}
 
 	constants.addSkills(skillNamesFound)

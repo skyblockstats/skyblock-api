@@ -1,14 +1,24 @@
 import typedHypixelApi from 'typed-hypixel-api'
 import { fetchAchievements } from '../hypixelCached.js'
 
-interface Achievement {
+interface TieredAchievement {
 	id: string
 	name: string
-	value: number | boolean
+	value?: number
 	description: string
 }
 
-export type Achievements = Achievement[]
+interface OneTimeAchievement {
+	id: string
+	name: string
+	achieved: boolean
+	description: string
+}
+
+export interface Achievements {
+	tiered: TieredAchievement[]
+	oneTime: OneTimeAchievement[]
+}
 
 export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataResponse['player']): Promise<Achievements> {
 	const gameAchievements: typedHypixelApi.AchievementsResponse['achievements'] = await fetchAchievements()
@@ -16,9 +26,9 @@ export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataRe
 	for (const [gameId, achievementsData] of Object.entries(gameAchievements)) {
 		if (gameId !== 'skyblock') continue
 
-		let tieredAchievements: Achievement[] = []
+		let tieredAchievements: TieredAchievement[] = []
 		for (const [achievementId, achievementData] of Object.entries(achievementsData.tiered)) {
-			const value = data.achievements[`skyblock_${achievementId}`] ?? 0
+			const value = data.achievements[`skyblock_${achievementId}`] ?? undefined
 			tieredAchievements.push({
 				id: achievementId.toLowerCase(),
 				name: achievementData.name,
@@ -27,20 +37,20 @@ export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataRe
 			})
 		}
 
-		let oneTimeAchievements: Achievement[] = []
+		let oneTimeAchievements: OneTimeAchievement[] = []
 		for (const [achievementId, achievementData] of Object.entries(achievementsData.one_time)) {
 			oneTimeAchievements.push({
 				id: achievementId.toLowerCase(),
 				name: achievementData.name,
-				value: data.achievementsOneTime.includes(`skyblock_${achievementId}`),
+				achieved: data.achievementsOneTime.includes(`skyblock_${achievementId}`),
 				description: achievementData.description
 			})
 		}
 
-		return [...tieredAchievements, ...oneTimeAchievements]
+		return { tiered: tieredAchievements, oneTime: oneTimeAchievements }
 	}
 
 	// this shouldn't be possible
 	console.debug('skyblock not found in achievements?')
-	return []
+	return { tiered: [], oneTime: [] }
 }
