@@ -8,15 +8,9 @@ interface Achievement {
 	description: string
 }
 
-export interface Achievements {
-	skyblock: Achievement[]
-}
+export type Achievements = Achievement[]
 
 export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataResponse['player']): Promise<Achievements> {
-	const playerAchievements: Achievements = {
-		skyblock: []
-	}
-
 	const gameAchievements: typedHypixelApi.AchievementsResponse['achievements'] = await fetchAchievements()
 
 	for (const [gameId, achievementsData] of Object.entries(gameAchievements)) {
@@ -43,8 +37,10 @@ export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataRe
 			})
 		}
 
-		playerAchievements[gameId] = [...tieredAchievements, ...oneTimeAchievements]
+		return [...tieredAchievements, ...oneTimeAchievements]
 	}
 
-	return playerAchievements
+	// this shouldn't be possible
+	console.debug('skyblock not found in achievements?')
+	return []
 }
