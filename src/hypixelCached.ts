@@ -3,7 +3,7 @@
  */
 
 import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/skyblock/profile.js'
-import { isUuid, sleep, undashUuid } from './util.js'
+import { isUuid, sleep, undashUuid, withCache } from './util.js'
 import { CleanFullPlayer, CleanPlayer } from './cleaners/player.js'
 import * as hypixel from './hypixel.js'
 import * as mojang from './mojang.js'
@@ -11,6 +11,7 @@ import NodeCache from 'node-cache'
 import { debug } from './index.js'
 import LRUCache from 'lru-cache'
 import { CleanBasicMember } from './cleaners/skyblock/member.js'
+import { sendUncleanApiRequest } from './hypixel.js'
 
 // cache usernames for 30 minutes
 
@@ -442,3 +443,14 @@ export async function fetchProfileName(user: string, profile: string): Promise<s
 	profileNameCache.set(`${playerUuid}.${profileUuid}`, profileName)
 	return profileName
 }
+
+export async function fetchAchievements() {
+	return await withCache(
+		'achievements',
+		30 * 60 * 1000,
+		async () => {
+			return (await sendUncleanApiRequest('resources/achievements', {})).achievements
+		}
+	)
+}
+

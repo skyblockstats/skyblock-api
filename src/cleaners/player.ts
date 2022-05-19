@@ -44,6 +44,6 @@ export async function cleanPlayerResponse(data: typedHypixelApi.PlayerDataRespon
         socials: cleanSocialMedia(data),
         profiles: cleanPlayerSkyblockProfiles(data.stats?.SkyBlock?.profiles),
         claimed: cleanPlayerSkyblockClaimed(data),
-        achievements: cleanPlayerAchievements(data)
+        achievements: await cleanPlayerAchievements(data)
     }
 }

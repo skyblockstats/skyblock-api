@@ -102,7 +102,6 @@ export function getStatUnit(name: string): string | null {
 
 
 export function cleanProfileStats(data: typedHypixelApi.SkyBlockProfileMember): StatItem[] {
-	// TODO: add type for statsRaw (probably in hypixelApi.ts since its coming from there)
 	const stats: StatItem[] = []
 
 	const rawStats = data?.stats ?? {}

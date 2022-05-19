@@ -53,13 +53,18 @@ export interface ApiOptions {
 	basic?: boolean
 }
 
-/** Sends an API request to Hypixel and cleans it up. */
-export async function sendCleanApiRequest<P extends keyof typeof cleanResponseFunctions>(path: P, args: Omit<typedHypixelApi.Requests[P]['options'], 'key'>, options?: ApiOptions): Promise<Awaited<ReturnType<typeof cleanResponseFunctions[P]>>> {
+/** Sends an API request to Hypixel and returns the response. */
+export async function sendUncleanApiRequest<P extends keyof typedHypixelApi.Requests>(path: P, args: Omit<typedHypixelApi.Requests[P]['options'], 'key'>): Promise<typedHypixelApi.Requests[P]['response']['data']> {
 	const key = await chooseApiKey()
 	const data = await sendApiRequest(path, { key, ...args })
 	if (!data)
 		throw new Error(`No data returned from ${path}`)
-	// clean the response
+	return data
+}
+
+/** Sends an API request to Hypixel and cleans it up. */
+export async function sendCleanApiRequest<P extends keyof typeof cleanResponseFunctions>(path: P, args: Omit<typedHypixelApi.Requests[P]['options'], 'key'>, options?: ApiOptions): Promise<Awaited<ReturnType<typeof cleanResponseFunctions[P]>>> {
+	const data = await sendUncleanApiRequest(path, args)
 	return await cleanResponse(path, data, options ?? {})
 }
 

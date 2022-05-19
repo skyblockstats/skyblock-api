@@ -17,7 +17,6 @@ export async function cleanVisitedZones(data: typedHypixelApi.SkyBlockProfileMem
 
 	constants.addZones(rawZones)
 
-	// TODO: store all the zones that exist in SkyBlock, add add those to the array with visited being false
 	const zones: Zone[] = []
 
 	const knownZones = await constants.fetchZones()
