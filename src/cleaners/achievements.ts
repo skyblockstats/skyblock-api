@@ -26,6 +26,7 @@ export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataRe
 	for (const [gameId, achievementsData] of Object.entries(gameAchievements)) {
 		if (gameId !== 'skyblock') continue
 
+
 		let tieredAchievements: TieredAchievement[] = []
 		for (const [achievementId, achievementData] of Object.entries(achievementsData.tiered)) {
 			const value = data.achievements[`skyblock_${achievementId}`] ?? undefined
@@ -33,7 +34,7 @@ export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataRe
 				id: achievementId.toLowerCase(),
 				name: achievementData.name,
 				value,
-				description: achievementData.description.replace(/%s/g, value.toString())
+				description: value ? achievementData.description.replace(/%s/g, value.toString()) : achievementData.description
 			})
 		}
 
