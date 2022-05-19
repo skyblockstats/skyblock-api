@@ -88,7 +88,13 @@ function fetchFile(path: string): Promise<GithubFile> {
 					'Accept': 'application/vnd.github.v3+json',
 				},
 			)
+
 			const data = await r.json() as any
+
+			// this happens when the ratelimit is exceeded
+			if (!('path' in data)) {
+				console.error('Error getting GitHub file', data)
+			}
 
 			const file = {
 				path: data.path,
