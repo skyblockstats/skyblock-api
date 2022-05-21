@@ -11,7 +11,7 @@ interface TieredAchievement {
 interface ChallengeAchievement {
 	id: string
 	name: string
-	achieved: boolean
+	unlocked: boolean
 	description: string
 }
 
@@ -37,18 +37,30 @@ export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataRe
 				description: value ? achievementData.description.replace(/%s/g, value.toString()) : achievementData.description
 			})
 		}
+		tieredAchievements.sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
 
-		let challengeAchievements: ChallengeAchievement[] = []
+		let unlockedChallengeAchievements: ChallengeAchievement[] = []
+		let lockedChallengeAchievements: ChallengeAchievement[] = []
+
 		for (const [achievementId, achievementData] of Object.entries(achievementsData.one_time)) {
-			challengeAchievements.push({
+			const achievement: ChallengeAchievement = {
 				id: achievementId.toLowerCase(),
 				name: achievementData.name,
-				achieved: data.achievementsOneTime.includes(`skyblock_${achievementId.toLowerCase()}`),
+				unlocked: data.achievementsOneTime.includes(`skyblock_${achievementId.toLowerCase()}`),
 				description: achievementData.description
-			})
+			}
+			if (achievement.unlocked)
+				unlockedChallengeAchievements.push(achievement)
+			else
+				lockedChallengeAchievements.push(achievement)
 		}
 
-		return { tiered: tieredAchievements, challenge: challengeAchievements }
+		return {
+			tiered: tieredAchievements, challenge: [
+				...unlockedChallengeAchievements,
+				...lockedChallengeAchievements
+			]
+		}
 	}
 
 	// this shouldn't be possible
