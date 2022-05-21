@@ -169,15 +169,15 @@ function skillsFromSkyBlockAchievements(achievements: CleanFullPlayer['achieveme
 	return {
 		apiEnabled: false,
 		list: [
-			skillFromLevel('fishing', achievements.tiered.find(a => a.id === 'angler')?.value ?? 0),
-			skillFromLevel('enchanting', achievements.tiered.find(a => a.id === 'augmentation')?.value ?? 0),
-			skillFromLevel('combat', achievements.tiered.find(a => a.id === 'combat')?.value ?? 0),
-			skillFromLevel('alchemy', achievements.tiered.find(a => a.id === 'concoctor')?.value ?? 0),
-			skillFromLevel('taming', achievements.tiered.find(a => a.id === 'domesticator')?.value ?? 0),
-			skillFromLevel('dungeoneering', achievements.tiered.find(a => a.id === 'dungeoneer')?.value ?? 0),
-			skillFromLevel('mining', achievements.tiered.find(a => a.id === 'excavator')?.value ?? 0),
-			skillFromLevel('foraging', achievements.tiered.find(a => a.id === 'gatherer')?.value ?? 0),
-			skillFromLevel('farming', achievements.tiered.find(a => a.id === 'harvester')?.value ?? 0)
+			skillFromLevel('fishing', achievements.tiered.find(a => a.id === 'angler')?.amount ?? 0),
+			skillFromLevel('enchanting', achievements.tiered.find(a => a.id === 'augmentation')?.amount ?? 0),
+			skillFromLevel('combat', achievements.tiered.find(a => a.id === 'combat')?.amount ?? 0),
+			skillFromLevel('alchemy', achievements.tiered.find(a => a.id === 'concoctor')?.amount ?? 0),
+			skillFromLevel('taming', achievements.tiered.find(a => a.id === 'domesticator')?.amount ?? 0),
+			skillFromLevel('dungeoneering', achievements.tiered.find(a => a.id === 'dungeoneer')?.amount ?? 0),
+			skillFromLevel('mining', achievements.tiered.find(a => a.id === 'excavator')?.amount ?? 0),
+			skillFromLevel('foraging', achievements.tiered.find(a => a.id === 'gatherer')?.amount ?? 0),
+			skillFromLevel('farming', achievements.tiered.find(a => a.id === 'harvester')?.amount ?? 0)
 		]
 	}
 }
