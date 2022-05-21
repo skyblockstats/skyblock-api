@@ -4,7 +4,13 @@ import { fetchAchievements } from '../hypixelCached.js'
 interface TieredAchievement {
 	id: string
 	name: string
-	value: number | null
+	tier: number
+	amount: number
+	/**
+	 * The amount that has to be gotten to get to the next tier. If this is
+	 * null, that means the player is at the max tier.
+	 */
+	next: number | null
 	description: string
 }
 
@@ -29,15 +35,27 @@ export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataRe
 
 		let tieredAchievements: TieredAchievement[] = []
 		for (const [achievementId, achievementData] of Object.entries(achievementsData.tiered)) {
-			const value = data.achievements[`skyblock_${achievementId.toLowerCase()}`] ?? null
+			const amount = data.achievements[`skyblock_${achievementId.toLowerCase()}`] ?? null
+
+			let tier = 0
+			for (const tierData of achievementData.tiers) {
+				if (amount >= tierData.amount)
+					tier = tierData.tier
+				else
+					break
+			}
+			const next = achievementData.tiers[tier]?.amount ?? null
+
 			tieredAchievements.push({
 				id: achievementId.toLowerCase(),
 				name: achievementData.name,
-				value,
-				description: value ? achievementData.description.replace(/%s/g, value.toString()) : achievementData.description
+				tier,
+				next,
+				amount,
+				description: achievementData.description.replace(/%s/g, (achievementData.tiers[Math.max(0, tier - 1)].amount).toString())
 			})
 		}
-		tieredAchievements.sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
+		tieredAchievements.sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0))
 
 		let unlockedChallengeAchievements: ChallengeAchievement[] = []
 		let lockedChallengeAchievements: ChallengeAchievement[] = []
