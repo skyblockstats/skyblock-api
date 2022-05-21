@@ -8,7 +8,7 @@ interface TieredAchievement {
 	description: string
 }
 
-interface OneTimeAchievement {
+interface ChallengeAchievement {
 	id: string
 	name: string
 	achieved: boolean
@@ -17,7 +17,7 @@ interface OneTimeAchievement {
 
 export interface Achievements {
 	tiered: TieredAchievement[]
-	oneTime: OneTimeAchievement[]
+	challenge: ChallengeAchievement[]
 }
 
 export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataResponse['player']): Promise<Achievements> {
@@ -38,9 +38,9 @@ export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataRe
 			})
 		}
 
-		let oneTimeAchievements: OneTimeAchievement[] = []
+		let challengeAchievements: ChallengeAchievement[] = []
 		for (const [achievementId, achievementData] of Object.entries(achievementsData.one_time)) {
-			oneTimeAchievements.push({
+			challengeAchievements.push({
 				id: achievementId.toLowerCase(),
 				name: achievementData.name,
 				achieved: data.achievementsOneTime.includes(`skyblock_${achievementId.toLowerCase()}`),
@@ -48,10 +48,10 @@ export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataRe
 			})
 		}
 
-		return { tiered: tieredAchievements, oneTime: oneTimeAchievements }
+		return { tiered: tieredAchievements, challenge: challengeAchievements }
 	}
 
 	// this shouldn't be possible
 	console.debug('skyblock not found in achievements?')
-	return { tiered: [], oneTime: [] }
+	return { tiered: [], challenge: [] }
 }
