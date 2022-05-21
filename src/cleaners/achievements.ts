@@ -4,7 +4,7 @@ import { fetchAchievements } from '../hypixelCached.js'
 interface TieredAchievement {
 	id: string
 	name: string
-	value?: number
+	value: number | null
 	description: string
 }
 
@@ -29,7 +29,7 @@ export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataRe
 
 		let tieredAchievements: TieredAchievement[] = []
 		for (const [achievementId, achievementData] of Object.entries(achievementsData.tiered)) {
-			const value = data.achievements[`skyblock_${achievementId}`] ?? undefined
+			const value = data.achievements[`skyblock_${achievementId.toLowerCase()}`] ?? null
 			tieredAchievements.push({
 				id: achievementId.toLowerCase(),
 				name: achievementData.name,
@@ -43,7 +43,7 @@ export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataRe
 			oneTimeAchievements.push({
 				id: achievementId.toLowerCase(),
 				name: achievementData.name,
-				achieved: data.achievementsOneTime.includes(`skyblock_${achievementId}`),
+				achieved: data.achievementsOneTime.includes(`skyblock_${achievementId.toLowerCase()}`),
 				description: achievementData.description
 			})
 		}
