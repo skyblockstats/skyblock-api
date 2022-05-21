@@ -87,7 +87,7 @@ const leaderboardMax = 100
 const reversedLeaderboards = [
 	'first_join', 'last_save',
 	'_best_time', '_best_time_2',
-	'fastest_coop_join'
+	'fastest_coop_join', 'fastest_target_practice'
 ]
 
 let client: MongoClient
@@ -324,6 +324,10 @@ function getMemberLeaderboardAttributes(member: CleanMember): StringNumber {
 		data.slowest_coop_join = member.coopInvitation.acceptedTimestamp - member.coopInvitation.invitedTimestamp
 	}
 
+	const fastestTargetPractice = member.stats.find(s => s.rawName === 'fastest_target_practice')?.value
+	if (fastestTargetPractice !== undefined)
+		data.fastest_target_practice = fastestTargetPractice
+
 	return data
 }
 
@@ -433,6 +437,7 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 		'top_1_leaderboards_count',
 		'fastest_coop_join',
 		'slowest_coop_join',
+		'fastest_target_practice'
 	]
 }
 
