@@ -1,9 +1,8 @@
 import typedHypixelApi from 'typed-hypixel-api'
-import * as constants from '../../constants.js'
 
 interface EssenceType {
 	id: string
-	value: number
+	amount: number
 }
 
 export interface Essence {
@@ -13,11 +12,11 @@ export interface Essence {
 export function cleanEssence(data: typedHypixelApi.SkyBlockProfileMember): Essence {
 	const essences: EssenceType[] = []
 
-	for (const [id, value] of Object.entries(data ?? {})) {
+	for (const [id, amount] of Object.entries(data ?? {})) {
 		if (id.startsWith('essence_')) {
 			essences.push({
 				id: id.replace(/^essence_/, ''),
-				value: value ?? 0,
+				amount: amount ?? 0,
 			})
 		}
 	}
