@@ -35,7 +35,7 @@ export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataRe
 
 		let tieredAchievements: TieredAchievement[] = []
 		for (const [achievementId, achievementData] of Object.entries(achievementsData.tiered)) {
-			const amount = data.achievements[`skyblock_${achievementId.toLowerCase()}`] ?? null
+			const amount = data.achievements[`skyblock_${achievementId.toLowerCase()}`] ?? 0
 
 			let tier = 0
 			for (const tierData of achievementData.tiers) {
