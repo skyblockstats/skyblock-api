@@ -27,6 +27,10 @@ export interface Achievements {
 }
 
 export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataResponse['player']): Promise<Achievements> {
+	if (!data.achievements) {
+		return { tiered: [], challenge: [] }
+	}
+
 	const gameAchievements: typedHypixelApi.AchievementsResponse['achievements'] = await fetchAchievements()
 
 	for (const [gameId, achievementsData] of Object.entries(gameAchievements)) {
