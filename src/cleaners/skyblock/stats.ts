@@ -85,6 +85,9 @@ export interface StatItem {
 }
 
 export function getStatUnit(name: string): string | null {
+	if (name === 'fastest_target_practice')
+		return 'time'
+
 	for (const [unitName, statMatchers] of Object.entries(statUnits)) {
 		for (const statMatch of statMatchers) {
 			let trailingEnd = statMatch[0] === '_'
@@ -102,7 +105,6 @@ export function getStatUnit(name: string): string | null {
 
 
 export function cleanProfileStats(data: typedHypixelApi.SkyBlockProfileMember): StatItem[] {
-	// TODO: add type for statsRaw (probably in hypixelApi.ts since its coming from there)
 	const stats: StatItem[] = []
 
 	const rawStats = data?.stats ?? {}
@@ -118,6 +120,16 @@ export function cleanProfileStats(data: typedHypixelApi.SkyBlockProfileMember): 
 			unit: getStatUnit(statNameRaw) ?? null
 		})
 	}
+
+	if (data.fastest_target_practice !== undefined)
+		stats.push({
+			categorizedName: 'fastest_target_practice',
+			// the api gives it in seconds, we want milliseconds
+			value: data.fastest_target_practice * 1000,
+			rawName: 'fastest_target_practice',
+			category: 'misc',
+			unit: 'time'
+		})
 
 	return stats
 }

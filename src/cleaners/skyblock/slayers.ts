@@ -1,11 +1,13 @@
 import typedHypixelApi from 'typed-hypixel-api'
+import * as constants from '../../constants.js'
 
 
 const SLAYER_NAMES = {
 	spider: 'tarantula',
 	zombie: 'revenant',
 	wolf: 'sven',
-	enderman: 'voidgloom_seraph'
+	enderman: 'voidgloom_seraph',
+	blaze: 'inferno_demonlord'
 } as const
 
 // todo: put this in skyblock-constants since it can be determined from other people's profiles
@@ -13,7 +15,8 @@ export const SLAYER_TIERS: Record<keyof typeof SLAYER_NAMES, number> = {
 	spider: 4,
 	zombie: 5,
 	enderman: 4,
-	wolf: 4
+	wolf: 4,
+	blaze: 4
 }
 
 type SlayerName = (typeof SLAYER_NAMES)[keyof typeof SLAYER_NAMES]
@@ -46,7 +49,10 @@ export function cleanSlayers(data: typedHypixelApi.SkyBlockProfileMember): Slaye
 	let totalXp: number = 0
 	let totalKills: number = 0
 
+	let slayerIds: string[] = []
+
 	for (const slayerNameRaw in slayersDataRaw) {
+		slayerIds.push(slayerNameRaw)
 		const slayerDataRaw = slayersDataRaw[slayerNameRaw]
 
 		// convert name provided by api (spider) to the real name (tarantula)
@@ -105,6 +111,8 @@ export function cleanSlayers(data: typedHypixelApi.SkyBlockProfileMember): Slaye
 		if (slayerKills)
 			totalKills += slayerKills
 	}
+
+	constants.addSlayers(slayerIds)
 
 	return {
 		xp: totalXp,

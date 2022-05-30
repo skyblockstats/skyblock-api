@@ -3,14 +3,15 @@
  */
 
 import { CleanProfile, CleanFullProfile, CleanBasicProfile } from './cleaners/skyblock/profile.js'
-import { isUuid, sleep, undashUuid } from './util.js'
-import { CleanPlayer } from './cleaners/player.js'
+import { isUuid, sleep, undashUuid, withCache } from './util.js'
+import { CleanFullPlayer, CleanPlayer } from './cleaners/player.js'
 import * as hypixel from './hypixel.js'
 import * as mojang from './mojang.js'
 import NodeCache from 'node-cache'
 import { debug } from './index.js'
 import LRUCache from 'lru-cache'
 import { CleanBasicMember } from './cleaners/skyblock/member.js'
+import { sendUncleanApiRequest } from './hypixel.js'
 
 // cache usernames for 30 minutes
 
@@ -157,19 +158,32 @@ export async function usernameFromUser(user: string): Promise<string | null> {
 
 let fetchingPlayers: Set<string> = new Set()
 
-export async function fetchPlayer(user: string): Promise<CleanPlayer | null> {
+function cleanFullPlayerToCleanPlayer(player: CleanFullPlayer): CleanPlayer {
+	return {
+		rank: player.rank,
+		socials: player.socials,
+		username: player.username,
+		uuid: player.uuid,
+		claimed: player.claimed,
+		profiles: player.profiles
+	}
+}
+
+export async function fetchPlayer<Full extends boolean = true>(user: string, full: Full): Promise<(Full extends true ? CleanFullPlayer : CleanPlayer) | null> {
 	const playerUuid = await uuidFromUser(user)
 	if (!playerUuid) return null
 
-	if (playerCache.has(playerUuid))
-		return playerCache.get(playerUuid)!
+	if (playerCache.has(playerUuid)) {
+		const player: CleanFullPlayer = playerCache.get(playerUuid)!
+		return full ? player : cleanFullPlayerToCleanPlayer(player) as any
+	}
 
 	// if it's already in the process of fetching, check every 100ms until it's not fetching the player anymore and fetch it again, since it'll be cached now
 	if (fetchingPlayers.has(playerUuid)) {
 		while (fetchingPlayers.has(playerUuid)) {
 			await sleep(100)
 		}
-		return await fetchPlayer(user)
+		return await fetchPlayer(user, full)
 	}
 
 	fetchingPlayers.add(playerUuid)
@@ -194,7 +208,7 @@ export async function fetchPlayer(user: string): Promise<CleanPlayer | null> {
 	}
 	basicPlayerCache.set(playerUuid, cleanBasicPlayer)
 
-	return cleanPlayer
+	return full ? cleanPlayer : cleanFullPlayerToCleanPlayer(cleanPlayer) as any
 }
 
 /** Fetch a player without their profiles. This is heavily cached. */
@@ -205,12 +219,13 @@ export async function fetchBasicPlayer(user: string, includeClaimed: boolean = t
 
 	if (basicPlayerCache.has(playerUuid)) {
 		const player = basicPlayerCache.get(playerUuid)!
-		if (!includeClaimed)
+		if (!includeClaimed) {
 			delete player.claimed
+		}
 		return player
 	}
 
-	const player = await fetchPlayer(playerUuid)
+	const player = await fetchPlayer(playerUuid, false)
 	if (!player) {
 		console.debug('no player? this should never happen, perhaps the uuid is invalid or the player hasn\'t played hypixel', playerUuid)
 		return null
@@ -259,8 +274,8 @@ export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanPr
 	basicProfiles.sort((a, b) => {
 		const memberA = a.members?.find(m => m.uuid === playerUuid)
 		const memberB = b.members?.find(m => m.uuid === playerUuid)
-		if (!memberA || !memberB || !memberA.lastSave || !memberB.lastSave) return 0
-		return memberB.lastSave - memberA.lastSave
+
+		return (memberB?.lastSave ?? 0) - (memberA?.lastSave ?? 0)
 	})
 
 	// cache the profiles
@@ -282,7 +297,7 @@ async function fetchBasicProfiles(user: string): Promise<CleanBasicProfile[] | n
 
 	if (debug) console.debug('Cache miss: fetchBasicProfiles', user)
 
-	const player = await fetchPlayer(playerUuid)
+	const player = await fetchPlayer(playerUuid, false)
 	if (!player) {
 		// this happens when the player changed their name recently and the old name is cached on hypixel
 		return []
@@ -428,3 +443,14 @@ export async function fetchProfileName(user: string, profile: string): Promise<s
 	profileNameCache.set(`${playerUuid}.${profileUuid}`, profileName)
 	return profileName
 }
+
+export async function fetchAchievements() {
+	return await withCache(
+		'achievements',
+		30 * 60 * 1000,
+		async () => {
+			return (await sendUncleanApiRequest('resources/achievements', {})).achievements
+		}
+	)
+}
+

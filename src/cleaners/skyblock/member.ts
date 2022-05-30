@@ -10,7 +10,7 @@ import { CleanMinion, cleanMinions } from './minions.js'
 import { cleanSlayers, SlayerData } from './slayers.js'
 import { AccountCustomization } from '../../database.js'
 import { cleanVisitedZones, Zone } from './zones.js'
-import { cleanSkills, Skill } from './skills.js'
+import { cleanSkills, Skills } from './skills.js'
 import * as cached from '../../hypixelCached.js'
 import typedHypixelApi from 'typed-hypixel-api'
 import { cleanPets, PetsData } from './pets.js'
@@ -19,6 +19,8 @@ import * as constants from '../../constants.js'
 import { Included } from '../../hypixel.js'
 import { CleanPlayer } from '../player.js'
 import { CleanRank } from '../rank.js'
+import { AccessoryBagUpgrades, cleanAccessoryBagUpgrades } from './accessoryBagUpgrades.js'
+import { cleanEssence, Essence } from './essence.js'
 
 export interface CleanBasicMember {
 	uuid: string
@@ -29,7 +31,7 @@ export interface CleanBasicMember {
 	left?: boolean
 }
 
-export interface CleanMember extends CleanBasicMember {
+interface ExtraCleanMemberFields {
 	purse: number
 	stats: StatItem[]
 	rawHypixelStats: { [key: string]: number }
@@ -37,7 +39,7 @@ export interface CleanMember extends CleanBasicMember {
 	fairySouls: FairySouls
 	inventories?: Inventories
 	quests: Quest[]
-	skills: Skill[]
+	skills: Skills
 	zones: Zone[]
 	collections: Collection[]
 	slayers: SlayerData
@@ -45,12 +47,16 @@ export interface CleanMember extends CleanBasicMember {
 	harp: HarpData
 	coopInvitation: CoopInvitation | null
 	farmingContests: FarmingContests
-	/** Whether the user left the coop */
+	accessoryBagUpgrades: AccessoryBagUpgrades
+	essence: Essence
+	/** Whether the member left the coop. */
 	left: boolean
 }
 
+export type CleanMember = CleanBasicMember & ExtraCleanMemberFields
+
 export async function cleanSkyBlockProfileMemberResponseBasic(member: typedHypixelApi.SkyBlockProfileMember & { uuid: string }): Promise<CleanBasicMember | null> {
-	const player = await cached.fetchPlayer(member.uuid)
+	const player = await cached.fetchPlayer(member.uuid, false)
 	if (!player) return null
 	return {
 		uuid: member.uuid,
@@ -64,17 +70,18 @@ export async function cleanSkyBlockProfileMemberResponseBasic(member: typedHypix
 /** Cleans up a member (from skyblock/profile) */
 export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi.SkyBlockProfileMember & { uuid: string }, profileId?: string, included: Included[] | undefined = undefined): Promise<CleanMember | null> {
 	const inventoriesIncluded = included === undefined || included.includes('inventories')
-	const player = await cached.fetchPlayer(member.uuid)
+	const player = await cached.fetchPlayer(member.uuid, true)
 	if (!player) return null
 
 	const fairySouls = await cleanFairySouls(member)
+
 	const { max_fairy_souls: maxFairySouls } = await constants.fetchConstantValues()
 	if (fairySouls.total > (maxFairySouls ?? 0))
 		await constants.setConstantValues({ max_fairy_souls: fairySouls.total })
 
 	const coopInvitationPromise = cleanCoopInvitation(member, member.uuid)
 	const minionsPromise = cleanMinions(member)
-	const skillsPromise = cleanSkills(member)
+	const skillsPromise = cleanSkills(member, player)
 	const zonesPromise = cleanVisitedZones(member)
 	const petsPromise = cleanPets(member)
 	const harpPromise = cleanHarp(member)
@@ -101,6 +108,7 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 		inventories: inventoriesPromise ? await inventoriesPromise : undefined,
 		quests: cleanQuests(member),
 		skills: await skillsPromise,
+
 		zones: await zonesPromise,
 		collections: cleanCollections(member),
 		slayers: cleanSlayers(member),
@@ -108,34 +116,20 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 		harp: await harpPromise,
 		coopInvitation: await coopInvitationPromise,
 		farmingContests: await farmingContestsPromise,
+		accessoryBagUpgrades: cleanAccessoryBagUpgrades(member),
+		essence: cleanEssence(member),
 
 		left: (player.profiles?.find(profile => profile.uuid === profileId) === undefined) ?? false
 	}
 }
 
 
-export interface CleanMemberProfilePlayer extends CleanPlayer {
+export type CleanMemberProfilePlayer = CleanPlayer & {
 	// The profile name may be different for each player, so we put it here
 	profileName: string
 	firstJoin: number | null
 	lastSave: number | null
-	purse: number
-	stats: StatItem[]
-	rawHypixelStats: { [key: string]: number }
-	minions: CleanMinion[]
-	fairySouls: FairySouls
-	inventories?: Inventories
-	quests: Quest[]
-	skills: Skill[]
-	zones: Zone[]
-	collections: Collection[]
-	slayers: SlayerData
-	pets: PetsData
-	harp: HarpData
-	coopInvitation: CoopInvitation | null
-	farmingContests: FarmingContests
-	left: boolean
-}
+} & ExtraCleanMemberFields
 
 export interface CleanMemberProfile {
 	member: CleanMemberProfilePlayer

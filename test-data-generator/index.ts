@@ -54,7 +54,8 @@ async function addConstants() {
 		'stats',
 		'values',
 		'zones',
-		'harp_songs'
+		'harp_songs',
+		'max_minion_tiers',
 	]
 	for (const constantName of constantNames) {
 		const constantData = await constants.fetchJSONConstant(constantName + '.json')
@@ -66,6 +67,7 @@ async function addConstants() {
 
 async function main() {
 	await addResponse('resources/skyblock/items', {}, '')
+	await addResponse('resources/achievements', {}, '')
 	const uuidsToUsername = {}
 	for (const playerUuid of playerUuids) {
 		await addResponse('player', { uuid: playerUuid }, playerUuid)

@@ -1,9 +1,11 @@
 import typedHypixelApi from 'typed-hypixel-api'
 import { fetchSkills } from '../../constants.js'
 import { levelFromXpTable } from '../../util.js'
+import * as constants from '../../constants.js'
+import { CleanFullPlayer } from '../player.js'
 
 export interface Skill {
-	name: string
+	id: string
 	xp: number
 	level: number
 
@@ -11,6 +13,16 @@ export interface Skill {
 
 	levelXp: number
 	levelXpRequired: number
+}
+
+export interface Skills {
+	list: Skill[]
+	/**
+	 * Whether the player has their skills API enabled. If this is off, that
+	 * means the data doesn't include xp and is per-player. You should show a
+	 * warning to the user.
+	 */
+	apiEnabled: boolean
 }
 
 // the highest level you can have in each skill
@@ -136,12 +148,50 @@ export function levelForSkillXp(xp: number, maxLevel: number) {
 	return levelFromXpTable(xp, xpTable)
 }
 
-export async function cleanSkills(data: typedHypixelApi.SkyBlockProfileMember): Promise<Skill[]> {
+function skillFromLevel(id: string, level: number | undefined): Skill {
+	if (level === undefined)
+		level = 0
+	const maxLevel = skillsMaxLevel[id] ?? skillsDefaultMaxLevel
+	const xpTable = (maxLevel <= 25 ? skillXpTableEasier : skillXpTable).slice(0, maxLevel)
+	const xp = level > 0 ? xpTable[level - 1] ?? 0 : 0
+
+	return {
+		id,
+		level,
+		levelXp: 0,
+		levelXpRequired: xpTable[level],
+		maxLevel: maxLevel,
+		xp
+	}
+}
+
+function skillsFromSkyBlockAchievements(achievements: CleanFullPlayer['achievements']): Skills {
+	return {
+		apiEnabled: false,
+		list: [
+			skillFromLevel('fishing', achievements.tiered.find(a => a.id === 'angler')?.amount ?? 0),
+			skillFromLevel('enchanting', achievements.tiered.find(a => a.id === 'augmentation')?.amount ?? 0),
+			skillFromLevel('combat', achievements.tiered.find(a => a.id === 'combat')?.amount ?? 0),
+			skillFromLevel('alchemy', achievements.tiered.find(a => a.id === 'concoctor')?.amount ?? 0),
+			skillFromLevel('taming', achievements.tiered.find(a => a.id === 'domesticator')?.amount ?? 0),
+			skillFromLevel('dungeoneering', achievements.tiered.find(a => a.id === 'dungeoneer')?.amount ?? 0),
+			skillFromLevel('mining', achievements.tiered.find(a => a.id === 'excavator')?.amount ?? 0),
+			skillFromLevel('foraging', achievements.tiered.find(a => a.id === 'gatherer')?.amount ?? 0),
+			skillFromLevel('farming', achievements.tiered.find(a => a.id === 'harvester')?.amount ?? 0)
+		]
+	}
+}
+
+export async function cleanSkills(data: typedHypixelApi.SkyBlockProfileMember, player: CleanFullPlayer): Promise<Skills> {
 	const allSkillNames = await fetchSkills()
 	const skills: Skill[] = []
+
+	let skillNamesFound: string[] = []
+
 	for (const item in data) {
 		if (item.startsWith('experience_skill_')) {
 			const skillName = item.slice('experience_skill_'.length)
+			skillNamesFound.push(skillName)
 
 			// the amount of total xp you have in this skill
 			const skillXp: number = data[item]
@@ -163,7 +213,7 @@ export async function cleanSkills(data: typedHypixelApi.SkyBlockProfileMember): 
 			const skillLevelXpRequired = xpTable[skillLevel] - previousLevelXp
 
 			skills.push({
-				name: skillName,
+				id: skillName,
 				xp: skillXp,
 				level: skillLevel,
 				maxLevel: skillMaxLevel,
@@ -173,13 +223,22 @@ export async function cleanSkills(data: typedHypixelApi.SkyBlockProfileMember): 
 		}
 	}
 
+	// if the player has no skills but has kills, we can assume they have the skills api off
+	// (we check kills to know whether the profile is actually used, this is kinda arbitrary)
+	if (skills.length === 0 && 'stats' in data && Object.keys(data.stats).includes('kills')) {
+		return skillsFromSkyBlockAchievements(player.achievements)
+	}
+
+	constants.addSkills(skillNamesFound)
+
+
 	// add missing skills
-	const missingSkillNames = allSkillNames.filter(skillName => !skills.some(skill => skill.name === skillName))
+	const missingSkillNames = allSkillNames.filter(skillName => !skills.some(skill => skill.id === skillName))
 	for (const skillName of missingSkillNames) {
 		const skillMaxLevel = skillsMaxLevel[skillName] ?? skillsDefaultMaxLevel
 		const xpTable = (skillMaxLevel <= 25 ? skillXpTableEasier : skillXpTable).slice(0, skillMaxLevel)
 		skills.push({
-			name: skillName,
+			id: skillName,
 			xp: 0,
 			level: 0,
 			maxLevel: skillMaxLevel,
@@ -189,7 +248,10 @@ export async function cleanSkills(data: typedHypixelApi.SkyBlockProfileMember): 
 	}
 
 	// sort skills by name
-	skills.sort((a, b) => a.name.localeCompare(b.name))
+	skills.sort((a, b) => a.id.localeCompare(b.id))
 
-	return skills
+	return {
+		apiEnabled: true,
+		list: skills,
+	}
 }

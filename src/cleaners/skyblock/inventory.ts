@@ -6,7 +6,7 @@ function base64decode(base64: string): Buffer {
 	return Buffer.from(base64, 'base64')
 }
 
-interface Item {
+export interface Item {
 	id: string
 	count: number
 	vanillaId: string
@@ -21,11 +21,24 @@ interface Item {
 	anvilUses?: number
 	timestamp?: string
 	enchantments?: { [name: string]: number }
+	petInfo?: {
+		id: string
+	}
 
 	headTexture?: string
 }
 
 export type Inventory = Item[]
+
+export function headIdFromBase64(headDataBase64: string): string | undefined {
+	const headData = JSON.parse(base64decode(headDataBase64).toString())
+	const headDataUrl = headData?.textures?.SKIN?.url
+	if (headDataUrl) {
+		const splitUrl = headDataUrl.split('/')
+		return splitUrl[splitUrl.length - 1]
+	}
+	return undefined
+}
 
 function cleanItem(rawItem): Item | null {
 	// if the item doesn't have an id, it isn't an item
@@ -40,15 +53,10 @@ function cleanItem(rawItem): Item | null {
 
 	if (vanillaId === 397) {
 		const headDataBase64 = itemTag?.SkullOwner?.Properties?.textures?.[0]?.Value
-		if (headDataBase64) {
-			const headData = JSON.parse(base64decode(headDataBase64).toString())
-			const headDataUrl = headData?.textures?.SKIN?.url
-			if (headDataUrl) {
-				const splitUrl = headDataUrl.split('/')
-				headId = splitUrl[splitUrl.length - 1]
-			}
-		}
+		if (headDataBase64)
+			headId = headIdFromBase64(headDataBase64)
 	}
+
 
 	return {
 		id: extraAttributes?.id ?? null,
@@ -66,6 +74,9 @@ function cleanItem(rawItem): Item | null {
 		enchantments: extraAttributes?.enchantments,
 		anvilUses: extraAttributes?.anvil_uses,
 		timestamp: extraAttributes?.timestamp,
+		petInfo: extraAttributes?.petInfo ? {
+			id: JSON.parse(extraAttributes.petInfo).type
+		} : undefined,
 
 		headTexture: headId,
 	}
@@ -75,22 +86,19 @@ function cleanItems(rawItems): Inventory {
 	return rawItems.map(cleanItem)
 }
 
-export function cleanInventory(encodedNbt: string): Promise<Inventory> {
-	return new Promise(resolve => {
-		const base64Data = base64decode(encodedNbt)
-		nbt.parse(base64Data, false, (err, value) => {
-			const simplifiedNbt = nbt.simplify(value)
-			// do some basic cleaning on the items and return
-			resolve(cleanItems(simplifiedNbt.i))
-		})
-	})
+export async function cleanInventory(encodedNbt: string): Promise<Inventory> {
+	const base64Data = base64decode(encodedNbt)
+	const value: any = await new Promise((resolve, reject) => nbt.parse(base64Data, false, (err, value) => { if (err) reject(err); else resolve(value) }))
+	const simplifiedNbt = nbt.simplify(value)
+	// do some basic cleaning on the items and return
+	return cleanItems(simplifiedNbt.i)
 }
 
 export const INVENTORIES = {
 	armor: 'inv_armor',
 	inventory: 'inv_contents',
 	ender_chest: 'ender_chest_contents',
-	talisman_bag: 'talisman_bag',
+	accessory_bag: 'talisman_bag',
 	potion_bag: 'potion_bag',
 	fishing_bag: 'fishing_bag',
 	quiver: 'quiver',

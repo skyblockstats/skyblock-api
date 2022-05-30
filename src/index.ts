@@ -1,5 +1,5 @@
-import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount, deleteSession } from './database.js'
-import { fetchElection, fetchItemList, fetchMemberProfile, fetchUser } from './hypixel.js'
+import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount, deleteSession, fetchPaginatedItemsAuctions, fetchItemsAuctions } from './database.js'
+import { fetchAuctionItems, fetchAuctionUncached, fetchElection, fetchItemList, fetchMemberProfile, fetchUser } from './hypixel.js'
 import rateLimit from 'express-rate-limit'
 import * as constants from './constants.js'
 import * as discord from './discord.js'
@@ -155,9 +155,51 @@ app.get('/election', async (req, res) => {
 
 app.get('/items', async (req, res) => {
 	try {
-		res.json(
-			await fetchItemList()
-		)
+		res
+			.setHeader('Cache-Control', 'public, max-age=600')
+			.json(
+				await fetchItemList()
+			)
+	} catch (err) {
+		console.error(err)
+		res.json({ ok: false })
+	}
+})
+
+app.get('/auctionprices', async (req, res) => {
+	const itemIds = typeof req.query.items === 'string' ? req.query.items.split(',') : null
+	if (itemIds && itemIds.length > 100)
+		return res.json({
+			ok: false,
+			error: 'More than 100 items in the items query parameter.'
+		})
+	try {
+		res
+			.json(
+				itemIds ? await fetchItemsAuctions(itemIds) : await fetchPaginatedItemsAuctions(0, 100)
+			)
+	} catch (err) {
+		console.error(err)
+		res.json({ ok: false })
+	}
+})
+
+app.get('/auctionitems', async (req, res) => {
+	try {
+		res
+			.json(await fetchAuctionItems())
+	} catch (err) {
+		console.error(err)
+		res.json({ ok: false })
+	}
+})
+
+app.get('/auction/:uuid', async (req, res) => {
+	const auction = await fetchAuctionUncached(req.params.uuid)
+	try {
+		res
+			// .setHeader('Cache-Control', 'public, max-age=600')
+			.json(auction)
 	} catch (err) {
 		console.error(err)
 		res.json({ ok: false })

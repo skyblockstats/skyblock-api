@@ -5,7 +5,7 @@
 import { categorizeStat, getStatUnit } from './cleaners/skyblock/stats.js'
 import { CleanFullProfile } from './cleaners/skyblock/profile.js'
 import { SLAYER_TIERS } from './cleaners/skyblock/slayers.js'
-import { Collection, Db, MongoClient, WithId } from 'mongodb'
+import { Binary, Collection, Db, MongoClient, WithId } from 'mongodb'
 import { CleanMember } from './cleaners/skyblock/member.js'
 import * as cached from './hypixelCached.js'
 import * as constants from './constants.js'
@@ -16,6 +16,8 @@ import { v4 as uuid4 } from 'uuid'
 import { debug } from './index.js'
 import Queue from 'queue-promise'
 import { RANK_COLORS } from './cleaners/rank.js'
+import { cleanItemId } from './cleaners/skyblock/itemId.js'
+import { periodicallyFetchRecentlyEndedAuctions } from './hypixel.js'
 
 // don't update the user for 3 minutes
 const recentlyUpdated = new NodeCache({
@@ -85,7 +87,7 @@ const leaderboardMax = 100
 const reversedLeaderboards = [
 	'first_join', 'last_save',
 	'_best_time', '_best_time_2',
-	'fastest_coop_join'
+	'fastest_coop_join', 'fastest_target_practice'
 ]
 
 let client: MongoClient
@@ -115,10 +117,52 @@ export interface AccountSchema {
 	customization?: AccountCustomization
 }
 
+export interface SimpleAuctionSchemaBson {
+	/** The UUID of the auction so we can look it up later. */
+	id: Binary
+	coins: number
+	/**
+	 * The timestamp as **seconds** since epoch. It's in seconds instead of ms
+	 * since we don't need to be super exact and so it's shorter.
+	 */
+	ts: number
+	/** Whether the auction was successfully bought or simply expired. */
+	s: boolean
+	bin: boolean
+}
+export interface SimpleAuctionSchema {
+	/** The UUID of the auction so we can look it up later. */
+	id: string
+	coins: number
+	/**
+	 * The timestamp as **seconds** since epoch. It's in seconds instead of ms
+	 * since we don't need to be super exact and so it's shorter.
+	 */
+	ts: number
+	/** Whether the auction was successfully bought or simply expired. */
+	s: boolean
+	bin: boolean
+}
+export interface ItemAuctionsSchema {
+	/** The id of the item */
+	id: string
+	sbId: string
+	auctions: SimpleAuctionSchema[]
+}
+export interface ItemAuctionsSchemaBson {
+	/** The id of the item */
+	_id: string
+	sbId: string
+	auctions: SimpleAuctionSchemaBson[]
+	/** This is here so it can be indexed by Mongo, it can easily be figured out by getting the first item in auctions */
+	oldestDate: number
+}
+
 let memberLeaderboardsCollection: Collection<DatabaseMemberLeaderboardItem>
 let profileLeaderboardsCollection: Collection<DatabaseProfileLeaderboardItem>
 let sessionsCollection: Collection<SessionSchema>
 let accountsCollection: Collection<AccountSchema>
+let itemAuctionsCollection: Collection<ItemAuctionsSchemaBson>
 
 
 const leaderboardInfos: { [leaderboardName: string]: string } = {
@@ -141,11 +185,19 @@ async function connect(): Promise<void> {
 	profileLeaderboardsCollection = database.collection('profile-leaderboards')
 	sessionsCollection = database.collection('sessions')
 	accountsCollection = database.collection('accounts')
+	itemAuctionsCollection = database.collection('item-auctions')
+
+	periodicallyFetchRecentlyEndedAuctions()
+
 	console.log('Connected to database :)')
 }
 
 interface StringNumber {
 	[name: string]: number
+}
+
+function createUuid(uuid: string): Binary {
+	return new Binary(Buffer.from((uuid).replace(/-/g, ''), 'hex'), Binary.SUBTYPE_UUID)
 }
 
 function getMemberCollectionAttributes(member: CleanMember): StringNumber {
@@ -158,9 +210,10 @@ function getMemberCollectionAttributes(member: CleanMember): StringNumber {
 }
 
 function getMemberSkillAttributes(member: CleanMember): StringNumber {
+	if (!member.skills.apiEnabled) return {}
 	const skillAttributes = {}
-	for (const collection of member.skills) {
-		const skillLeaderboardName = `skill_${collection.name}`
+	for (const collection of member.skills.list) {
+		const skillLeaderboardName = `skill_${collection.id}`
 		skillAttributes[skillLeaderboardName] = collection.xp
 	}
 	return skillAttributes
@@ -271,6 +324,10 @@ function getMemberLeaderboardAttributes(member: CleanMember): StringNumber {
 		data.slowest_coop_join = member.coopInvitation.acceptedTimestamp - member.coopInvitation.invitedTimestamp
 	}
 
+	const fastestTargetPractice = member.stats.find(s => s.rawName === 'fastest_target_practice')?.value
+	if (fastestTargetPractice !== undefined)
+		data.fastest_target_practice = fastestTargetPractice
+
 	return data
 }
 
@@ -357,7 +414,7 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 		...await constants.fetchStats(),
 
 		// collection leaderboards
-		...(await constants.fetchCollections()).map(value => `collection_${value}`),
+		...(await constants.fetchCollections()).map(value => `collection_${cleanItemId(value)}`),
 
 		// skill leaderboards
 		...(await constants.fetchSkills()).map(value => `skill_${value}`),
@@ -380,6 +437,7 @@ export async function fetchAllMemberLeaderboardAttributes(): Promise<string[]> {
 		'top_1_leaderboards_count',
 		'fastest_coop_join',
 		'slowest_coop_join',
+		'fastest_target_practice'
 	]
 }
 
@@ -811,12 +869,6 @@ export async function updateDatabaseMember(member: CleanMember, profile: CleanFu
 
 	if (member.rawHypixelStats)
 		constants.addStats(Object.keys(member.rawHypixelStats))
-	constants.addCollections(member.collections.map(coll => coll.name))
-	constants.addSkills(member.skills.map(skill => skill.name))
-	constants.addZones(member.zones.map(zone => zone.name))
-	constants.addSlayers(member.slayers.bosses.map(s => s.rawName))
-	constants.addPets(member.pets.list.map(s => s.id))
-	constants.addHarpSongs(member.harp.songs.map(s => s.id))
 
 	if (debug) console.debug('done constants..')
 
@@ -1067,6 +1119,69 @@ export async function updateAccount(discordId: string, schema: AccountSchema) {
 		discordId
 	}, { $set: schema }, { upsert: true })
 }
+
+function toItemAuctionsSchema(i: ItemAuctionsSchemaBson): ItemAuctionsSchema {
+	return {
+		id: i._id,
+		sbId: i.sbId,
+		auctions: i.auctions.map(a => {
+			return {
+				...a,
+				id: a.id.toString('hex'),
+			}
+		}),
+	}
+}
+
+function toItemAuctionsSchemaBson(i: ItemAuctionsSchema): ItemAuctionsSchemaBson {
+	return {
+		_id: i.id,
+		sbId: i.sbId,
+		auctions: i.auctions.map(a => {
+			return {
+				...a,
+				id: createUuid(a.id)
+			}
+		}),
+		// we sort by oldestDate to get the volume sold, but we don't want brand new items with like no data having a high frequency
+		oldestDate: i.auctions.length > 10 ? i.auctions[0]?.ts ?? 0 : 0
+	}
+}
+
+/** Fetch all the Item Auctions for the item ids in the given array. */
+export async function fetchItemsAuctions(itemIds: string[]): Promise<ItemAuctionsSchema[]> {
+	const auctions = await itemAuctionsCollection?.find({
+		_id: { $in: itemIds }
+	}).sort('oldestDate', -1).toArray()
+	return auctions.map(toItemAuctionsSchema)
+}
+
+
+/** Fetch all the Item Auctions for the item ids in the given array. */
+export async function fetchPaginatedItemsAuctions(skip: number, limit: number): Promise<ItemAuctionsSchema[]> {
+	const auctions = await itemAuctionsCollection?.find({}).sort('oldestDate', -1).skip(skip).limit(limit).toArray()
+	return auctions.map(toItemAuctionsSchema)
+}
+
+export async function updateItemAuction(auction: ItemAuctionsSchema) {
+	await itemAuctionsCollection?.updateOne({
+		_id: auction.id,
+	}, { $set: toItemAuctionsSchemaBson(auction) }, { upsert: true })
+}
+
+/**
+ * Fetches the SkyBlock ids of all the items in the auctions database. This method is slow and should be cached!
+ */
+export async function fetchItemsAuctionsIds(skyblockIds: boolean = false): Promise<string[] | undefined> {
+	if (!itemAuctionsCollection) return undefined
+	const docs = await itemAuctionsCollection?.aggregate([
+		{ $sort: { oldestDate: -1 } },
+		// this removes everything except the _id
+		{ $project: skyblockIds ? { _id: false, sbId: true } : { _id: true } }
+	]).toArray()
+	return skyblockIds ? docs.filter(r => r.sbId).map(r => r.sbId) : docs.map(r => r._id)
+}
+
 
 export async function fetchServerStatus() {
 	return await database.admin().serverStatus()

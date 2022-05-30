@@ -14,10 +14,20 @@ export async function cleanCoopInvitation(data: typedHypixelApi.SkyBlockProfileM
 	if (!data.coop_invitation)
 		return null
 
+	let invitedTimestamp = data.coop_invitation.timestamp
+	let acceptedTimestamp = data.coop_invitation.confirmed_timestamp ?? null
+
+	// the accepted timestamp should always be greater, otherwise swap
+	if (acceptedTimestamp !== null && invitedTimestamp > acceptedTimestamp) {
+		let temp = invitedTimestamp
+		invitedTimestamp = acceptedTimestamp
+		acceptedTimestamp = temp
+	}
+
 	return {
-		invitedTimestamp: data.coop_invitation.timestamp,
+		invitedTimestamp,
 		invitedBy: await cached.fetchBasicPlayer(data.coop_invitation.invited_by, false),
 		accepted: data.coop_invitation.confirmed,
-		acceptedTimestamp: data.coop_invitation.confirmed_timestamp ?? null
+		acceptedTimestamp
 	}
 }

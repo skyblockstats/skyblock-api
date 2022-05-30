@@ -12,6 +12,10 @@ if (!process.env.hypixel_keys)
 /** This array should only ever contain one item because using multiple hypixel api keys isn't allowed :) */
 const apiKeys = process.env?.hypixel_keys?.split(' ') ?? []
 
+if (apiKeys.length === 0) {
+	console.warn('Warning: hypixel_keys was not found in .env. This will prevent the program from using the Hypixel API.')
+}
+
 interface KeyUsage {
 	remaining: number
 	limit: number

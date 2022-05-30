@@ -6,17 +6,24 @@ export interface Zone {
 	visited: boolean
 }
 
+export function zoneIdToName(id: string) {
+	// this currently does nothing, but in the future it could get data from https://api.hypixel.net/resources/games
+	return id
+}
+
 
 export async function cleanVisitedZones(data: typedHypixelApi.SkyBlockProfileMember): Promise<Zone[]> {
 	const rawZones = data?.visited_zones || []
-	// TODO: store all the zones that exist in SkyBlock, add add those to the array with visited being false
+
+	constants.addZones(rawZones)
+
 	const zones: Zone[] = []
 
 	const knownZones = await constants.fetchZones()
 
 	for (const rawZoneName of knownZones) {
 		zones.push({
-			name: rawZoneName,
+			name: zoneIdToName(rawZoneName),
 			visited: rawZones.includes(rawZoneName)
 		})
 	}
