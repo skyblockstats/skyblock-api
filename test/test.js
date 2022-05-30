@@ -38,6 +38,8 @@ hypixelApi.mockSendApiRequest(async (path, options) => {
 		}
 		case 'resources/skyblock/items':
 			return await readJsonData('resources/skyblock/items')
+		case 'resources/achievements':
+			return await readJsonData('resources/achievements')
 	}
 })
 
