@@ -1,11 +1,7 @@
-import fetch from 'node-fetch'
-import { Agent } from 'https'
+import { fetch } from 'undici'
 
 const DISCORD_CLIENT_ID = '885347559382605916'
 
-const httpsAgent = new Agent({
-	keepAlive: true
-})
 
 export interface TokenResponse {
 	access_token: string
@@ -49,7 +45,6 @@ export async function exchangeCode(redirectUri: string, code: string): Promise<T
 		API_ENDPOINT + '/oauth2/token',
 		{
 			method: 'POST',
-			agent: () => httpsAgent,
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 			body: new URLSearchParams(data).toString()
 		}
@@ -63,8 +58,7 @@ export async function getUser(accessToken: string): Promise<DiscordUser> {
 	const response = await fetch(
 		API_ENDPOINT + '/users/@me',
 		{
-			headers: {'Authorization': 'Bearer ' + accessToken},
-			agent: () => httpsAgent,
+			headers: { 'Authorization': 'Bearer ' + accessToken },
 		}
 	)
 	return await response.json() as DiscordUser

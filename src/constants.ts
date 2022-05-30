@@ -5,17 +5,13 @@
 // we have to do this so we can mock the function from the tests properly
 import * as constants from './constants.js'
 
-import * as nodeFetch from 'node-fetch'
 import NodeCache from 'node-cache'
 import { debug } from './index.js'
 import { sleep } from './util.js'
 import Queue from 'queue-promise'
-import fetch from 'node-fetch'
-import { Agent } from 'https'
+import { fetch } from 'undici'
+import type { Response as UndiciResponse } from 'undici/types/fetch'
 
-const httpsAgent = new Agent({
-	keepAlive: true
-})
 
 const githubApiBase = 'https://api.github.com'
 const owner = 'skyblockstats'
@@ -34,13 +30,12 @@ const queue = new Queue({
  * @param headers The extra headers
  * @param json The JSON body, only applicable for some types of methods
  */
-async function fetchGithubApi(method: string, route: string, headers?: any, json?: any): Promise<nodeFetch.Response> {
+async function fetchGithubApi(method: string, route: string, headers?: any, json?: any): Promise<UndiciResponse> {
 	try {
 		if (debug) console.debug('fetching github api', method, route)
 		const data = await fetch(
 			githubApiBase + route,
 			{
-				agent: () => httpsAgent,
 				body: json ? JSON.stringify(json) : undefined,
 				method,
 				headers: Object.assign({
