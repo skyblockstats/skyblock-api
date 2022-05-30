@@ -1,3 +1,5 @@
+import { AccessoryBagUpgrades, cleanAccessoryBagUpgrades } from './accessoryBagUpgrades.js'
+import { cleanExperimentation, Experimentation } from './experimentation.js'
 import { cleanFarmingContests, FarmingContests } from './farmingContents.js'
 import { cleanCoopInvitation, CoopInvitation } from './coopInvitation.js'
 import { cleanCollections, Collection } from './collections.js'
@@ -19,7 +21,6 @@ import * as constants from '../../constants.js'
 import { Included } from '../../hypixel.js'
 import { CleanPlayer } from '../player.js'
 import { CleanRank } from '../rank.js'
-import { AccessoryBagUpgrades, cleanAccessoryBagUpgrades } from './accessoryBagUpgrades.js'
 
 export interface CleanBasicMember {
 	uuid: string
@@ -47,6 +48,7 @@ export interface CleanMember extends CleanBasicMember {
 	coopInvitation: CoopInvitation | null
 	farmingContests: FarmingContests
 	accessoryBagUpgrades: AccessoryBagUpgrades
+	experimentation: Experimentation
 	/** Whether the user left the coop */
 	left: boolean
 }
@@ -82,6 +84,7 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 	const harpPromise = cleanHarp(member)
 	const inventoriesPromise = inventoriesIncluded ? cleanInventories(member) : Promise.resolve(undefined)
 	const farmingContestsPromise = cleanFarmingContests(member)
+	const experimentationTablePromise = cleanExperimentation(member)
 
 	return {
 		uuid: member.uuid,
@@ -113,6 +116,7 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 		coopInvitation: await coopInvitationPromise,
 		farmingContests: await farmingContestsPromise,
 		accessoryBagUpgrades: cleanAccessoryBagUpgrades(member),
+		experimentation: await experimentationTablePromise,
 
 		left: (player.profiles?.find(profile => profile.uuid === profileId) === undefined) ?? false
 	}

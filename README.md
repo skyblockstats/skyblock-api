@@ -19,3 +19,13 @@ If you (this is really just here for myself so I don't forget) are adding a new 
 First, install the dependencies with `npm i`.
 Then to run it, do `tsc -w` in one terminal, `npx nodemon build` in another. This makes it automatically restart when you make a change.
 If you don't like it auto restarting, then just do `node build` instead of `npx nodemon build`.
+
+
+## Terminology
+
+Here's some words frequently used in the codebase that might potentially get confused:
+
+- Profile: Sometimes known as a co-op, these contain one or more members.
+- Member: Someone who is in a profile.
+- Player: An individual account, it can be in multiple profiles and each instance of them in the profile is a different member.
+
