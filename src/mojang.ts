@@ -3,9 +3,9 @@
  */
 
 import { isUuid, sleep, undashUuid } from './util.js'
-import * as nodeFetch from 'node-fetch'
-import fetch from 'node-fetch'
+import { fetch } from 'undici'
 import { Agent } from 'https'
+import type { Response as UndiciResponse } from 'undici/types/fetch'
 
 // We need to create an agent to prevent memory leaks
 const httpsAgent = new Agent({
@@ -22,13 +22,12 @@ interface MojangApiResponse {
  * Get mojang api data from the session server
  */
 export let profileFromUuid = async function profileFromUuid(uuid: string): Promise<MojangApiResponse> {
-	let fetchResponse: nodeFetch.Response
+	let fetchResponse: UndiciResponse
 
 	try {
 		fetchResponse = await fetch(
-			// using mojang directly is faster than ashcon lol, also mojang removed the ratelimits from here
+			// using mojang directly is faster than ashcon, also there seem to be no ratelimits here?
 			`https://sessionserver.mojang.com/session/minecraft/profile/${undashUuid(uuid)}`,
-			{ agent: () => httpsAgent }
 		)
 	} catch {
 		// if there's an error, wait a second and try again
@@ -59,12 +58,11 @@ export let profileFromUuid = async function profileFromUuid(uuid: string): Promi
 export let profileFromUsername = async function profileFromUsername(username: string): Promise<MojangApiResponse> {
 	// since we don't care about anything other than the uuid, we can use /uuid/ instead of /user/
 
-	let fetchResponse: nodeFetch.Response
+	let fetchResponse: UndiciResponse
 
 	try {
 		fetchResponse = await fetch(
 			`https://api.mojang.com/users/profiles/minecraft/${username}`,
-			{ agent: () => httpsAgent }
 		)
 	} catch {
 		// if there's an error, wait a second and try again
@@ -76,7 +74,7 @@ export let profileFromUsername = async function profileFromUsername(username: st
 	const rawData = await fetchResponse.text()
 	try {
 		data = JSON.parse(rawData)
-	} catch {}
+	} catch { }
 
 
 	if (!data?.id) {
@@ -91,12 +89,11 @@ export let profileFromUsername = async function profileFromUsername(username: st
 }
 
 export async function profileFromUsernameAlternative(username: string): Promise<MojangApiResponse> {
-	let fetchResponse: nodeFetch.Response
+	let fetchResponse: UndiciResponse
 
 	try {
 		fetchResponse = await fetch(
 			`https://api.ashcon.app/mojang/v2/user/${username}`,
-			{ agent: () => httpsAgent }
 		)
 	} catch {
 		// if there's an error, wait a second and try again
