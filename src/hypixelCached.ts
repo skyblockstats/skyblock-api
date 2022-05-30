@@ -274,8 +274,8 @@ export async function fetchSkyblockProfiles(playerUuid: string): Promise<CleanPr
 	basicProfiles.sort((a, b) => {
 		const memberA = a.members?.find(m => m.uuid === playerUuid)
 		const memberB = b.members?.find(m => m.uuid === playerUuid)
-		if (!memberA || !memberB || !memberA.lastSave || !memberB.lastSave) return 0
-		return memberB.lastSave - memberA.lastSave
+
+		return (memberB?.lastSave ?? 0) - (memberA?.lastSave ?? 0)
 	})
 
 	// cache the profiles
