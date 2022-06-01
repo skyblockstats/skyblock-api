@@ -26,7 +26,7 @@ export async function cleanCoopInvitation(data: typedHypixelApi.SkyBlockProfileM
 
 	return {
 		invitedTimestamp,
-		invitedBy: await cached.fetchBasicPlayer(data.coop_invitation.invited_by, false),
+		invitedBy: await cached.fetchBasicPlayer(data.coop_invitation.invited_by),
 		accepted: data.coop_invitation.confirmed,
 		acceptedTimestamp
 	}

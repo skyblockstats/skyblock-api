@@ -164,7 +164,6 @@ function cleanFullPlayerToCleanPlayer(player: CleanFullPlayer): CleanPlayer {
 		socials: player.socials,
 		username: player.username,
 		uuid: player.uuid,
-		claimed: player.claimed,
 		profiles: player.profiles
 	}
 }
@@ -212,16 +211,13 @@ export async function fetchPlayer<Full extends boolean = true>(user: string, ful
 }
 
 /** Fetch a player without their profiles. This is heavily cached. */
-export async function fetchBasicPlayer(user: string, includeClaimed: boolean = true): Promise<CleanPlayer | null> {
+export async function fetchBasicPlayer(user: string): Promise<CleanPlayer | null> {
 	const playerUuid = await uuidFromUser(user)
 
 	if (!playerUuid) return null
 
 	if (basicPlayerCache.has(playerUuid)) {
 		const player = basicPlayerCache.get(playerUuid)!
-		if (!includeClaimed) {
-			delete player.claimed
-		}
 		return player
 	}
 
@@ -232,8 +228,6 @@ export async function fetchBasicPlayer(user: string, includeClaimed: boolean = t
 	}
 
 	delete player.profiles
-	if (!includeClaimed)
-		delete player.claimed
 	return player
 }
 

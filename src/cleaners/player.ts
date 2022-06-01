@@ -26,11 +26,11 @@ export interface CleanPlayer extends CleanBasicPlayer {
     rank: CleanRank
     socials: CleanSocialMedia
     profiles?: CleanBasicProfile[]
-    claimed?: ClaimedSkyBlockItem[]
 }
 
 export interface CleanFullPlayer extends CleanPlayer {
     achievements: Achievements
+    claimed: ClaimedSkyBlockItem[]
 }
 
 export async function cleanPlayerResponse(data: typedHypixelApi.PlayerDataResponse['player']): Promise<CleanFullPlayer | null> {

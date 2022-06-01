@@ -54,14 +54,14 @@ interface DatabaseProfileLeaderboardItem {
 }
 
 
-interface memberRawLeaderboardItem {
+interface MemberRawLeaderboardItem {
 	uuid: string
 	profile: string
 	color: string
 	username: string
 	value: number
 }
-interface profileRawLeaderboardItem {
+interface ProfileRawLeaderboardItem {
 	uuid: string
 	/** An array of uuids for each player in the profile */
 	players: string[]
@@ -81,9 +81,9 @@ interface ProfileLeaderboardItem {
 	value: number
 }
 
-export const cachedRawLeaderboards: Map<string, (memberRawLeaderboardItem | profileRawLeaderboardItem)[]> = new Map()
+export const cachedRawLeaderboards: Map<string, (MemberRawLeaderboardItem | ProfileRawLeaderboardItem)[]> = new Map()
 
-const leaderboardMax = 100
+const LEADERBOARD_MAX = 100
 const reversedLeaderboards = [
 	'first_join', 'last_save',
 	'_best_time', '_best_time_2',
@@ -465,18 +465,18 @@ function isLeaderboardReversed(name: string): boolean {
 /** A set of names of the raw leaderboards that are currently being fetched. This is used to make sure two leaderboads aren't fetched at the same time */
 const fetchingRawLeaderboardNames: Set<string> = new Set()
 
-async function fetchMemberLeaderboardRaw(name: string): Promise<memberRawLeaderboardItem[]> {
+async function fetchMemberLeaderboardRaw(name: string): Promise<MemberRawLeaderboardItem[]> {
 	if (!client) throw Error('Client isn\'t initialized yet')
 
 	if (cachedRawLeaderboards.has(name))
-		return cachedRawLeaderboards.get(name) as memberRawLeaderboardItem[]
+		return cachedRawLeaderboards.get(name) as MemberRawLeaderboardItem[]
 
 	// if it's currently being fetched, check every 100ms until it's in cachedRawLeaderboards
 	if (fetchingRawLeaderboardNames.has(name) && !cachedRawLeaderboards.get(name)) {
 		while (true) {
 			await sleep(100)
 			if (cachedRawLeaderboards.has(name))
-				return cachedRawLeaderboards.get(name) as memberRawLeaderboardItem[]
+				return cachedRawLeaderboards.get(name) as MemberRawLeaderboardItem[]
 		}
 	}
 
@@ -491,12 +491,12 @@ async function fetchMemberLeaderboardRaw(name: string): Promise<memberRawLeaderb
 
 	if (debug) console.debug(`Fetching leaderboard ${name} from database...`)
 	try {
-		const leaderboardRaw: memberRawLeaderboardItem[] = (await memberLeaderboardsCollection
+		const leaderboardRaw: MemberRawLeaderboardItem[] = (await memberLeaderboardsCollection
 			.find(query)
 			.sort(sortQuery)
-			.limit(leaderboardMax)
+			.limit(LEADERBOARD_MAX)
 			.toArray())
-			.map((i: DatabaseMemberLeaderboardItem): memberRawLeaderboardItem => {
+			.map((i: DatabaseMemberLeaderboardItem): MemberRawLeaderboardItem => {
 				return {
 					profile: i.profile,
 					uuid: i.uuid,
@@ -516,16 +516,16 @@ async function fetchMemberLeaderboardRaw(name: string): Promise<memberRawLeaderb
 	}
 }
 
-async function fetchProfileLeaderboardRaw(name: string): Promise<profileRawLeaderboardItem[]> {
+async function fetchProfileLeaderboardRaw(name: string): Promise<ProfileRawLeaderboardItem[]> {
 	if (cachedRawLeaderboards.has(name))
-		return cachedRawLeaderboards.get(name) as profileRawLeaderboardItem[]
+		return cachedRawLeaderboards.get(name) as ProfileRawLeaderboardItem[]
 
 	// if it's currently being fetched, check every 100ms until it's in cachedRawLeaderboards
 	if (fetchingRawLeaderboardNames.has(name)) {
 		while (true) {
 			await sleep(100)
 			if (cachedRawLeaderboards.has(name))
-				return cachedRawLeaderboards.get(name) as profileRawLeaderboardItem[]
+				return cachedRawLeaderboards.get(name) as ProfileRawLeaderboardItem[]
 		}
 	}
 
@@ -538,12 +538,12 @@ async function fetchProfileLeaderboardRaw(name: string): Promise<profileRawLeade
 
 	fetchingRawLeaderboardNames.add(name)
 	try {
-		const leaderboardRaw: profileRawLeaderboardItem[] = (await profileLeaderboardsCollection
+		const leaderboardRaw: ProfileRawLeaderboardItem[] = (await profileLeaderboardsCollection
 			.find(query)
 			.sort(sortQuery)
-			.limit(leaderboardMax)
+			.limit(LEADERBOARD_MAX)
 			.toArray())
-			.map((i: DatabaseProfileLeaderboardItem): profileRawLeaderboardItem => {
+			.map((i: DatabaseProfileLeaderboardItem): ProfileRawLeaderboardItem => {
 				return {
 					players: i.players,
 					colors: i.colors,
@@ -589,7 +589,6 @@ interface LeaderboardBasicPlayer {
 export async function fetchMemberLeaderboard(name: string): Promise<MemberLeaderboard> {
 	const leaderboardRaw = await fetchMemberLeaderboardRaw(name)
 
-
 	const leaderboard: MemberLeaderboardItem[] = []
 	for (const i of leaderboardRaw) {
 		leaderboard.push({
@@ -616,7 +615,9 @@ export async function fetchMemberLeaderboard(name: string): Promise<MemberLeader
 export async function fetchProfileLeaderboard(name: string): Promise<ProfileLeaderboard> {
 	const leaderboardRaw = await fetchProfileLeaderboardRaw(name)
 
-	const fetchLeaderboardProfile = async (i: profileRawLeaderboardItem): Promise<ProfileLeaderboardItem> => {
+	const leaderboard: ProfileLeaderboardItem[] = []
+
+	for (const i of leaderboardRaw) {
 		const players: LeaderboardBasicPlayer[] = []
 		for (const playerUuid of i.players) {
 			const player: LeaderboardBasicPlayer = {
@@ -629,17 +630,13 @@ export async function fetchProfileLeaderboard(name: string): Promise<ProfileLead
 			if (player)
 				players.push(player)
 		}
-		return {
+		leaderboard.push({
 			players: players,
 			profileUuid: i.uuid,
 			value: i.value
-		}
+		})
 	}
-	const promises: Promise<ProfileLeaderboardItem>[] = []
-	for (const item of leaderboardRaw) {
-		promises.push(fetchLeaderboardProfile(item))
-	}
-	const leaderboard = await Promise.all(promises)
+
 	return {
 		name: name,
 		unit: getStatUnit(name) ?? null,
@@ -709,7 +706,7 @@ export async function fetchMemberLeaderboardSpots(player: string, profile: strin
 
 	const memberLeaderboardSpots: LeaderboardSpot[] = []
 
-	let leaderboardPromises: Promise<memberRawLeaderboardItem[]>[] = []
+	let leaderboardPromises: Promise<MemberRawLeaderboardItem[]>[] = []
 	for (const leaderboardName in applicableAttributes)
 		leaderboardPromises.push(fetchMemberLeaderboardRaw(leaderboardName))
 	for (const leaderboardName in applicableAttributes) {
@@ -732,7 +729,7 @@ export async function fetchMemberLeaderboardSpots(player: string, profile: strin
 }
 
 async function getLeaderboardRequirement(name: string, leaderboardType: 'member' | 'profile'): Promise<{ top_100: number | null, top_1: number | null }> {
-	let leaderboard: memberRawLeaderboardItem[] | profileRawLeaderboardItem[]
+	let leaderboard: MemberRawLeaderboardItem[] | ProfileRawLeaderboardItem[]
 	if (leaderboardType === 'member')
 		leaderboard = await fetchMemberLeaderboardRaw(name)
 	else if (leaderboardType === 'profile')
@@ -740,7 +737,7 @@ async function getLeaderboardRequirement(name: string, leaderboardType: 'member'
 
 	// if there's more than 100 items, return the 100th. if there's less, return null
 	return {
-		top_100: leaderboard![leaderboardMax - 1]?.value ?? null,
+		top_100: leaderboard![LEADERBOARD_MAX - 1]?.value ?? null,
 		top_1: leaderboard![1]?.value ?? null
 	}
 }
@@ -969,9 +966,9 @@ export async function updateDatabaseProfile(profile: CleanFullProfile): Promise<
 
 
 	// add the profile to the cached leaderboard without having to refetch it
-	for (const [attributeName, attributeValue] of Object.entries(leaderboardAttributes)) {
-		const existingRawLeaderboard = await fetchProfileLeaderboardRaw(attributeName)
-		const leaderboardReverse = isLeaderboardReversed(attributeName)
+	for (const [leaderboardName, attributeValue] of Object.entries(leaderboardAttributes)) {
+		const existingRawLeaderboard = await fetchProfileLeaderboardRaw(leaderboardName)
+		const leaderboardReverse = isLeaderboardReversed(leaderboardName)
 
 		const newRawLeaderboard = existingRawLeaderboard
 			// remove the player from the leaderboard, if they're there
@@ -985,7 +982,7 @@ export async function updateDatabaseProfile(profile: CleanFullProfile): Promise<
 			}])
 			.sort((a, b) => leaderboardReverse ? a.value - b.value : b.value - a.value)
 			.slice(0, 100)
-		cachedRawLeaderboards.set(attributeName, newRawLeaderboard)
+		cachedRawLeaderboards.set(leaderboardName, newRawLeaderboard)
 	}
 
 	if (debug) console.debug('added profile to leaderboards', profile.name, leaderboardAttributes)
