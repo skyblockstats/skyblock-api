@@ -132,7 +132,14 @@ export async function withCache<T>(key: string, ttl: number | ((arg: T) => Date)
 		...(caches.get(key) ?? { data: undefined, nextUpdate: new Date(0) }),
 		isFetching: true,
 	})
-	const data = await task()
+	const data = await task().catch(e => {
+		console.error(e)
+		caches.set(key, {
+			...(caches.get(key) ?? { data: undefined, nextUpdate: new Date(0) }),
+			isFetching: false,
+		})
+		return undefined
+	})
 	caches.set(key, {
 		...caches.get(key)!,
 		isFetching: false,
