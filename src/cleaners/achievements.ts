@@ -56,10 +56,11 @@ export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataRe
 				tier,
 				next,
 				amount,
-				description: achievementData.description.replace(/%s/g, (achievementData.tiers[Math.max(0, tier - 1)].amount).toString())
+				// description: achievementData.description.replace(/%s/g, (achievementData.tiers[Math.max(0, tier - 1)].amount).toString())
+				description: achievementData.description
 			})
 		}
-		tieredAchievements.sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0))
+		// tieredAchievements.sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0))
 
 		const unlockedChallengeAchievements: ChallengeAchievement[] = []
 		const lockedChallengeAchievements: ChallengeAchievement[] = []
