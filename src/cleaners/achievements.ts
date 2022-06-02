@@ -37,7 +37,7 @@ export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataRe
 		if (gameId !== 'skyblock') continue
 
 
-		let tieredAchievements: TieredAchievement[] = []
+		const tieredAchievements: TieredAchievement[] = []
 		for (const [achievementId, achievementData] of Object.entries(achievementsData.tiered)) {
 			const amount = data.achievements[`skyblock_${achievementId.toLowerCase()}`] ?? 0
 
@@ -61,8 +61,8 @@ export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataRe
 		}
 		tieredAchievements.sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0))
 
-		let unlockedChallengeAchievements: ChallengeAchievement[] = []
-		let lockedChallengeAchievements: ChallengeAchievement[] = []
+		const unlockedChallengeAchievements: ChallengeAchievement[] = []
+		const lockedChallengeAchievements: ChallengeAchievement[] = []
 
 		for (const [achievementId, achievementData] of Object.entries(achievementsData.one_time)) {
 			const achievement: ChallengeAchievement = {
