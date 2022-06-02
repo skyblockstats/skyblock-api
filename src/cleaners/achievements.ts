@@ -27,10 +27,6 @@ export interface Achievements {
 }
 
 export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataResponse['player']): Promise<Achievements> {
-	// temporarily disabled because this might be causing high memory usage?
-	return { tiered: [], challenge: [] }
-
-
 	if (!data.achievements) {
 		return { tiered: [], challenge: [] }
 	}
