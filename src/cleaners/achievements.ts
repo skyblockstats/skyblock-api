@@ -32,7 +32,6 @@ export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataRe
 	}
 
 	const gameAchievements: typedHypixelApi.AchievementsResponse['achievements'] = await fetchAchievements()
-	return { tiered: [], challenge: [] }
 
 	for (const [gameId, achievementsData] of Object.entries(gameAchievements)) {
 		if (gameId !== 'skyblock') continue
@@ -78,8 +77,11 @@ export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataRe
 				lockedChallengeAchievements.push(achievement)
 		}
 
+		// temporarily disabled
+		return { tiered: [], challenge: [] }
 		return {
-			tiered: tieredAchievements, challenge: [
+			tiered: tieredAchievements,
+			challenge: [
 				...unlockedChallengeAchievements,
 				...lockedChallengeAchievements
 			]
