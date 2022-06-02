@@ -27,15 +27,12 @@ export interface Achievements {
 }
 
 export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataResponse['player']): Promise<Achievements> {
-	// temporarily disabled because this might be causing high memory usage?
-	return { tiered: [], challenge: [] }
-
-
 	if (!data.achievements) {
 		return { tiered: [], challenge: [] }
 	}
 
 	const gameAchievements: typedHypixelApi.AchievementsResponse['achievements'] = await fetchAchievements()
+	return { tiered: [], challenge: [] }
 
 	for (const [gameId, achievementsData] of Object.entries(gameAchievements)) {
 		if (gameId !== 'skyblock') continue
