@@ -77,8 +77,6 @@ export async function cleanPlayerAchievements(data: typedHypixelApi.PlayerDataRe
 				lockedChallengeAchievements.push(achievement)
 		}
 
-		// temporarily disabled
-		return { tiered: [], challenge: [] }
 		return {
 			tiered: tieredAchievements,
 			challenge: [
