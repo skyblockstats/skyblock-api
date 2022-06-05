@@ -8,13 +8,14 @@ function base64decode(base64: string): Buffer {
 
 export interface Item {
 	id: string
-	count: number
+	/** If this is missing, it's assumed to be 1 */
+	count?: number
 	vanillaId: string
 
 	display: {
 		name: string
-		lore: string[]
-		glint: boolean
+		lore?: string[]
+		glint?: boolean
 	}
 
 	reforge?: string

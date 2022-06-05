@@ -5,7 +5,7 @@ import * as constants from './constants.js'
 import * as discord from './discord.js'
 import express from 'express'
 import { getKeyUsage } from './hypixelApi.js'
-import { basicPlayerCache, basicProfilesCache, playerCache, profileCache, profileNameCache, profilesCache, usernameCache } from './hypixelCached.js'
+import { basicPlayerCache, basicProfilesCache, fetchBazaar, playerCache, profileCache, profileNameCache, profilesCache, usernameCache } from './hypixelCached.js'
 import { register } from './metrics.js'
 
 const app = express()
@@ -205,6 +205,17 @@ app.get('/auction/:uuid', async (req, res) => {
 		res.json({ ok: false })
 	}
 })
+
+app.get('/bazaar', async (req, res) => {
+	try {
+		res
+			.json(await fetchBazaar())
+	} catch (err) {
+		console.error(err)
+		res.json({ ok: false })
+	}
+})
+
 
 app.post('/accounts/createsession', async (req, res) => {
 	try {

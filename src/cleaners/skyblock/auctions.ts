@@ -1,5 +1,5 @@
 import typedHypixelApi from 'typed-hypixel-api'
-import { cleanInventory, headIdFromBase64, Item } from './inventory.js'
+import { cleanInventory, Item } from './inventory.js'
 
 
 export interface Auction {

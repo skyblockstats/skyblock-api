@@ -448,3 +448,14 @@ export async function fetchAchievements() {
 	)
 }
 
+
+export async function fetchBazaar() {
+	return await withCache(
+		'skyblock/bazaar',
+		60 * 1000,
+		async () => {
+			return await hypixel.sendCleanApiRequest('skyblock/bazaar', {})
+		}
+	)
+}
+

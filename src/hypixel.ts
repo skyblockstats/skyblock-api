@@ -37,6 +37,7 @@ import { cleanAuctions } from './cleaners/skyblock/auctions.js'
 import { string } from 'prismarine-nbt'
 import { withCache } from './util.js'
 import { Item } from './cleaners/skyblock/inventory.js'
+import { cleanBazaar } from './cleaners/skyblock/bazaar.js'
 
 export type Included = 'profiles' | 'player' | 'stats' | 'inventories' | undefined
 
@@ -74,6 +75,7 @@ const cleanResponseFunctions = {
 	'skyblock/profiles': (data, options) => cleanSkyblockProfilesResponse(data.profiles),
 	'skyblock/auctions_ended': (data, options) => cleanEndedAuctions(data),
 	'skyblock/auction': (data, options) => cleanAuctions(data),
+	'skyblock/bazaar': (data, options) => cleanBazaar(data),
 	'resources/skyblock/election': (data, options) => cleanElectionResponse(data),
 	'resources/skyblock/items': (data, options) => cleanItemListResponse(data),
 } as const
@@ -397,7 +399,7 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 
 			const simpleAuction: SimpleAuctionSchema = {
 				s: true,
-				coins: Math.round(auction.coins / auction.item.count),
+				coins: Math.round(auction.coins / (auction.item.count ?? 1)),
 				id: auction.id,
 				ts: Math.floor(auction.timestamp / 1000),
 				bin: auction.bin,
