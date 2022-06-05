@@ -1,11 +1,11 @@
 import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount, deleteSession, fetchPaginatedItemsAuctions, fetchItemsAuctions } from './database.js'
-import { fetchAuctionItems, fetchAuctionUncached, fetchElection, fetchItemList, fetchMemberProfile, fetchUser } from './hypixel.js'
+import { fetchAuctionUncached, fetchElection, fetchItemList, fetchMemberProfile, fetchUser } from './hypixel.js'
 import rateLimit from 'express-rate-limit'
 import * as constants from './constants.js'
 import * as discord from './discord.js'
 import express from 'express'
 import { getKeyUsage } from './hypixelApi.js'
-import { basicPlayerCache, basicProfilesCache, fetchBazaar, playerCache, profileCache, profileNameCache, profilesCache, usernameCache } from './hypixelCached.js'
+import { basicPlayerCache, basicProfilesCache, fetchBazaar, playerCache, profileCache, profileNameCache, profilesCache, usernameCache, fetchAuctionItems } from './hypixelCached.js'
 import { register } from './metrics.js'
 
 const app = express()

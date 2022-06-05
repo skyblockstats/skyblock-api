@@ -444,15 +444,7 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 	}
 }
 
-export async function fetchAuctionItems() {
-	return await withCache(
-		'auctionItems',
-		10 * 60 * 1000,
-		fetchAuctionItemsUncached
-	)
-}
-
-async function fetchAuctionItemsUncached() {
+export async function fetchAuctionItemsUncached() {
 	const auctionItemIds = await fetchItemsAuctionsIds(true)
 	if (!auctionItemIds) return undefined
 	const itemList = await fetchItemList()

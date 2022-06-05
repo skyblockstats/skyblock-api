@@ -459,3 +459,11 @@ export async function fetchBazaar() {
 	)
 }
 
+
+export async function fetchAuctionItems() {
+	return await withCache(
+		'auctionItems',
+		10 * 60 * 1000,
+		hypixel.fetchAuctionItemsUncached
+	)
+}
