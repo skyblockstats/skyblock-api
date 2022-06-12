@@ -190,7 +190,14 @@ export async function cleanSkills(data: typedHypixelApi.SkyBlockProfileMember, p
 
 	for (const item in data) {
 		if (item.startsWith('experience_skill_')) {
-			const skillName = item.slice('experience_skill_'.length)
+			let skillName = item.slice('experience_skill_'.length)
+
+			// hypixel replaced social with social2
+			if (skillName === 'social2')
+				skillName = 'social'
+			else if (skillName === 'social')
+				continue
+
 			skillNamesFound.push(skillName)
 
 			// the amount of total xp you have in this skill
