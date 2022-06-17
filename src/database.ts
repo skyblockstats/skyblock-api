@@ -170,7 +170,6 @@ const leaderboardInfos: { [leaderboardName: string]: string } = {
 	highest_critical_damage: 'uhhhhh yeah idk either',
 	leaderboards_count: 'This leaderboard counts how many leaderboards a player is in the top 100 spot for.',
 	top_1_leaderboards_count: 'This leaderboard counts how many leaderboards a player is in the #1 spot for.',
-	skill_social: 'This leaderboard is inaccurate because Hypixel only shows social skill data on some API profiles.'
 }
 
 
