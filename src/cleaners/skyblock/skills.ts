@@ -12,6 +12,7 @@ export interface Skill {
 	maxLevel: number
 
 	levelXp: number
+	/** The amount of xp required to go to the next level. If the player is at the max level, this will be 0. */
 	levelXpRequired: number
 }
 
@@ -23,6 +24,10 @@ export interface Skills {
 	 * warning to the user.
 	 */
 	apiEnabled: boolean
+	/**
+	 * The player's average skill level, excluding carpentry, runecrafting, and social.
+	 */
+	average: number
 }
 
 // the highest level you can have in each skill
@@ -159,26 +164,33 @@ function skillFromLevel(id: string, level: number | undefined): Skill {
 		id,
 		level,
 		levelXp: 0,
-		levelXpRequired: xpTable[level],
+		levelXpRequired: xpTable[level] ?? 0,
 		maxLevel: maxLevel,
 		xp
 	}
 }
 
 function skillsFromSkyBlockAchievements(achievements: CleanFullPlayer['achievements']): Skills {
+	const skills = [
+		skillFromLevel('alchemy', achievements.tiered.find(a => a.id === 'concoctor')?.amount ?? 0),
+		// carpentry
+		skillFromLevel('combat', achievements.tiered.find(a => a.id === 'combat')?.amount ?? 0),
+		skillFromLevel('enchanting', achievements.tiered.find(a => a.id === 'augmentation')?.amount ?? 0),
+		skillFromLevel('farming', achievements.tiered.find(a => a.id === 'harvester')?.amount ?? 0),
+		skillFromLevel('fishing', achievements.tiered.find(a => a.id === 'angler')?.amount ?? 0),
+		skillFromLevel('foraging', achievements.tiered.find(a => a.id === 'gatherer')?.amount ?? 0),
+		skillFromLevel('mining', achievements.tiered.find(a => a.id === 'excavator')?.amount ?? 0),
+		// runecrafting
+		// social
+		skillFromLevel('taming', achievements.tiered.find(a => a.id === 'domesticator')?.amount ?? 0),
+
+		// dungeoneering isn't *really* a skill; this value is the level of the highest class
+		// skillFromLevel('dungeoneering', achievements.tiered.find(a => a.id === 'dungeoneer')?.amount ?? 0),
+	]
 	return {
 		apiEnabled: false,
-		list: [
-			skillFromLevel('fishing', achievements.tiered.find(a => a.id === 'angler')?.amount ?? 0),
-			skillFromLevel('enchanting', achievements.tiered.find(a => a.id === 'augmentation')?.amount ?? 0),
-			skillFromLevel('combat', achievements.tiered.find(a => a.id === 'combat')?.amount ?? 0),
-			skillFromLevel('alchemy', achievements.tiered.find(a => a.id === 'concoctor')?.amount ?? 0),
-			skillFromLevel('taming', achievements.tiered.find(a => a.id === 'domesticator')?.amount ?? 0),
-			skillFromLevel('dungeoneering', achievements.tiered.find(a => a.id === 'dungeoneer')?.amount ?? 0),
-			skillFromLevel('mining', achievements.tiered.find(a => a.id === 'excavator')?.amount ?? 0),
-			skillFromLevel('foraging', achievements.tiered.find(a => a.id === 'gatherer')?.amount ?? 0),
-			skillFromLevel('farming', achievements.tiered.find(a => a.id === 'harvester')?.amount ?? 0)
-		]
+		list: skills,
+		average: calculateAverageSkillLevel(skills)
 	}
 }
 
@@ -217,7 +229,7 @@ export async function cleanSkills(data: typedHypixelApi.SkyBlockProfileMember, p
 			const skillLevelXp = skillXp - previousLevelXp
 
 			// the amount of extra xp required for this level
-			const skillLevelXpRequired = xpTable[skillLevel] - previousLevelXp
+			const skillLevelXpRequired = skillLevel < skillMaxLevel ? (xpTable[skillLevel] - previousLevelXp) : 0
 
 			skills.push({
 				id: skillName,
@@ -260,5 +272,17 @@ export async function cleanSkills(data: typedHypixelApi.SkyBlockProfileMember, p
 	return {
 		apiEnabled: true,
 		list: skills,
+		average: calculateAverageSkillLevel(skills)
 	}
+}
+
+function calculateAverageSkillLevel(skills: Skill[]): number {
+	const validSkills = skills.filter(skill => !(['carpentry', 'runecrafting', 'social'].includes(skill.id)))
+	const averageSkillLevel = validSkills.reduce((acc, skill) => {
+		// note: hypixel doesn't use the exact level for the in-game value but we do
+		const exactLevel = skill.level + ((skill.levelXpRequired > 0) ? (skill.levelXp / skill.levelXpRequired) : 0)
+		return acc + exactLevel
+	}, 0) / validSkills.length
+	const averageSkillLevelRounded = Math.round(averageSkillLevel * 100) / 100
+	return averageSkillLevelRounded
 }
