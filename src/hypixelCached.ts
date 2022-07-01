@@ -40,7 +40,7 @@ export const playerCache = new NodeCache({
 
 // cache "basic players" (players without profiles) for 20 minutes
 export const basicPlayerCache: LRUCache<string, CleanPlayer> = new LRUCache({
-	max: 1000,
+	max: 10000,
 	ttl: 60 * 20 * 1000,
 })
 
@@ -199,7 +199,14 @@ export async function fetchPlayer<Full extends boolean = true>(user: string, ful
 	usernameCache.set(playerUuid, cleanPlayer.username)
 
 	// clone in case it gets modified somehow later
-	const cleanBasicPlayer = Object.assign({}, cleanPlayer)
+	const clonedCleanPlayer = Object.assign({}, cleanPlayer)
+	const cleanBasicPlayer: CleanPlayer = {
+		rank: clonedCleanPlayer.rank,
+		socials: clonedCleanPlayer.socials,
+		username: clonedCleanPlayer.username,
+		uuid: clonedCleanPlayer.uuid,
+		profiles: clonedCleanPlayer.profiles
+	}
 	if (cleanBasicPlayer.profiles) {
 		// remove the names from the profiles so we only keep uuids
 		// this helps save a bit of memory since we don't care about the names
