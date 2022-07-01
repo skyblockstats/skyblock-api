@@ -30,6 +30,9 @@ export async function cleanAuctions(data: typedHypixelApi.SkyBlockRequestAuction
         })
     }
 
+    // sort by newer first
+    auctions.sort((a, b) => b.creationTimestamp - a.creationTimestamp)
+
     return auctions
 
 }
