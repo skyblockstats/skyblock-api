@@ -33,7 +33,7 @@ import * as cached from './hypixelCached.js'
 import { debug } from './index.js'
 import { WithId } from 'mongodb'
 import { cleanEndedAuctions } from './cleaners/skyblock/endedAuctions.js'
-import { Auction, cleanAuctions } from './cleaners/skyblock/auctions.js'
+import { Auctions, cleanAuctions } from './cleaners/skyblock/auctions.js'
 import { withCache } from './util.js'
 import { Item } from './cleaners/skyblock/inventory.js'
 
@@ -486,7 +486,7 @@ async function fetchAuctionItemsUncached() {
 	return idsToData
 }
 
-export async function fetchPlayerAuctions(user: string, page: number): Promise<Auction[] | null> {
+export async function fetchPlayerAuctions(user: string, page: number): Promise<Auctions | null> {
 	const playerUuid = await cached.uuidFromUser(user)
 	if (!playerUuid) return null
 
@@ -495,5 +495,5 @@ export async function fetchPlayerAuctions(user: string, page: number): Promise<A
 		{ player: playerUuid },
 		{ page }
 	)
-	return playerAuctions.auctions
+	return playerAuctions
 }
