@@ -23,7 +23,7 @@ import {
 	updateItemAuction
 } from './database.js'
 import { cleanElectionResponse, ElectionData } from './cleaners/skyblock/election.js'
-import { cleanItemListResponse, ItemListData } from './cleaners/skyblock/itemList.js'
+import { cleanItemListResponse } from './cleaners/skyblock/itemList.js'
 import { CleanBasicMember, CleanMemberProfile } from './cleaners/skyblock/member.js'
 import { cleanSkyblockProfilesResponse } from './cleaners/skyblock/profiles.js'
 import { CleanPlayer, cleanPlayerResponse } from './cleaners/player.js'
@@ -34,7 +34,6 @@ import { debug } from './index.js'
 import { WithId } from 'mongodb'
 import { cleanEndedAuctions } from './cleaners/skyblock/endedAuctions.js'
 import { Auction, cleanAuctions } from './cleaners/skyblock/auctions.js'
-import { string } from 'prismarine-nbt'
 import { withCache } from './util.js'
 import { Item } from './cleaners/skyblock/inventory.js'
 
