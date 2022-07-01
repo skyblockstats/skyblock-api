@@ -211,7 +211,7 @@ app.get('/auction/:uuid', async (req, res) => {
 app.get('/playerauctions/:user', async (req, res) => {
 	try {
 		res.json(
-			await fetchPlayerAuctions(req.params.user)
+			await fetchPlayerAuctions(req.params.user, parseInt(req.query.page as string) || 0)
 		)
 	} catch (err) {
 		console.error(err)

@@ -3,6 +3,11 @@ import { cleanInventory, Item } from './inventory.js'
 import * as cached from '../../hypixelCached.js'
 import { CleanPlayer } from '../player.js'
 
+export interface Auctions {
+    auctions: Auction[]
+    pages: number
+}
+
 export interface Auction {
     id: string
     sellerUuid: string
@@ -16,19 +21,22 @@ export interface Auction {
 }
 
 
-export async function cleanAuctions(data: typedHypixelApi.SkyBlockRequestAuctionResponse): Promise<Auction[]> {
+export async function cleanAuctions(data: typedHypixelApi.SkyBlockRequestAuctionResponse, page: number): Promise<Auctions> {
     const auctionPromises: Promise<Auction>[] = []
-    for (const auction of data.auctions) {
+
+    let rawAuctions = data.auctions
+    // sort by newer first
+    rawAuctions.sort((a, b) => b.start - a.start)
+
+    rawAuctions = rawAuctions.slice(page * 10, page * 10 + 10)
+
+    for (const auction of rawAuctions) {
         auctionPromises.push(cleanAuction(auction))
     }
 
     const auctions = await Promise.all(auctionPromises)
 
-    // sort by newer first
-    auctions.sort((a, b) => b.creationTimestamp - a.creationTimestamp)
-
-    return auctions
-
+    return { auctions, pages: Math.ceil(rawAuctions.length / 10) }
 }
 
 async function cleanAuction(auction: typedHypixelApi.SkyBlockRequestAuctionResponse['auctions'][number]): Promise<Auction> {

@@ -50,6 +50,8 @@ export interface ApiOptions {
 	mainMemberUuid?: string
 	/** Only get the most basic information, like uuids and names */
 	basic?: boolean
+	/** Some endpoints have pagination */
+	page?: number
 }
 
 /** Sends an API request to Hypixel and returns the response. */
@@ -72,7 +74,7 @@ const cleanResponseFunctions = {
 	'skyblock/profile': (data: typedHypixelApi.SkyBlockProfileResponse, options) => cleanSkyblockProfileResponse(data.profile, options),
 	'skyblock/profiles': (data, options) => cleanSkyblockProfilesResponse(data.profiles),
 	'skyblock/auctions_ended': (data, options) => cleanEndedAuctions(data),
-	'skyblock/auction': (data, options) => cleanAuctions(data),
+	'skyblock/auction': (data, options) => cleanAuctions(data, options.page ?? 0),
 	'resources/skyblock/election': (data, options) => cleanElectionResponse(data),
 	'resources/skyblock/items': (data, options) => cleanItemListResponse(data),
 } as const
@@ -484,15 +486,14 @@ async function fetchAuctionItemsUncached() {
 	return idsToData
 }
 
-export async function fetchPlayerAuctions(user: string): Promise<Auction[] | null> {
+export async function fetchPlayerAuctions(user: string, page: number): Promise<Auction[] | null> {
 	const playerUuid = await cached.uuidFromUser(user)
 	if (!playerUuid) return null
 
 	const playerAuctions = await sendCleanApiRequest(
 		'skyblock/auction',
-		{
-			player: playerUuid
-		}
+		{ player: playerUuid },
+		{ page }
 	)
-	return playerAuctions
+	return playerAuctions.auctions
 }
