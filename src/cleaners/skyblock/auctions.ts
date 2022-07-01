@@ -25,7 +25,7 @@ export async function cleanAuctions(data: typedHypixelApi.SkyBlockRequestAuction
     const auctions = await Promise.all(auctionPromises)
 
     // sort by newer first
-    auctions.sort((a, b) => a.creationTimestamp - b.creationTimestamp)
+    auctions.sort((a, b) => b.creationTimestamp - a.creationTimestamp)
 
     return auctions
 
