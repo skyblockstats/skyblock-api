@@ -1,5 +1,5 @@
 import { createSession, fetchAccountFromDiscord, fetchAllLeaderboardsCategorized, fetchLeaderboard, fetchMemberLeaderboardSpots, fetchSession, finishedCachingRawLeaderboards, leaderboardUpdateMemberQueue, leaderboardUpdateProfileQueue, updateAccount, deleteSession, fetchPaginatedItemsAuctions, fetchItemsAuctions } from './database.js'
-import { fetchAuctionItems, fetchAuctionUncached, fetchElection, fetchItemList, fetchMemberProfile, fetchUser } from './hypixel.js'
+import { fetchAuctionItems, fetchAuctionUncached, fetchElection, fetchItemList, fetchMemberProfile, fetchPlayerAuctions, fetchUser } from './hypixel.js'
 import rateLimit from 'express-rate-limit'
 import * as constants from './constants.js'
 import * as discord from './discord.js'
@@ -205,6 +205,20 @@ app.get('/auction/:uuid', async (req, res) => {
 		res.json({ ok: false })
 	}
 })
+
+
+
+app.get('/playerauctions/:user', async (req, res) => {
+	try {
+		res.json(
+			await fetchPlayerAuctions(req.params.user)
+		)
+	} catch (err) {
+		console.error(err)
+		res.json({ ok: false })
+	}
+})
+
 
 app.post('/accounts/createsession', async (req, res) => {
 	try {
