@@ -29,6 +29,8 @@ export async function cleanAuctions(data: typedHypixelApi.SkyBlockRequestAuction
     // sort by newer first
     rawAuctions.sort((a, b) => b.start - a.start)
 
+    const totalPages = Math.ceil(rawAuctions.length / PAGE_SIZE)
+
     rawAuctions = rawAuctions.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE)
 
     for (const auction of rawAuctions) {
@@ -37,7 +39,7 @@ export async function cleanAuctions(data: typedHypixelApi.SkyBlockRequestAuction
 
     const auctions = await Promise.all(auctionPromises)
 
-    return { auctions, pages: Math.ceil(rawAuctions.length / PAGE_SIZE) }
+    return { auctions, pages: totalPages }
 }
 
 async function cleanAuction(auction: typedHypixelApi.SkyBlockRequestAuctionResponse['auctions'][number]): Promise<Auction> {
