@@ -52,7 +52,7 @@ async function cleanAuction(auction: typedHypixelApi.SkyBlockRequestAuctionRespo
         creationTimestamp: auction.start,
         buyer,
         boughtTimestamp: auction.end,
-        coins: auction.highest_bid_amount,
+        coins: auction.highest_bid_amount || auction.starting_bid,
         bin: auction.bin ?? false,
         item: (await cleanInventory(typeof auction.item_bytes === 'string' ? auction.item_bytes : auction.item_bytes.data))[0]
     }
