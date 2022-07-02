@@ -33,7 +33,7 @@
     "express": "^4.18.1",
     "express-rate-limit": "^6.4.0",
     "lru-cache": "^7.10.1",
-    "mongodb": "^4.4.0",
+    "mongodb": "^4.7.0",
     "node-cache": "^5.1.2",
     "prismarine-nbt": "^2.2.1",
     "prom-client": "^14.0.1",

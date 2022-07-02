@@ -198,7 +198,9 @@ async function connect(): Promise<void> {
 		return console.warn('Warning: db_uri was not found in .env. Features that utilize the database such as leaderboards won\'t work.')
 	if (!process.env.db_name)
 		return console.warn('Warning: db_name was not found in .env. Features that utilize the database such as leaderboards won\'t work.')
-	client = await MongoClient.connect(process.env.db_uri)
+	client = await MongoClient.connect(process.env.db_uri, {
+		maxConnecting: 100
+	})
 	database = client.db(process.env.db_name)
 	memberLeaderboardsCollection = database.collection('member-leaderboards')
 	profileLeaderboardsCollection = database.collection('profile-leaderboards')
