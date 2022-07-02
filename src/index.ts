@@ -176,7 +176,7 @@ app.get('/auctionprices', async (req, res) => {
 	try {
 		res
 			.json(
-				itemIds ? await fetchItemsAuctions(itemIds) : await fetchPaginatedItemsAuctions(0, 100)
+				itemIds ? await fetchItemsAuctions(itemIds, false) : await fetchPaginatedItemsAuctions(0, 100)
 			)
 	} catch (err) {
 		console.error(err)

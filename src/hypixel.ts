@@ -380,7 +380,7 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 		}
 		let updatedDatabaseAuctionItems: Map<string, ItemAuctionsSchema> = new Map()
 
-		const itemsAuctions = await fetchItemsAuctions(Array.from(newAuctionItemIds))
+		const itemsAuctions = await fetchItemsAuctions(Array.from(newAuctionItemIds), true)
 		for (const itemAuctions of itemsAuctions) {
 			updatedDatabaseAuctionItems.set(itemAuctions.id, itemAuctions)
 		}

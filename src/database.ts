@@ -144,11 +144,30 @@ export interface SimpleAuctionSchema {
 	/** The lore of the item. */
 	lore: string
 }
+/** Same as SimpleAuctionSchema except without lore. */
+export interface SimplerAuctionSchema {
+	coins: number
+	/**
+	 * The timestamp as **seconds** since epoch. It's in seconds instead of ms
+	 * since we don't need to be super exact and so it's shorter.
+	 */
+	ts: number
+	/** Whether the auction was successfully bought or simply expired. */
+	s: boolean
+	bin: boolean
+}
+
 export interface ItemAuctionsSchema {
 	/** The id of the item */
 	id: string
 	sbId: string
 	auctions: SimpleAuctionSchema[]
+}
+export interface SimplerItemAuctionsSchema {
+	/** The id of the item */
+	id: string
+	sbId: string
+	auctions: SimplerAuctionSchema[]
 }
 export interface ItemAuctionsSchemaBson {
 	/** The id of the item */
@@ -1129,6 +1148,17 @@ function toItemAuctionsSchema(i: ItemAuctionsSchemaBson): ItemAuctionsSchema {
 		}),
 	}
 }
+function toSimplerItemAuctionsSchema(i: ItemAuctionsSchema): SimplerItemAuctionsSchema {
+	return {
+		id: i.id,
+		sbId: i.sbId,
+		auctions: i.auctions.map((a: any) => {
+			if ('lore' in a)
+				delete a.lore
+			return a
+		}),
+	}
+}
 
 function toItemAuctionsSchemaBson(i: ItemAuctionsSchema): ItemAuctionsSchemaBson {
 	return {
@@ -1148,18 +1178,21 @@ function toItemAuctionsSchemaBson(i: ItemAuctionsSchema): ItemAuctionsSchemaBson
 }
 
 /** Fetch all the Item Auctions for the item ids in the given array. */
-export async function fetchItemsAuctions(itemIds: string[]): Promise<ItemAuctionsSchema[]> {
+export async function fetchItemsAuctions<Lore extends boolean = false>(itemIds: string[], lore: Lore): Promise<(Lore extends true ? ItemAuctionsSchema : SimplerItemAuctionsSchema)[]> {
 	const auctions = await itemAuctionsCollection?.find({
 		_id: { $in: itemIds }
 	}).sort('oldestDate', -1).toArray()
-	return auctions.map(toItemAuctionsSchema)
+	let a = auctions.map(toItemAuctionsSchema)
+	if (!lore)
+		return a.map(toSimplerItemAuctionsSchema) as any
+	return a
 }
 
 
 /** Fetch all the Item Auctions for the item ids in the given array. */
-export async function fetchPaginatedItemsAuctions(skip: number, limit: number): Promise<ItemAuctionsSchema[]> {
+export async function fetchPaginatedItemsAuctions(skip: number, limit: number): Promise<SimplerItemAuctionsSchema[]> {
 	const auctions = await itemAuctionsCollection?.find({}).sort('oldestDate', -1).skip(skip).limit(limit).toArray()
-	return auctions.map(toItemAuctionsSchema)
+	return auctions.map(toItemAuctionsSchema).map(toSimplerItemAuctionsSchema)
 }
 
 export async function updateItemAuction(auction: ItemAuctionsSchema) {
