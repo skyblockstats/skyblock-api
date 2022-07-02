@@ -130,6 +130,8 @@ export interface SimpleAuctionSchemaBson {
 	s: boolean
 	/** If this is missing, it's false. */
 	bin?: true
+	/** The lore of the item. Lines are separated by newline characters. */
+	lore: string
 }
 export interface SimpleAuctionSchema {
 	/** The UUID of the auction so we can look it up later. */
@@ -143,6 +145,8 @@ export interface SimpleAuctionSchema {
 	/** Whether the auction was successfully bought or simply expired. */
 	s: boolean
 	bin: boolean
+	/** The lore of the item. */
+	lore: string
 }
 export interface ItemAuctionsSchema {
 	/** The id of the item */

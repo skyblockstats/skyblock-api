@@ -404,6 +404,7 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 				id: auction.id,
 				ts: Math.floor(auction.timestamp / 1000),
 				bin: auction.bin,
+				lore: auction.item.display.lore.join('\n')
 			}
 			// make sure the auction isn't already in there
 			if (!auctions.find((a) => a.id === simpleAuction.id)) {
