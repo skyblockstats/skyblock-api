@@ -401,13 +401,14 @@ export async function periodicallyFetchRecentlyEndedAuctions() {
 			const simpleAuction: SimpleAuctionSchema = {
 				s: true,
 				coins: Math.round(auction.coins / auction.item.count),
-				id: auction.id,
 				ts: Math.floor(auction.timestamp / 1000),
 				bin: auction.bin,
 				lore: auction.item.display.lore.join('\n')
 			}
 			// make sure the auction isn't already in there
-			if (!auctions.find((a) => a.id === simpleAuction.id)) {
+			// we use the timestamp because it's sorta unique enough
+			// (we don't store auction ids in the database because they're too big)
+			if (!auctions.find((a) => a.ts === simpleAuction.ts)) {
 				auctions.push(simpleAuction)
 				// keep only the last 100 items
 				if (auctions.length > 100)

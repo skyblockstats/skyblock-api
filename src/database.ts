@@ -118,8 +118,6 @@ export interface AccountSchema {
 }
 
 export interface SimpleAuctionSchemaBson {
-	/** The UUID of the auction so we can look it up later. */
-	id: Binary
 	coins: number
 	/**
 	 * The timestamp as **seconds** since epoch. It's in seconds instead of ms
@@ -134,8 +132,6 @@ export interface SimpleAuctionSchemaBson {
 	lore: string
 }
 export interface SimpleAuctionSchema {
-	/** The UUID of the auction so we can look it up later. */
-	id: string
 	coins: number
 	/**
 	 * The timestamp as **seconds** since epoch. It's in seconds instead of ms
@@ -1128,7 +1124,6 @@ function toItemAuctionsSchema(i: ItemAuctionsSchemaBson): ItemAuctionsSchema {
 		auctions: i.auctions.map(a => {
 			return {
 				...a,
-				id: a.id.toString('hex'),
 				bin: a.bin ?? false
 			}
 		}),
@@ -1142,7 +1137,6 @@ function toItemAuctionsSchemaBson(i: ItemAuctionsSchema): ItemAuctionsSchemaBson
 		auctions: i.auctions.map(a => {
 			return {
 				...a,
-				id: createUuid(a.id),
 				bin: a.bin ? true : undefined
 			}
 		}),
