@@ -195,8 +195,8 @@ interface StringNumber {
 	[name: string]: number
 }
 
-function createUuid(uuid: string): Binary {
-	return new Binary(Buffer.from((uuid).replace(/-/g, ''), 'hex'), Binary.SUBTYPE_UUID)
+export function createUuid(uuid: string): Binary {
+	return new Binary(Buffer.from(uuid.replace(/-/g, ''), 'hex'), Binary.SUBTYPE_UUID)
 }
 
 function getMemberCollectionAttributes(member: CleanMember): StringNumber {

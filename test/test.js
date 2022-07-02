@@ -5,13 +5,13 @@ const { levelForSkillXp } = await import('../build/cleaners/skyblock/skills.js')
 const hypixelCached = await import('../build/hypixelCached.js')
 const hypixelApi = await import('../build/hypixelApi.js')
 const constants = await import('../build/constants.js')
+const database = await import('../build/database.js')
 const hypixel = await import('../build/hypixel.js')
 const mojang = await import('../build/mojang.js')
 const util = await import('../build/util.js')
 const assert = await import('assert')
 const path = await import('path')
 const fs = await import('fs')
-
 
 const cachedJsonData = {}
 
@@ -177,6 +177,10 @@ describe('Individual utility things', () => {
 		it('94449 xp is level 24 (max 25)', () => assert.strictEqual(levelForSkillXp(94449, 25), 24))
 		it('94450 xp is level 25 (max 25)', () => assert.strictEqual(levelForSkillXp(94450, 25), 25))
 		it('99999 xp is level 25 (max 25)', () => assert.strictEqual(levelForSkillXp(99999, 25), 25))
+	})
+
+	describe('#createUuid', () => {
+		it('createUuid works', () => assert.strictEqual(database.createUuid('6536bfed869548fd83a1ecd24cf2a0fd').toString('hex'), '6536bfed869548fd83a1ecd24cf2a0fd'))
 	})
 })
 
