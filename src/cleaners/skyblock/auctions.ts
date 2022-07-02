@@ -43,7 +43,7 @@ export async function cleanAuctions(data: typedHypixelApi.SkyBlockRequestAuction
 }
 
 async function cleanAuction(auction: typedHypixelApi.SkyBlockRequestAuctionResponse['auctions'][number]): Promise<Auction> {
-    const buyerUuid = auction.end ? auction.bids[auction.bids.length - 1].bidder : null
+    const buyerUuid = auction.end ? (auction.bids[auction.bids.length - 1]?.bidder ?? null) : null
     const buyer = buyerUuid ? await cached.fetchPlayer(buyerUuid, false) : null
     return {
         id: auction.uuid,
