@@ -128,7 +128,8 @@ export interface SimpleAuctionSchemaBson {
 	ts: number
 	/** Whether the auction was successfully bought or simply expired. */
 	s: boolean
-	bin: boolean
+	/** If this is missing, it's false. */
+	bin?: true
 }
 export interface SimpleAuctionSchema {
 	/** The UUID of the auction so we can look it up later. */
@@ -1124,6 +1125,7 @@ function toItemAuctionsSchema(i: ItemAuctionsSchemaBson): ItemAuctionsSchema {
 			return {
 				...a,
 				id: a.id.toString('hex'),
+				bin: a.bin ?? false
 			}
 		}),
 	}
@@ -1136,7 +1138,8 @@ function toItemAuctionsSchemaBson(i: ItemAuctionsSchema): ItemAuctionsSchemaBson
 		auctions: i.auctions.map(a => {
 			return {
 				...a,
-				id: createUuid(a.id)
+				id: createUuid(a.id),
+				bin: a.bin ? true : undefined
 			}
 		}),
 		// we sort by oldestDate to get the volume sold, but we don't want brand new items with like no data having a high frequency
