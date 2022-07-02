@@ -331,10 +331,12 @@ export async function fetchItemList() {
 }
 
 export async function fetchAuctionUncached(uuid: string) {
-	return await sendCleanApiRequest(
+	const auctions = await sendCleanApiRequest(
 		'skyblock/auction',
 		{ uuid }
 	)
+	if (!auctions || auctions.auctions.length === 0) return null
+	return auctions.auctions[0]
 }
 
 /**
