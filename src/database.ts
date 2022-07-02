@@ -1135,10 +1135,12 @@ function toItemAuctionsSchemaBson(i: ItemAuctionsSchema): ItemAuctionsSchemaBson
 		_id: i.id,
 		sbId: i.sbId,
 		auctions: i.auctions.map(a => {
-			return {
+			const newA: SimpleAuctionSchemaBson = {
 				...a,
 				bin: a.bin ? true : undefined
 			}
+			if (newA.bin === undefined) delete newA.bin
+			return newA
 		}),
 		// we sort by oldestDate to get the volume sold, but we don't want brand new items with like no data having a high frequency
 		oldestDate: i.auctions.length > 10 ? i.auctions[0]?.ts ?? 0 : 0
