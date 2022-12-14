@@ -20,7 +20,7 @@ const limiter = rateLimit({
 	max: 200,
 	skip: (req: express.Request) => {
 		console.log(req.headers)
-		return req.headers['x-key'] === process.env.key
+		return req.headers.key === process.env.key
 	},
 	keyGenerator: (req: express.Request) => {
 		return (req.headers['cf-connecting-ip'] ?? req.ip).toString()
