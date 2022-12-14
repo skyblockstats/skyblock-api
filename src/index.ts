@@ -19,6 +19,7 @@ const limiter = rateLimit({
 	windowMs: 60 * 1000 * 5,
 	max: 200,
 	skip: (req: express.Request) => {
+		console.log(req.headers)
 		return req.headers.key === process.env.key
 	},
 	keyGenerator: (req: express.Request) => {
