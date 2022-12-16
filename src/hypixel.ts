@@ -306,7 +306,7 @@ export async function fetchMemberProfilesUncached(playerUuid: string): Promise<C
 export async function fetchElection(): Promise<ElectionData> {
 	return await withCache(
 		'election',
-		(r) => new Date((r.lastUpdated + 60 * 60) * 1000),
+		(r) => new Date(r.lastUpdated + 60 * 60 * 1000),
 		async () => {
 			return await sendCleanApiRequest(
 				'resources/skyblock/election',
@@ -320,7 +320,7 @@ export async function fetchElection(): Promise<ElectionData> {
 export async function fetchItemList() {
 	return await withCache(
 		'itemList',
-		(r) => new Date((r.lastUpdated + 60 * 60) * 1000),
+		(r) => new Date(r.lastUpdated + 60 * 60 * 1000),
 		async () => {
 			return await sendCleanApiRequest(
 				'resources/skyblock/items',
