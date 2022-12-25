@@ -5,6 +5,7 @@ import {
     cleanSkyblockProfileResponse
 } from './profile.js'
 import typedHypixelApi from 'typed-hypixel-api'
+import { ApiOptions } from '../../hypixel.js'
 
 export function cleanPlayerSkyblockProfiles(rawProfiles: HypixelPlayerStatsSkyBlockProfiles | undefined): CleanBasicProfile[] {
     if (!rawProfiles) return []
@@ -20,12 +21,15 @@ export function cleanPlayerSkyblockProfiles(rawProfiles: HypixelPlayerStatsSkyBl
 }
 
 /** Convert an array of raw profiles into clean profiles */
-export async function cleanSkyblockProfilesResponse(data: typedHypixelApi.SkyBlockProfilesResponse['profiles']): Promise<CleanFullProfile[] | null> {
+export async function cleanSkyblockProfilesResponse(
+    data: typedHypixelApi.SkyBlockProfilesResponse['profiles'],
+    options: ApiOptions
+): Promise<CleanFullProfile[] | null> {
     if (!data) return null
 
     const promises: Promise<CleanFullProfile | null>[] = []
     for (const profile of data) {
-        promises.push(cleanSkyblockProfileResponse(profile))
+        promises.push(cleanSkyblockProfileResponse(profile, options))
     }
     const cleanedProfiles: CleanFullProfile[] = (await Promise.all(promises)).filter((p): p is CleanFullProfile => p !== null)
     return cleanedProfiles

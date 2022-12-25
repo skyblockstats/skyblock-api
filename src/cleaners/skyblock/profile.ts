@@ -78,12 +78,22 @@ export async function cleanSkyblockProfileResponse<O extends ApiOptions>(
 
     const cleanedMembers: CleanMember[] = (await Promise.all(promises)).filter(m => m) as CleanMember[]
 
+    // sometimes it's ms since epoch and sometimes it's a string, so we
+    // just throw it into new Date() and js will figure it out for us
+    const lastSave = data.last_save ? (new Date(data.last_save).getTime()) : undefined
+    // also set the lastSave in the member if options.mainMemberUuid matches
+    if (options?.mainMemberUuid) {
+        const mainMember = cleanedMembers.find(m => m.uuid === options.mainMemberUuid)
+        if (mainMember) mainMember.lastSave = lastSave ?? null
+    }
+
     if (options?.basic) {
         const cleanProfile: CleanProfile = {
             uuid: profileId,
             name: 'cute_name' in data ? data.cute_name : undefined,
             members: cleanedMembers,
-            mode: cleanGameMode(data)
+            mode: cleanGameMode(data),
+            lastSave
         }
         // we have to do this because of the basic checking typing
         return cleanProfile as any
@@ -111,7 +121,8 @@ export async function cleanSkyblockProfileResponse<O extends ApiOptions>(
         minions: minions,
         minionCount: uniqueMinions,
         maxUniqueMinions: maxUniqueMinions ?? 0,
-        mode: cleanGameMode(data)
+        mode: cleanGameMode(data),
+        lastSave
     }
     return cleanFullProfile
 }
@@ -122,5 +133,8 @@ export interface CleanBasicProfile {
 
     // the name depends on the user, so its sometimes not included
     name?: string
+
+    /** Timestamp for when the profile was last saved for the user. */
+    lastSave?: number
 }
 

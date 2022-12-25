@@ -72,7 +72,7 @@ export async function sendCleanApiRequest<P extends keyof typeof cleanResponseFu
 const cleanResponseFunctions = {
 	'player': (data, options) => cleanPlayerResponse(data.player),
 	'skyblock/profile': (data: typedHypixelApi.SkyBlockProfileResponse, options) => cleanSkyblockProfileResponse(data.profile, options),
-	'skyblock/profiles': (data, options) => cleanSkyblockProfilesResponse(data.profiles),
+	'skyblock/profiles': (data, options) => cleanSkyblockProfilesResponse(data.profiles, options),
 	'skyblock/auctions_ended': (data, options) => cleanEndedAuctions(data),
 	'skyblock/auction': (data, options) => cleanAuctions(data, options.page ?? 0),
 	'resources/skyblock/election': (data, options) => cleanElectionResponse(data),
