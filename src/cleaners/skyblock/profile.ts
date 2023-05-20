@@ -42,7 +42,7 @@ export async function cleanSkyblockProfileResponseLighter(data: typedHypixelApi.
     const cleanedMembers: CleanBasicMember[] = (await Promise.all(promises)).filter(m => m) as CleanBasicMember[]
 
     return {
-        uuid: data.profile_id,
+        uuid: data.profile_id.replace(/-/g, ''),
         name: 'cute_name' in data ? data.cute_name : undefined,
         members: cleanedMembers,
         mode: cleanGameMode(data)
@@ -114,7 +114,7 @@ export async function cleanSkyblockProfileResponse<O extends ApiOptions>(
 
     // return more detailed info
     const cleanFullProfile: CleanFullProfile = {
-        uuid: data.profile_id,
+        uuid: data.profile_id.replace(/-/g, ''),
         name: 'cute_name' in data ? data.cute_name : undefined,
         members: cleanedMembers,
         bank: cleanBank(data),
