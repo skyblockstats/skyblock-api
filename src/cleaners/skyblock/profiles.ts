@@ -13,7 +13,7 @@ export function cleanPlayerSkyblockProfiles(rawProfiles: HypixelPlayerStatsSkyBl
     let profiles: CleanBasicProfile[] = []
     for (const profile of Object.values(rawProfiles ?? {})) {
         profiles.push({
-            uuid: profile.profile_id,
+            uuid: profile.profile_id.replace(/-/g, ''),
             name: profile.cute_name
         })
     }

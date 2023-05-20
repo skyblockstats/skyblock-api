@@ -60,7 +60,7 @@ export async function cleanSkyblockProfileResponse<O extends ApiOptions>(
     const promises: Promise<CleanMember | null>[] = []
     if (!data) return null
 
-    const profileId = data.profile_id
+    const profileId = data.profile_id.replace(/-/g, '')
 
     for (const memberUUID in data.members) {
         const memberRaw = data.members[memberUUID]
