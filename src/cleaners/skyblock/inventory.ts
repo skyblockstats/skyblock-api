@@ -107,7 +107,13 @@ export const INVENTORIES = {
 	personal_vault: 'personal_vault_contents'
 }
 
-export type Inventories = { [name in keyof typeof INVENTORIES]: Item[] }
+export type Backpack = {
+	icon: Item | null,
+	items: Item[],
+	slot: string,
+};
+
+export type Inventories = { backpacks: Backpack[] } & { [name in keyof typeof INVENTORIES]: Item[] }
 
 export async function cleanInventories(data: typedHypixelApi.SkyBlockProfileMember): Promise<Inventories> {
 	const cleanInventories: any = {}
@@ -125,5 +131,22 @@ export async function cleanInventories(data: typedHypixelApi.SkyBlockProfileMemb
 			cleanInventories[cleanInventoryName] = inventoryContents
 		}
 	}
+	const backpacks = data.backpack_contents
+	const backpackIcons = data.backpack_icons ?? {};
+	const cleanBackpacks: Backpack[] = [];
+	if (backpacks) {
+		for (const backpackId in backpacks) {
+			const backpack = backpacks[backpackId]
+			const contents = await cleanInventory(backpack.data)
+			const icon = backpackIcons[backpackId]
+
+			cleanBackpacks.push({
+				items: contents,
+				slot: backpackId,
+				icon: (icon && (await cleanInventory(icon.data))[0]) ?? null,
+			})
+		}
+	}
+	cleanInventories['backpacks'] = cleanBackpacks;
 	return cleanInventories
 }
