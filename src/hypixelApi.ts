@@ -184,7 +184,7 @@ export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(
 
 		if (attemptCount > 3) {
 			console.log(`API request to ${path} with options ${JSON.stringify(optionsWithoutKey)} was throttled too many times, giving up`)
-			return null as any
+			throw new Error('Throttled')
 		}
 
 		// if it's throttled, wait 10 seconds and try again
