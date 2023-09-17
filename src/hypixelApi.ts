@@ -99,16 +99,33 @@ export interface HypixelPlayerSocialMedia {
 	}
 }
 
-
+/**
+ * A list of Dates for requests that were sent in the past 60 seconds.
+ * This is used for calculating the approximate request count.
+ */
+let requestTimestamps: Date[] = []
+let lastRateLog = Date.now()
 
 /** Send an HTTP request to the Hypixel API */
 export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(
 	path: P,
-	options: typedHypixelApi.Requests[P]['options']
+	options: typedHypixelApi.Requests[P]['options'],
+	attemptCount = 0
 ): Promise<typedHypixelApi.Requests[P]['response']['data']> => {
 	const optionsWithoutKey: any = { ...options }
 	if ('key' in optionsWithoutKey) delete optionsWithoutKey.key
 	console.log(`Sending API request to ${path} with options ${JSON.stringify(optionsWithoutKey)}`)
+
+	// rate calculation
+	if (attemptCount === 0) {
+		requestTimestamps.push(new Date())
+		requestTimestamps = requestTimestamps.filter(timestamp => timestamp.getTime() > Date.now() - 60000)
+		// log every minute
+		if (Date.now() > lastRateLog + 60000) {
+			lastRateLog = Date.now()
+			console.info(`${requestTimestamps.length} Hypixel API requests in past minute`)
+		}
+	}
 
 	// Send a raw http request to api.hypixel.net, and return the parsed json
 	let response: typedHypixelApi.Requests[P]['response']
@@ -120,7 +137,7 @@ export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(
 	} catch (e) {
 		console.log(`Error sending API request to ${path} with options ${JSON.stringify(optionsWithoutKey)}, retrying in a scond`)
 		await sleep(1000)
-		return await sendApiRequest(path, options)
+		return await sendApiRequest(path, options, attemptCount + 1)
 	}
 
 	if (!response.data.success) {
@@ -128,7 +145,7 @@ export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(
 		if (response.data.cause === 'This endpoint is currently disabled') {
 			console.log(`API request to ${path} with options ${JSON.stringify(optionsWithoutKey)} failed because the endpoint is disabled, retrying in 30 seconds`)
 			await sleep(30000)
-			return await sendApiRequest(path, options)
+			return await sendApiRequest(path, options, attemptCount + 1)
 		}
 
 		// if the cause is "Invalid API key", remove the key from the list of keys and try again
@@ -140,7 +157,7 @@ export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(
 			return await sendApiRequest(path, {
 				...options,
 				key: chooseApiKey()
-			})
+			}, attemptCount + 1)
 		}
 
 		console.log(`API request to ${path} with options ${JSON.stringify(optionsWithoutKey)} was not successful: ${JSON.stringify(response.data)}`)
@@ -161,12 +178,13 @@ export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(
 	}
 
 	if ('key' in options && !response.data.success && 'throttle' in response.data && response.data.throttle) {
-		if (apiKeyUsage[options.key])
+		if (apiKeyUsage[options.key]) {
 			apiKeyUsage[options.key].remaining = 0
+		}
 		// if it's throttled, wait 10 seconds and try again
 		console.log(`API request to ${path} with options ${JSON.stringify(optionsWithoutKey)} was throttled, retrying in 10 seconds`)
 		await sleep(10000)
-		return await sendApiRequest(path, options)
+		return await sendApiRequest(path, options, attemptCount + 1)
 	}
 	return response.data
 }
