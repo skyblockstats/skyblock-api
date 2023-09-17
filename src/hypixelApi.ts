@@ -140,7 +140,7 @@ export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(path
 			})
 		}
 
-		console.log(`API request to ${path} with options ${JSON.stringify(optionsWithoutKey)} was not successful: ${response.data}`)
+		console.log(`API request to ${path} with options ${JSON.stringify(optionsWithoutKey)} was not successful: ${JSON.stringify(response.data)}`)
 	}
 
 	if ('key' in options && response.headers['ratelimit-limit']) {
