@@ -288,8 +288,12 @@ app.post('/accounts/update', async (req, res) => {
 
 
 app.get('/metrics', async (req, res) => {
-	if (!req.headers.host?.startsWith('0.0.0.0:'))
+	const isLocal = req.headers.host?.startsWith('0.0.0.0:')
+	const keyMatches = req.headers.key === process.env.key
+
+	if (!isLocal && !keyMatches)
 		return res.status(403).send('Forbidden')
+
 	try {
 		res.set('Content-Type', register.contentType)
 		res.end(await register.metrics())

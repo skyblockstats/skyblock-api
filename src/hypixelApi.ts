@@ -102,7 +102,10 @@ export interface HypixelPlayerSocialMedia {
 
 
 /** Send an HTTP request to the Hypixel API */
-export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(path: P, options: typedHypixelApi.Requests[P]['options']): Promise<typedHypixelApi.Requests[P]['response']['data']> => {
+export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(
+	path: P,
+	options: typedHypixelApi.Requests[P]['options']
+): Promise<typedHypixelApi.Requests[P]['response']['data']> => {
 	const optionsWithoutKey: any = { ...options }
 	if ('key' in optionsWithoutKey) delete optionsWithoutKey.key
 	console.log(`Sending API request to ${path} with options ${JSON.stringify(optionsWithoutKey)}`)
