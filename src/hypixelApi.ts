@@ -103,6 +103,10 @@ export interface HypixelPlayerSocialMedia {
 
 /** Send an HTTP request to the Hypixel API */
 export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(path: P, options: typedHypixelApi.Requests[P]['options']): Promise<typedHypixelApi.Requests[P]['response']['data']> => {
+	const optionsWithoutKey: any = { ...options }
+	if ('key' in optionsWithoutKey) delete optionsWithoutKey.key
+	console.log(`Sending API request to ${path} with options ${JSON.stringify(optionsWithoutKey)}`)
+
 	// Send a raw http request to api.hypixel.net, and return the parsed json
 	let response: typedHypixelApi.Requests[P]['response']
 	try {
@@ -111,6 +115,7 @@ export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(path
 			options
 		)
 	} catch (e) {
+		console.log(`Error sending API request to ${path} with options ${JSON.stringify(optionsWithoutKey)}, retrying in a scond`)
 		await sleep(1000)
 		return await sendApiRequest(path, options)
 	}
@@ -118,6 +123,7 @@ export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(path
 	if (!response.data.success) {
 		// bruh
 		if (response.data.cause === 'This endpoint is currently disabled') {
+			console.log(`API request to ${path} with options ${JSON.stringify(optionsWithoutKey)} failed because the endpoint is disabled, retrying in 30 seconds`)
 			await sleep(30000)
 			return await sendApiRequest(path, options)
 		}
@@ -133,6 +139,8 @@ export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(path
 				key: chooseApiKey()
 			})
 		}
+
+		console.log(`API request to ${path} with options ${JSON.stringify(optionsWithoutKey)} was not successful: ${response.data}`)
 	}
 
 	if ('key' in options && response.headers['ratelimit-limit']) {
@@ -153,6 +161,7 @@ export let sendApiRequest = async<P extends keyof typedHypixelApi.Requests>(path
 		if (apiKeyUsage[options.key])
 			apiKeyUsage[options.key].remaining = 0
 		// if it's throttled, wait 10 seconds and try again
+		console.log(`API request to ${path} with options ${JSON.stringify(optionsWithoutKey)} was throttled, retrying in 10 seconds`)
 		await sleep(10000)
 		return await sendApiRequest(path, options)
 	}
