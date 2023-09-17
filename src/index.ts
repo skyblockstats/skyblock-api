@@ -29,6 +29,8 @@ const limiter = rateLimit({
 app.use(limiter)
 app.use(express.json())
 app.use((req, res, next) => {
+	const ip = req.headers['cf-connecting-ip'] ?? req.ip
+	console.log(`${ip} ${req.method} ${req.path}`)
 	res.setHeader('Access-Control-Allow-Origin', '*')
 	res.setHeader('Access-Control-Allow-Headers', '*')
 	next()
