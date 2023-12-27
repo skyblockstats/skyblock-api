@@ -5,7 +5,7 @@ import { cleanCoopInvitation, CoopInvitation } from './coopInvitation.js'
 import { cleanCollections, Collection } from './collections.js'
 import { cleanInventories, Inventories } from './inventory.js'
 import { cleanFairySouls, FairySouls } from './fairysouls.js'
-import { cleanObjectives, Objective } from './objectives.js'
+import { cleanQuests, Quest } from './quests.js'
 import { CleanFullProfileBasicMembers } from './profile.js'
 import { cleanProfileStats, StatItem } from './stats.js'
 import { CleanMinion, cleanMinions } from './minions.js'
@@ -39,7 +39,7 @@ interface ExtraCleanMemberFields {
 	minions: CleanMinion[]
 	fairySouls: FairySouls
 	inventories?: Inventories
-	objectives: Objective[]
+	quests: Quest[]
 	skills: Skills
 	zones: Zone[]
 	collections: Collection[]
@@ -110,8 +110,7 @@ export async function cleanSkyBlockProfileMemberResponse(member: typedHypixelApi
 		minions: await minionsPromise,
 		fairySouls: fairySouls,
 		inventories: inventoriesPromise ? await inventoriesPromise : undefined,
-		objectives: cleanObjectives(member),
-
+		quests: cleanQuests(member),
 		skills: await skillsPromise,
 
 		zones: await zonesPromise,

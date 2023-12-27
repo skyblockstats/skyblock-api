@@ -3,7 +3,6 @@
  */
 import { shuffle, sleep } from './util.js'
 import typedHypixelApi from 'typed-hypixel-api'
-import { Agent } from 'https'
 
 if (!process.env.hypixel_keys)
 	// if there's no hypixel keys in env, run dotenv
